@@ -1,3 +1,10 @@
+# Virtual Environment
+venv
+flask_packages
+
+# Vim
+*.sw[po]
+
 *.py[cod]
 
 # C extensions
