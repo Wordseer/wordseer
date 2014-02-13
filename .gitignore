@@ -5,7 +5,12 @@ flask_packages
 # Vim
 *.sw[po]
 
+# Python
 *.py[cod]
+
+# Database
+migrations
+*.db
 
 # C extensions
 *.so
