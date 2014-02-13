@@ -1,6 +1,5 @@
 # Virtual Environment
 venv
-flask_packages
 
 # Vim
 *.sw[po]
