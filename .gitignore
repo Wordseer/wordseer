@@ -8,7 +8,7 @@ venv
 *.py[cod]
 
 # Database
-migrations
+db
 *.db
 
 # C extensions
