@@ -7,17 +7,28 @@ from sqlalchemy.orm import sessionmaker
 # create database connection
 engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
 Session = sessionmaker(bind=engine)
-session = Session()# defined models
-__all__ = ["unit", "document"]
+session = Session()
+
+# defined models
+__all__ = [
+    "unit",
+    "document",
+    "word",
+    "sentence",
+    "metadata",
+    "association_tables",
+]
 
 # custom base model
 class Base(object):
 
     @declared_attr
     def __tablename__(cls):
-        return cls.__name__.lower()
 
-    __table_args__ = {'mysql_engine': 'InnoDB'}
+        # table name should be plural of model name
+        import inflect
+        p = inflect.engine()
+        return p.plural(cls.__name__.lower())
 
     id =  Column(Integer, primary_key=True)
 
@@ -25,5 +36,10 @@ class Base(object):
     def save(self):
         session.add(self)
         session.commit()
+
+    # Look up with id
+    @staticmethod
+    def find(id):
+        session.query(
 
 Base = declarative_base(cls=Base)
