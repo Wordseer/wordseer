@@ -26,9 +26,7 @@ class Base(object):
     def __tablename__(cls):
 
         # table name should be plural of model name
-        import inflect
-        p = inflect.engine()
-        return p.plural(cls.__name__.lower())
+        return cls.__name__.lower()
 
     id =  Column(Integer, primary_key=True)
 
@@ -40,6 +38,6 @@ class Base(object):
     # Look up with id
     @staticmethod
     def find(id):
-        session.query(
+        return session.query(cls).filter(cls.id==id)
 
 Base = declarative_base(cls=Base)

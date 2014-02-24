@@ -9,4 +9,4 @@ class Metadata(Base):
     property_value = Column(String, index = True)
 
     # Relationships
-    unit = relationship("Unit", backref=backref("unit", uselist=False))
+    unit = relationship("Unit", backref=backref("metadata", uselist=False))
