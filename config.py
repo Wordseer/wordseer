@@ -6,6 +6,4 @@ part_of_speech_tagging = True;
 word_to_word_similarity = True;
 sequence_indexing = True;
 
-db = {
-    "server": "localhost:3306",
-    "name": "",}
+db_url = 'sqlite:///wordseer.db'
