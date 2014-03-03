@@ -1,11 +1,9 @@
 """
 Configuration file for the pipeline.
 """
-from corenlp import StanfordCoreNLP
 
 # NLP locations
 CORE_NLP_DIR = "stanford-corenlp/"
-PARSER = StanfordCoreNLP(CORE_NLP_DIR)
 
 # Processing options
 grammatical_processing = True; 
