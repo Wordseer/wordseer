@@ -1,4 +1,10 @@
-CORE_NLP_DIR = "stanford-corenlp-dir/"
+"""
+Configuration file for the pipeline.
+"""
+from corenlp import StanfordCoreNLP
+
+
+CORE_NLP_DIR = "stanford-corenlp/"
 PARSER = StanfordCoreNLP(CORE_NLP_DIR)
 
 grammatical_processing = True; 

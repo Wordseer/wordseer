@@ -1,11 +1,10 @@
 import os
-
 from nltk.tokenize import sent_tokenize
-from corenlp import StanfordCoreNLP
+
 import config
 import database
 
-class CollectionProcessor {
+class CollectionProcessor:
     # Todo: Figure out config stuff
     def process(self):
         """
@@ -13,7 +12,9 @@ class CollectionProcessor {
         """
         
         # Set up database
-        engine = create_engine(config.db_url)
+        db = database.Database(config.db_url)
+        print db
+
+a = CollectionProcessor()
+a.process()
         
-        
-    
