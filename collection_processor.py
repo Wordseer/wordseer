@@ -1,8 +1,9 @@
 import os
-from sqlalchemy import create_engine
+
 from nltk.tokenize import sent_tokenize
 from corenlp import StanfordCoreNLP
 import config
+import database
 
 class CollectionProcessor {
     # Todo: Figure out config stuff
