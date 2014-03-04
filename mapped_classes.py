@@ -20,3 +20,4 @@ class Highlight(Base):
     user = Column(String(45), index=True, nullable=False, default="")
     startNumber = Column(Float, nullable=False, default=0)
     endNumber = Column(Float, nullable=False, default=0)
+

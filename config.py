@@ -13,3 +13,8 @@ sequence_indexing = True;
 
 # Database options
 db_url = 'sqlite:///wordseer.db'
+
+# Logging options
+log_file = "wordseer_backend.log"
+log_level =
+log_format =
