@@ -21,3 +21,12 @@ class Highlight(Base):
     startNumber = Column(Float, nullable=False, default=0)
     endNumber = Column(Float, nullable=False, default=0)
 
+class Log(mapped_classes.Base):
+    """
+    A log entry, which is recorded in the database.
+    """
+
+    __tablename__ = "log"
+
+    log_item = Column(String(100), nullable = False, primary_key = True)
+    item_value = Column(Text, nullable = False)
