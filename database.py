@@ -35,4 +35,8 @@ class Database:
             Log(log_item = "database_created", item_value = "true"),
             Log(log_item = "latest_parsed_sentence_number", item_value = "0"),
             Log(log_item = "latest_parsed_document_id", item_value = "0")])
-        
+
+    def __exit__(self):
+        self.session.close()
+
+

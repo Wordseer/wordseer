@@ -19,7 +19,7 @@ class Logger():
         value.
         """
         entry = Log(log_item = item, item_value = value)
-        session = new database.Database()
+        
 
         #if "replace" in replace_value:
         #    entry = session.merge(entry)
@@ -35,12 +35,13 @@ class Logger():
 
             entry.value = existing_entry.value + " [" + entry.value + "] "
 
-        entry = session.merge(entry)
-        session.commit()
-        session.close()
+        with database.Database() as session:
+            entry = session.merge(entry)
+            session.commit()
+            session.close()
 
     def get(item):
-        session = new database.Database()
+        session = database.Database()
         results = session.query(Log).filter(log.item == item)
 
         if len(results) > 0:
