@@ -16,4 +16,4 @@ class Database:
         self.engine = create_engine(config.db_url)
         mapped_classes.Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
-        return self.Session
+        return Session()
