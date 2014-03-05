@@ -24,7 +24,6 @@ class Logger():
         #if "replace" in replace_value:
         #    entry = session.merge(entry)
 
-            
         elif "update" in replace_value:
             try:
                 existing_entry = session.query(Log).\
@@ -39,3 +38,12 @@ class Logger():
         entry = session.merge(entry)
         session.commit()
         session.close()
+
+    def get(item):
+        session = new database.Database()
+        results = session.query(Log).filter(log.item == item)
+
+        if len(results) > 0:
+            return results[0].item_value
+
+        return ""
