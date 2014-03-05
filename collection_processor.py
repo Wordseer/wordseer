@@ -1,12 +1,11 @@
 import os
-import config
 import database
 import tokenizer
 
 class CollectionProcessor:
     def process(self):        
         # Set up database
-        db = database.Database(config.db_url)
+        db = database.Database()
         print db
 
         # TODO: sort out tokenizer
