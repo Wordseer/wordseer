@@ -9,6 +9,10 @@ from nltk.tokenize import sent_tokenize
 
 class Tokenizer:
         def __init__(self):
+            """Instantiate a tokenizer. This method merely readies the parser.
+            Note that readying the parser takes some time.
+            """
+            
             self.parser = StanfordCoreNLP(config.CORE_NLP_DIR)
 
         def tokenize(txt):
@@ -36,8 +40,7 @@ class Tokenizer:
                     words.append(w)
                     tagged.append(TaggedWord(word = w, tag = w["PartOfSpeech"]))
                     
-                sent = Sentence(sentence = text,
-                    tagged = tagged, words = words))
-                paragraph.append(sent)
+                paragraph.append(Sentence(sentence = text,
+                    tagged = tagged, words = words)))
 
             return paragraph
