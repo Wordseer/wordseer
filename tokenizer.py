@@ -39,3 +39,5 @@ class Tokenizer:
                 sent = Sentence(sentence = text,
                     tagged = tagged, words = words))
                 paragraph.append(sent)
+
+            return paragraph
