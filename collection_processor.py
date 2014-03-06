@@ -5,7 +5,12 @@ import tokenizer
 class CollectionProcessor:
     def process(self, start_from_scratch):
         """
-
+        This function:
+        1. Sets up the database if necessary
+        2. Extracts metadata, populates the narratives, sentenes, and paragraphs
+        tables
+        3. Processes the sentences by tokenizing and indexing the words
+        4. Processes the sentences by performing grammatical parsing
         Arguments:
         start_from_scratch: If true, then the tables in the database will be
         recreated.
