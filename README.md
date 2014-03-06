@@ -7,9 +7,9 @@ more maintainable python.
 
 Requires
 --------
-*stanford-corenlp-python
-*sqlaclchemy
-*corenlp
+* stanford-corenlp-python
+* sqlaclchemy
+* corenlp
 
 Todo
 ----
