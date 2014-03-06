@@ -2,7 +2,7 @@
 Handle logging functions, using the Log mapped class.
 """
 
-from mapped_classes import Log
+from models import Log
 import database
 
 class Logger():
