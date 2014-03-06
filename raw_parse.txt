@@ -8,7 +8,8 @@
             ('det', 'sentence', '4', 'a', '3'),
             ('root', 'ROOT', '0', 'sentence', '4')],
         'words': [
-            ('this', {'CharacterOffsetEnd': '4',
+            ('this',
+                {'CharacterOffsetEnd': '4',
                 'Lemma': 'this',
                 'PartOfSpeech': 'DT',
                 'CharacterOffsetBegin': '0'}),
