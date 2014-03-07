@@ -2,8 +2,9 @@ import unittest
 import tokenizer
 
 class TokenizerTests(unittest.TestCase):
-    def test(self):
-        self.failUnless(False)
+    def test_init(self):
+        t = tokenizer.Tokenizer()
+        self.failUnless(t)
 
 def main():
     unittest.main()
