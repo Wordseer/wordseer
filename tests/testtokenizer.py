@@ -1,5 +1,5 @@
 import unittest
-import config
+import tokenizer
 
 class TokenizerTests(unittest.TestCase):
     def test(self):

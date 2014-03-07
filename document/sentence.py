@@ -1,6 +1,6 @@
-import Unit
+import unit
 
-class Sentence(Unit):
+class Sentence(unit.Unit):
     """
     A sentence is a type of Unit that can only contain words.
     """

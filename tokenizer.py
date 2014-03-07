@@ -4,7 +4,7 @@ Set up the tokenizer using the Stanfurd NLP library.
 
 import config
 from corenlp import StanfordCoreNLP
-from document import TaggedWord, Sentence
+from document import taggedword, sentence
 from nltk.tokenize import sent_tokenize
 
 class Tokenizer:
@@ -38,9 +38,10 @@ class Tokenizer:
                     if w[0] == ".":
                         words[-1].space_after = "."
                     words.append(w)
-                    tagged.append(TaggedWord(word = w, tag = w["PartOfSpeech"]))
+                    tagged.append(taggedword.TaggedWord(
+                        word = w, tag = w["PartOfSpeech"]))
                     
-                paragraph.append(Sentence(sentence = text,
-                    tagged = tagged, words = words)))
+                paragraph.append(sentence.Sentence(sentence = text,
+                    tagged = tagged, words = words))
 
             return paragraph
