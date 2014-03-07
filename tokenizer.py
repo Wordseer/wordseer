@@ -15,7 +15,7 @@ class Tokenizer:
             
             self.parser = StanfordCoreNLP(config.CORE_NLP_DIR)
 
-        def tokenize(txt):
+        def tokenize(self, txt):
             """Turn a string of one or more sentences into a list of Sentence
             objects.
 
@@ -30,18 +30,18 @@ class Tokenizer:
             paragraph = [] # a list of Sentences
             
             for s in parsed_text["sentences"]:
-                words = [] # a list of words
-                tagged = [] # a list of TaggedWords
-                text = sentence["text"]
+                word_list = [] # a list of words
+                tagged_words = [] # a list of TaggedWords
+                text = s["text"]
                 
-                for w in sentence["words"]:
+                for w in s["words"]:
                     if w[0] == ".":
-                        words[-1].space_after = "."
-                    words.append(w)
-                    tagged.append(taggedword.TaggedWord(
-                        word = w, tag = w["PartOfSpeech"]))
+                        tagged_words[-1].space_after = "."
+                    word_list.append(w)
+                    tagged_words.append(taggedword.TaggedWord(
+                        word = w, tag = w[1]["PartOfSpeech"]))
                     
                 paragraph.append(sentence.Sentence(sentence = text,
-                    tagged = tagged, words = words))
+                    tagged = tagged_words, words = word_list))
 
             return paragraph

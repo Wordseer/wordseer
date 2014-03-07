@@ -24,4 +24,4 @@ class Sentence(unit.Unit):
             setattr(self, key, val)
 
     def __str__(self):
-        return this.metadata.__str__() + "\n" + sentence
+        return self.metadata.__str__() + "\n" + sentence
