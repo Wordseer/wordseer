@@ -3,7 +3,7 @@ import database
 import tokenizer
 
 class CollectionProcessor:
-    def process(self, start_from_scratch):
+    def process(self, document_structure_file_name, start_from_scratch):
         """
         This function:
         1. Sets up the database if necessary
@@ -21,13 +21,15 @@ class CollectionProcessor:
                 db.reset()
         logger = Logger()
 
-        # TODO: MySQLDataReaderWriter
+        # TODO: MySQLDataReaderWriter?
         
-        # TODO: sort out tokenizer
-        tokenizer = Tokenizer()
+        t = tokenizer.Tokenizer()
 
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
         if not "true" in logger.get("finished_recording_text_and_metadata"):
+            print("Extracing document text and metadata")
+            extractor = StructureExtracotr(t, document_structure_file_name)
+            
             
         
