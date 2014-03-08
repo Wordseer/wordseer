@@ -2,12 +2,17 @@ import unittest
 import tokenizer
 from document import sentence
 
-class CommonTests(object):
+
+
+class CommonTests:
+    @classmethod
+    def setUpClass(commonTests, text=""):
+            CommonTests.t = tokenizer.Tokenizer()
+
     def setUp(self, text=""):
-        self.example = text
-        t = tokenizer.Tokenizer()
-        self.result = t.tokenize(self.example)
-        self.raw = t.parser.raw_parse(self.example)
+            self.example = text
+            self.result = self.t.tokenize(self.example)
+            self.raw = self.t.parser.raw_parse(self.example)
 
     def test_text(self):
         for s in range(0, len(self.result)):
