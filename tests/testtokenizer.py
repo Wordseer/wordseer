@@ -15,18 +15,33 @@ class ParagraphTests(unittest.TestCase):
             + "nothing."
         t = tokenizer.Tokenizer()
         self.result = t.tokenize(self.example)
+        self.raw = t.parser.raw_parse(self.example)
 
-    def test_stentences(self):
+    def test_sentences(self):
         # Make sure it's a list of all the sentences.
         for sent in self.result: 
             self.failUnless(isinstance(sent, sentence.Sentence))
-        self.failIf(len(self.result) != self.example.count("."))
+            self.failUnless(sent.tagged[-2].word[0] in ["word", "death",
+                "candle", "more", "nothing"])
+
+    def test_text(self):
+        for s in range(0, len(self.result)):
+            for w in range(0, len(self.result[s].words)):
+                self.failUnless(self.result[s].words[w] ==
+                    self.raw["sentences"][s]["words"][w][0])
+
+    def test_tags(self):
+        # Make sure the words are tagged.
+        for sent in self.result:
+            for tw in sent.tagged:
+                self.failIf(tw.tag == "")
 
 class SentenceTests(unittest.TestCase):
     def setUp(self):
         self.example = "The quick brown fox jumped over the lazy dog."
         t = tokenizer.Tokenizer()
         self.result = t.tokenize(self.example)
+        self.raw = t.parser.raw_parse(self.example)
         
     def test_sentences(self):
         # Make sure it's a list of sentences.
@@ -35,9 +50,10 @@ class SentenceTests(unittest.TestCase):
 
     def test_text(self):
         # Make sure the sentence text was properly transcribed.
-        for sent in self.result:
-            for i in range(0, len(sent.words)):
-                self.failUnless(sent.words[i] == sent.tagged[i].word[0])
+        for s in range(0, len(self.result)):
+            for w in range(0, len(self.result[s].words)):
+                self.failUnless(self.result[s].words[w] ==
+                    self.raw["sentences"][s]["words"][w][0])
             
     #def test_period(self):
     #    for sent in self.result:
