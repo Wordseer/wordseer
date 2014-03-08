@@ -16,6 +16,12 @@ class ParagraphTests(unittest.TestCase):
         t = tokenizer.Tokenizer()
         self.result = t.tokenize(self.example)
 
+    def test_stentences(self):
+        # Make sure it's a list of all the sentences.
+        for sent in self.result: 
+            self.failUnless(isinstance(sent, sentence.Sentence))
+        self.failIf(len(self.result) != self.example.count("."))
+
 class SentenceTests(unittest.TestCase):
     def setUp(self):
         self.example = "The quick brown fox jumped over the lazy dog."
