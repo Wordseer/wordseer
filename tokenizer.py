@@ -7,6 +7,7 @@ from corenlp import StanfordCoreNLP
 from document import taggedword, sentence
 from nltk.tokenize import sent_tokenize
 
+
 class Tokenizer:
         def __init__(self):
             """Instantiate a tokenizer. This method merely readies the parser.
@@ -37,7 +38,7 @@ class Tokenizer:
                 for w in s["words"]:
                     if w[0] == ".":
                         tagged_words[-1].space_after = "."
-                    word_list.append(w)
+                    word_list.append(w[0])
                     tagged_words.append(taggedword.TaggedWord(
                         word = w, tag = w[1]["PartOfSpeech"]))
                     
