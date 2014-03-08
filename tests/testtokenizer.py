@@ -2,8 +2,6 @@ import unittest
 import tokenizer
 from document import sentence
 
-
-
 class CommonTests:
     @classmethod
     def setUpClass(commonTests, text=""):
