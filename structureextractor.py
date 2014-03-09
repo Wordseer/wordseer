@@ -56,9 +56,11 @@ class StructureExtractor:
 
     def extract_unit_information(structure, parent_node):
         """
-
+        Process the given node, according to the given structure, and return
+        a list of Unit objects that represent the parent_node.
+        
         :param dict structure: A JSON description of the structure
-        :param Tag parent_node: A BeautifulSoup Tag of the parent node.
+        :param Tag parent_node: A BeautifulSoup object of the parent node.
         :return: A list of Units
         :rtype: Unit
         """
@@ -103,8 +105,9 @@ class StructureExtractor:
                         else:
                             sents = get_sentences(child_structure, node,
                                 True)
-                u = document.unit.Unit(metadata=unit_metadata, units=children,
-                    sentences=sents, name=struc_name)
+                units.append(document.unit.Unit(metadata=unit_metadata,
+                    units=children, sentences=sents, name=struc_name))
+        return units
 
     def make_css_selector(input, node):
         """
