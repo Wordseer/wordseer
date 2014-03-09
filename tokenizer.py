@@ -36,11 +36,14 @@ class Tokenizer:
             text = s["text"]
 
             for w in s["words"]:
-                if w[0] == ".":
-                    tagged_words[-1].space_after = "."
+                tw = TaggedWord(aggedword.TaggedWord(word=w,
+                    tag=w[1]["PartOfSpeech"]))
+                    
+                if txt[w[1]["CharacterOffsetBegin"]] != " ":
+                        tw.space_before = ""
+                        
                 word_list.append(w[0])
-                tagged_words.append(taggedword.TaggedWord(
-                    word=w, tag=w[1]["PartOfSpeech"]))
+                tagged_words.append(tw)
 
             paragraph.append(sentence.Sentence(sentence=text,
                 tagged=tagged_words, words=word_list))

@@ -4,7 +4,6 @@ class TaggedWord:
     """
     
     space_before = " "
-    space_after = " "
 
     def __init__(self, *args, **kwargs):
         """Instantiate a TaggedWord object.
