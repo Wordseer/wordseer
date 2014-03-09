@@ -56,11 +56,17 @@ class SentenceTests(CommonTests, unittest.TestCase):
         for sent in self.result: 
             self.failUnless(isinstance(sent, sentence.Sentence))
 
-    #def test_period(self):
-    #    for sent in self.result:
-    #        print sent.tagged[-2].word
-    #        self.failUnless(sent.tagged[-1].space_after == "." and
-    #            self.example[-1] == ".")
+    def test_space_before(self):
+        # Make sure space_before has been properly done
+        for s in range(0, len(self.result)):
+            for w in range(0, len(self.result[s].words)):
+                space = self.result[s].tagged[w].space_before
+                actual_char = self.example[int(self.raw["sentences"][s]["words"]
+                    [w][1]["CharacterOffsetBegin"])]
+                if space == "":
+                    self.failUnless(actual_char != " ")
+                else:
+                    self.failUnless(actual_char == " ")
 
 def main():
     unittest.main()
