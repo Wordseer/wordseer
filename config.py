@@ -6,10 +6,10 @@ Configuration file for the pipeline.
 CORE_NLP_DIR = "stanford-corenlp/"
 
 # Processing options
-grammatical_processing = True; 
-part_of_speech_tagging = True;
-word_to_word_similarity = True;
-sequence_indexing = True;
+GRAMMATICAL_PROCESSING = True
+PART_OF_SPEECH_TAGGING = True
+WORD_TO_WORD_SIMILARITY = True
+SEQUENCE_INDEXING = True
 
 # Database options
-db_url = 'sqlite:///wordseer.db'
+DB_URL = 'sqlite:///wordseer.db'
