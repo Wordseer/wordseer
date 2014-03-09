@@ -39,9 +39,9 @@ class StructureExtractor:
         # TODO: was there a reason the original was written like that?
 
         with open(file.name, "r") as f:
-            self.doc = json.load(f)
+            doc = BeautifulSoup(f, xml)
 
-        units = self.extract_unit_information(self.document_structure, self.doc)
+        units = self.extract_unit_information(self.document_structure, doc)
 
         for unit in units:
             d = document.Document(metadata = u.metadata,
