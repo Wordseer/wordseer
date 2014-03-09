@@ -38,9 +38,8 @@ class Base(object):
 
         """
 
-        # table name should be plural of model name
-        import inflect
-        return inflect.engine().plural(cls.__name__).lower()
+        # Set table name to be lower case of class name
+        return cls.__name__.lower()
 
     # Define the primary key
     id = Column(Integer, primary_key=True)
@@ -102,6 +101,24 @@ class Base(object):
 # Set the above Base class as the default model.
 Base = declarative_base(cls=Base)
 
+"""
+##################
+Association Tables
+##################
+"""
+
+# Many-to-many table between words and sentences
+word_in_sentence = Table("word_in_sentence", Base.metadata,
+    Column('word_id', Integer, ForeignKey('word.id')),
+    Column('sentence_id', Integer, ForeignKey('sentence.id'))
+)
+
+"""
+######
+Models
+######
+"""
+
 class Unit(Base):
     """A model representing a unit (or segment) of text.
 
@@ -113,10 +130,11 @@ class Unit(Base):
     Attributes:
       unit_type (str): the unit type (document, section, etc.).
       number (int): a sequencing number (e.g. 2 for chapter 2).
+      parent_id (int): a link to the parent unit.
 
     Relationships:
       belongs to: parent (Unit)
-      has many: children (Unit)
+      has many: children (Unit), sentences, properties
 
     TODO: implement relationships
 
@@ -124,6 +142,15 @@ class Unit(Base):
 
     unit_type = Column(String(64), index = True)
     number = Column(Integer, index = True)
+    parent_id = Column(Integer, ForeignKey('unit.id'))
+
+    # Relationships
+
+    children = relationship("Unit")
+
+    sentences = relationship("Sentence", backref=backref("unit"))
+
+    properties = relationship("Property", backref=backref("unit"))
 
 class Sentence(Base):
     """A model representing a sentence.
@@ -147,13 +174,13 @@ class Sentence(Base):
     unit_id = Column(Integer, ForeignKey('unit.id'))
     text = Column(Text, index = True)
 
-    # Relationships
-    unit = relationship("Unit", backref=backref("sentences"))
-
     words = relationship("Word",
         secondary="word_in_sentence",
         backref="sentences"
     )
+
+    def __repr__(self):
+        return "<Sentence: " + self.text + ">"
 
 class Word(Base):
     """A model representing a word.
@@ -169,6 +196,9 @@ class Word(Base):
     """
 
     word = Column(String, index = True)
+
+    def __repr__(self):
+        return "<Word: " + self.word + ">"
 
 class Property(Base):
     """A model representing a property of a unit.
@@ -189,14 +219,8 @@ class Property(Base):
 
     # Schema
     unit_id = Column(Integer, ForeignKey('unit.id'))
-    property_name = Column(String, index = True)
-    property_value = Column(String, index = True)
+    name = Column(String, index = True)
+    value = Column(String, index = True)
 
-    # Relationships
-    unit = relationship("Unit", backref=backref("metadata", uselist=False))
-
-# Many-to-many table between this model and the Word model
-word_in_sentence = Table("word_in_sentence", Base.metadata,
-    Column('word_id', Integer, ForeignKey('word.id')),
-    Column('sentence_id', Integer, ForeignKey('sentence.id'))
-)
+    def __repr__(self):
+        return "<Property: " + self.name + ">"
