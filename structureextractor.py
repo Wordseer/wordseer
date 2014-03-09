@@ -3,8 +3,9 @@
     :synopsis:
 """
 
+import document
 import json
-import beautifulstonesoup
+from bs4 import BeautifulSoup
 
 class StructureExtractor:
     def __init__(self, tokenizer, structure_file):
@@ -21,13 +22,37 @@ class StructureExtractor:
         self.document_structure = json.load(self.structure_file)
 
     def extract(file):
-        """
+        """Extract a list of Documents from a file. This method uses the
+        structure_file given in the constructor for rules to identify documents.
 
         :param file file: The file to extract
         :return: A list of Document objects
         :rtype: list
         """
-        pass
+        
+        documents = []
+        
+        #text = ""
+        #with open(file.name, "r", -1) as f: # TODO: this seems a bit ridiculous
+        #    for line in f:
+        #        text += f.readline() + "\n"
+        # TODO: was there a reason the original was written like that?
+
+        with open(file.name, "r") as f:
+            self.doc = json.load(f)
+
+        units = self.extract_unit_information(self.document_structure, self.doc)
+
+        for unit in units:
+            d = document.Document(metadata = u.metadata,
+                name = "document",
+                sentences = u.sentences,
+                title = u.name,
+                units = u.units)
+            documents.append(d)
+
+        return documents
+        
 
     def extract_unit_information(structure, parent_node):
         """
