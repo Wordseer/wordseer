@@ -62,7 +62,10 @@ class StructureExtractor:
         :return: A list of Units
         :rtype: Unit
         """
-        pass
+
+        units = []
+
+        
 
     def makeCSSSelector(input, node):
         """
