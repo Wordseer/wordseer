@@ -64,10 +64,49 @@ class StructureExtractor:
         """
 
         units = []
-
         
+        unit_xpaths = structure["xpaths"]
 
-    def makeCSSSelector(input, node):
+        for i in range(0, len(unit_xpaths)):
+            xpath = unit_xpaths[i]
+            selector = self.make_css_selector(xpath, parent_node)
+            nodes = BeautifulSoup()
+            if len(selector) == 0:
+                nodes.append(parent_node)
+            else:
+                #TODO: may not work with root nodes, should look into it
+                nodes = parent_node.select(selector)
+            struc_name = structure["structureName"]
+            for node in nodes.children:
+                try:
+                    metadata_structure = structure["metdata"]
+                except NameError:
+                    metadata_structure = None
+
+                unit_metadata = self.get_metadata(metadata_structure, node)
+                sentences = [] # Sentence objects
+                children = [] # Unit objects
+                try:
+                    #TODO: condense these try-catches
+                    child_unit_structures = structure["units"]
+                except NameError:
+                    child_unit_structures = None
+
+                if child_unit_structures != None:
+                    for n in range(0, len(child_unit_structures)):
+                        child_structure = child_unit_structures[n]
+                        child_type = child_structure["structureName"]
+                        if "sentence" in child_type:
+                            child_units = self.extract_unit_information(
+                                child_structure, node)
+                            children.extend(child_units)
+                        else:
+                            sents = get_sentences(child_structure, node,
+                                True)
+                u = document.unit.Unit(metadata=unit_metadata, units=children,
+                    sentences=sents, name=struc_name)
+
+    def make_css_selector(input, node):
         """
 
         :param string input: ??
