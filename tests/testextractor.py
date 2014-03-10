@@ -11,3 +11,12 @@ class ExtractorTests(unittest.TestCase):
         t = tokenizer.Tokenizer()
         extractor = structurextractor.StructureExtractor(t, structure_file)
         documents = extractor.extract(self.input_file)
+
+    def test(self):
+        self.failUnless(False)
+
+def main():
+    unittest.main()
+
+if __name__ == "__main__":
+    main()
