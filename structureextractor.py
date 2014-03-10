@@ -109,7 +109,7 @@ class StructureExtractor:
         return units
 
     #TODO: why does this require a node?
-    def make_css_selector(xpath, node):
+    def make_css_selector(xpath):#, node):
         """This function transforms xpaths from configuration xml files into
         css selectors for use with BeautifulSoup.
         
