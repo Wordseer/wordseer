@@ -12,8 +12,14 @@ class ExtractorTests(unittest.TestCase):
         extractor = structurextractor.StructureExtractor(t, structure_file)
         documents = extractor.extract(self.input_file)
 
-    def test(self):
-        self.failUnless(False)
+    def test_css_maker(self):
+        xpaths = {"./author/text()" = ":root > author > "
+            "./title/text()" = ":root > title > "
+            "./time/text()" = ":root > time > "
+            "./number/text()" = ":root > number > "
+            "./tags/tag/text()" = ":root > tags > tag > "}
+        for path, selector in xpaths.items():
+            self.failunless(selector == extractor.make_css_selector(path))
 
 def main():
     unittest.main()
