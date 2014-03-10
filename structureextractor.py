@@ -22,7 +22,7 @@ class StructureExtractor:
         self.structure_file = open(structure_file, "r")
         self.document_structure = json.load(self.structure_file)
 
-    def extract(file):
+    def extract(self, file):
         """Extract a list of Documents from a file. This method uses the
         structure_file given in the constructor for rules to identify documents.
 
@@ -30,9 +30,9 @@ class StructureExtractor:
         :return: A list of Document objects
         :rtype: list
         """
-        
+
         documents = []
-        
+
         #text = ""
         #with open(file.name, "r", -1) as f: # TODO: this seems a bit ridiculous
         #    for line in f:
@@ -45,20 +45,20 @@ class StructureExtractor:
         units = self.extract_unit_information(self.document_structure, doc)
 
         for unit in units:
-            d = document.Document(metadata = u.metadata,
-                name = "document",
-                sentences = u.sentences,
-                title = u.name,
-                units = u.units)
+            d = document.Document(metadata=u.metadata,
+                name="document",
+                sentences=u.sentences,
+                title=u.name,
+                units=u.units)
             documents.append(d)
 
         return documents
-        
 
-    def extract_unit_information(structure, parent_node):
+
+    def extract_unit_information(self, structure, parent_node):
         """Process the given node, according to the given structure, and return
         a list of Unit objects that represent the parent_node.
-        
+
         :param dict structure: A JSON description of the structure
         :param Tag parent_node: A BeautifulSoup object of the parent node.
         :return: A list of Units
@@ -66,7 +66,7 @@ class StructureExtractor:
         """
 
         units = []
-        
+
         unit_xpaths = structure["xpaths"]
 
         for xpath in xpaths:
@@ -109,11 +109,11 @@ class StructureExtractor:
         return units
 
     #TODO: why does this require a node?
-    def make_css_selector(xpath, node=None):
+    def make_css_selector(self, xpath, node=None):
         """This function transforms xpaths from configuration xml files into
         css selectors for use with BeautifulSoup.
-        
-        :param string xpath: xpath string from 
+
+        :param string xpath: xpath string from a structure file
         :param Tag node: A BeautifulSoup Tag for the node that requires a
         selector.
         :return: The css selector.
@@ -128,7 +128,7 @@ class StructureExtractor:
             xpath = string.replace(xpath, "//", " > ")
         if "." in xpath:
             xpath = string.replace(xpath, ".", " :root")
-            
+
         xpath = xpath.strip()
 
         if xpath[-1] == ">":
@@ -137,9 +137,9 @@ class StructureExtractor:
             xpath = xpath[1:]
 
         return xpath
-        
 
-    def get_sentences(structure, parent_node, tokenize):
+
+    def get_sentences(self, structure, parent_node, tokenize):
         """Return the sentences present in the parent_node and its children.
 
         :param dict structure: A JSON description of the structure
@@ -149,7 +149,7 @@ class StructureExtractor:
         :return: A list of Sentences.
         :rtype: list
         """
-        
+
         unit_xpaths = structure["xpaths"]
         try:
             metadata_structure = structure["metadata"]
@@ -175,15 +175,15 @@ class StructureExtractor:
 
         if tokenize:
             sents = self.t.tokenize(sentence_text)
-            
+
             for sentence in sents:
                 sentence.metadata = sentence_metadata
                 words = split(" ", sentence.sentence)
                 total_word_length = 0
-                
+
                 for word in words:
                     total_word_length += len(word)
-                
+
                 # TODO: additionalMetadata is a private variable set to false,
                 # why is it there?
                 # if self.additional_metadata:
@@ -195,9 +195,9 @@ class StructureExtractor:
                 metadata=sentence_metadata))
 
         return sentences
-            
 
-    def get_metadata(metadata_structure, node):
+
+    def get_metadata(self, metadata_structure, node):
         """
 
         :param list structure: A JSON description of the structure
@@ -208,7 +208,7 @@ class StructureExtractor:
 
         pass
 
-    def get_xpath_attribute(xpath_pattern, attribute, node):
+    def get_xpath_attribute(self, xpath_pattern, attribute, node):
         """
 
         :param string xpath_pattern:
@@ -220,7 +220,7 @@ class StructureExtractor:
 
         pass
 
-    def get_xpath_text(xpath_pattern, node):
+    def get_xpath_text(self, xpath_pattern, node):
         """
 
         :param string xpath_pattern:
@@ -228,5 +228,5 @@ class StructureExtractor:
         :return: A list of strings
         :rtype: list
         """
-        
+
         pass
