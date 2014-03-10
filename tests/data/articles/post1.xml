@@ -1,0 +1,13 @@
+<article>
+<time>2012-02-23</time>
+<title>Post 1</title>
+<author>rachel</author>
+<tags>
+ <tag>Tag 0</tag>
+ <tag>Tag 3</tag>
+</tags>
+<number>1</number>
+<text>
+	This is the text of post 1. I love clouds.
+</text>
+</article>

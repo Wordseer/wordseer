@@ -1,0 +1,13 @@
+<article>
+<time>2012-03-24</time>
+<title>Post 2</title>
+<author>amy</author>
+<tags>
+ <tag>Tag 1</tag>
+ <tag>Tag 3</tag>
+</tags>
+<number>2</number>
+<text>
+	This is the text of post 3. I love blogs.
+</text>
+</article>
