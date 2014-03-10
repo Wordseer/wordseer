@@ -71,7 +71,7 @@ class StructureExtractor:
 
         for xpath in xpaths:
             selector = self.make_css_selector(xpath, parent_node)
-            nodes = BeautifulSoup()
+            nodes = BeautifulSoup("", xml)
             if len(selector) == 0:
                 nodes.append(parent_node)
             else:
@@ -109,7 +109,7 @@ class StructureExtractor:
         return units
 
     #TODO: why does this require a node?
-    def make_css_selector(xpath):#, node):
+    def make_css_selector(xpath, node=None):
         """This function transforms xpaths from configuration xml files into
         css selectors for use with BeautifulSoup.
         
@@ -140,16 +140,62 @@ class StructureExtractor:
         
 
     def get_sentences(structure, parent_node, tokenize):
-        """
+        """Return the sentences present in the parent_node and its children.
 
         :param dict structure: A JSON description of the structure
-        :param Tag node: ?
-        :param boolean tokenize:
-        :return: A list of sentences.
+        :param Tag node: a BeautifulSoup object of the node to get sentences
+        from
+        :param boolean tokenize: if True, then the sentences will be tokenized
+        :return: A list of Sentences.
         :rtype: list
         """
+        
+        unit_xpaths = structure["xpaths"]
+        try:
+            metadata_structure = structure["metadata"]
+        except NameError:
+            metadata_structure = None
 
-        pass
+        sentence_text = ""
+        sentence_metadata = [] # List of Metadata objects
+
+        for xpath in unit_xpaths:
+            selector = make_css_selector(xpath, parent_node)
+            #TODO: bit of redundancy here from another method
+            sentence_nodes = BeautifulSoup("", xml)
+            if len(selector) == 0:
+                sentence_nodes.append(parent_node)
+            else:
+                sentence_nodes = parent_node.select(selector)
+
+            for sentence_node in sentence_nodes:
+                sentence_text += sentence_node.text().strip() + "\n"
+                sentence_metadata.append(get_metadata(
+                    metadata_structure, sentence_node))
+
+        if tokenize:
+            sents = self.t.tokenize(sentence_text)
+            
+            for sentence in sents:
+                sentence.metadata = sentence_metadata
+                words = split(" "_, sentence.sentence)
+                total_word_length = 0
+                
+                for word in words:
+                    total_word_length += len(word)
+                
+                # TODO: additionalMetadata is a private variable set to false,
+                # why is it there?
+                # if self.additional_metadata:
+
+                sentences.append(sentence)
+
+        else:
+            sentences.add(document.sentence.Sentence(sentence=sentence_text,
+                metadata=sentence_metadata))
+
+        return sentences
+            
 
     def get_metadata(metadata_structure, node):
         """
@@ -184,3 +230,5 @@ class StructureExtractor:
         """
         
         pass
+
+    def if_exists(var1, var2)
