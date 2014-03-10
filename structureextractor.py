@@ -125,7 +125,7 @@ class StructureExtractor:
         if "//" in xpath:
             xpath = string.replace(xpath, "//", " ")
         if "/" in xpath:
-            xpath = string.replace(xpath, "//", " > "
+            xpath = string.replace(xpath, "//", " > ")
         if "." in xpath:
             xpath = string.replace(xpath, ".", " :root")
             
@@ -178,7 +178,7 @@ class StructureExtractor:
             
             for sentence in sents:
                 sentence.metadata = sentence_metadata
-                words = split(" "_, sentence.sentence)
+                words = split(" ", sentence.sentence)
                 total_word_length = 0
                 
                 for word in words:
@@ -230,5 +230,3 @@ class StructureExtractor:
         """
         
         pass
-
-    def if_exists(var1, var2)
