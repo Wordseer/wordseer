@@ -11,7 +11,3 @@ Requires
 * sqlaclchemy
 * corenlp
 * beautifulsoup
-
-Todo
-----
-
