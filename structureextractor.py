@@ -69,8 +69,7 @@ class StructureExtractor:
         
         unit_xpaths = structure["xpaths"]
 
-        for i in range(0, len(unit_xpaths)):
-            xpath = unit_xpaths[i]
+        for xpath in xpaths:
             selector = self.make_css_selector(xpath, parent_node)
             nodes = BeautifulSoup()
             if len(selector) == 0:
