@@ -5,8 +5,8 @@ import tokenizer
 #@unittest.skip("Not yet working")
 class ExtractorTests(unittest.TestCase):
     def setUp(self):
-        self.structure_file = "data/structure.json"
-        self.input_file = open("data/articles/post1.xml")
+        self.structure_file = "tests/data/structure.json"
+        self.input_file = open("tests/data/articles/post1.xml")
         t = tokenizer.Tokenizer()
         extractor = structurextractor.StructureExtractor(t, structure_file)
         documents = extractor.extract(self.input_file)
