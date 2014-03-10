@@ -5,6 +5,7 @@
 
 import document
 import json
+import string
 from bs4 import BeautifulSoup
 
 class StructureExtractor:
@@ -55,8 +56,7 @@ class StructureExtractor:
         
 
     def extract_unit_information(structure, parent_node):
-        """
-        Process the given node, according to the given structure, and return
+        """Process the given node, according to the given structure, and return
         a list of Unit objects that represent the parent_node.
         
         :param dict structure: A JSON description of the structure
@@ -109,17 +109,36 @@ class StructureExtractor:
                     units=children, sentences=sents, name=struc_name))
         return units
 
-    def make_css_selector(input, node):
-        """
-
-        :param string input: ??
+    #TODO: why does this require a node?
+    def make_css_selector(xpath, node):
+        """This function transforms xpaths from configuration xml files into
+        css selectors for use with BeautifulSoup.
+        
+        :param string xpath: xpath string from 
         :param Tag node: A BeautifulSoup Tag for the node that requires a
         selector.
         :return: The css selector.
         :rtype: string
         """
+        #TODO: condense this?
+        if "text()" in xpath:
+            xpath = string.replace(xpath, "text()", "")
+        if "//" in xpath:
+            xpath = string.replace(xpath, "//", " ")
+        if "/" in xpath:
+            xpath = string.replace(xpath, "//", " > "
+        if "." in xpath:
+            xpath = string.replace(xpath, ".", " :root")
+            
+        xpath = xpath.strip()
 
-        pass
+        if xpath[-1] == ">":
+            xpath = xpath[:-1]
+        if xpath[0] == ">":
+            xpath = xpath[1:]
+
+        return xpath
+        
 
     def get_sentences(structure, parent_node, tokenize):
         """
