@@ -14,13 +14,12 @@ class ExtractorTests(unittest.TestCase):
         documents = self.extractor.extract(self.input_file)
 
     def test_css_maker(self):
-        xpaths = {"./author/text()": ":root > author > ",
-            "./title/text()": ":root > title > ",
-            "./time/text()": ":root > time > ",
-            "./number/text()": ":root > number > ",
-            "./tags/tag/text()": ":root > tags > tag > "}
+        xpaths = {"./author/text()": ":root > author ",
+            "./title/text()": ":root > title ",
+            "./time/text()": ":root > time ",
+            "./number/text()": ":root > number ",
+            "./tags/tag/text()": ":root > tags > tag "}
         for path, selector in xpaths.items():
-            print(selector)
             self.failUnless(selector == self.extractor.make_css_selector(path))
 
 def main():

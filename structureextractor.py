@@ -131,9 +131,7 @@ class StructureExtractor:
         if "//" in xpath:
             xpath = string.replace(xpath, "//", " ")
         if "/" in xpath:
-            print xpath
             xpath = string.replace(xpath, "/", " > ")
-            print xpath
         if "." in xpath:
             xpath = string.replace(xpath, ".", " :root")
 
