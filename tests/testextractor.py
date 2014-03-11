@@ -2,7 +2,7 @@ import unittest
 from structureextractor import StructureExtractor
 import tokenizer
 
-@unittest.skip("JSON problems")
+#@unittest.skip("JSON problems")
 class ExtractorTests(unittest.TestCase):
     def setUp(self):
         self.structure_file = "tests/data/structure.json"
