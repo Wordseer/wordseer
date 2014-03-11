@@ -40,7 +40,7 @@ class StructureExtractor:
         # TODO: was there a reason the original was written like that?
 
         with open(file.name, "r") as f:
-            doc = BeautifulSoup(f, xml)
+            doc = BeautifulSoup(f, "xml")
 
         units = self.extract_unit_information(self.document_structure, doc)
 
@@ -69,18 +69,23 @@ class StructureExtractor:
 
         unit_xpaths = structure["xpaths"]
 
-        for xpath in xpaths:
+        for xpath in unit_xpaths:
             selector = self.make_css_selector(xpath, parent_node)
-            nodes = BeautifulSoup("", xml)
+            nodes = BeautifulSoup("", "xml")
+            
             if len(selector) == 0:
                 nodes.append(parent_node)
+                print(nodes.__class__)
             else:
                 #TODO: may not work with root nodes, should look into it
-                nodes = parent_node.select(selector)
+                # TODO: is picking the first one okay behavior?
+                nodes = parent_node.select(selector)[0]
+                
             struc_name = structure["structureName"]
+            
             for node in nodes.children:
                 try:
-                    metadata_structure = structure["metdata"]
+                    metadata_structure = structure["metadata"]
                 except NameError:
                     metadata_structure = None
 

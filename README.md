@@ -11,3 +11,4 @@ Requires
 * sqlaclchemy
 * corenlp
 * beautifulsoup
+* lxml
