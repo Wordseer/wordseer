@@ -2,7 +2,6 @@ import unittest
 from structureextractor import StructureExtractor
 import tokenizer
 
-#@unittest.skip("JSON problems")
 class ExtractorTests(unittest.TestCase):
     def setUp(self):
         self.structure_file = "tests/data/structure.json"
@@ -10,8 +9,13 @@ class ExtractorTests(unittest.TestCase):
         t = tokenizer.Tokenizer()
         self.extractor = StructureExtractor(t, self.structure_file)
 
-    def test_extractor(self):
+    @unittest.skip("Depends on extract_unit_information()")
+    def test_extract(self):
         documents = self.extractor.extract(self.input_file)
+
+    @unittest.skip("Root selector problems")
+    def test_extract_unit_information(self):
+        pass
 
     def test_css_maker(self):
         xpaths = {"./author/text()": ":root > author ",
@@ -21,6 +25,12 @@ class ExtractorTests(unittest.TestCase):
             "./tags/tag/text()": ":root > tags > tag "}
         for path, selector in xpaths.items():
             self.failUnless(selector == self.extractor.make_css_selector(path))
+
+    @unittest.skip("Root selector problems")
+    def test_get_sentences(self):
+        pass
+
+    
 
 def main():
     unittest.main()
