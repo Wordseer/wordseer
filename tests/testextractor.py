@@ -21,7 +21,6 @@ class ExtractorTests(unittest.TestCase):
             "./tags/tag/text()": ":root > tags > tag > "}
         for path, selector in xpaths.items():
             print(selector)
-            print(self.extractor.make_css_selector(path))
             self.failUnless(selector == self.extractor.make_css_selector(path))
 
 def main():
