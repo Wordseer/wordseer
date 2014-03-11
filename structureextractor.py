@@ -75,11 +75,12 @@ class StructureExtractor:
             
             if len(selector) == 0:
                 nodes.append(parent_node)
-                print(nodes.__class__)
             else:
-                #TODO: may not work with root nodes, should look into it
+                # TODO: may not work with root nodes, should look into it
                 # TODO: is picking the first one okay behavior?
-                nodes = parent_node.select(selector)[0]
+                # TODO: this conversion seems hacky
+                nodes = BeautifulSoup(str(parent_node.select(selector)[0]),
+                    "xml")
                 
             struc_name = structure["structureName"]
             
@@ -130,7 +131,9 @@ class StructureExtractor:
         if "//" in xpath:
             xpath = string.replace(xpath, "//", " ")
         if "/" in xpath:
-            xpath = string.replace(xpath, "//", " > ")
+            print xpath
+            xpath = string.replace(xpath, "/", " > ")
+            print xpath
         if "." in xpath:
             xpath = string.replace(xpath, ".", " :root")
 
