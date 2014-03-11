@@ -211,8 +211,31 @@ class StructureExtractor:
         :return: A list of metadata
         :rtype: list
         """
+        metadata = [] # A list of Metadata
 
-        pass
+        if metadata_structure not None:
+            for specification in metadata_structure:
+                try:
+                    xpaths = specification["xpaths"]
+                except NameError:
+                    xpaths = None
+                try:
+                    attribute = specification["attr"]
+                except:
+                    attribute = None
+                
+                extracted = [] # A list of strings
+
+                if xpaths not None:
+                    if len(xpaths) > 0:
+                        for xpath in xpaths:
+                            if attribute != None:
+                                extracted = self.get_xpath_attribute(xpath,
+                                    attribute, node)
+                            else:
+                                extracted = get_xpath_text(xpath, node)
+                            for value in extracted:
+                                
 
     def get_xpath_attribute(self, xpath_pattern, attribute, node):
         """
