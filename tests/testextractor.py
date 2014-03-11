@@ -9,6 +9,8 @@ class ExtractorTests(unittest.TestCase):
         self.input_file = open("tests/data/articles/post1.xml")
         t = tokenizer.Tokenizer()
         self.extractor = StructureExtractor(t, self.structure_file)
+
+    def test_extractor(self):
         documents = self.extractor.extract(self.input_file)
 
     def test_css_maker(self):
