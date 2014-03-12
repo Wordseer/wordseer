@@ -46,11 +46,11 @@ class StructureExtractor:
         units = self.extract_unit_information(self.document_structure, doc)
 
         for unit in units:
-            d = document.Document(metadata=u.metadata,
+            d = document.Document(metadata=unit.metadata,
                 name="document",
-                sentences=u.sentences,
-                title=u.name,
-                units=u.units)
+                sentences=unit.sentences,
+                title=unit.name,
+                units=unit.units)
             documents.append(d)
 
         return documents
@@ -73,7 +73,7 @@ class StructureExtractor:
         for xpath in unit_xpaths:
             selector = self.make_css_selector(xpath, parent_node)
             nodes = BeautifulSoup("", "xml")
-            
+
             if len(selector) == 0:
                 nodes.append(parent_node)
             else:
@@ -82,9 +82,9 @@ class StructureExtractor:
                 # TODO: this conversion seems hacky
                 nodes = BeautifulSoup(str(parent_node.select(selector)[0]),
                     "xml")
-                
+
             struc_name = structure["structureName"]
-            
+
             for node in nodes.children:
                 try:
                     metadata_structure = structure["metadata"]
@@ -92,7 +92,7 @@ class StructureExtractor:
                     metadata_structure = None
 
                 unit_metadata = self.get_metadata(metadata_structure, node)
-                sentences = [] # Sentence objects
+                sents = [] # Sentence objects
                 children = [] # Unit objects
                 try:
                     #TODO: condense these try-catches
@@ -109,7 +109,7 @@ class StructureExtractor:
                                 child_structure, node)
                             children.extend(child_units)
                         else:
-                            sents = get_sentences(child_structure, node,
+                            sents = self.get_sentences(child_structure, node,
                                 True)
                 units.append(document.unit.Unit(metadata=unit_metadata,
                     units=children, sentences=sents, name=struc_name))
@@ -157,19 +157,20 @@ class StructureExtractor:
         :rtype: list
         """
 
+        sentences = [] # a list of sentences
+        sentence_text = ""
+        sentence_metadata = [] # List of Metadata objects
         unit_xpaths = structure["xpaths"]
+
         try:
             metadata_structure = structure["metadata"]
         except NameError:
             metadata_structure = None
 
-        sentence_text = ""
-        sentence_metadata = [] # List of Metadata objects
-
         for xpath in unit_xpaths:
-            selector = make_css_selector(xpath, parent_node)
+            selector = self.make_css_selector(xpath, parent_node)
             #TODO: bit of redundancy here from another method
-            sentence_nodes = BeautifulSoup("", xml)
+            sentence_nodes = BeautifulSoup("", "xml")
             if len(selector) == 0:
                 sentence_nodes.append(parent_node)
             else:
@@ -177,7 +178,7 @@ class StructureExtractor:
 
             for sentence_node in sentence_nodes:
                 sentence_text += sentence_node.text().strip() + "\n"
-                sentence_metadata.append(get_metadata(
+                sentence_metadata.append(self.get_metadata(
                     metadata_structure, sentence_node))
 
         if tokenize:
@@ -185,7 +186,7 @@ class StructureExtractor:
 
             for sentence in sents:
                 sentence.metadata = sentence_metadata
-                words = split(" ", sentence.sentence)
+                words = string.split(" ", sentence.sentence)
                 total_word_length = 0
 
                 for word in words:
@@ -198,7 +199,7 @@ class StructureExtractor:
                 sentences.append(sentence)
 
         else:
-            sentences.add(document.sentence.Sentence(sentence=sentence_text,
+            sentences.append(document.sentence.Sentence(sentence=sentence_text,
                 metadata=sentence_metadata))
 
         return sentences
@@ -224,7 +225,7 @@ class StructureExtractor:
         metadata = [] # A list of Metadata
 
         # TODO: do we need this check?
-        if metadata_structure not None:
+        if metadata_structure is not None:
             for spec in metadata_structure:
                 try:
                     xpaths = spec["xpaths"]
@@ -234,26 +235,27 @@ class StructureExtractor:
                     attribute = spec["attr"]
                 except NameError:
                     attribute = None
-                
+
                 extracted = [] # A list of strings
 
-                if xpaths not None:
+                if xpaths is not None:
                     for xpath in xpaths:
-                        if attribute not None:
+                        if attribute is not None:
                             extracted = self.get_xpath_attribute(xpath,
                                 attribute, node)
                         else:
-                            extracted = get_xpath_text(xpath, node)
+                            extracted = self.get_xpath_text(xpath, node)
                         for val in extracted:
-                            metadata.add(metadata.Metadata(value=val,
-                                property_name=spec["propertyName"]
+                            metadata.append(document.metadata.Metadata(
+                                value=val,
+                                property_name=spec["propertyName"],
                                 specification=spec))
         return metadata
 
     def get_xpath_attribute(self, xpath_pattern, attribute, node):
         """Return values of attribute from the child elements of node that
         match xpath_pattern.
-        
+
         :param string xpath_pattern: A pattern to find matches for
         :param string attribute: The attribute whose values should be returned
         :param Tag node: The node to search in
@@ -276,12 +278,12 @@ class StructureExtractor:
                 vals = node[attribute].split(" ")
                 if len(vals) > 0:
                     for val in vals:
-                        values.add(val)
+                        values.append(val)
         return values
 
     def get_xpath_text(self, xpath_pattern, node):
         """Get the text from children of node that match xpath_pattern.
-        
+
         :param string xpath_pattern: The pattern to find matches for.
         :param Tag node: The node to find matches under
         :return: A list of strings
