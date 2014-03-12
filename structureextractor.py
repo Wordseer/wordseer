@@ -221,7 +221,7 @@ class StructureExtractor:
                     xpaths = None
                 try:
                     attribute = spec["attr"]
-                except:
+                except NameError:
                     attribute = None
                 
                 extracted = [] # A list of strings
