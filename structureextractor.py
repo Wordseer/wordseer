@@ -240,12 +240,13 @@ class StructureExtractor:
                                     specification=spec))
 
     def get_xpath_attribute(self, xpath_pattern, attribute, node):
-        """
-
-        :param string xpath_pattern: 
-        :param string attribute:
-        :param Tag node:
-        :return: A list of strings
+        """Return values of attribute from the child elements of node that
+        match the xpath_pattern.
+        
+        :param string xpath_pattern: A pattern to find matches for
+        :param string attribute: The attribute whose values should be returned
+        :param Tag node: The node to search in
+        :return: A list of strings, the values of the attributes
         :rtype: list
         """
 
@@ -260,7 +261,11 @@ class StructureExtractor:
         else:
             nodes = node.select(selector)
             for node in nodes:
-                value = node[attribute]
+                vals = node[attribute].split(" ")
+                if len(vals) > 0:
+                    for val in vals:
+                        values.add(val)
+        return values
 
     def get_xpath_text(self, xpath_pattern, node):
         """
