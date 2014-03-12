@@ -214,13 +214,13 @@ class StructureExtractor:
         metadata = [] # A list of Metadata
 
         if metadata_structure not None:
-            for specification in metadata_structure:
+            for spec in metadata_structure:
                 try:
-                    xpaths = specification["xpaths"]
+                    xpaths = spec["xpaths"]
                 except NameError:
                     xpaths = None
                 try:
-                    attribute = specification["attr"]
+                    attribute = spec["attr"]
                 except:
                     attribute = None
                 
@@ -234,20 +234,33 @@ class StructureExtractor:
                                     attribute, node)
                             else:
                                 extracted = get_xpath_text(xpath, node)
-                            for value in extracted:
-                                
+                            for val in extracted:
+                                metadata.add(metadata.Metadata(value=val,
+                                    property_name=spec["propertyName"]
+                                    specification=spec))
 
     def get_xpath_attribute(self, xpath_pattern, attribute, node):
         """
 
-        :param string xpath_pattern:
+        :param string xpath_pattern: 
         :param string attribute:
         :param Tag node:
         :return: A list of strings
         :rtype: list
         """
 
-        pass
+        selector = self.make_css_selector(xpath_pattern, node)
+        values = [] # list of strings
+
+        if len(selector) == 0:
+            vals = node[attribute].split(" ")
+            if len(vals) > 0:
+                for value in vals:
+                    values.append(value)
+        else:
+            nodes = node.select(selector)
+            for node in nodes:
+                value = node[attribute]
 
     def get_xpath_text(self, xpath_pattern, node):
         """
