@@ -31,6 +31,14 @@ class ExtractorTests(unittest.TestCase):
         pass
 
     
+    def test_get_metadata(self):
+        pass
+
+    def test_get_xpath_attribute(self):
+        pass
+
+    def test_get_xpath_text(self):
+        pass
 
 def main():
     unittest.main()

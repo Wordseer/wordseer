@@ -255,6 +255,7 @@ class StructureExtractor:
 
         if len(selector) == 0:
             vals = node[attribute].split(" ")
+            # Split the attribute since xml does not allow multiple attributes
             if len(vals) > 0:
                 for value in vals:
                     values.append(value)
