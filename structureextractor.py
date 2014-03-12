@@ -213,6 +213,7 @@ class StructureExtractor:
         """
         metadata = [] # A list of Metadata
 
+        # TODO: do we need this check?
         if metadata_structure not None:
             for spec in metadata_structure:
                 try:
@@ -227,17 +228,16 @@ class StructureExtractor:
                 extracted = [] # A list of strings
 
                 if xpaths not None:
-                    if len(xpaths) > 0:
-                        for xpath in xpaths:
-                            if attribute != None:
-                                extracted = self.get_xpath_attribute(xpath,
-                                    attribute, node)
-                            else:
-                                extracted = get_xpath_text(xpath, node)
-                            for val in extracted:
-                                metadata.add(metadata.Metadata(value=val,
-                                    property_name=spec["propertyName"]
-                                    specification=spec))
+                    for xpath in xpaths:
+                        if attribute not None:
+                            extracted = self.get_xpath_attribute(xpath,
+                                attribute, node)
+                        else:
+                            extracted = get_xpath_text(xpath, node)
+                        for val in extracted:
+                            metadata.add(metadata.Metadata(value=val,
+                                property_name=spec["propertyName"]
+                                specification=spec))
 
     def get_xpath_attribute(self, xpath_pattern, attribute, node):
         """Return values of attribute from the child elements of node that
