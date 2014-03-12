@@ -204,7 +204,16 @@ class StructureExtractor:
 
 
     def get_metadata(self, metadata_structure, node):
-        """
+        """Return a list of Metadata objects of the metadata of the Tags in
+        node according to the rules in metadata_structure.
+
+        If the Tags have attributes, then the value fields of the metadata
+        objects will be those attributes. Otherwise, the text in the Tags
+        will be the values. property_name is set according to PropertyName in
+        metadata_strcuture. specification is set as the object in the JSON
+        file that describes the xpath and propertyName of that Metadata object.
+        This function iterates over every child of metadata in the structure
+        file.
 
         :param list structure: A JSON description of the structure
         :param Tag node: ?
@@ -238,6 +247,7 @@ class StructureExtractor:
                             metadata.add(metadata.Metadata(value=val,
                                 property_name=spec["propertyName"]
                                 specification=spec))
+        return metadata
 
     def get_xpath_attribute(self, xpath_pattern, attribute, node):
         """Return values of attribute from the child elements of node that
