@@ -30,13 +30,15 @@ class ExtractorTests(unittest.TestCase):
     def test_get_sentences(self):
         pass
 
-    
+    @unittest.skip("Depends on get_xpath_attribute")
     def test_get_metadata(self):
         pass
 
+    @unittest.skip("Root selector problems")
     def test_get_xpath_attribute(self):
         pass
 
+    @unittest.skip("Root selector problems")
     def test_get_xpath_text(self):
         pass
 
