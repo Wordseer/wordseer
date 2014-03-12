@@ -9,6 +9,7 @@ import string
 from bs4 import BeautifulSoup
 
 class StructureExtractor:
+    #TODO: some of these methods cannot accept Tags, require BeautifulSoup
     def __init__(self, tokenizer, structure_file):
         """Create a new StructureExtractor.
 
@@ -251,7 +252,7 @@ class StructureExtractor:
 
     def get_xpath_attribute(self, xpath_pattern, attribute, node):
         """Return values of attribute from the child elements of node that
-        match the xpath_pattern.
+        match xpath_pattern.
         
         :param string xpath_pattern: A pattern to find matches for
         :param string attribute: The attribute whose values should be returned
@@ -279,12 +280,24 @@ class StructureExtractor:
         return values
 
     def get_xpath_text(self, xpath_pattern, node):
-        """
-
-        :param string xpath_pattern:
-        :param Tag node:
+        """Get the text from children of node that match xpath_pattern.
+        
+        :param string xpath_pattern: The pattern to find matches for.
+        :param Tag node: The node to find matches under
         :return: A list of strings
         :rtype: list
         """
 
-        pass
+        selector = self.make_css_selector(xpath_pattern, node)
+        values = [] # a list of strings
+
+        if len(selector) == 0:
+            values.append(node.get_text())
+        else:
+            nodes = node.select(selector)
+            for node in nodes:
+                value = nodes.get_text().strip()
+                if len(value) > 0:
+                    values.append(value)
+
+        return values
