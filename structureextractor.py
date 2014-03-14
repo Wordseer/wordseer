@@ -9,6 +9,10 @@ import string
 from bs4 import BeautifulSoup
 
 class StructureExtractor:
+    """This class parses an XML file according to the format given in a
+    JSON file. It generates document classes (Sentences, Documents, Metadatas,
+    etc.) from the input file.
+    """
     #TODO: some of these methods cannot accept Tags, require BeautifulSoup
     def __init__(self, tokenizer, structure_file):
         """Create a new StructureExtractor.
@@ -46,7 +50,7 @@ class StructureExtractor:
         units = self.extract_unit_information(self.document_structure, doc)
 
         for unit in units:
-            d = document.Document(metadata=unit.metadata,
+            d = document.document.Document(metadata=unit.metadata,
                 name="document",
                 sentences=unit.sentences,
                 title=unit.name,
@@ -91,7 +95,7 @@ class StructureExtractor:
                 except NameError:
                     metadata_structure = None
 
-                unit_metadata = self.get_metadata(metadata_structure, node)
+                unit_metadata = get_metadata(metadata_structure, node)
                 sents = [] # Sentence objects
                 children = [] # Unit objects
                 try:
@@ -147,7 +151,7 @@ class StructureExtractor:
 
             for sentence_node in sentence_nodes:
                 sentence_text += sentence_node.text().strip() + "\n"
-                sentence_metadata.append(self.get_metadata(
+                sentence_metadata.append(get_metadata(
                     metadata_structure, sentence_node))
 
         if tokenize:
@@ -174,104 +178,52 @@ class StructureExtractor:
         return sentences
 
 
-    def get_metadata(self, metadata_structure, node):
-        """Return a list of Metadata objects of the metadata of the Tags in
-        node according to the rules in metadata_structure.
+def get_metadata(metadata_structure, node):
+    """Return a list of Metadata objects of the metadata of the Tags in
+    node according to the rules in metadata_structure.
 
-        If the Tags have attributes, then the value fields of the metadata
-        objects will be those attributes. Otherwise, the text in the Tags
-        will be the values. property_name is set according to PropertyName in
-        metadata_strcuture. specification is set as the object in the JSON
-        file that describes the xpath and propertyName of that Metadata object.
-        This function iterates over every child of metadata in the structure
-        file.
+    If the Tags have attributes, then the value fields of the metadata
+    objects will be those attributes. Otherwise, the text in the Tags
+    will be the values. property_name is set according to PropertyName in
+    metadata_strcuture. specification is set as the object in the JSON
+    file that describes the xpath and propertyName of that Metadata object.
+    This function iterates over every child of metadata in the structure
+    file.
 
-        :param list structure: A JSON description of the structure
-        :param Tag node: ?
-        :return: A list of metadata
-        :rtype: list
-        """
-        metadata = [] # A list of Metadata
+    :param list structure: A JSON description of the structure
+    :param Tag node: ?
+    :return: A list of metadata
+    :rtype: list
+    """
+    metadata = [] # A list of Metadata
 
-        # TODO: do we need this check?
-        if metadata_structure is not None:
-            for spec in metadata_structure:
-                try:
-                    xpaths = spec["xpaths"]
-                except NameError:
-                    xpaths = None
-                try:
-                    attribute = spec["attr"]
-                except NameError:
-                    attribute = None
+    # TODO: do we need this check?
+    if metadata_structure is not None:
+        for spec in metadata_structure:
+            try:
+                xpaths = spec["xpaths"]
+            except NameError:
+                xpaths = None
+            try:
+                attribute = spec["attr"]
+            except NameError:
+                attribute = None
 
-                extracted = [] # A list of strings
+            extracted = [] # A list of strings
 
-                if xpaths is not None:
-                    for xpath in xpaths:
-                        if attribute is not None:
-                            extracted = self.get_xpath_attribute(xpath,
-                                attribute, node)
-                        else:
-                            extracted = self.get_xpath_text(xpath, node)
-                        for val in extracted:
-                            metadata.append(document.metadata.Metadata(
-                                value=val,
-                                property_name=spec["propertyName"],
-                                specification=spec))
-        return metadata
-
-    def get_xpath_attribute(self, xpath_pattern, attribute, node):
-        """Return values of attribute from the child elements of node that
-        match xpath_pattern.
-
-        :param string xpath_pattern: A pattern to find matches for
-        :param string attribute: The attribute whose values should be returned
-        :param Tag node: The node to search in
-        :return: A list of strings, the values of the attributes
-        :rtype: list
-        """
-
-        selector = make_css_selector(xpath_pattern, node)
-        values = [] # list of strings
-
-        if len(selector) == 0:
-            vals = node[attribute].split(" ")
-            # Split the attribute since xml does not allow multiple attributes
-            if len(vals) > 0:
-                for value in vals:
-                    values.append(value)
-        else:
-            nodes = node.select(selector)
-            for node in nodes:
-                vals = node[attribute].split(" ")
-                if len(vals) > 0:
-                    for val in vals:
-                        values.append(val)
-        return values
-
-    def get_xpath_text(self, xpath_pattern, node):
-        """Get the text from children of node that match xpath_pattern.
-
-        :param string xpath_pattern: The pattern to find matches for.
-        :param Tag node: The node to find matches under
-        :return: A list of strings
-        :rtype: list
-        """
-
-        selector = make_css_selector(xpath_pattern, node)
-        values = [] # a list of strings
-
-        if len(selector) == 0:
-            values.append(node.get_text())
-        else:
-            nodes = node.select(selector)
-            for node in nodes:
-                value = nodes.get_text().strip()
-                if len(value) > 0:
-                    values.append(value)
-
-        return values
+            if xpaths is not None:
+                for xpath in xpaths:
+                    if attribute is not None:
+                        extracted = get_xpath_attribute(xpath,
+                            attribute, node)
+                    else:
+                        extracted = get_xpath_text(xpath, node)
+                    for val in extracted:
+                        metadata.append(document.metadata.Metadata(
+                            value=val,
+                            property_name=spec["propertyName"],
+                            specification=spec))
+    return metadata
 
 #TODO: why does this require a node?
 def make_css_selector(xpath, node=None):
@@ -302,3 +254,55 @@ def make_css_selector(xpath, node=None):
         xpath = xpath[1:]
 
     return xpath
+
+def get_xpath_attribute(xpath_pattern, attribute, node):
+    """Return values of attribute from the child elements of node that
+    match xpath_pattern.
+
+    :param string xpath_pattern: A pattern to find matches for
+    :param string attribute: The attribute whose values should be returned
+    :param Tag node: The node to search in
+    :return: A list of strings, the values of the attributes
+    :rtype: list
+    """
+
+    selector = make_css_selector(xpath_pattern, node)
+    values = [] # list of strings
+
+    if len(selector) == 0:
+        vals = node[attribute].split(" ")
+        # Split the attribute since xml does not allow multiple attributes
+        if len(vals) > 0:
+            for value in vals:
+                values.append(value)
+    else:
+        nodes = node.select(selector)
+        for node in nodes:
+            vals = node[attribute].split(" ")
+            if len(vals) > 0:
+                for val in vals:
+                    values.append(val)
+    return values
+
+def get_xpath_text(xpath_pattern, node):
+    """Get the text from children of node that match xpath_pattern.
+
+    :param string xpath_pattern: The pattern to find matches for.
+    :param Tag node: The node to find matches under
+    :return: A list of strings
+    :rtype: list
+    """
+
+    selector = make_css_selector(xpath_pattern, node)
+    values = [] # a list of strings
+
+    if len(selector) == 0:
+        values.append(node.get_text())
+    else:
+        nodes = node.select(selector)
+        for node in nodes:
+            value = nodes.get_text().strip()
+            if len(value) > 0:
+                values.append(value)
+
+    return values
