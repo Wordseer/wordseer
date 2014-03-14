@@ -8,7 +8,7 @@ import json
 import string
 from bs4 import BeautifulSoup
 
-class StructureExtractor:
+class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
     JSON file. It generates document classes (Sentences, Documents, Metadatas,
     etc.) from the input file.
