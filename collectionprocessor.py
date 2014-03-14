@@ -3,7 +3,7 @@ import logger
 import os
 import tokenizer
 
-class CollectionProcessor:
+class CollectionProcessor(object):
     def process(self, collection_dir, document_structure_file_name,
         file_name_extension, start_from_scratch):
         """
