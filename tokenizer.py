@@ -8,7 +8,7 @@ from document import taggedword, sentence
 from nltk.tokenize import sent_tokenize
 
 
-class Tokenizer:
+class Tokenizer(object):
     def __init__(self):
         """Instantiate a tokenizer. This method merely readies the parser.
         Note that readying the parser takes some time.
@@ -37,9 +37,9 @@ class Tokenizer:
 
             for w in s["words"]:
                 tw = taggedword.TaggedWord(word=w, tag=w[1]["PartOfSpeech"])
-                    
+
                 if txt[int(w[1]["CharacterOffsetBegin"])] != " ":
-                        tw.space_before = ""
+                    tw.space_before = ""
                         
                 word_list.append(w[0])
                 tagged_words.append(tw)
