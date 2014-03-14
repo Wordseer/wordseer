@@ -1,5 +1,5 @@
 import unittest
-from structureextractor import StructureExtractor
+from structureextractor import StructureExtractor, make_css_selector
 import tokenizer
 
 class ExtractorTests(unittest.TestCase):
@@ -24,7 +24,7 @@ class ExtractorTests(unittest.TestCase):
             "./number/text()": ":root > number ",
             "./tags/tag/text()": ":root > tags > tag "}
         for path, selector in xpaths.items():
-            self.failUnless(selector == self.extractor.make_css_selector(path))
+            self.failUnless(selector == make_css_selector(path))
 
     @unittest.skip("Root selector problems")
     def test_get_sentences(self):

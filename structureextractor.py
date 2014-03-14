@@ -71,7 +71,7 @@ class StructureExtractor:
         unit_xpaths = structure["xpaths"]
 
         for xpath in unit_xpaths:
-            selector = self.make_css_selector(xpath, parent_node)
+            selector = make_css_selector(xpath, parent_node)
             nodes = BeautifulSoup("", "xml")
 
             if len(selector) == 0:
@@ -115,37 +115,6 @@ class StructureExtractor:
                     units=children, sentences=sents, name=struc_name))
         return units
 
-    #TODO: why does this require a node?
-    def make_css_selector(self, xpath, node=None):
-        """This function transforms xpaths from configuration xml files into
-        css selectors for use with BeautifulSoup.
-
-        :param string xpath: xpath string from a structure file
-        :param Tag node: A BeautifulSoup Tag for the node that requires a
-        selector.
-        :return: The css selector.
-        :rtype: string
-        """
-        #TODO: condense this?
-        if "text()" in xpath:
-            xpath = string.replace(xpath, "text()", "")
-        if "//" in xpath:
-            xpath = string.replace(xpath, "//", " ")
-        if "/" in xpath:
-            xpath = string.replace(xpath, "/", " > ")
-        if "." in xpath:
-            xpath = string.replace(xpath, ".", " :root")
-
-        xpath = xpath.strip()
-
-        if xpath[-1] == ">":
-            xpath = xpath[:-1]
-        if xpath[0] == ">":
-            xpath = xpath[1:]
-
-        return xpath
-
-
     def get_sentences(self, structure, parent_node, tokenize):
         """Return the sentences present in the parent_node and its children.
 
@@ -168,7 +137,7 @@ class StructureExtractor:
             metadata_structure = None
 
         for xpath in unit_xpaths:
-            selector = self.make_css_selector(xpath, parent_node)
+            selector = make_css_selector(xpath, parent_node)
             #TODO: bit of redundancy here from another method
             sentence_nodes = BeautifulSoup("", "xml")
             if len(selector) == 0:
@@ -263,7 +232,7 @@ class StructureExtractor:
         :rtype: list
         """
 
-        selector = self.make_css_selector(xpath_pattern, node)
+        selector = make_css_selector(xpath_pattern, node)
         values = [] # list of strings
 
         if len(selector) == 0:
@@ -290,7 +259,7 @@ class StructureExtractor:
         :rtype: list
         """
 
-        selector = self.make_css_selector(xpath_pattern, node)
+        selector = make_css_selector(xpath_pattern, node)
         values = [] # a list of strings
 
         if len(selector) == 0:
@@ -303,3 +272,33 @@ class StructureExtractor:
                     values.append(value)
 
         return values
+
+#TODO: why does this require a node?
+def make_css_selector(xpath, node=None):
+    """This function transforms xpaths from configuration xml files into
+    css selectors for use with BeautifulSoup.
+
+    :param string xpath: xpath string from a structure file
+    :param Tag node: A BeautifulSoup Tag for the node that requires a
+    selector.
+    :return: The css selector.
+    :rtype: string
+    """
+    #TODO: condense this?
+    if "text()" in xpath:
+        xpath = string.replace(xpath, "text()", "")
+    if "//" in xpath:
+        xpath = string.replace(xpath, "//", " ")
+    if "/" in xpath:
+        xpath = string.replace(xpath, "/", " > ")
+    if "." in xpath:
+        xpath = string.replace(xpath, ".", " :root")
+
+    xpath = xpath.strip()
+
+    if xpath[-1] == ">":
+        xpath = xpath[:-1]
+    if xpath[0] == ">":
+        xpath = xpath[1:]
+
+    return xpath
