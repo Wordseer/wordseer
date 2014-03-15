@@ -34,7 +34,8 @@ class Tokenizer(object):
             text = s["text"]
 
             for w in s["words"]:
-                tw = taggedword.TaggedWord(word=w, tag=w[1]["PartOfSpeech"])
+                tw = taggedword.TaggedWord(word=w, tag=w[1]["PartOfSpeech"],
+                    lemma=w[1]["Lemma"])
 
                 if txt[int(w[1]["CharacterOffsetBegin"])] != " ":
                     tw.space_before = ""
