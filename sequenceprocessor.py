@@ -3,7 +3,7 @@ class SequenceProcessor(object):
         # TODO: handle reader_writer once it's finished
         self.grammatical_info_exists = grammatical_info_exists
 
-        stop_words.extend(pronouns + prepositions + determiners + \
+        self.stop_words.extend(pronouns + prepositions + determiners + \
             conjunctions + modal_verbs + primary_verbs + adverbs + \
             punctuation + contractions)
 
@@ -39,5 +39,17 @@ class SequenceProcessor(object):
         """Remove every sort of stop from the sentences.
 
         :param list words: A list of TaggedWord objects.
-        :return:
+        :return list: The list without stops.
+        """
+        
         without_stops = []
+        for word in words:
+            if self.stop_words not in word.lower():
+                without_stops.append(word)
+
+        return without_stops
+
+    def process(sentence):
+        #TODO: implement timing?
+        previously_indexed = {}
+        ok = True
