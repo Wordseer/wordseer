@@ -53,3 +53,4 @@ class SequenceProcessor(object):
         #TODO: implement timing?
         previously_indexed = {}
         ok = True
+        sequences = []
