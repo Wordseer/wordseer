@@ -5,8 +5,6 @@ Set up the tokenizer using the Stanfurd NLP library.
 import config
 from corenlp import StanfordCoreNLP
 from document import taggedword, sentence
-from nltk.tokenize import sent_tokenize
-
 
 class Tokenizer(object):
     def __init__(self):
