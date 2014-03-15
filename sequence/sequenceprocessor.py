@@ -1,3 +1,5 @@
+import sequence
+
 class SequenceProcessor(object):
     def __init__(reader_writer, grammatical_info_exists):
         # TODO: handle reader_writer once it's finished
@@ -53,4 +55,22 @@ class SequenceProcessor(object):
         #TODO: implement timing?
         previously_indexed = {}
         ok = True
-        sequences = []
+        sequences = [] # a list of Sequences
+        #TODO: there must be a way to make this nicer
+        for i in range(0, len(sentence.tagged)):
+            previously_indexed["i", ""]
+            for j in range(i+1, len(sentence.tagged) + 1):
+                if j - i < 5:
+                    words = sentence.tagged[i:j]
+                    lemmatized_phrase = self.join_lemmas(words, " ")
+                    surface_phrase = self.join_words(words, " ")
+                    words_nostops = self.remove_stops(words)
+                    lemmatized_phrase_nostops =
+                        self.join_lemmas(words_nostops, " ")
+                    surface_phrase_nostops =
+                        self.join_words(words_nostops, " ")
+
+                    #TODO: these assignments could maybe be done better
+                    has_stops = len(words_nostops) < len(words)
+                    lemmatized_has_stops = len(lemmatized_phrase_nostop)
+            
