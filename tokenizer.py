@@ -18,11 +18,8 @@ class Tokenizer(object):
         """Turn a string of one or more sentences into a list of Sentence
         objects.
 
-        Args:
-            par (str): One or more sentences, in a string format.
-
-        Returns:
-            A list of document.Sentence objects.
+        :param str par: One or more sentences, in a string format.
+        :return list: A list of document.Sentence objects.
         """
 
         parsed_text = self.parser.raw_parse(txt)
