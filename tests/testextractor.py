@@ -17,15 +17,6 @@ class ExtractorTests(unittest.TestCase):
     def test_extract_unit_information(self):
         pass
 
-    def test_css_maker(self):
-        xpaths = {"./author/text()": ":root > author ",
-            "./title/text()": ":root > title ",
-            "./time/text()": ":root > time ",
-            "./number/text()": ":root > number ",
-            "./tags/tag/text()": ":root > tags > tag "}
-        for path, selector in xpaths.items():
-            self.failUnless(selector == make_css_selector(path))
-
     @unittest.skip("Root selector problems")
     def test_get_sentences(self):
         pass
@@ -41,6 +32,15 @@ class ExtractorTests(unittest.TestCase):
     @unittest.skip("Root selector problems")
     def test_get_xpath_text(self):
         pass
+
+    def test_get_nodes_from_xpath(self):
+        xpaths = {"./author/text()": ":root > author ",
+            "./title/text()": ":root > title ",
+            "./time/text()": ":root > time ",
+            "./number/text()": ":root > number ",
+            "./tags/tag/text()": ":root > tags > tag ",
+            "   ": ""}
+        
 
 def main():
     unittest.main()

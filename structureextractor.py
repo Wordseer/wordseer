@@ -79,7 +79,7 @@ class StructureExtractor(object):
                 try:
                     metadata_structure = structure["metadata"]
                 except NameError:
-                    metadata_structure = None
+                    metadata_structure = []
 
                 unit_metadata = get_metadata(metadata_structure, node)
                 sents = [] # Sentence objects
@@ -123,10 +123,9 @@ class StructureExtractor(object):
         try:
             metadata_structure = structure["metadata"]
         except NameError:
-            metadata_structure = None
+            metadata_structure = {}
 
         for xpath in unit_xpaths:
-            #TODO: bit of redundancy here from another method
             sentence_nodes = get_nodes_from_xpath(xpath, parent_node)
 
             for sentence_node in sentence_nodes:
@@ -171,37 +170,35 @@ def get_metadata(metadata_structure, node):
     file.
 
     :param list structure: A JSON description of the structure
-    :param etree node: An lxml element tree to get metadata from. 
+    :param etree node: An lxml element tree to get metadata from.
     :return list: A list of Metadata objects
     """
     metadata = [] # A list of Metadata
+    
+    for spec in metadata_structure:
+        try:
+            xpaths = spec["xpaths"]
+        except NameError:
+            xpaths = None
+        try:
+            attribute = spec["attr"]
+        except NameError:
+            attribute = None
 
-    # TODO: do we need this check?
-    if metadata_structure is not None:
-        for spec in metadata_structure:
-            try:
-                xpaths = spec["xpaths"]
-            except NameError:
-                xpaths = None
-            try:
-                attribute = spec["attr"]
-            except NameError:
-                attribute = None
+        extracted = [] # A list of strings
 
-            extracted = [] # A list of strings
-
-            if xpaths is not None:
-                for xpath in xpaths:
-                    if attribute is not None:
-                        extracted = get_xpath_attribute(xpath,
-                            attribute, node)
-                    else:
-                        extracted = get_xpath_text(xpath, node)
-                    for val in extracted:
-                        metadata.append(document.metadata.Metadata(
-                            value=val,
-                            property_name=spec["propertyName"],
-                            specification=spec))
+        if xpaths is not None:
+            for xpath in xpaths:
+                if attribute is not None:
+                    extracted = get_xpath_attribute(xpath,
+                        attribute, node)
+                else:
+                    extracted = get_xpath_text(xpath, node)
+                for val in extracted:
+                    metadata.append(document.metadata.Metadata(
+                        value=val,
+                        property_name=spec["propertyName"],
+                        specification=spec))
     return metadata
 
 def get_xpath_attribute(xpath_pattern, attribute, node):
