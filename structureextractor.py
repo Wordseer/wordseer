@@ -20,8 +20,7 @@ class StructureExtractor(object):
         :param Tokenizer tokenizer: A tokenizer object
         :param str structure_file: Path to a JSON file that specifies the
         document structure.
-        :return: a StructureExtractor instance
-        :rtype: StructureExtractor
+        :return StructureExtractor: a StructureExtractor instance
         """
         self.t = tokenizer
         self.structure_file = open(structure_file, "r")
@@ -32,8 +31,7 @@ class StructureExtractor(object):
         structure_file given in the constructor for rules to identify documents.
 
         :param file file: The file to extract
-        :return: A list of Document objects
-        :rtype: list
+        :return list: A list of Document objects
         """
 
         documents = []
@@ -65,9 +63,8 @@ class StructureExtractor(object):
         a list of Unit objects that represent the parent_node.
 
         :param dict structure: A JSON description of the structure
-        :param Tag parent_node: A BeautifulSoup object of the parent node.
-        :return: A list of Units
-        :rtype: Unit
+        :param etree parent_node: An lxml element tree of the parent node.
+        :return list: A list of Units
         """
 
         units = []
@@ -113,11 +110,10 @@ class StructureExtractor(object):
         """Return the sentences present in the parent_node and its children.
 
         :param dict structure: A JSON description of the structure
-        :param Tag node: a BeautifulSoup object of the node to get sentences
+        :param etree node: An lxml etree object of the node to get sentences
         from
         :param boolean tokenize: if True, then the sentences will be tokenized
-        :return: A list of Sentences.
-        :rtype: list
+        :return list: A list of Sentences.
         """
 
         sentences = [] # a list of sentences
@@ -176,9 +172,8 @@ def get_metadata(metadata_structure, node):
     file.
 
     :param list structure: A JSON description of the structure
-    :param Tag node: ?
-    :return: A list of metadata
-    :rtype: list
+    :param etree node: An lxml element tree to get metadata from. 
+    :return list: A list of Metadata objects
     """
     metadata = [] # A list of Metadata
 
@@ -216,9 +211,8 @@ def get_xpath_attribute(xpath_pattern, attribute, node):
 
     :param string xpath_pattern: A pattern to find matches for
     :param string attribute: The attribute whose values should be returned
-    :param Tag node: The node to search in
-    :return: A list of strings, the values of the attributes
-    :rtype: list
+    :param etree node: The node to search in
+    :return list: A list of strings, the values of the attributes
     """
 
     values = [] # list of strings
@@ -242,9 +236,8 @@ def get_xpath_text(xpath_pattern, node):
     """Get the text from children of node that match xpath_pattern.
 
     :param string xpath_pattern: The pattern to find matches for.
-    :param Tag node: The node to find matches under
-    :return: A list of strings
-    :rtype: list
+    :param etree node: The node to find matches under
+    :return list: A list of strings
     """
 
     values = [] # a list of strings
