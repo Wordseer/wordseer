@@ -75,15 +75,7 @@ class StructureExtractor(object):
         unit_xpaths = structure["xpaths"]
 
         for xpath in unit_xpaths:
-            nodes = "" #TODO: maybe a better way to set this?
-
-            if len(xpath.strip()) == 0:
-                nodes = parent_node
-            else:
-                # TODO: may not work with root nodes, should look into it
-                # TODO: is picking the first one okay behavior?
-                # TODO: this conversion seems hacky
-                nodes = parent_node.xpath(xpath)
+            nodes = get_nodes_from_xpath(xpath, parent_node)
 
             struc_name = structure["structureName"]
 
@@ -140,11 +132,7 @@ class StructureExtractor(object):
 
         for xpath in unit_xpaths:
             #TODO: bit of redundancy here from another method
-            sentence_nodes = ""
-            if len(xpath.strip()) == 0:
-                sentence_nodes = parent_node
-            else:
-                sentence_nodes = parent_node.xpath(xpath)
+            sentence_nodes = get_nodes_from_xpath(xpath, parent_node)
 
             for sentence_node in sentence_nodes:
                 sentence_text += sentence_node.text.strip() + "\n"
@@ -271,3 +259,15 @@ def get_xpath_text(xpath_pattern, node):
                 values.append(value)
 
     return values
+
+def get_nodes_from_xpath(xpath, nodes):
+    """If the selector is longer than 0 chars, then return the children
+    of nodes that match xpath. Otherwise, return all the nodes.
+
+    :param str xpath: The xpath to match.
+    :param etree nodes: LXML etree object of nodes to search.
+    :return etree: The matched nodes."""
+    if len(xpath.strip()) == 0:
+        return nodes
+    else:
+        return nodes.xpath(xpath)
