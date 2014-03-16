@@ -6,7 +6,7 @@
 import document
 import json
 import string
-from bs4 import BeautifulSoup
+from lxml import etree
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
@@ -45,7 +45,7 @@ class StructureExtractor(object):
         # TODO: was there a reason the original was written like that?
 
         with open(file.name, "r") as f:
-            doc = BeautifulSoup(f, "xml")
+            doc = etree.parse(f)
 
         units = self.extract_unit_information(self.document_structure, doc)
 
@@ -75,17 +75,15 @@ class StructureExtractor(object):
         unit_xpaths = structure["xpaths"]
 
         for xpath in unit_xpaths:
-            selector = make_css_selector(xpath, parent_node)
-            nodes = BeautifulSoup("", "xml")
+            nodes = "" #TODO: maybe a better way to set this?
 
-            if len(selector) == 0:
-                nodes.append(parent_node)
+            if len(xpath.strip()) == 0:
+                nodes = parent_node
             else:
                 # TODO: may not work with root nodes, should look into it
                 # TODO: is picking the first one okay behavior?
                 # TODO: this conversion seems hacky
-                nodes = BeautifulSoup(str(parent_node.select(selector)[0]),
-                    "xml")
+                nodes = parent_node.xpath(xpath)
 
             struc_name = structure["structureName"]
 
@@ -141,16 +139,15 @@ class StructureExtractor(object):
             metadata_structure = None
 
         for xpath in unit_xpaths:
-            selector = make_css_selector(xpath, parent_node)
             #TODO: bit of redundancy here from another method
-            sentence_nodes = BeautifulSoup("", "xml")
-            if len(selector) == 0:
-                sentence_nodes.append(parent_node)
+            sentence_nodes = ""
+            if len(xpath.strip()) == 0:
+                sentence_nodes = parent_node
             else:
-                sentence_nodes = parent_node.select(selector)
+                sentence_nodes = parent_node.xpath(xpath)
 
             for sentence_node in sentence_nodes:
-                sentence_text += sentence_node.text().strip() + "\n"
+                sentence_text += sentence_node.text.strip() + "\n"
                 sentence_metadata.append(get_metadata(
                     metadata_structure, sentence_node))
 
@@ -225,36 +222,6 @@ def get_metadata(metadata_structure, node):
                             specification=spec))
     return metadata
 
-#TODO: why does this require a node?
-def make_css_selector(xpath, node=None):
-    """This function transforms xpaths from configuration xml files into
-    css selectors for use with BeautifulSoup.
-
-    :param string xpath: xpath string from a structure file
-    :param Tag node: A BeautifulSoup Tag for the node that requires a
-    selector.
-    :return: The css selector.
-    :rtype: string
-    """
-    #TODO: condense this?
-    if "text()" in xpath:
-        xpath = string.replace(xpath, "text()", "")
-    if "//" in xpath:
-        xpath = string.replace(xpath, "//", " ")
-    if "/" in xpath:
-        xpath = string.replace(xpath, "/", " > ")
-    if "." in xpath:
-        xpath = string.replace(xpath, ".", " :root")
-
-    xpath = xpath.strip()
-
-    if xpath[-1] == ">":
-        xpath = xpath[:-1]
-    if xpath[0] == ">":
-        xpath = xpath[1:]
-
-    return xpath
-
 def get_xpath_attribute(xpath_pattern, attribute, node):
     """Return values of attribute from the child elements of node that
     match xpath_pattern.
@@ -266,19 +233,18 @@ def get_xpath_attribute(xpath_pattern, attribute, node):
     :rtype: list
     """
 
-    selector = make_css_selector(xpath_pattern, node)
     values = [] # list of strings
 
-    if len(selector) == 0:
-        vals = node[attribute].split(" ")
+    if len(xpath_pattern.strip()) == 0:
+        vals = node.get(attribute).split(" ")
         # Split the attribute since xml does not allow multiple attributes
         if len(vals) > 0:
             for value in vals:
                 values.append(value)
     else:
-        nodes = node.select(selector)
+        nodes = node.xpath(xpath_pattern)
         for node in nodes:
-            vals = node[attribute].split(" ")
+            vals = node.get(attribute).split(" ")
             if len(vals) > 0:
                 for val in vals:
                     values.append(val)
@@ -293,15 +259,14 @@ def get_xpath_text(xpath_pattern, node):
     :rtype: list
     """
 
-    selector = make_css_selector(xpath_pattern, node)
     values = [] # a list of strings
 
-    if len(selector) == 0:
-        values.append(node.get_text())
+    if len(xpath_pattern.strip()) == 0:
+        values.append(etree.tostring(node, method="text"))
     else:
-        nodes = node.select(selector)
+        nodes = node.xpath(xpath_pattern)
         for node in nodes:
-            value = nodes.get_text().strip()
+            value = etree.tostring(nodes, method="text").strip()
             if len(value) > 0:
                 values.append(value)
 
