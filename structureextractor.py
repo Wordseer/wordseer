@@ -13,7 +13,6 @@ class StructureExtractor(object):
     JSON file. It generates document classes (Sentences, Documents, Metadatas,
     etc.) from the input file.
     """
-    #TODO: some of these methods cannot accept Tags, require BeautifulSoup
     def __init__(self, tokenizer, structure_file):
         """Create a new StructureExtractor.
 
