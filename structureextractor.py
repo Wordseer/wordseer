@@ -258,5 +258,4 @@ def get_nodes_from_xpath(xpath, nodes):
     :return etree: The matched nodes."""
     if len(xpath.strip()) == 0:
         return nodes
-    else:
-        return nodes.xpath(xpath)
+    return nodes.xpath(xpath)
