@@ -8,6 +8,12 @@ class ExtractorTests(unittest.TestCase):
         self.structure_file = "tests/data/structure.json"
         self.input_file = "tests/data/articles/post1.xml"
         self.xml = etree.parse(self.input_file)
+        self.xpaths = ["./author/text()",
+            "./title/text()",
+            "./time/text()",
+            "./number/text()",
+            "./tags/tag/text()",
+            "   "]
         t = tokenizer.Tokenizer()
         self.extractor = StructureExtractor(t, self.structure_file)
 
@@ -33,14 +39,15 @@ class ExtractorTests(unittest.TestCase):
         pass
 
     def test_get_xpath_text(self):
-        xpaths = {"./author/text()": ["rachel"],
-            "./title/text()": ["Post 1"],
-            "./time/text()": ["2012-02-23"],
-            "./number/text()": ["1"],
-            "./tags/tag/text()": ["Tag 0", "Tag 3"],
-            "   ": ["\n2012-02-23\nPost 1\nrachel\n\n Tag 0\n Tag " +\
-                "3\n\n1\n\n\tThis is the text of post 1. I love clouds.\n\n"]}
-        for xpath, text in xpaths.items():
+        texts = [["rachel"],
+            ["Post 1"],
+            ["2012-02-23"],
+            ["1"],
+            ["Tag 0", "Tag 3"],
+            ["\n2012-02-23\nPost 1\nrachel\n\n Tag 0\n Tag " +\
+                "3\n\n1\n\n\tThis is the text of post 1. I love clouds.\n\n"]]
+        key = dict(zip(self.xpaths, texts))
+        for xpath, text in key.items():
             result = get_xpath_text(xpath, self.xml.getroot())
             self.failUnless(result == text)
 
