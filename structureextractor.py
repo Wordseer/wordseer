@@ -3,7 +3,7 @@
     :synopsis:
 """
 
-import document
+from document import *
 import json
 import string
 from lxml import etree
@@ -47,7 +47,7 @@ class StructureExtractor(object):
         units = self.extract_unit_information(self.document_structure, doc)
 
         for unit in units:
-            d = document.document.Document(metadata=unit.metadata,
+            d = document.Document(metadata=unit.metadata,
                 name="document",
                 sentences=unit.sentences,
                 title=unit.name,
@@ -101,7 +101,7 @@ class StructureExtractor(object):
                         else:
                             sents = self.get_sentences(child_structure, node,
                                 True)
-                units.append(document.unit.Unit(metadata=unit_metadata,
+                units.append(unit.Unit(metadata=unit_metadata,
                     units=children, sentences=sents, name=struc_name))
         return units
 
@@ -151,7 +151,7 @@ class StructureExtractor(object):
                 sentences.append(sentence)
 
         else:
-            sentences.append(document.sentence.Sentence(sentence=sentence_text,
+            sentences.append(sentence.Sentence(sentence=sentence_text,
                 metadata=sentence_metadata))
 
         return sentences
@@ -173,16 +173,16 @@ def get_metadata(metadata_structure, node):
     :param etree node: An lxml element tree to get metadata from.
     :return list: A list of Metadata objects
     """
-    metadata = [] # A list of Metadata
+    metadata_list = [] # A list of Metadata
     
     for spec in metadata_structure:
         try:
             xpaths = spec["xpaths"]
-        except NameError:
+        except KeyError:
             xpaths = None
         try:
             attribute = spec["attr"]
-        except NameError:
+        except KeyError:
             attribute = None
 
         extracted = [] # A list of strings
@@ -195,11 +195,11 @@ def get_metadata(metadata_structure, node):
                 else:
                     extracted = get_xpath_text(xpath, node)
                 for val in extracted:
-                    metadata.append(document.metadata.Metadata(
+                    metadata_list.append(metadata.Metadata(
                         value=val,
                         property_name=spec["propertyName"],
                         specification=spec))
-    return metadata
+    return metadata_list
 
 def get_xpath_attribute(xpath_pattern, attribute, node):
     """Return values of attribute from the child elements of node that

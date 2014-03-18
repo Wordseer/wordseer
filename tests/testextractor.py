@@ -1,11 +1,14 @@
 import unittest
 from structureextractor import *
 import tokenizer
+import json
 from lxml import etree
 
 class ExtractorTests(unittest.TestCase):
     def setUp(self):
         self.structure_file = "tests/data/structure.json"
+        with open(self.structure_file) as f:
+            self.json = json.load(f)
         self.input_file = "tests/data/articles/post1.xml"
         self.xml = etree.parse(self.input_file)
         self.xpaths = ["./author/text()",
@@ -30,14 +33,21 @@ class ExtractorTests(unittest.TestCase):
     def test_get_sentences(self):
         pass
 
-    @unittest.skip("Depends on get_xpath_attribute")
     def test_get_metadata(self):
-        pass
+        structure = self.json["metadata"]
+        metadata = {"Time": "2012-02-23",
+            "Author": "rachel",
+            "Title": "Post 1",
+            "Number": "1",
+            "Tag": ["Tag 0", "Tag 3"]}
+        results = get_metadata(structure, self.xml.getroot())
+        for result in results:
+            print result
 
-    @unittest.skip("Root selector problems")
+    @unittest.skip("Need example code")
     def test_get_xpath_attribute(self):
         pass
-
+        
     def test_get_xpath_text(self):
         texts = [["rachel"],
             ["Post 1"],

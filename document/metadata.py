@@ -1,4 +1,4 @@
-class Metadata:
+class Metadata(object):
     def __init__(self, *args, **kwargs):
         """
         Instantiate a Metadata instance.
@@ -16,5 +16,5 @@ class Metadata:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-        def __str__(self):
-            return self.property_name + ": " + value
+    def __str__(self):
+        return self.property_name + ": " + self.value
