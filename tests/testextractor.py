@@ -7,6 +7,7 @@ class ExtractorTests(unittest.TestCase):
     def setUp(self):
         self.structure_file = "tests/data/structure.json"
         self.input_file = "tests/data/articles/post1.xml"
+        self.xml = etree.parse(self.input_file)
         t = tokenizer.Tokenizer()
         self.extractor = StructureExtractor(t, self.structure_file)
 
@@ -31,25 +32,17 @@ class ExtractorTests(unittest.TestCase):
     def test_get_xpath_attribute(self):
         pass
 
-    @unittest.skip("Root selector problems")
     def test_get_xpath_text(self):
-        pass
-
-    def test_get_nodes_from_xpath(self):
-        with open(self.input_file) as f:
-            tree = etree.parse(f)
-        root = tree.getroot()
-        xpaths = {"./author/text()": root[2],
-            "./title/text()": root[1],
-            "./time/text()": root[0],
-            "./number/text()": root[4],
-            "./tags/tag/text()": root[3],
-            "   ": root}
-
-        for xpath, result in xpaths.items():
-            print result
-            print get_nodes_from_xpath(xpath, root)
-            self.failUnless(result == get_nodes_from_xpath(xpath, tree))
+        xpaths = {"./author/text()": ["rachel"],
+            "./title/text()": ["Post 1"],
+            "./time/text()": ["2012-02-23"],
+            "./number/text()": ["1"],
+            "./tags/tag/text()": ["Tag 0", "Tag 3"],
+            "   ": ["\n2012-02-23\nPost 1\nrachel\n\n Tag 0\n Tag " +\
+                "3\n\n1\n\n\tThis is the text of post 1. I love clouds.\n\n"]}
+        for xpath, text in xpaths.items():
+            result = get_xpath_text(xpath, self.xml.getroot())
+            self.failUnless(result == text)
 
 def main():
     unittest.main()

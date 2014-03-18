@@ -233,7 +233,8 @@ def get_xpath_text(xpath_pattern, node):
 
     :param string xpath_pattern: The pattern to find matches for.
     :param etree node: The node to find matches under
-    :return list: A list of strings
+    :return list: A list of strings, with one string for every node that matches
+    xpath_pattern
     """
 
     values = [] # a list of strings
@@ -243,7 +244,7 @@ def get_xpath_text(xpath_pattern, node):
     else:
         nodes = node.xpath(xpath_pattern)
         for node in nodes:
-            value = etree.tostring(nodes, method="text").strip()
+            value = str(etree.tostring(node.getparent(), method="text")).strip()
             if len(value) > 0:
                 values.append(value)
 
