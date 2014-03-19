@@ -127,9 +127,7 @@ class StructureExtractor(object):
 
         for xpath in unit_xpaths:
             sentence_nodes = get_nodes_from_xpath(xpath, parent_node)
-            print xpath
             for sentence_node in sentence_nodes:
-                print sentence_node
                 sentence_text += etree.tostring(sentence_node,
                     method="text").strip() + "\n"
                 sentence_metadata.append(get_metadata(

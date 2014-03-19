@@ -73,8 +73,9 @@ class PlayTests(CommonTests, unittest.TestCase):
             "tests/data/shakespeare/", "structure.json", "brief_example.xml")
         
     def test_get_sentences(self):
-        a = self.extractor.get_sentences(self.json, self.xml.getroot(), False)
-        print(a[0].sentence)
+        self.failUnless(self.extractor.get_sentences(self.json["units"][0],
+            self.xml.getroot(), False)[0].sentence == etree.tostring(
+            self.xml.getroot()[5], method="text").strip() + "\n")
         
 def main():
     unittest.main()
