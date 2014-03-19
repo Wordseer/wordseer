@@ -24,7 +24,6 @@ class CommonTests:
             for tw in sent.tagged:
                 self.failIf(tw.tag == "")
         
-
 class ParagraphTests(CommonTests, unittest.TestCase):
     def setUp(self):
         example = "She should have died hereafter; There would have " \

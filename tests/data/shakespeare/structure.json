@@ -1,7 +1,7 @@
 {
     "structureName": "document",
     "xpaths": [
-        "PLAY"
+        "/PLAY"
     ],
     "titleXpaths": [
         "./TITLE/text()"

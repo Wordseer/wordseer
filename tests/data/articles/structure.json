@@ -1,7 +1,7 @@
 {
     "structureName": "document",
     "xpaths": [
-        "article"
+        "/article"
     ],
     "titleXpaths": [
         "./title/text()"

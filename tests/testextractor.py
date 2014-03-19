@@ -70,12 +70,11 @@ class PostTests(CommonTests, unittest.TestCase):
 class PlayTests(CommonTests, unittest.TestCase):
     def setUp(self):
         super(PlayTests, self).setUp(
-            "tests/data/shakespeare/", "structure.json", "brief_example.json")
+            "tests/data/shakespeare/", "structure.json", "brief_example.xml")
         
     def test_get_sentences(self):
-        #sents = ["
-        #self.extractor.get_sentences(
-        pass
+        a = self.extractor.get_sentences(self.json, self.xml.getroot(), False)
+        print(a[0].sentence)
         
 def main():
     unittest.main()

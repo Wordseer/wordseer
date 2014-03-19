@@ -115,7 +115,7 @@ class StructureExtractor(object):
         :return list: A list of Sentences.
         """
 
-        sentences = [] # a list of sentences
+        result_sentences = [] # a list of sentences
         sentence_text = ""
         sentence_metadata = [] # List of Metadata objects
         unit_xpaths = structure["xpaths"]
@@ -127,18 +127,20 @@ class StructureExtractor(object):
 
         for xpath in unit_xpaths:
             sentence_nodes = get_nodes_from_xpath(xpath, parent_node)
-
+            print xpath
             for sentence_node in sentence_nodes:
-                sentence_text += sentence_node.text.strip() + "\n"
+                print sentence_node
+                sentence_text += etree.tostring(sentence_node,
+                    method="text").strip() + "\n"
                 sentence_metadata.append(get_metadata(
                     metadata_structure, sentence_node))
 
         if tokenize:
             sents = self.t.tokenize(sentence_text)
 
-            for sentence in sents:
-                sentence.metadata = sentence_metadata
-                words = string.split(" ", sentence.sentence)
+            for sent in sents:
+                sent.metadata = sentence_metadata
+                words = string.split(" ", sent.sentence)
                 total_word_length = 0
 
                 for word in words:
@@ -148,13 +150,13 @@ class StructureExtractor(object):
                 # why is it there?
                 # if self.additional_metadata:
 
-                sentences.append(sentence)
+                result_sentences.append(sentence)
 
         else:
-            sentences.append(sentence.Sentence(sentence=sentence_text,
+            result_sentences.append(sentence.Sentence(sentence=sentence_text,
                 metadata=sentence_metadata))
 
-        return sentences
+        return result_sentences
 
 
 def get_metadata(metadata_structure, node):
