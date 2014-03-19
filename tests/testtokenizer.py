@@ -4,7 +4,7 @@ from document import sentence
 
 class CommonTests:
     @classmethod
-    def setUpClass(commonTests, text=""):
+    def setUpClass(commonTests):
             CommonTests.t = tokenizer.Tokenizer()
 
     def setUp(self, text=""):
