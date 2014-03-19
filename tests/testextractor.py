@@ -4,21 +4,30 @@ import tokenizer
 import json
 from lxml import etree
 
-class PostTests(unittest.TestCase):
-    def setUp(self):
-        self.structure_file = "tests/data/articles/structure.json"
+class CommonTests(object):
+    #@classmethod
+    #def setUpClass(commonTests):
+    #    CommonTests.t = tokenizer.Tokenizer()
+
+    def setUp(self, path, structure_file, input_file):
+        self.structure_file = path + structure_file
+        self.input_file = path + input_file
         with open(self.structure_file) as f:
             self.json = json.load(f)
-        self.input_file = "tests/data/articles/post1.xml"
         self.xml = etree.parse(self.input_file)
+        t = tokenizer.Tokenizer()
+        self.extractor = StructureExtractor(t, self.structure_file)
+
+class PostTests(CommonTests, unittest.TestCase):
+    def setUp(self):
         self.xpaths = ["./author/text()",
             "./title/text()",
             "./time/text()",
             "./number/text()",
             "./tags/tag/text()",
             "   "]
-        t = tokenizer.Tokenizer()
-        self.extractor = StructureExtractor(t, self.structure_file)
+        super(PostTests, self).setUp(
+            "tests/data/articles/", "structure.json", "post1.xml")
 
     @unittest.skip("Depends on extract_unit_information()")
     def test_extract(self):
@@ -40,7 +49,6 @@ class PostTests(unittest.TestCase):
         for result in results:
             self.failUnless(result.property_name in metadata.keys())
             self.failUnless(result.value in metadata[result.property_name])
-            
 
     @unittest.skip("Need example code")
     def test_get_xpath_attribute(self):
@@ -59,20 +67,15 @@ class PostTests(unittest.TestCase):
             result = get_xpath_text(xpath, self.xml.getroot())
             self.failUnless(result == text)
 
-class PlayTests(unittest.TestCase):
+class PlayTests(CommonTests, unittest.TestCase):
     def setUp(self):
-        path = "tests/data/shakespeare/"
-        self.structure_file = "structure.json"
-        self.input_file = "brief_example.json"
-        with open(self.structure_file) as f:
-            self.json = json.load(f)
-        self.xml = etree.parse(self.input_file)
-        t = tokenizer.Tokenizer()
-        self.extractor = StructureExtractor(t, self.structure_file)
+        super(PlayTests, self).setUp(
+            "tests/data/shakespeare/", "structure.json", "brief_example.json")
         
     def test_get_sentences(self):
-        sents = ["
-        self.extractor.get_sentences(
+        #sents = ["
+        #self.extractor.get_sentences(
+        pass
         
 def main():
     unittest.main()
