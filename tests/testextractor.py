@@ -60,10 +60,20 @@ class PostTests(unittest.TestCase):
             self.failUnless(result == text)
 
 class PlayTests(unittest.TestCase):
+    def setUp(self):
+        path = "tests/data/shakespeare/"
+        self.structure_file = "structure.json"
+        self.input_file = "brief_example.json"
+        with open(self.structure_file) as f:
+            self.json = json.load(f)
+        self.xml = etree.parse(self.input_file)
+        t = tokenizer.Tokenizer()
+        self.extractor = StructureExtractor(t, self.structure_file)
+        
     def test_get_sentences(self):
         sents = ["
         self.extractor.get_sentences(
-
+        
 def main():
     unittest.main()
 
