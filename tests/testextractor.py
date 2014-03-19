@@ -42,7 +42,9 @@ class ExtractorTests(unittest.TestCase):
             "Tag": ["Tag 0", "Tag 3"]}
         results = get_metadata(structure, self.xml.getroot())
         for result in results:
-            print result
+            self.failUnless(result.property_name in metadata.keys())
+            self.failUnless(result.value in metadata[result.property_name])
+            
 
     @unittest.skip("Need example code")
     def test_get_xpath_attribute(self):
