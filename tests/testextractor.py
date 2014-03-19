@@ -4,9 +4,9 @@ import tokenizer
 import json
 from lxml import etree
 
-class ExtractorTests(unittest.TestCase):
+class PostTests(unittest.TestCase):
     def setUp(self):
-        self.structure_file = "tests/data/structure.json"
+        self.structure_file = "tests/data/articles/structure.json"
         with open(self.structure_file) as f:
             self.json = json.load(f)
         self.input_file = "tests/data/articles/post1.xml"
@@ -27,10 +27,6 @@ class ExtractorTests(unittest.TestCase):
 
     @unittest.skip("Root selector problems")
     def test_extract_unit_information(self):
-        pass
-
-    @unittest.skip("Root selector problems")
-    def test_get_sentences(self):
         pass
 
     def test_get_metadata(self):
@@ -62,6 +58,11 @@ class ExtractorTests(unittest.TestCase):
         for xpath, text in key.items():
             result = get_xpath_text(xpath, self.xml.getroot())
             self.failUnless(result == text)
+
+class PlayTests(unittest.TestCase):
+    def test_get_sentences(self):
+        sents = ["
+        self.extractor.get_sentences(
 
 def main():
     unittest.main()
