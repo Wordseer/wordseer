@@ -34,9 +34,9 @@ class PostTests(CommonTests, unittest.TestCase):
         with open(self.input_file) as f:
             documents = self.extractor.extract(f)
 
-    @unittest.skip("Root selector problems")
     def test_extract_unit_information(self):
-        pass
+        units = extractor.extract_unit_information(self.json, self.xml.getroot())
+        print units
 
     def test_get_metadata(self):
         structure = self.json["metadata"]
@@ -79,7 +79,7 @@ class PlayTests(CommonTests, unittest.TestCase):
         self.failUnless(self.extractor.get_sentences(self.json["units"][0],
             self.xml.getroot(), False)[0].sentence == etree.tostring(
             self.xml.getroot()[5], method="text").strip() + "\n")
-        
+
 def main():
     unittest.main()
 
