@@ -65,20 +65,17 @@ class StructureExtractor(object):
         :param etree parent_node: An lxml element tree of the parent node.
         :return list: A list of Units
         """
-
+        print "Extracting unit info"
         units = []
-
         unit_xpaths = structure["xpaths"]
-
         for xpath in unit_xpaths:
             nodes = get_nodes_from_xpath(xpath, parent_node)
-
             struc_name = structure["structureName"]
 
             for node in nodes:
                 try:
                     metadata_structure = structure["metadata"]
-                except ValueError:
+                except KeyError:
                     metadata_structure = []
 
                 unit_metadata = get_metadata(metadata_structure, node)
@@ -87,20 +84,21 @@ class StructureExtractor(object):
                 try:
                     #TODO: condense these try-catches
                     child_unit_structures = structure["units"]
-                except ValueError:
-                    child_unit_structures = None
-
-                if child_unit_structures != None:
-                    for n in range(0, len(child_unit_structures)):
-                        child_structure = child_unit_structures[n]
-                        child_type = child_structure["structureName"]
-                        if "sentence" in child_type:
-                            child_units = self.extract_unit_information(
-                                child_structure, node)
-                            children.extend(child_units)
-                        else:
-                            sents = self.get_sentences(child_structure, node,
-                                True)
+                    print structure["units"]
+                except KeyError:
+                    child_unit_structures = []
+                for child_structure in child_unit_structures:
+                    child_type = child_structure["structureName"]
+                    
+                    if "sentence" in child_type:
+                        pass
+                        #print child_type
+                        #print "Recursing"
+                        #child_units = self.extract_unit_information(
+                        #    child_structure, node)
+                        #children.extend(child_units)
+                    else:
+                        sents = self.get_sentences(child_structure, node, True)
                 units.append(unit.Unit(metadata=unit_metadata,
                     units=children, sentences=sents, name=struc_name))
         return units

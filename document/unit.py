@@ -22,10 +22,10 @@ class Unit:
     def __str__(self):
         s = self.metadata.__str__()
 
-        for u in units:
+        for u in self.units:
             s += u.__str__() + "\n"
 
-        for s in sentences:
+        for s in self.sentences:
             s += s.__str__() + "\n"
 
         return s

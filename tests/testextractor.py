@@ -35,9 +35,12 @@ class PostTests(CommonTests, unittest.TestCase):
             documents = self.extractor.extract(f)
 
     def test_extract_unit_information(self):
-        units = self.extractor.extract_unit_information(self.json, self.xml.getroot())
-        print units
-
+        self.failUnless(self.extractor.extract_unit_information(self.json,
+            self.xml.getroot()) ==
+            self.extractor.extract_unit_information(self.json, self.xml))
+        #for unit in units:
+        #    print unit
+            
     def test_get_metadata(self):
         structure = self.json["metadata"]
         metadata = {"Time": "2012-02-23",
