@@ -10,5 +10,4 @@ Requires
 * stanford-corenlp-python
 * sqlaclchemy
 * corenlp
-* beautifulsoup
 * lxml
