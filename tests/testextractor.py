@@ -73,7 +73,7 @@ class PlayTests(CommonTests, unittest.TestCase):
             "tests/data/shakespeare/", "structure.json", "brief_example.xml")
         
     def test_get_sentences(self):
-        #Recurse through the json dict, ideally
+        #Test more cases?
         current_structure = self.json
         current_element = self.xml
         self.failUnless(self.extractor.get_sentences(self.json["units"][0],
