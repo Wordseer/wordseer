@@ -15,7 +15,9 @@ class Unit:
         id -- an integer id.
         name -- a name for the unit.
         """
-
+        self.metadata = ""
+        self.units = []
+        self.sentences = []
         for key, value in kwargs.items():
             setattr(self, key, value)
 
@@ -29,3 +31,6 @@ class Unit:
             s += s.__str__() + "\n"
 
         return s
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__

@@ -35,9 +35,12 @@ class PostTests(CommonTests, unittest.TestCase):
             documents = self.extractor.extract(f)
 
     def test_extract_unit_information(self):
-        self.failUnless(self.extractor.extract_unit_information(self.json,
-            self.xml.getroot()) ==
-            self.extractor.extract_unit_information(self.json, self.xml))
+        a = self.extractor.extract_unit_information(self.json,
+            self.xml.getroot())
+        b = self.extractor.extract_unit_information(self.json, self.xml)
+        print a[0]
+        print b[0]
+        self.failUnless(a == b)
         #for unit in units:
         #    print unit
             

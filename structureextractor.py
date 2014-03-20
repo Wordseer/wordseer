@@ -57,6 +57,49 @@ class StructureExtractor(object):
         return documents
 
 
+    #def extract_unit_information(self, structure, parent_node):
+        #"""Process the given node, according to the given structure, and return
+        #a list of Unit objects that represent the parent_node.
+
+        #:param dict structure: A JSON description of the structure
+        #:param etree parent_node: An lxml element tree of the parent node.
+        #:return list: A list of Units
+        #"""
+        #print "Extracting unit info"
+        #units = []
+        #unit_xpaths = structure["xpaths"]
+        #for xpath in unit_xpaths:
+            #nodes = get_nodes_from_xpath(xpath, parent_node)
+            #struc_name = structure["structureName"]
+
+            #for node in nodes:
+                #try:
+                    #metadata_structure = structure["metadata"]
+                #except KeyError:
+                    #metadata_structure = []
+
+                #unit_metadata = get_metadata(metadata_structure, node)
+                #sents = [] # Sentence objects
+                #children = [] # Unit objects
+                #try:
+                    ##TODO: condense these try-catches
+                    #child_unit_structures = structure["units"]
+                #except KeyError:
+                    #child_unit_structures = []
+                #for child_structure in child_unit_structures:
+                    #child_type = child_structure["structureName"]
+                    
+                    #if "sentence" in child_type:
+                        #pass
+                        ##child_units = self.extract_unit_information(
+                        ##    child_structure, node)
+                        ##children.extend(child_units)
+                    #else:
+                        #sents = self.get_sentences(child_structure, node, True)
+                #units.append(unit.Unit(metadata=unit_metadata,
+                    #units=children, sentences=sents, name=struc_name))
+        #return units
+
     def extract_unit_information(self, structure, parent_node):
         """Process the given node, according to the given structure, and return
         a list of Unit objects that represent the parent_node.
@@ -65,42 +108,14 @@ class StructureExtractor(object):
         :param etree parent_node: An lxml element tree of the parent node.
         :return list: A list of Units
         """
-        print "Extracting unit info"
         units = []
-        unit_xpaths = structure["xpaths"]
-        for xpath in unit_xpaths:
+        xpaths = structure["xpaths"]
+
+        for xpath in xpaths:
             nodes = get_nodes_from_xpath(xpath, parent_node)
-            struc_name = structure["structureName"]
 
             for node in nodes:
-                try:
-                    metadata_structure = structure["metadata"]
-                except KeyError:
-                    metadata_structure = []
-
-                unit_metadata = get_metadata(metadata_structure, node)
-                sents = [] # Sentence objects
-                children = [] # Unit objects
-                try:
-                    #TODO: condense these try-catches
-                    child_unit_structures = structure["units"]
-                    print structure["units"]
-                except KeyError:
-                    child_unit_structures = []
-                for child_structure in child_unit_structures:
-                    child_type = child_structure["structureName"]
-                    
-                    if "sentence" in child_type:
-                        pass
-                        #print child_type
-                        #print "Recursing"
-                        #child_units = self.extract_unit_information(
-                        #    child_structure, node)
-                        #children.extend(child_units)
-                    else:
-                        sents = self.get_sentences(child_structure, node, True)
-                units.append(unit.Unit(metadata=unit_metadata,
-                    units=children, sentences=sents, name=struc_name))
+                units.append(unit.Unit(name=structure["structureName"]))
         return units
 
     def get_sentences(self, structure, parent_node, tokenize):
@@ -121,15 +136,15 @@ class StructureExtractor(object):
         try:
             metadata_structure = structure["metadata"]
         except NameError:
-            metadata_structure = {}
+            metadata_structure = []
 
         for xpath in unit_xpaths:
             sentence_nodes = get_nodes_from_xpath(xpath, parent_node)
             for sentence_node in sentence_nodes:
                 sentence_text += etree.tostring(sentence_node,
                     method="text").strip() + "\n"
-                sentence_metadata.append(get_metadata(
-                    metadata_structure, sentence_node))
+                sentence_metadata.append(get_metadata(metadata_structure,
+                    sentence_node))
 
         if tokenize:
             sents = self.t.tokenize(sentence_text)
@@ -177,6 +192,7 @@ def get_metadata(metadata_structure, node):
         try:
             xpaths = spec["xpaths"]
         except KeyError:
+            #TODO: can be simplified
             xpaths = None
         try:
             attribute = spec["attr"]
@@ -254,7 +270,8 @@ def get_nodes_from_xpath(xpath, nodes):
 
     :param str xpath: The xpath to match.
     :param etree nodes: LXML etree object of nodes to search.
-    :return etree: The matched nodes."""
+    :return list: The matched nodes, as ElementStringResult objects.
+    """
     if len(xpath.strip()) == 0 or nodes in nodes.xpath("../" + xpath):
-        return nodes
+        return [nodes]
     return nodes.xpath(xpath)
