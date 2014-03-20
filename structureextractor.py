@@ -257,6 +257,6 @@ def get_nodes_from_xpath(xpath, nodes):
     :param str xpath: The xpath to match.
     :param etree nodes: LXML etree object of nodes to search.
     :return etree: The matched nodes."""
-    if len(xpath.strip()) == 0:
+    if len(xpath.strip()) == 0 or nodes in nodes.xpath("../" + xpath):
         return nodes
     return nodes.xpath(xpath)

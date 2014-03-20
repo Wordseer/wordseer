@@ -74,10 +74,8 @@ class PlayTests(CommonTests, unittest.TestCase):
         
     def test_get_sentences(self):
         #Recurse through the json dict, ideally
-        current_level = self.json
-        while "units" in current_level.keys:
-            #get_sentences
-            #get actual text
+        current_structure = self.json
+        current_element = self.xml
         self.failUnless(self.extractor.get_sentences(self.json["units"][0],
             self.xml.getroot(), False)[0].sentence == etree.tostring(
             self.xml.getroot()[5], method="text").strip() + "\n")
