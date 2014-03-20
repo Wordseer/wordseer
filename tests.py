@@ -5,6 +5,7 @@ from app.models import *
 
 class TestCase(unittest.TestCase):
     def setUp(self):
+        # TODO: figure out how to set up a test database
         pass
 
     def tearDown(self):
@@ -59,6 +60,51 @@ class TestCase(unittest.TestCase):
         u2 = p2.unit
 
         print("\"Hello World\" unit: ", u2.sentences)
+
+    def test_sample_document(self):
+        """Test turning a document file into the corresponding models.
+
+        Once a document has been imported as an object, it should use the
+        Unit constructor to initialize and save all models for the document.
+        """
+
+        # Import the document.
+        document = self.import_document("sample_document.txt")
+        doc_unit = Unit(document)
+
+        # Look at document contents
+        print(doc_unit.sentences)
+
+    """
+    #######
+    Helpers
+    #######
+    """
+
+    def import_document(self, filename):
+        """Simulate a document import without using a processor.
+        """
+
+        doc_dict = dict()
+        doc_dict["subunits"] = dict()
+        doc_dict["properties"] = dict()
+        doc_dict["sentences"] = list()
+
+        with open(filename) as document:
+            for line in document:
+                words = line.split()
+
+                if words:
+                    if words[0][-1] == ":":
+                        doc_dict["properties"][words[0][:-1]] = " ".join(words[1:])
+                    else:
+                        doc_dict["sentences"].append((line, words))
+                else:
+                    # Empty line
+                    doc_dict["sentences"].append(("", ["\n"]))
+
+        print(doc_dict)
+        return doc_dict
 
 if __name__ == '__main__':
     unittest.main()

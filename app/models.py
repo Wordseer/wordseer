@@ -102,18 +102,6 @@ class Base(object):
 Base = declarative_base(cls=Base)
 
 """
-##################
-Association Tables
-##################
-"""
-
-# Many-to-many table between words and sentences
-word_in_sentence = Table("word_in_sentence", Base.metadata,
-    Column('word_id', Integer, ForeignKey('word.id')),
-    Column('sentence_id', Integer, ForeignKey('sentence.id'))
-)
-
-"""
 ######
 Models
 ######
@@ -151,6 +139,55 @@ class Unit(Base):
     sentences = relationship("Sentence", backref=backref("unit"))
 
     properties = relationship("Property", backref=backref("unit"))
+
+    def __init__(self):
+        """Default empty constructor """
+        pass
+
+    def __init__(self, document=None):
+      """Initialize a top-level document unit from a document file.
+
+      Expects a dictionary that has the following entries:
+      - properties (dict): the metadata of the document
+      - subunits (dict): the structure of the subunits
+      - sentences (list): a list of sentences, in order
+      - words (set): the set of all words (or tokens)
+
+      This is tentative.
+
+      """
+
+      self.unit_type = "document"
+      self.number = 0
+
+      for name, value in document["properties"].items():
+          prop = Property()
+          prop.name = name
+          prop.value = value
+
+          prop.save()
+          self.properties.append(prop)
+
+      for sentence_tuple in document["sentences"]:
+          words = sentence_tuple[1]
+          sentence_text = sentence_tuple[0]
+
+          sentence = Sentence()
+          sentence.text = sentence_text
+
+          for word_str in words:
+              word = Word()
+              word.word = word_str
+              word.save()
+
+              sentence.words.append(word)
+
+          sentence.save()
+          self.sentences.append(sentence)
+
+      # TODO: initialize subunits
+
+      self.save
 
 class Sentence(Base):
     """A model representing a sentence.
@@ -224,3 +261,15 @@ class Property(Base):
 
     def __repr__(self):
         return "<Property: " + self.name + ">"
+
+"""
+##################
+Association Tables
+##################
+"""
+
+# Many-to-many table between words and sentences
+word_in_sentence = Table("word_in_sentence", Base.metadata,
+    Column('word_id', Integer, ForeignKey('word.id')),
+    Column('sentence_id', Integer, ForeignKey('sentence.id'))
+)

@@ -1,0 +1,12 @@
+title: Sample Document
+dir: sample_document.txt
+doctype: sample_doc
+
+This is a sample document to use for testing in test.py.
+This is the second sentence of the sample document.
+Hello World.
+This sentence doesn't have a period
+This sentence has a period (.) in the middle of the sentence.
+
+This sentence came after a new line.
+This is the last sentence.
