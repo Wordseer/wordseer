@@ -35,7 +35,7 @@ class PostTests(CommonTests, unittest.TestCase):
             documents = self.extractor.extract(f)
 
     def test_extract_unit_information(self):
-        units = extractor.extract_unit_information(self.json, self.xml.getroot())
+        units = self.extractor.extract_unit_information(self.json, self.xml.getroot())
         print units
 
     def test_get_metadata(self):

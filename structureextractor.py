@@ -75,10 +75,10 @@ class StructureExtractor(object):
 
             struc_name = structure["structureName"]
 
-            for node in nodes.children:
+            for node in nodes:
                 try:
                     metadata_structure = structure["metadata"]
-                except NameError:
+                except ValueError:
                     metadata_structure = []
 
                 unit_metadata = get_metadata(metadata_structure, node)
@@ -87,7 +87,7 @@ class StructureExtractor(object):
                 try:
                     #TODO: condense these try-catches
                     child_unit_structures = structure["units"]
-                except NameError:
+                except ValueError:
                     child_unit_structures = None
 
                 if child_unit_structures != None:
