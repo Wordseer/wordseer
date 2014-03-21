@@ -19,3 +19,6 @@ class TaggedWord:
 
     def __str__(self):
         return self.word + "/" + self.tag + " - " + lemma
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__

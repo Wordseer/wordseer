@@ -13,7 +13,7 @@ class Sentence(unit.Unit):
         id
         number
         document_id
-        sentence
+        text
         words
         tagged
         lemmas
@@ -24,4 +24,7 @@ class Sentence(unit.Unit):
             setattr(self, key, val)
 
     def __str__(self):
-        return self.metadata.__str__() + "\n" + sentence
+        return self.metadata.__str__() + "\n" + self.text
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__

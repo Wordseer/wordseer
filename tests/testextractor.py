@@ -1,4 +1,4 @@
-from document import metadata
+from document import metadata, sentence
 import unittest
 from structureextractor import *
 import tokenizer
@@ -40,8 +40,6 @@ class PostTests(CommonTests, unittest.TestCase):
             self.xml.getroot())
         b = self.extractor.extract_unit_information(self.json, self.xml)
         doc_info = a[0]
-        for unit in doc_info.units:
-            print unit
         # Make sure that root and file are the same
         self.failUnless(a == b)
         # Should only be one unit present
@@ -51,21 +49,28 @@ class PostTests(CommonTests, unittest.TestCase):
         # It should have no sentences
         self.failUnless(doc_info.sentences == [])
         # It should have metadata
-        self.failUnless(isinstance(doc_info.metdata, metadata.Metadata))
+        for meta in doc_info.metadata:
+            self.failUnless(isinstance(meta, metadata.Metadata))
         # It should only contain one other unit
         self.failUnless(len(doc_info.units) == 1)
         sent_info = doc_info.units[0]
-        # 
+        # The sentence should be named correctly
+        self.failUnless(sent_info.name == self.json["units"][0]["structureName"])
+        # It should have a sentence
+        self.failUnless(len(sent_info.sentences) == 2)
+        for sent in sent_info.sentences:
+
+        #    print sent
+            self.failUnless(isinstance(sent, sentence.Sentence))
         
 
     def test_get_metadata(self):
-        structure = self.json["metadata"]
         metadata = {"Time": "2012-02-23",
             "Author": "rachel",
             "Title": "Post 1",
             "Number": "1",
             "Tag": ["Tag 0", "Tag 3"]}
-        results = get_metadata(structure, self.xml.getroot())
+        results = get_metadata(self.json, self.xml.getroot())
         for result in results:
             self.failUnless(result.property_name in metadata.keys())
             self.failUnless(result.value in metadata[result.property_name])
@@ -97,7 +102,7 @@ class PlayTests(CommonTests, unittest.TestCase):
         current_structure = self.json
         current_element = self.xml
         self.failUnless(self.extractor.get_sentences(self.json["units"][0],
-            self.xml.getroot(), False)[0].sentence == etree.tostring(
+            self.xml.getroot(), False)[0].text == etree.tostring(
             self.xml.getroot()[5], method="text").strip() + "\n")
 
 def main():

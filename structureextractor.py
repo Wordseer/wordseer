@@ -113,11 +113,10 @@ class StructureExtractor(object):
 
         for xpath in xpaths:
             nodes = get_nodes_from_xpath(xpath, parent_node)
-
             for node in nodes:
                 current_unit = unit.Unit(name=structure["structureName"])
                 # Get the metadata
-                current_unit.metadata = get_metadata(structureg
+                current_unit.metadata = get_metadata(structure, node)
                 # If there are child units, retrieve them and put them in a
                 # list, otherwise get the sentences
                 children = []
@@ -125,6 +124,8 @@ class StructureExtractor(object):
                     for child_struc in structure["units"]:
                         children.extend(self.extract_unit_information(child_struc,
                             node))
+                else:
+                    current_unit.sentences = self.get_sentences(structure, node, True)
                 current_unit.units = children
                 units.append(current_unit)
         return units
@@ -145,7 +146,12 @@ class StructureExtractor(object):
         unit_xpaths = structure["xpaths"]
 
         for xpath in unit_xpaths:
-            sentence_nodes = get_nodes_from_xpath(xpath, parent_node)
+            try:
+                sentence_nodes = get_nodes_from_xpath(xpath, parent_node)
+            except AttributeError:
+                # It's already an ElementString or some such
+                sentence_nodes = parent_node.getparent().iter()
+                
             for sentence_node in sentence_nodes:
                 sentence_text += etree.tostring(sentence_node,
                     method="text").strip() + "\n"
@@ -157,7 +163,7 @@ class StructureExtractor(object):
 
             for sent in sents:
                 sent.metadata = sentence_metadata
-                words = string.split(" ", sent.sentence)
+                words = string.split(" ", sent.text)
                 total_word_length = 0
 
                 for word in words:
@@ -167,12 +173,11 @@ class StructureExtractor(object):
                 # why is it there?
                 # if self.additional_metadata:
 
-                result_sentences.append(sentence)
+                result_sentences.append(sent)
 
         else:
-            result_sentences.append(sentence.Sentence(sentence=sentence_text,
+            result_sentences.append(sentence.Sentence(text=sentence_text,
                 metadata=sentence_metadata))
-
         return result_sentences
 
 

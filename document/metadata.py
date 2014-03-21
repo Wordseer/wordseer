@@ -18,3 +18,6 @@ class Metadata(object):
 
     def __str__(self):
         return self.property_name + ": " + self.value
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__

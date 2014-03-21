@@ -28,7 +28,7 @@ class Tokenizer(object):
         for s in parsed_text["sentences"]:
             word_list = [] # a list of words
             tagged_words = [] # a list of TaggedWords
-            text = s["text"]
+            sent_text = s["text"]
 
             for w in s["words"]:
                 tw = taggedword.TaggedWord(word=w, tag=w[1]["PartOfSpeech"],
@@ -40,7 +40,7 @@ class Tokenizer(object):
                 word_list.append(w[0])
                 tagged_words.append(tw)
 
-            paragraph.append(sentence.Sentence(sentence=text,
+            paragraph.append(sentence.Sentence(text=sent_text,
                 tagged=tagged_words, words=word_list))
 
         return paragraph
