@@ -116,7 +116,8 @@ class StructureExtractor(object):
 
             for node in nodes:
                 current_unit = unit.Unit(name=structure["structureName"])
-                
+                # Get the metadata
+                current_unit.metadata = get_metadata(structureg
                 # If there are child units, retrieve them and put them in a
                 # list, otherwise get the sentences
                 children = []
@@ -143,17 +144,12 @@ class StructureExtractor(object):
         sentence_metadata = [] # List of Metadata objects
         unit_xpaths = structure["xpaths"]
 
-        try:
-            metadata_structure = structure["metadata"]
-        except NameError:
-            metadata_structure = []
-
         for xpath in unit_xpaths:
             sentence_nodes = get_nodes_from_xpath(xpath, parent_node)
             for sentence_node in sentence_nodes:
                 sentence_text += etree.tostring(sentence_node,
                     method="text").strip() + "\n"
-                sentence_metadata.append(get_metadata(metadata_structure,
+                sentence_metadata.append(get_metadata(structure,
                     sentence_node))
 
         if tokenize:
@@ -180,7 +176,7 @@ class StructureExtractor(object):
         return result_sentences
 
 
-def get_metadata(metadata_structure, node):
+def get_metadata(structure, node):
     """Return a list of Metadata objects of the metadata of the Tags in
     node according to the rules in metadata_structure.
 
@@ -196,8 +192,14 @@ def get_metadata(metadata_structure, node):
     :param etree node: An lxml element tree to get metadata from.
     :return list: A list of Metadata objects
     """
+
+    try:
+        metadata_structure = structure["metadata"]
+    except KeyError:
+        return []
+
     metadata_list = [] # A list of Metadata
-    
+
     for spec in metadata_structure:
         try:
             xpaths = spec["xpaths"]

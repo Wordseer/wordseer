@@ -1,4 +1,4 @@
-from document import unit
+from document import metadata
 import unittest
 from structureextractor import *
 import tokenizer
@@ -50,6 +50,8 @@ class PostTests(CommonTests, unittest.TestCase):
         self.failUnless(doc_info.name == self.json["structureName"])
         # It should have no sentences
         self.failUnless(doc_info.sentences == [])
+        # It should have metadata
+        self.failUnless(isinstance(doc_info.metdata, metadata.Metadata))
         # It should only contain one other unit
         self.failUnless(len(doc_info.units) == 1)
         sent_info = doc_info.units[0]
