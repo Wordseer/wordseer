@@ -1,3 +1,4 @@
+from document import unit
 import unittest
 from structureextractor import *
 import tokenizer
@@ -38,12 +39,22 @@ class PostTests(CommonTests, unittest.TestCase):
         a = self.extractor.extract_unit_information(self.json,
             self.xml.getroot())
         b = self.extractor.extract_unit_information(self.json, self.xml)
-        print a[0]
-        print b[0]
+        doc_info = a[0]
+        for unit in doc_info.units:
+            print unit
+        # Make sure that root and file are the same
         self.failUnless(a == b)
-        #for unit in units:
-        #    print unit
-            
+        # Should only be one unit present
+        self.failUnless(len(a) == 1)
+        # It should be named correctly
+        self.failUnless(doc_info.name == self.json["structureName"])
+        # And it should only contain one other unit
+
+        self.failUnless(len(doc_info.units) == 1)
+        sent_info = doc_info.units[0]
+        # 
+        
+
     def test_get_metadata(self):
         structure = self.json["metadata"]
         metadata = {"Time": "2012-02-23",

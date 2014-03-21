@@ -115,7 +115,17 @@ class StructureExtractor(object):
             nodes = get_nodes_from_xpath(xpath, parent_node)
 
             for node in nodes:
-                units.append(unit.Unit(name=structure["structureName"]))
+                current_unit = unit.Unit(name=structure["structureName"])
+                
+                # If there are child units, retrieve them and put them in a
+                # list, otherwise get the sentences
+                children = []
+                if "units" in structure.keys():
+                    for child_struc in structure["units"]:
+                        children.extend(self.extract_unit_information(child_struc,
+                            node))
+                current_unit.units = children
+                units.append(current_unit)
         return units
 
     def get_sentences(self, structure, parent_node, tokenize):
