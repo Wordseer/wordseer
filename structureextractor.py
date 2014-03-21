@@ -211,18 +211,17 @@ def get_metadata(metadata_structure, node):
 
         extracted = [] # A list of strings
 
-        if xpaths is not None:
-            for xpath in xpaths:
-                if attribute is not None:
-                    extracted = get_xpath_attribute(xpath,
-                        attribute, node)
-                else:
-                    extracted = get_xpath_text(xpath, node)
-                for val in extracted:
-                    metadata_list.append(metadata.Metadata(
-                        value=val,
-                        property_name=spec["propertyName"],
-                        specification=spec))
+        for xpath in xpaths:
+            if attribute is not None:
+                extracted = get_xpath_attribute(xpath,
+                    attribute, node)
+            else:
+                extracted = get_xpath_text(xpath, node)
+            for val in extracted:
+                metadata_list.append(metadata.Metadata(
+                    value=val,
+                    property_name=spec["propertyName"],
+                    specification=spec))
     return metadata_list
 
 def get_xpath_attribute(xpath_pattern, attribute, node):

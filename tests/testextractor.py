@@ -48,8 +48,9 @@ class PostTests(CommonTests, unittest.TestCase):
         self.failUnless(len(a) == 1)
         # It should be named correctly
         self.failUnless(doc_info.name == self.json["structureName"])
-        # And it should only contain one other unit
-
+        # It should have no sentences
+        self.failUnless(doc_info.sentences == [])
+        # It should only contain one other unit
         self.failUnless(len(doc_info.units) == 1)
         sent_info = doc_info.units[0]
         # 
