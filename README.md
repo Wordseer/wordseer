@@ -28,3 +28,8 @@ Use
 After installing the above dependencies, make sure you edit the config file
 for your setup. Particularly make sure to point `CORE_NLP_DIR` to the Stanford
 NLP library.
+
+Testing
+-------
+
+To test, simply run `runtests.py`.
