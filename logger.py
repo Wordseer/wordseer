@@ -2,8 +2,9 @@
 Handle logging functions, using the Log mapped class.
 """
 
-from models import Log
 import database
+from models import Log
+import sqlalchemy.orm.exc
 
 class Logger():
     def log(item, value, replace_value):
@@ -21,16 +22,16 @@ class Logger():
         entry = Log(log_item = item, item_value = value)
         
 
-        #if "replace" in replace_value:
-        #    entry = session.merge(entry)
+        if "replace" in replace_value:
+            entry = session.merge(entry)
 
         elif "update" in replace_value:
             try:
                 existing_entry = session.query(Log).\
                     filter(Log.value == value).one()
-            except MultipleResultsFound, e:
-                print e
-            except NoResultFound, e:
+            except MultipleResultsFound as e:
+                print e.strerror
+            except NoResultFound as e:
                 existing_entry = Log(log_item = item, item_value = "")
 
             entry.value = existing_entry.value + " [" + entry.value + "] "

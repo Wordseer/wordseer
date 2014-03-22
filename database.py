@@ -6,7 +6,7 @@ import config
 import logging
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import models
+#import models
 
 class Database(object):
     """
@@ -30,15 +30,15 @@ class Database(object):
 
         return Session()
 
-    def reset(self):
-        """
-        Create the tables again.
-        """
-        odels.Base.metadata.create_all(self.engine)
-        self.session.add_all([
-            Log(log_item="database_created", item_value="true"),
-            Log(log_item="latest_parsed_sentence_number", item_value="0"),
-            Log(log_item="latest_parsed_document_id", item_value="0")])
+    #def reset(self):
+        #"""
+        #Create the tables again.
+        #"""
+        #models.Base.metadata.create_all(self.engine)
+        #self.session.add_all([
+            #Log(log_item="database_created", item_value="true"),
+            #Log(log_item="latest_parsed_sentence_number", item_value="0"),
+            #Log(log_item="latest_parsed_document_id", item_value="0")])
 
     def __exit__(self):
         self.session.close()
