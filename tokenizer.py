@@ -1,5 +1,5 @@
 """
-Set up the tokenizer using the Stanfurd NLP library.
+Set up the tokenizer using the Stanford NLP library.
 """
 
 import config
@@ -7,6 +7,9 @@ from corenlp import StanfordCoreNLP
 from document import taggedword, sentence
 
 class Tokenizer(object):
+    """This class takes a string as input and returns a list of Sentences,
+    with each word tagged as a TaggedWord."""
+
     def __init__(self):
         """Instantiate a tokenizer. This method merely readies the parser.
         Note that readying the parser takes some time.
@@ -36,7 +39,7 @@ class Tokenizer(object):
 
                 if txt[int(w[1]["CharacterOffsetBegin"])] != " ":
                     tw.space_before = ""
-                        
+
                 word_list.append(w[0])
                 tagged_words.append(tw)
 
