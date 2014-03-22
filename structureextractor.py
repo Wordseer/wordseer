@@ -1,12 +1,13 @@
 """
 .. module:: StuctureExtractor
-    :synopsis:
+    :synopsis: Methods to parse XML files and generate python classes from their
+    contents.
 """
 
-from document import *
+from document import document, sentence, unit, metadata
 import json
-import string
 from lxml import etree
+import string
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
@@ -35,23 +36,17 @@ class StructureExtractor(object):
 
         documents = []
 
-        #text = ""
-        #with open(file.name, "r", -1) as f: # TODO: this seems a bit ridiculous
-        #    for line in f:
-        #        text += f.readline() + "\n"
-        # TODO: was there a reason the original was written like that?
-
         with open(file.name, "r") as f:
             doc = etree.parse(f)
 
         units = self.extract_unit_information(self.document_structure, doc)
 
-        for unit in units:
-            d = document.Document(metadata=unit.metadata,
+        for extracted_unit in units:
+            d = document.Document(metadata=extracted_unit.metadata,
                 name="document",
-                sentences=unit.sentences,
-                title=unit.name,
-                units=unit.units)
+                sentences=extracted_unit.sentences,
+                title=extracted_unit.name,
+                units=extracted_unit.units)
             documents.append(d)
 
         return documents
@@ -108,7 +103,7 @@ class StructureExtractor(object):
             except AttributeError:
                 # It's already an ElementString or some such
                 sentence_nodes = parent_node.getparent().iter()
-                
+
             for sentence_node in sentence_nodes:
                 sentence_text += etree.tostring(sentence_node,
                     method="text").strip() + "\n"
@@ -167,7 +162,7 @@ def get_metadata(structure, node):
             xpaths = spec["xpaths"]
         except KeyError:
             #TODO: can be simplified
-            xpaths = None
+            xpaths = []
         try:
             attribute = spec["attr"]
         except KeyError:
