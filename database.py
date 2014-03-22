@@ -8,15 +8,19 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import models
 
-class Database:
+class Database(object):
+    """
+    Manage connections with the database. This class is probably not necessary.
+    """
+    
     def __init__(self):
         """
         Create an engine object and create the tables (if they haven't already
         been created).
         """
         engine = create_engine(config.DB_URL)
-        Session = sessionmaker(bind=self.engine)
-        self.session = Session()
+        session = sessionmaker(bind=self.engine)
+        self.session = session()
 
         created = session.query(models.Log).\
             filter_by(log_item == "database_created")
@@ -38,5 +42,3 @@ class Database:
 
     def __exit__(self):
         self.session.close()
-
-
