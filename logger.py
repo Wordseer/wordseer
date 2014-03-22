@@ -31,13 +31,14 @@ class Logger(object):
         elif "update" in replace_value:
             try:
                 existing_entry = session.query(Log).\
-                    filter(Log.item_value == value).one()
-            except MultipleResultsFound as e:
-                pass
-            except NoResultFound as e:
+                    filter(Log.log_item == item).one()
+            except NoResultFound:
                 existing_entry = Log(log_item=item, item_value="")
+            except MultipleResultsFound, e:
+                print e
 
-            entry.value = existing_entry.value + " [" + entry.value + "] "
+            entry.item_value = existing_entry.item_value + " [" + entry.item_value + "] "
+            session.merge(entry)
 
         session.commit()
         session.close()
@@ -50,7 +51,7 @@ class Logger(object):
         not exist, the first one if there are several instances.
         """
         session = database.Database().session
-        results = session.query(Log).filter(Log.item_value == item)
+        results = session.query(Log).filter(Log.log_item == item).all()
 
         if len(results) > 0:
             return results[0].item_value
