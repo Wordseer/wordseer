@@ -28,7 +28,7 @@ class Database(object):
         if len(created) == 0 or "false" in created[0].item_value:
             self.reset()
 
-        return Session()
+        return self.session()
 
     #def reset(self):
         #"""

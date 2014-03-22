@@ -4,10 +4,12 @@ Handle logging functions, using the Log mapped class.
 
 import database
 from models import Log
-import sqlalchemy.orm.exc
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
-class Logger():
-    def log(item, value, replace_value):
+class Logger(object):
+    """Manage log writing and reading to the database."""
+    #TODO: maybe not make this a class?
+    def log(self, item, value, replace_value):
         """
         Add a new log entry.
 
@@ -19,8 +21,9 @@ class Logger():
         entry will add on to the previous entry's value with this entry's
         value.
         """
-        entry = Log(log_item = item, item_value = value)
         
+        entry = Log(log_item=item, item_value=value)
+        session = database.Database().session
 
         if "replace" in replace_value:
             entry = session.merge(entry)
@@ -28,22 +31,26 @@ class Logger():
         elif "update" in replace_value:
             try:
                 existing_entry = session.query(Log).\
-                    filter(Log.value == value).one()
+                    filter(Log.item_value == value).one()
             except MultipleResultsFound as e:
-                print e.strerror
+                pass
             except NoResultFound as e:
-                existing_entry = Log(log_item = item, item_value = "")
+                existing_entry = Log(log_item=item, item_value="")
 
             entry.value = existing_entry.value + " [" + entry.value + "] "
 
-        with database.Database() as session:
-            entry = session.merge(entry)
-            session.commit()
-            session.close()
+        session.commit()
+        session.close()
 
-    def get(item):
-        session = database.Database()
-        results = session.query(Log).filter(log.item == item)
+    def get(self, item):
+        """Get the value for a specific log item.
+
+        :param string item: The item to retrieve.
+        :return string: The value of the given item, blank if the item does
+        not exist, the first one if there are several instances.
+        """
+        session = database.Database().session
+        results = session.query(Log).filter(Log.item_value == item)
 
         if len(results) > 0:
             return results[0].item_value

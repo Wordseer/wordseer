@@ -15,4 +15,4 @@ class Log(Base):
     __tablename__ = "log"
 
     log_item = Column(String(100), nullable = False, primary_key = True)
-    item_vaslue = Column(Text, nullable = False)
+    item_value = Column(Text, nullable = False)
