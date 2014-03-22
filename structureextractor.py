@@ -56,50 +56,6 @@ class StructureExtractor(object):
 
         return documents
 
-
-    #def extract_unit_information(self, structure, parent_node):
-        #"""Process the given node, according to the given structure, and return
-        #a list of Unit objects that represent the parent_node.
-
-        #:param dict structure: A JSON description of the structure
-        #:param etree parent_node: An lxml element tree of the parent node.
-        #:return list: A list of Units
-        #"""
-        #print "Extracting unit info"
-        #units = []
-        #unit_xpaths = structure["xpaths"]
-        #for xpath in unit_xpaths:
-            #nodes = get_nodes_from_xpath(xpath, parent_node)
-            #struc_name = structure["structureName"]
-
-            #for node in nodes:
-                #try:
-                    #metadata_structure = structure["metadata"]
-                #except KeyError:
-                    #metadata_structure = []
-
-                #unit_metadata = get_metadata(metadata_structure, node)
-                #sents = [] # Sentence objects
-                #children = [] # Unit objects
-                #try:
-                    ##TODO: condense these try-catches
-                    #child_unit_structures = structure["units"]
-                #except KeyError:
-                    #child_unit_structures = []
-                #for child_structure in child_unit_structures:
-                    #child_type = child_structure["structureName"]
-                    
-                    #if "sentence" in child_type:
-                        #pass
-                        ##child_units = self.extract_unit_information(
-                        ##    child_structure, node)
-                        ##children.extend(child_units)
-                    #else:
-                        #sents = self.get_sentences(child_structure, node, True)
-                #units.append(unit.Unit(metadata=unit_metadata,
-                    #units=children, sentences=sents, name=struc_name))
-        #return units
-
     def extract_unit_information(self, structure, parent_node):
         """Process the given node, according to the given structure, and return
         a list of Unit objects that represent the parent_node.
@@ -122,10 +78,11 @@ class StructureExtractor(object):
                 children = []
                 if "units" in structure.keys():
                     for child_struc in structure["units"]:
-                        children.extend(self.extract_unit_information(child_struc,
-                            node))
+                        children.extend(
+                            self.extract_unit_information(child_struc, node))
                 else:
-                    current_unit.sentences = self.get_sentences(structure, node, True)
+                    current_unit.sentences = self.get_sentences(structure, node,
+                        True)
                 current_unit.units = children
                 units.append(current_unit)
         return units

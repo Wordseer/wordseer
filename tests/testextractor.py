@@ -56,12 +56,13 @@ class PostTests(CommonTests, unittest.TestCase):
         sent_info = doc_info.units[0]
         # The sentence should be named correctly
         self.failUnless(sent_info.name == self.json["units"][0]["structureName"])
-        # It should have a sentence
+        # It should have two sentences
         self.failUnless(len(sent_info.sentences) == 2)
+        # And the sentences should have the right text
         for sent in sent_info.sentences:
-
-        #    print sent
             self.failUnless(isinstance(sent, sentence.Sentence))
+            self.failUnless(sent.text in
+                "This is the text of post 1. I love clouds.")
         
 
     def test_get_metadata(self):
