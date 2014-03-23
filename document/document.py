@@ -29,3 +29,6 @@ class Document(unit.Unit):
             s += str(sent) + "\n"
 
         return s
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
