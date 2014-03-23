@@ -105,8 +105,10 @@ class SequenceProcessor(object):
             for j in range(i+1, len(sentence.tagged) + 1):
                 if j - i < 5:
                     wordlist = sentence.tagged[i:j]
+                    
                     lemmatized_phrase = self.join_lemmas(wordlist, " ")
                     surface_phrase = self.join_words(wordlist, " ")
+                    
                     words_nostops = self.remove_stops(wordlist)
                     lemmatized_phrase_nostops = self.join_lemmas(words_nostops,
                         " ")
@@ -115,6 +117,7 @@ class SequenceProcessor(object):
                     #TODO: these assignments could maybe be done better
                     has_stops = len(words_nostops) < len(wordlist)
                     lemmatized_has_stops = len(lemmatized_phrase_nostop)
+                    
                     all_stop_words = len(words_nostops) == 0
                     lemmatized_all_stop_words = len(lemmatized_phrase_nostops) == 0
 
@@ -128,6 +131,7 @@ class SequenceProcessor(object):
                             all_function_words=all_stop_words,
                             words=wordlist))
                         previously_indexed[i].append(surface_phrase)
+                        
                         if has_stops and not all_stop_words and words_nostops[0] == wordlist[0]:
                             if not surface_phrase_nostop in previously_indexed[i]:
                                 sequences.append(Sequence(start_position=i,
@@ -148,6 +152,7 @@ class SequenceProcessor(object):
                             all_function_words=lemmatized_all_stop_words,
                             words=wordlist))
                         previously_indexed[i].append(lemmatized_phrase)
+                        
                         if not lemmatized_phrase_wothout_stops in previously_indexed[i]:
                             if lemmatized_has_stops and not lemmatized_all_stop_words and words_without_stops[0] == words[0]:
                                 sequences.append(Sequence(start_position=i,
@@ -158,8 +163,9 @@ class SequenceProcessor(object):
                                     has_function_words=False,
                                     all_function_words=False,
                                     words=words_nostops))
-        for sequence in sequences:
-            self.reader_writer.index_sequence(sequence)
+                                    
+        #for sequence in sequences:
+        #    self.reader_writer.index_sequence(sequence)
 
         return True
 
