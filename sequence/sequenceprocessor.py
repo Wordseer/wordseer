@@ -7,48 +7,52 @@ class SequenceProcessor(object):
         self.reader_writer = reader_writer
         self.grammatical_info_exists = grammatical_info_exists
 
-        prepositions = string.split(" ", ("about away across against along"
-            "around at behind beside besides by despite down during for from"
-            " in inside into near of off on onto over through to toward with"
-            " within whence until without upon hither thither unto up"))
+        self.stop_words = []
 
-        pronouns = string.split(" ", ("i its it you your thou thine thee we"
+        prepositions = string.split(("about away across against along"
+            " around at behind beside besides by despite down during for from"
+            " in inside into near of off on onto over through to toward with"
+            " within whence until without upon hither thither unto up"), " ")
+
+        pronouns = string.split(("i its it you your thou thine thee we"
             " he they me us her them him my mine her hers his our thy thine"
             " ours their theirs myself itself mimself ourselves herself"
             " themselves anything something everything nothing anyone"
-            " someone everyone ones such"))
+            " someone everyone ones such"), " ")
 
-        determiners = string.split(" ", ("the a an some any this these each"
+        determiners = string.split(("the a an some any this these each"
             " that no every all half both twice one two first second other"
             " another next last many few much little more less most least"
-            " several no own"))
+            " several no own"), " ")
 
-        conjunctions = string.split(" ", ("and or but so when as while"
+        conjunctions = string.split(("and or but so when as while"
             " because although if though what who where whom when why whose"
-            " which how than nor not"))
+            " which how than nor not"), " ")
 
-        modal_verbs = string.split(" ", ("can can't don't won't shan't"
+        modal_verbs = string.split(("can can't don't won't shan't"
             " shouldn't ca canst might may would wouldst will willst should"
-            " shall must could"))
+            " shall must could"), " ")
 
-        primary_verbs = string.split(" ", ("is are am be been being went go "
-            "do did doth has have hath was were had"))
+        primary_verbs = string.split(("is are am be been being went go"
+            " do did doth has have hath was were had"), " ")
 
-        adverbs = string.split(" ", ("again very here there today tomorrow"
+        adverbs = string.split(("again very here there today tomorrow"
             " now then always never sometimes usually often therefore"
             " however besides moreover though otherwise else instead"
-            " anyway incidentally meanwhile"))
+            " anyway incidentally meanwhile"), " ")
 
-        punctuation = string.split(" ", (". ! @ # $ % ^ & * ( ) _ - -- --- +"
-            " = ` ~  � { } [ ] | \\ : ; \" ' < > ? , . / "))
+        punctuation = string.split((". ! @ # $ % ^ & * ( ) _ - -- --- +"
+            " = ` ~  { } [ ] | \\ : ; \" ' < > ? , . / "), " ")
 
-        contractions = string.split(" ", (" 's 'nt 'm n't th 'll o s"
-            " 't 'rt "))
-        
-        self.stop_words.extend(pronouns + prepositions + determiners +\
-            conjunctions + modal_verbs + primary_verbs + adverbs +\
+        contractions = string.split((" 's 'nt 'm n't th 'll o s"
+            " 't 'rt "), " ")
+
+        self.stop_words.extend(pronouns + prepositions + determiners +
+            conjunctions + modal_verbs + primary_verbs + adverbs +
             punctuation + contractions)
 
+
+    #TODO: these methods are almost identical
     def join_lemmas(self, words, delimiter):
         """Join the lemmas of words with the delimiter.
 
@@ -57,11 +61,11 @@ class SequenceProcessor(object):
         :return str: The combined lemmas.
         """
 
-        lemmas = ""
+        lemmas = []
         for word in words:
-            lemmas += word.lemma + delimiter
+            lemmas.extend([word.lemma, delimiter])
 
-        return lemmas
+        return "".join(lemmas[:-1])
 
     def join_words(self, words, delimiter):
         """Join  words with the delimiter.
@@ -71,11 +75,11 @@ class SequenceProcessor(object):
         :return str: The combined words.
         """
 
-        words = ""
+        result = []
         for word in words:
-            words += word.word + delimiter
+            result.extend([word.word, delimiter])
 
-        return words
+        return "".join(result[:-1])
 
     def remove_stops(self, words):
         """Remove every sort of stop from the sentences.
@@ -86,7 +90,7 @@ class SequenceProcessor(object):
         
         without_stops = []
         for word in words:
-            if self.stop_words not in word.lower():
+            if word.word.lower() not in self.stop_words:
                 without_stops.append(word)
 
         return without_stops
@@ -104,10 +108,9 @@ class SequenceProcessor(object):
                     lemmatized_phrase = self.join_lemmas(wordlist, " ")
                     surface_phrase = self.join_words(wordlist, " ")
                     words_nostops = self.remove_stops(wordlist)
-                    lemmatized_phrase_nostops =
-                        self.join_lemmas(words_nostops, " ")
-                    surface_phrase_nostops =
-                        self.join_words(words_nostops, " ")
+                    lemmatized_phrase_nostops = self.join_lemmas(words_nostops,
+                        " ")
+                    surface_phrase_nostops = self.join_words(words_nostops, " ")
 
                     #TODO: these assignments could maybe be done better
                     has_stops = len(words_nostops) < len(wordlist)
