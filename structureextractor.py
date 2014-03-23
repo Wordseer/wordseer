@@ -26,16 +26,17 @@ class StructureExtractor(object):
         self.structure_file = open(structure_file, "r")
         self.document_structure = json.load(self.structure_file)
 
-    def extract(self, file):
+    def extract(self, infile):
         """Extract a list of Documents from a file. This method uses the
         structure_file given in the constructor for rules to identify documents.
 
-        :param file file: The file to extract
+        :param file/str infile: The file to extract; readable objects or paths
+        as strings are acceptable.
         :return list: A list of Document objects
         """
 
         documents = []
-        doc = etree.parse(file)
+        doc = etree.parse(infile)
         units = self.extract_unit_information(self.document_structure, doc)
 
         for extracted_unit in units:
@@ -75,6 +76,7 @@ class StructureExtractor(object):
                 else:
                     current_unit.sentences = self.get_sentences(structure, node,
                         True)
+
                 current_unit.units = children
                 units.append(current_unit)
         return units

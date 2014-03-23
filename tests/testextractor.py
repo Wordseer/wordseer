@@ -47,22 +47,32 @@ class PostTests(CommonTests, unittest.TestCase):
             "Title": "Post 1",
             "Number": "1",
             "Tag": ["Tag 0", "Tag 3"]}
-
+        self.sentence_contents = "This is the text of post 1. I love clouds."
         super(PostTests, self).setUp(
             "tests/data/articles/", "structure.json", "post1.xml")
 
     def test_extract(self):
         """Tests for extract().
         """
-        with open(self.input_file) as f:
-            documents = self.extractor.extract(f)
+        documents = self.extractor.extract(self.input_file)
 
         # There should be one document
         self.failUnless(len(documents) == 1)
+        # Check to make sure the name and title are correct
+        self.failUnless(documents[0].title == self.json["structureName"])
+        self.failUnless(documents[0].name == "document")
+        # Should be one unit, with the right sentences
+        self.failUnless(len(documents[0].units) == 1)
+            self.xml)[0].units[0].sentences
+        self.failUnless(documents[0].units[0].sentences ==
+            self.extractor.extract_unit_information(self.json,
+            self.xml)[0].units[0].sentences)
+        # Only two sentences in this doc
+        self.failUnless(len(documents[0].units[0].sentences) == 2)
+        for sent in documents[0].units[0].sentences:
+            self.failUnless(sent.text in self.sentence_contents)
         # Check to make sure metadata is properly extracted
         self.failUnless(compare_metadata(self.meta, documents[0].metadata))
-        
-        
 
     def test_extract_unit_information(self):
         """Tests for extract_unit_information.
@@ -70,6 +80,7 @@ class PostTests(CommonTests, unittest.TestCase):
         a = self.extractor.extract_unit_information(self.json,
             self.xml.getroot())
         b = self.extractor.extract_unit_information(self.json, self.xml)
+
         doc_info = a[0]
         # Make sure that root and file are the same
         self.failUnless(a == b)
@@ -93,8 +104,7 @@ class PostTests(CommonTests, unittest.TestCase):
         # And the sentences should have the right text
         for sent in sent_info.sentences:
             self.failUnless(isinstance(sent, sentence.Sentence))
-            self.failUnless(sent.text in
-                "This is the text of post 1. I love clouds.")
+            self.failUnless(sent.text in self.sentence_contents)
 
     def test_get_metadata(self):
         """Tests for get_metadata
@@ -161,7 +171,7 @@ def compare_metadata(dict_metadata, other_metadata):
             return False
 
     if len(list(set(unique_data))) != len(dict_metadata):
-        return "Lengths of sets not equal"
+        print "Lengths of sets not equal"
         return False
 
     return True
