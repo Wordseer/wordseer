@@ -34,22 +34,35 @@ class PostTests(CommonTests, unittest.TestCase):
     """Run tests based on a single post from the articles directory.
     """
     def setUp(self):
-        """Set up variables for the PostTests."""
+        """Set up variables for the PostTests.
+        """
         self.xpaths = ["./author/text()",
             "./title/text()",
             "./time/text()",
             "./number/text()",
             "./tags/tag/text()",
             "   "]
+        self.meta = {"Time": "2012-02-23",
+            "Author": "rachel",
+            "Title": "Post 1",
+            "Number": "1",
+            "Tag": ["Tag 0", "Tag 3"]}
+
         super(PostTests, self).setUp(
             "tests/data/articles/", "structure.json", "post1.xml")
 
-    @unittest.skip("Depends on extract_unit_information()")
     def test_extract(self):
         """Tests for extract().
         """
         with open(self.input_file) as f:
             documents = self.extractor.extract(f)
+
+        # There should be one document
+        self.failUnless(len(documents) == 1)
+        # Check to make sure metadata is properly extracted
+        self.failUnless(compare_metadata(self.meta, documents[0].metadata))
+        
+        
 
     def test_extract_unit_information(self):
         """Tests for extract_unit_information.
@@ -86,15 +99,8 @@ class PostTests(CommonTests, unittest.TestCase):
     def test_get_metadata(self):
         """Tests for get_metadata
         """
-        meta = {"Time": "2012-02-23",
-            "Author": "rachel",
-            "Title": "Post 1",
-            "Number": "1",
-            "Tag": ["Tag 0", "Tag 3"]}
         results = get_metadata(self.json, self.xml.getroot())
-        for result in results:
-            self.failUnless(result.property_name in meta.keys())
-            self.failUnless(result.value in meta[result.property_name])
+        self.failUnless(compare_metadata(self.meta, results))
 
     @unittest.skip("Need example code")
     def test_get_xpath_attribute(self):
@@ -133,6 +139,32 @@ class PlayTests(CommonTests, unittest.TestCase):
         self.failUnless(self.extractor.get_sentences(self.json["units"][0],
             self.xml.getroot(), False)[0].text == etree.tostring(
             self.xml.getroot()[5], method="text").strip() + "\n")
+
+def compare_metadata(dict_metadata, other_metadata):
+    """Compare a metadata object to a dict.
+    :param list dict_metadata: A dict to check other_metadata against, like
+    self.metadata.
+    :param Metadata other_metadata: The metadata object to check.
+    :return boolean: True if they are equal, False if not.
+    """
+    unique_data = []
+    for datum in other_metadata:
+        unique_data.append(datum.property_name)
+
+        if datum.property_name not in dict_metadata.keys():
+            print "Property " + datum.property_name + " not in self.meta"
+            return False
+
+        if datum.value not in dict_metadata[datum.property_name]:
+            print "Value " + datum.value + " not accepted for property " +\
+                datum.property_name
+            return False
+
+    if len(list(set(unique_data))) != len(dict_metadata):
+        return "Lengths of sets not equal"
+        return False
+
+    return True
 
 def main():
     unittest.main()

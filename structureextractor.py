@@ -35,10 +35,7 @@ class StructureExtractor(object):
         """
 
         documents = []
-
-        with open(file.name, "r") as f:
-            doc = etree.parse(f)
-
+        doc = etree.parse(file)
         units = self.extract_unit_information(self.document_structure, doc)
 
         for extracted_unit in units:
