@@ -1,12 +1,52 @@
 from sequence import Sequence
+import string
 
 class SequenceProcessor(object):
     def __init__(self, reader_writer, grammatical_info_exists):
         # TODO: handle reader_writer once it's finished
+        self.reader_writer = reader_writer
         self.grammatical_info_exists = grammatical_info_exists
 
-        self.stop_words.extend(pronouns + prepositions + determiners + \
-            conjunctions + modal_verbs + primary_verbs + adverbs + \
+        prepositions = string.split(" ", ("about away across against along"
+            "around at behind beside besides by despite down during for from"
+            " in inside into near of off on onto over through to toward with"
+            " within whence until without upon hither thither unto up"))
+
+        pronouns = string.split(" ", ("i its it you your thou thine thee we"
+            " he they me us her them him my mine her hers his our thy thine"
+            " ours their theirs myself itself mimself ourselves herself"
+            " themselves anything something everything nothing anyone"
+            " someone everyone ones such"))
+
+        determiners = string.split(" ", ("the a an some any this these each"
+            " that no every all half both twice one two first second other"
+            " another next last many few much little more less most least"
+            " several no own"))
+
+        conjunctions = string.split(" ", ("and or but so when as while"
+            " because although if though what who where whom when why whose"
+            " which how than nor not"))
+
+        modal_verbs = string.split(" ", ("can can't don't won't shan't"
+            " shouldn't ca canst might may would wouldst will willst should"
+            " shall must could"))
+
+        primary_verbs = string.split(" ", ("is are am be been being went go "
+            "do did doth has have hath was were had"))
+
+        adverbs = string.split(" ", ("again very here there today tomorrow"
+            " now then always never sometimes usually often therefore"
+            " however besides moreover though otherwise else instead"
+            " anyway incidentally meanwhile"))
+
+        punctuation = string.split(" ", (". ! @ # $ % ^ & * ( ) _ - -- --- +"
+            " = ` ~  � { } [ ] | \\ : ; \" ' < > ? , . / "))
+
+        contractions = string.split(" ", (" 's 'nt 'm n't th 'll o s"
+            " 't 'rt "))
+        
+        self.stop_words.extend(pronouns + prepositions + determiners +\
+            conjunctions + modal_verbs + primary_verbs + adverbs +\
             punctuation + contractions)
 
     def join_lemmas(self, words, delimiter):
@@ -122,3 +162,4 @@ class SequenceProcessor(object):
 
     def finish(self):
         pass
+
