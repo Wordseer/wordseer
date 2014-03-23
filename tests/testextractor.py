@@ -63,7 +63,6 @@ class PostTests(CommonTests, unittest.TestCase):
         self.failUnless(documents[0].name == "document")
         # Should be one unit, with the right sentences
         self.failUnless(len(documents[0].units) == 1)
-            self.xml)[0].units[0].sentences
         self.failUnless(documents[0].units[0].sentences ==
             self.extractor.extract_unit_information(self.json,
             self.xml)[0].units[0].sentences)
