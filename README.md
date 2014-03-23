@@ -25,6 +25,10 @@ Installation
 `corenlp` must be installed manually, and version *3.2.0* of Stanford's CoreNLP
 library must simply be in a directory accessible to the backend.
 
+You must also run the `createdb.py` script before running for the first time:
+
+`python2.7 createdb.py`
+
 Use
 ---
 
