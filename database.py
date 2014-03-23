@@ -4,6 +4,7 @@ Open, close, and manage database connections.
 
 import config
 import logging
+import os.path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Log, Base
@@ -38,6 +39,7 @@ class Database(object):
             Log(log_item="database_created", item_value="true"),
             Log(log_item="latest_parsed_sentence_number", item_value="0"),
             Log(log_item="latest_parsed_document_id", item_value="0")])
+        self.session.commit()
 
     def __exit__(self):
         self.session.close()

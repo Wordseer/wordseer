@@ -160,7 +160,6 @@ def get_metadata(structure, node):
         try:
             xpaths = spec["xpaths"]
         except KeyError:
-            #TODO: can be simplified
             xpaths = []
         try:
             attribute = spec["attr"]
