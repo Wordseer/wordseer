@@ -9,13 +9,11 @@ import tokenizer
 import json
 from lxml import etree
 
+t = tokenizer.Tokenizer()
+
 class CommonTests(object):
     """Functionality common to all extractor test cases.
     """
-    #@classmethod
-    #def setUpClass(commonTests):
-    #    CommonTests.t = tokenizer.Tokenizer()
-
     def setUp(self, path, structure_file, input_file):
         """Set up some common variables.
 
@@ -30,7 +28,6 @@ class CommonTests(object):
         with open(self.structure_file) as f:
             self.json = json.load(f)
         self.xml = etree.parse(self.input_file)
-        t = tokenizer.Tokenizer()
         self.extractor = StructureExtractor(t, self.structure_file)
 
 class PostTests(CommonTests, unittest.TestCase):
