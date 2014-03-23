@@ -10,14 +10,16 @@ Requires
 * [sqlaclchemy](http://www.sqlalchemy.org/)
 * [corenlp](https://github.com/silverasm/stanford-corenlp-python)
 * [lxml](http://lxml.de/)
-* [Stanford CoreNLP](http://nlp.stanford.edu/software/corenlp.shtml)
+* [Stanford CoreNLP](http://nlp.stanford.edu/software/corenlp.shtml): Specifically version 3.2.0
+* Unidecode
+
 
 Installation
 ------------
 
 To install `sqlalchemy` and `lxml`:
 
-`pip install SQLAlchemy lxml`
+`pip install SQLAlchemy lxml Unidecode`
 
 `corenlp` must be installed manually, and Stanford's CoreNLP library must simply
 be in a directory accessible to the backend.
