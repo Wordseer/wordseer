@@ -1,20 +1,23 @@
-class Unit:
+from comparebydict import CompareByDict
+
+class Unit(CompareByDict):
     """
     Units contain a list of sentences, or of other units. They also have
     metadata, an id, and a name.
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        Construct a Unit.
+        """Construct a Unit.
 
         Keyword arguments:
-        sentences -- a list of sentences.
-        units -- a list of units.
-        metadata -- an instance of Metadata
-        id -- an integer id.
-        name -- a name for the unit.
+        :keyword list sentences: A list of Sentence objects in this unit.
+        :keyword list units: A list of Unit objects in this unit.
+        :keyword list metadata: A list of Metadata objects to describe this
+        unit.
+        :keyword int id: An id number for this unit.
+        :keyword str name: A name for the unit.
         """
+
         self.metadata = ""
         self.units = []
         self.sentences = []
@@ -31,6 +34,3 @@ class Unit:
             s += s.__str__() + "\n"
 
         return s
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__

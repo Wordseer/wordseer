@@ -1,4 +1,6 @@
-class TaggedWord:
+from comparebydict import CompareByDict
+
+class TaggedWord(CompareByDict):
     """
     This class describes a single tagged word.
     """
@@ -8,17 +10,18 @@ class TaggedWord:
     def __init__(self, *args, **kwargs):
         """Instantiate a TaggedWord object.
 
-        Kwargs:
-            id (int): The ID for the word.
-            word (str): The stored word.
-            tag (str): Part of speech for the word.
-            lemma (str): The lemma for this word.
+        :keyword int id: The ID for the word.
+        :keyword str word: The stored word.
+        :keyword str tag: Part of speech for the word.
+        :keyword str lemma: The lemma for this word.
         """
+
+        self.word = ""
+        self.tag = ""
+        self.lemma = ""
+
         for item, val in kwargs.items():
             setattr(self, item, val)
 
     def __str__(self):
         return self.word + "/" + self.tag + " - " + lemma
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__

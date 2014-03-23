@@ -1,6 +1,7 @@
+from comparebydict import CompareByDict
 import unit
 
-class Document(unit.Unit):
+class Document(CompareByDict):
     """Store information about a Document."""
     
     def __init__(self, *args, **kwargs):
@@ -29,6 +30,3 @@ class Document(unit.Unit):
             s += str(sent) + "\n"
 
         return s
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__

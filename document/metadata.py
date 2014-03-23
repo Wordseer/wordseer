@@ -1,4 +1,6 @@
-class Metadata(object):
+from comparebydict import CompareByDict
+
+class Metadata(CompareByDict):
     def __init__(self, *args, **kwargs):
         """
         Instantiate a Metadata instance.
@@ -13,11 +15,12 @@ class Metadata(object):
         display_Name
         specification
         """
+
+        self.property_name = ""
+        self.value = ""
+
         for key, value in kwargs.items():
             setattr(self, key, value)
 
     def __str__(self):
         return self.property_name + ": " + self.value
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__

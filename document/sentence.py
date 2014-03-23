@@ -1,3 +1,4 @@
+from comparebydict import CompareByDict
 import unit
 
 class Sentence(unit.Unit):
@@ -20,11 +21,12 @@ class Sentence(unit.Unit):
         metadata
         totalSentences
         """
+
+        self.metadata = []
+        self.text = ""
+
         for key, val in kwargs.items():
             setattr(self, key, val)
 
     def __str__(self):
         return self.metadata.__str__() + "\n" + self.text
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
