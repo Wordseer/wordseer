@@ -7,31 +7,33 @@ more maintainable python.
 
 Requires
 --------
-* [sqlaclchemy](http://www.sqlalchemy.org/)
+* [SQLAlchemy](http://www.sqlalchemy.org/)
 * [corenlp](https://github.com/silverasm/stanford-corenlp-python)
 * [lxml](http://lxml.de/)
-* [Stanford CoreNLP](http://nlp.stanford.edu/software/corenlp.shtml): Specifically version 3.2.0
-* Unidecode
+* [Stanford CoreNLP](http://nlp.stanford.edu/software/corenlp.shtml):
+Specifically version 3.2.0
+* [Unidecode](https://pypi.python.org/pypi/Unidecode/)
 
 
 Installation
 ------------
 
-To install `sqlalchemy` and `lxml`:
+`sqlalchemy`, `lxml`, and `Unidecode` can be installed via `pip`:
 
 `pip install SQLAlchemy lxml Unidecode`
 
-`corenlp` must be installed manually, and Stanford's CoreNLP library must simply
-be in a directory accessible to the backend.
+`corenlp` must be installed manually, and version *3.2.0* of Stanford's CoreNLP
+library must simply be in a directory accessible to the backend.
 
 Use
 ---
 
 After installing the above dependencies, make sure you edit the config file
 for your setup. Particularly make sure to point `CORE_NLP_DIR` to the Stanford
-NLP library.
+NLP library. You should then be ready to parse files. Example files are
+included in `tests/data`.
 
 Testing
 -------
 
-To test, simply run `runtests.py`.
+To test, simply run `runtests.py` from the root directory.
