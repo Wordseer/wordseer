@@ -97,23 +97,27 @@ class SequenceProcessor(object):
 
     def process(self, sentence):
         #TODO: implement timing?
-        previously_indexed = []
         sequences = [] # a list of Sequences
         #TODO: there must be a way to make this nicer
         for i in range(0, len(sentence.tagged)):
-            previously_indexed[i] = []
+            self.previously_indexed = []
             for j in range(i+1, len(sentence.tagged) + 1):
                 if j - i < 5:
-                    sequences.extend(self.get_sequence(sentence,
-                        previously_indexed, i, j))
+                    # For every sequence of five or fewer words, create a
+                    # Sequence.
+                    sequences.extend(self.get_sequence(sentence, i, j))
 
         #for sequence in sequences:
         #    self.reader_writer.index_sequence(sequence)
 
         return True
 
-    def get_sequence(self, sentence, previously_indexed, i, j):
+    def get_sequence(self, sentence, i, j):
         """Handle the main processing part in the process() loop.
+        :param Sentence sentence: A sentence object to create sequences from.
+        :param int i: The index to start the sequence from, inclusive.
+        :param int j: The index to stop the sequence from, exclusive.
+        :return list: A list of Sequences.
         """
         sequences = []
         
@@ -134,7 +138,7 @@ class SequenceProcessor(object):
         all_stop_words = len(words_nostops) == 0
         lemmatized_all_stop_words = len(lemmatized_phrase_nostops) == 0
 
-        if not surface_phrase in previously_indexed[i]:
+        if not surface_phrase in self.previously_indexed:
             sequences.append(Sequence(start_position=i,
                 sentence_id=sentence.id,
                 document_id=sentence.document_id,
@@ -143,11 +147,12 @@ class SequenceProcessor(object):
                 has_function_words=has_stops,
                 all_function_words=all_stop_words,
                 words=wordlist))
-            previously_indexed[i].append(surface_phrase)
+            self.previously_indexed.append(surface_phrase)
             
-            if (has_stops and not all_stop_words and
-                words_nostops[0] == wordlist[0] and
-                not surface_phrase_nostop in previously_indexed[i]):
+            if (has_stops and not
+                all_stop_words and
+                words_nostops[0] == wordlist[0] and not
+                surface_phrase_nostop in self.previously_indexed):
                     sequences.append(Sequence(start_position=i,
                     sentence_id=sentence.id,
                     document_id=sentence.document_id,
@@ -166,11 +171,11 @@ class SequenceProcessor(object):
                 all_function_words=lemmatized_all_stop_words,
                 words=wordlist))
                 
-            previously_indexed[i].append(lemmatized_phrase)
+            self.previously_indexed.append(lemmatized_phrase)
             
-            if (not lemmatized_phrase_wothout_stops in
-                previously_indexed[i] and lemmatized_has_stops and
-                not lemmatized_all_stop_words and
+            if (not lemmatized_phrase_nostops in self.previously_indexed and
+                lemmatized_has_stops and not
+                lemmatized_all_stop_words and
                 words_without_stops[0] == words[0]):
                     sequences.append(Sequence(start_position=i,
                         sentence_id=sentence.id,
