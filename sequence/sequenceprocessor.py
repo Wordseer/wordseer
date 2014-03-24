@@ -51,33 +51,22 @@ class SequenceProcessor(object):
             conjunctions + modal_verbs + primary_verbs + adverbs +
             punctuation + contractions)
 
-
-    #TODO: these methods are almost identical
-    def join_lemmas(self, words, delimiter):
-        """Join the lemmas of words with the delimiter.
-
-        :param list words: A list of TaggedWord objects with lemmas.
-        :param str delimiter: A delimiter to put between lemmas.
-        :return str: The combined lemmas.
-        """
-
-        lemmas = []
-        for word in words:
-            lemmas.extend([word.lemma, delimiter])
-
-        return "".join(lemmas[:-1])
-
-    def join_words(self, words, delimiter):
-        """Join  words with the delimiter.
-
+    def join_tws(self, words, delimiter, attr):
+        """Join either the lemmas or text of words with the delimiter.
         :param list words: A list of TaggedWord objects.
-        :param str delimiter: A delimiter to put between words.
-        :return str: The combined words.
+        :param str delimiter: A delimiter to put between the words/lemmas.
+        :param str attr: Either "lemma" to combine lemmas or "word" to combine
+        words.
+        :return str: The combined sentence.
         """
-
+        
         result = []
+
         for word in words:
-            result.extend([word.word, delimiter])
+            if attr == "lemma":
+                result.extend([word.lemma, delimiter])
+            if attr == "word":
+                result.extend([word.word, delimiter])
 
         return "".join(result[:-1])
 
@@ -128,17 +117,17 @@ class SequenceProcessor(object):
         sequences = []
         
         wordlist = sentence.tagged[i:j]
-        lemmatized_phrase = self.join_lemmas(wordlist, " ")
-        surface_phrase = self.join_words(wordlist, " ")
+        lemmatized_phrase = self.join_tws(wordlist, " ", "word")
+        surface_phrase = self.join_tws(wordlist, " ", "word")
 
         if surface_phrase in self.previously_indexed:
             #If we've already seen this sentence, don't bother
             return sequences
         
         wordlist_nostops = self.remove_stops(wordlist)
-        lemmatized_phrase_nostops = self.join_lemmas(wordlist_nostops,
-            " ")
-        surface_phrase_nostops = self.join_words(wordlist_nostops, " ")
+        lemmatized_phrase_nostops = self.join_tws(wordlist_nostops,
+            " ", "lemma")
+        surface_phrase_nostops = self.join_tws(wordlist_nostops, " ", "word")
 
         #TODO: these assignments could maybe be done better
         has_stops = len(wordlist_nostops) < len(wordlist)
@@ -170,7 +159,7 @@ class SequenceProcessor(object):
                 has_function_words=False,
                 all_function_words=False,
                 words=words_nostop))
-            self.previously_indexed.append(surface_phrase_nostop)
+                self.previously_indexed.append(surface_phrase_nostop)
 
         # Definitely make a Sequence of the lemmatized_phrase
         sequences.append(Sequence(start_position=i,

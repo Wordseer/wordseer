@@ -27,7 +27,8 @@ class Sequence(object):
         made of function words.
         :keyword int length: The number of words in this sequence.
         :keyword list words: A list of TaggedWord objects representing the words
-        in this sequence.
+        in this sequence. Even if this sequence is lemmatized, the TaggedWords
+        contain both the original word and its lemma.
         """
 
         for item, value in kwargs:

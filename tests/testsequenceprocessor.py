@@ -21,13 +21,13 @@ class SequenceProcessorTests(unittest.TestCase):
     def test_join_lemmas(self):
         """Test join_lemmas()
         """
-        self.failUnless(self.seq_proc.join_lemmas(self.words, " ") ==
+        self.failUnless(self.seq_proc.join_tws(self.words, " ", "lemma") ==
             self.string)
 
     def test_join_words(self):
         """Test join_words()
         """
-        self.failUnless(self.seq_proc.join_words(self.words, " ") ==
+        self.failUnless(self.seq_proc.join_tws(self.words, " ", "word") ==
             self.string)
 
     def test_remove_stops(self):
