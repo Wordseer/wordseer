@@ -132,8 +132,9 @@ class SequenceProcessor(object):
                             words=wordlist))
                         previously_indexed[i].append(surface_phrase)
                         
-                        if has_stops and not all_stop_words and words_nostops[0] == wordlist[0]:
-                            if not surface_phrase_nostop in previously_indexed[i]:
+                        if has_stops and not all_stop_words and
+                            words_nostops[0] == wordlist[0] and
+                            not surface_phrase_nostop in previously_indexed[i]:
                                 sequences.append(Sequence(start_position=i,
                                 sentence_id=sentence.id,
                                 document_id=sentence.document_id,
@@ -151,10 +152,13 @@ class SequenceProcessor(object):
                             has_function_words=lemmatized_has_stops,
                             all_function_words=lemmatized_all_stop_words,
                             words=wordlist))
+                            
                         previously_indexed[i].append(lemmatized_phrase)
                         
-                        if not lemmatized_phrase_wothout_stops in previously_indexed[i]:
-                            if lemmatized_has_stops and not lemmatized_all_stop_words and words_without_stops[0] == words[0]:
+                        if not lemmatized_phrase_wothout_stops in
+                            previously_indexed[i] and lemmatized_has_stops and
+                            not lemmatized_all_stop_words and
+                            words_without_stops[0] == words[0]:
                                 sequences.append(Sequence(start_position=i,
                                     sentence_id=sentence.id,
                                     document_id=sentence.document_id,
@@ -163,6 +167,7 @@ class SequenceProcessor(object):
                                     has_function_words=False,
                                     all_function_words=False,
                                     words=words_nostops))
+                        
                                     
         #for sequence in sequences:
         #    self.reader_writer.index_sequence(sequence)
