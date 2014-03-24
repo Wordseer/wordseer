@@ -1,7 +1,6 @@
-from comparebydict import CompareByDict
-import unit
+from unit import Unit
 
-class Sentence(unit.Unit):
+class Sentence(Unit):
     """
     A sentence is a type of Unit that can only contain words.
     """

@@ -1,7 +1,6 @@
-from comparebydict import CompareByDict
-import unit
+from unit import Unit
 
-class Document(CompareByDict):
+class Document(Unit):
     """Store information about a Document."""
     
     def __init__(self, *args, **kwargs):
