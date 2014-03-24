@@ -142,11 +142,11 @@ class SequenceProcessor(object):
 
         #TODO: these assignments could maybe be done better
         has_stops = len(wordlist_nostops) < len(wordlist)
-        lemmatized_has_stops = len(lemmatized_phrase_nostop)
-        
-        all_stop_words = len(wordlist_nostops) == 0
+        lemmatized_has_stops = len(string.split(" ",
+            lemmatized_phrase_nostop)) < len(words)
         lemmatized_all_stop_words = len(lemmatized_phrase_nostops) == 0
 
+        # Definitely make a Sequence of the surface_phrase
         sequences.append(Sequence(start_position=i,
             sentence_id=sentence.id,
             document_id=sentence.document_id,
@@ -156,7 +156,8 @@ class SequenceProcessor(object):
             all_function_words=all_stop_words,
             words=wordlist))
         self.previously_indexed.append(surface_phrase)
-        
+
+        # Maybe make a Sequence of surface_phrase_nostop
         if (has_stops and not
             all_stop_words and
             wordlist_nostops[0] == wordlist[0] and not
@@ -169,7 +170,9 @@ class SequenceProcessor(object):
                 has_function_words=False,
                 all_function_words=False,
                 words=words_nostop))
+            self.previously_indexed.append(surface_phrase_nostop)
 
+        # Definitely make a Sequence of the lemmatized_phrase
         sequences.append(Sequence(start_position=i,
             sentence_id=sentence.id,
             document_id=sentence.document_id,
@@ -178,9 +181,9 @@ class SequenceProcessor(object):
             has_function_words=lemmatized_has_stops,
             all_function_words=lemmatized_all_stop_words,
             words=wordlist))
-            
         self.previously_indexed.append(lemmatized_phrase)
-        
+
+        # Maybe make a sequence of the lemmatized_phrase_nostop
         if (not lemmatized_phrase_nostops in self.previously_indexed and
             lemmatized_has_stops and not
             lemmatized_all_stop_words and
