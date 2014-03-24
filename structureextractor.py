@@ -4,7 +4,10 @@
     contents.
 """
 
-from document import document, sentence, unit, metadata
+from document.document import Document
+from document.sentence import Sentence
+from document.unit import Unit
+from document.metadata import Metadata
 import json
 from lxml import etree
 import string
@@ -40,7 +43,7 @@ class StructureExtractor(object):
         units = self.extract_unit_information(self.document_structure, doc)
 
         for extracted_unit in units:
-            d = document.Document(metadata=extracted_unit.metadata,
+            d = Document(metadata=extracted_unit.metadata,
                 name="document",
                 sentences=extracted_unit.sentences,
                 title=extracted_unit.name,
@@ -63,7 +66,7 @@ class StructureExtractor(object):
         for xpath in xpaths:
             nodes = get_nodes_from_xpath(xpath, parent_node)
             for node in nodes:
-                current_unit = unit.Unit(name=structure["structureName"])
+                current_unit = Unit(name=structure["structureName"])
                 # Get the metadata
                 current_unit.metadata = get_metadata(structure, node)
                 # If there are child units, retrieve them and put them in a
@@ -127,7 +130,7 @@ class StructureExtractor(object):
                 result_sentences.append(sent)
 
         else:
-            result_sentences.append(sentence.Sentence(text=sentence_text,
+            result_sentences.append(Sentence(text=sentence_text,
                 metadata=sentence_metadata))
         return result_sentences
 
@@ -175,7 +178,7 @@ def get_metadata(structure, node):
             else:
                 extracted = get_xpath_text(xpath, node)
             for val in extracted:
-                metadata_list.append(metadata.Metadata(
+                metadata_list.append(Metadata(
                     value=val,
                     property_name=spec["propertyName"],
                     specification=spec))
