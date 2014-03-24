@@ -18,7 +18,7 @@ class Unit(CompareByDict):
         :keyword str name: A name for the unit.
         """
 
-        self.metadata = ""
+        self.metadata = []
         self.units = []
         self.sentences = []
         for key, value in kwargs.items():

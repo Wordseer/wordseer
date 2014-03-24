@@ -17,6 +17,11 @@ class Document(Unit):
         :keyword string title: The title of the document.
         """
 
+        self.title = ""
+        self.metadata = []
+        self.units = []
+        self.sentences = []
+
         for key, value in kwargs.items():
             setattr(self, key, value)
 

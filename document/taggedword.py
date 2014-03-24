@@ -24,4 +24,4 @@ class TaggedWord(CompareByDict):
             setattr(self, item, val)
 
     def __str__(self):
-        return self.word + "/" + self.tag + " - " + lemma
+        return self.word + "/" + self.tag + " - " + self.lemma
