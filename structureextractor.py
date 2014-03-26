@@ -123,10 +123,6 @@ class StructureExtractor(object):
                 for word in words:
                     total_word_length += len(word)
 
-                # TODO: additionalMetadata is a private variable set to false,
-                # why is it there?
-                # if self.additional_metadata:
-
                 result_sentences.append(sent)
 
         else:
