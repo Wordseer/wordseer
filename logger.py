@@ -1,59 +1,58 @@
 """
-Handle logging functions, using the Log mapped class.
+Manage log writing and reading to the database. Many events are stored in a
+database rather than a convential textfile for speedy queries later on in
+the pipeline.
 """
 
 import database
 from models import Log
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+from sqlalchemy.orm.exc import NoResultFound
 
-class Logger(object):
-    """Manage log writing and reading to the database."""
-    #TODO: maybe not make this a class?
-    def log(self, item, value, replace_value):
-        """
-        Add a new log entry.
+def log(item, value, replace_value):
+    """
+    Add a new log entry to the log table.
 
-        Arguments:
-        item -- the entry to log.
-        value -- the name to log it under.
-        replace_value -- if set to "replace", then this entry will replace
-        the previous entry with the same value. If set to "update", then this
-        entry will add on to the previous entry's value with this entry's
-        value.
-        """
-        
-        entry = Log(log_item=item, item_value=value)
-        session = database.Database().session
+    :param str item: The item to log (think of it as a title).
+    :param str value: The value of the logged item.
+    :param str replace_value: if set to "replace", then this entry will replace
+    the previous entry with the same value. If set to "update", then this
+    entry will add on to the previous entry's value with this entry's
+    value.
+    :return None: None.
+    """
 
-        if "replace" in replace_value:
-            entry = session.merge(entry)
+    entry = Log(log_item=item, item_value=value)
+    session = database.Database().session
 
-        elif "update" in replace_value:
-            try:
-                existing_entry = session.query(Log).\
-                    filter(Log.log_item == item).one()
-            except NoResultFound:
-                existing_entry = Log(log_item=item, item_value="")
-            except MultipleResultsFound, e:
-                print e
+    if "replace" in replace_value:
+        entry = session.merge(entry)
 
-            entry.item_value = existing_entry.item_value + " [" + entry.item_value + "] "
-            session.merge(entry)
+    elif "update" in replace_value:
+        try:
+            existing_entry = session.query(Log).\
+                filter(Log.log_item == item).one()
+        except NoResultFound:
+            existing_entry = Log(log_item=item, item_value="")
 
-        session.commit()
-        session.close()
+        entry.item_value = existing_entry.item_value + " [" +\
+            entry.item_value + "] "
+        session.merge(entry)
 
-    def get(self, item):
-        """Get the value for a specific log item.
+    session.commit()
+    session.close()
 
-        :param string item: The item to retrieve.
-        :return string: The value of the given item, blank if the item does
-        not exist, the first one if there are several instances.
-        """
-        session = database.Database().session
-        results = session.query(Log).filter(Log.log_item == item).all()
+def get(item):
+    """Get the value for a specific log item.
 
-        if len(results) > 0:
-            return results[0].item_value
+    :param string item: The item to retrieve.
+    :return string: The value of the given item, blank if the item does
+    not exist, the first one if there are several instances.
+    """
 
-        return ""
+    session = database.Database().session
+    results = session.query(Log).filter(Log.log_item == item).first()
+
+    if results:
+        return results.item_value
+
+    return ""

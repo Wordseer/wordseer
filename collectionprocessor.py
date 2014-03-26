@@ -1,5 +1,5 @@
 import database
-import logger
+import logger # TODO: logger is different now
 import os
 import tokenizer
 
