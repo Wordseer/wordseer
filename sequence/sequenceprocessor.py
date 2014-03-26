@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from sequence import Sequence
 import string
 
@@ -42,7 +43,7 @@ class SequenceProcessor(object):
             " anyway incidentally meanwhile"), " ")
 
         punctuation = string.split((". ! @ # $ % ^ & * ( ) _ - -- --- +"
-            " = ` ~  { } [ ] | \\ : ; \" ' < > ? , . / "), " ")
+            " = ` ~ � { } [ ] | \\ : ; \" ' < > ? , . / "), " ")
 
         contractions = string.split((" 's 'nt 'm n't th 'll o s"
             " 't 'rt "), " ")
@@ -95,13 +96,16 @@ class SequenceProcessor(object):
         sequences = [] # a list of Sequences
         #TODO: there must be a way to make this nicer
         for i in range(0, len(sentence.tagged)):
+            # Iterate through every word
             self.previously_indexed = []
             for j in range(i+1, len(sentence.tagged) + 1):
+                # Check every word after the one at i
                 if j - i < 5:
-                    # For every sequence of five or fewer words, create a
-                    # Sequence.
+                    # If this word is less than five words away from i,
+                    # create a new Sequence (five or fewer words)
                     sequences.extend(self.get_sequence(sentence, i, j))
 
+        # TODO: readerwriter
         #for sequence in sequences:
         #    self.reader_writer.index_sequence(sequence)
 
@@ -116,9 +120,9 @@ class SequenceProcessor(object):
         """
         sequences = []
         
-        wordlist = sentence.tagged[i:j]
-        lemmatized_phrase = self.join_tws(wordlist, " ", "word")
-        surface_phrase = self.join_tws(wordlist, " ", "word")
+        wordlist = sentence.tagged[i:j] # all the words
+        lemmatized_phrase = self.join_tws(wordlist, " ", "lemma") # only lemmas
+        surface_phrase = self.join_tws(wordlist, " ", "word") # only words
 
         if surface_phrase in self.previously_indexed:
             #If we've already seen this sentence, don't bother
