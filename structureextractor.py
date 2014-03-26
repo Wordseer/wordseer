@@ -189,20 +189,20 @@ def get_xpath_attribute(xpath_pattern, attribute, node):
     values = [] # list of strings
 
     if len(xpath_pattern.strip()) == 0:
-        attr = node.xpath(".")[0].get(attribute)
+        # this is guaranteed to be one element, it also keeps problems from
+        # happening if it's a file rather than an element
+        nodes = node.xpath(".") 
+    else:
+        nodes = node.xpath(xpath_pattern)
+
+    for node in nodes:
+        attr = node.get(attribute)
         if attr is not None:
             vals = attr.split(" ")
             # Split the attribute since xml does not allow multiple attributes
             for value in vals:
                 values.append(value)
-    else:
-        nodes = node.xpath(xpath_pattern)
-        for node in nodes:
-            attr = node.get(attribute)
-            if attr is not None:
-                vals = string.split(attr, " ")
-                for val in vals:
-                    values.append(val)
+
     return values
 
 def get_xpath_text(xpath_pattern, node):
