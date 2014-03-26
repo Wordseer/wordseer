@@ -1,4 +1,4 @@
-<article>
+<article attribute="value1" blankval="" multival="one two">
 <time>2012-02-23</time>
 <title>Post 1</title>
 <author>rachel</author>

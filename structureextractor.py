@@ -176,7 +176,9 @@ def get_metadata(structure, node):
 
 def get_xpath_attribute(xpath_pattern, attribute, node):
     """Return values of attribute from the child elements of node that
-    match xpath_pattern.
+    match xpath_pattern. If there is no xpath_pattern, then the attributes of
+    the root element are selected. If the attribute has spaces, it is split
+    along the spaces into several list elements.
 
     :param string xpath_pattern: A pattern to find matches for
     :param string attribute: The attribute whose values should be returned
@@ -187,9 +189,10 @@ def get_xpath_attribute(xpath_pattern, attribute, node):
     values = [] # list of strings
 
     if len(xpath_pattern.strip()) == 0:
-        vals = node.get(attribute).split(" ")
-        # Split the attribute since xml does not allow multiple attributes
-        if len(vals) > 0:
+        attr = node.xpath(".")[0].get(attribute)
+        if attr is not None:
+            vals = attr.split(" ")
+            # Split the attribute since xml does not allow multiple attributes
             for value in vals:
                 values.append(value)
     else:

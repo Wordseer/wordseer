@@ -114,8 +114,16 @@ class PostTests(CommonTests, unittest.TestCase):
     def test_get_xpath_attribute(self):
         """Test get_xpath_attribute.
         """
-        result = get_xpath_attribute("./tags/tag", "attribute", self.xml)
-        self.failUnless(result == ["value"])
+        self.failUnless(get_xpath_attribute("./tags/tag", "attribute",
+            self.xml) == ["value"])
+        self.failUnless(get_xpath_attribute("", "attribute",
+            self.xml) == ["value1"])
+        self.failUnless(get_xpath_attribute("", "blankval",
+            self.xml) == [""])
+        self.failUnless(get_xpath_attribute("", "multival",
+            self.xml) == ["one", "two"])
+        self.failUnless(get_xpath_attribute("", "nonexistant",
+            self.xml) == [])
 
     def test_get_xpath_text(self):
         """Tests for get_xpath_text
