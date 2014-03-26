@@ -10,7 +10,6 @@ from document.unit import Unit
 from document.metadata import Metadata
 import json
 from lxml import etree
-import string
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
@@ -117,12 +116,6 @@ class StructureExtractor(object):
 
             for sent in sents:
                 sent.metadata = sentence_metadata
-                words = string.split(" ", sent.text)
-                total_word_length = 0
-
-                for word in words:
-                    total_word_length += len(word)
-
                 result_sentences.append(sent)
 
         else:
