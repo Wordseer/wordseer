@@ -111,11 +111,11 @@ class PostTests(CommonTests, unittest.TestCase):
         results = get_metadata(self.json, self.xml.getroot())
         self.failUnless(compare_metadata(self.meta, results))
 
-    @unittest.skip("Need example code")
     def test_get_xpath_attribute(self):
         """Test get_xpath_attribute.
         """
-        pass
+        result = get_xpath_attribute("./tags/tag", "attribute", self.xml)
+        self.failUnless(result == ["value"])
 
     def test_get_xpath_text(self):
         """Tests for get_xpath_text

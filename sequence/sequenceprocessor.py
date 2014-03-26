@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from sequence import Sequence
-import string
+import string #TODO: is this necessary?
 
 class SequenceProcessor(object):
     def __init__(self, reader_writer, grammatical_info_exists):

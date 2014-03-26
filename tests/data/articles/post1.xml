@@ -3,7 +3,7 @@
 <title>Post 1</title>
 <author>rachel</author>
 <tags>
- <tag>Tag 0</tag>
+ <tag attribute="value">Tag 0</tag>
  <tag>Tag 3</tag>
 </tags>
 <number>1</number>
