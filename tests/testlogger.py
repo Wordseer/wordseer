@@ -33,3 +33,5 @@ class LoggerTests(unittest.TestCase):
         self.failUnless(logger.get("logtest") ==
             self.db.session.query(Log).filter(Log.log_item == "logtest").\
             all()[0].item_value)
+
+        self.failUnless(logger.get("fakerandomname") == "")

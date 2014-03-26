@@ -10,7 +10,6 @@ from document.unit import Unit
 from document.metadata import Metadata
 import json
 from lxml import etree
-import string
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
@@ -191,7 +190,7 @@ def get_xpath_attribute(xpath_pattern, attribute, node):
     if len(xpath_pattern.strip()) == 0:
         # this is guaranteed to be one element, it also keeps problems from
         # happening if it's a file rather than an element
-        nodes = node.xpath(".") 
+        nodes = node.xpath(".")
     else:
         nodes = node.xpath(xpath_pattern)
 
