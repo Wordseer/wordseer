@@ -56,25 +56,6 @@ class SequenceProcessor(object):
             conjunctions + modal_verbs + primary_verbs + adverbs +
             punctuation + contractions)
 
-    def join_tws(self, words, delimiter, attr):
-        """Join either the lemmas or text of words with the delimiter.
-        :param list words: A list of TaggedWord objects.
-        :param str delimiter: A delimiter to put between the words/lemmas.
-        :param str attr: Either "lemma" to combine lemmas or "word" to combine
-        words.
-        :return str: The combined sentence.
-        """
-
-        result = []
-
-        for word in words:
-            if attr == "lemma":
-                result.extend([word.lemma, delimiter])
-            if attr == "word":
-                result.extend([word.word, delimiter])
-
-        return "".join(result[:-1])
-
     def remove_stops(self, words):
         """Remove every sort of stop from the sentences.
 
@@ -199,3 +180,21 @@ class SequenceProcessor(object):
     def finish(self):
         pass
 
+def join_tws(self, words, delimiter, attr):
+    """Join either the lemmas or text of words with the delimiter.
+    :param list words: A list of TaggedWord objects.
+    :param str delimiter: A delimiter to put between the words/lemmas.
+    :param str attr: Either "lemma" to combine lemmas or "word" to combine
+    words.
+    :return str: The combined sentence.
+    """
+
+    result = []
+
+    for word in words:
+        if attr == "lemma":
+            result.extend([word.lemma, delimiter])
+        if attr == "word":
+            result.extend([word.word, delimiter])
+
+    return "".join(result[:-1])
