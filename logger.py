@@ -8,26 +8,29 @@ import database
 from models import Log
 from sqlalchemy.orm.exc import NoResultFound
 
+REPLACE = "replace"
+UPDATE = "update"
+
 def log(item, value, replace_value):
     """
     Add a new log entry to the log table.
 
     :param str item: The item to log (think of it as a title).
     :param str value: The value of the logged item.
-    :param str replace_value: if set to "replace", then this entry will replace
-    the previous entry with the same value. If set to "update", then this
+    :param str replace_value: if set to logger.REPLACE, this entry will replace
+    the previous entry with the same value. If set to logger.UPDATE, then this
     entry will add on to the previous entry's value with this entry's
-    value.
+    value in the form "old [new]".
     :return None: None.
     """
 
     entry = Log(log_item=item, item_value=value)
     session = database.Database().session
 
-    if "replace" in replace_value:
+    if REPLACE == replace_value:
         entry = session.merge(entry)
 
-    elif "update" in replace_value:
+    elif UPDATE == replace_value:
         try:
             existing_entry = session.query(Log).\
                 filter(Log.log_item == item).one()

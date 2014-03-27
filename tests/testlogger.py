@@ -17,10 +17,10 @@ class LoggerTests(unittest.TestCase):
     def test_log(self):
         """Test the log() method. These tests assume that get() works.
         """
-        logger.log("logtest", "true", "replace")
+        logger.log("logtest", "true", logger.REPLACE)
         self.failUnless(logger.get("logtest") == "true")
 
-        logger.log("logtest", "false", "update")
+        logger.log("logtest", "false", logger.UPDATE)
         self.failUnless(logger.get("logtest") == "true [false] ")
 
     def test_get(self):
