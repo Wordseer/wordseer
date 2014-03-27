@@ -9,6 +9,10 @@ from sequence.sequence import Sequence
 class SequenceProcessor(object):
     """Process given input into Sequences.
     """
+
+    LEMMA = "lemma"
+    WORD = "word"
+
     def __init__(self, reader_writer, grammatical_info_exists):
         # TODO: handle reader_writer once it's finished
         self.reader_writer = reader_writer
@@ -106,21 +110,21 @@ class SequenceProcessor(object):
         sequences = []
 
         wordlist = sentence.tagged[i:j] # all the words
-        lemmatized_phrase = self.join_tws(wordlist, " ", "lemma") # only lemmas
-        surface_phrase = self.join_tws(wordlist, " ", "word") # only words
+        lemmatized_phrase = join_tws(wordlist, " ", "lemma") # only lemmas
+        surface_phrase = join_tws(wordlist, " ", "word") # only words
 
         if surface_phrase in self.previously_indexed:
             #If we've already seen this sentence, don't bother
             return sequences
 
         wordlist_nostops = self.remove_stops(wordlist)
-        lemmatized_phrase_nostops = self.join_tws(wordlist_nostops,
-            " ", "lemma")
-        surface_phrase_nostops = self.join_tws(wordlist_nostops, " ", "word")
+        lemmatized_phrase_nostops = join_tws(wordlist_nostops, " ", self.LEMMA)
+        surface_phrase_nostops = join_tws(wordlist_nostops, " ", self.WORD)
 
         has_stops = len(wordlist_nostops) < len(wordlist)
-        lemmatized_has_stops = (len(lemmatized_phrase_nostop.split(" ")) <
-            len(words))
+        lemmatized_has_stops = (len(lemmatized_phrase_nostops.split(" ")) <
+            len(wordlist))
+        all_stop_words = len(wordlist_nostops) == 0
         lemmatized_all_stop_words = len(lemmatized_phrase_nostops) == 0
 
         # Definitely make a Sequence of the surface_phrase
@@ -139,16 +143,16 @@ class SequenceProcessor(object):
         if (has_stops and not
             all_stop_words and
             wordlist_nostops[0] == wordlist[0] and not
-            surface_phrase_nostop in self.previously_indexed):
+            surface_phrase_nostops in self.previously_indexed):
             sequences.append(Sequence(start_position=i,
                 sentence_id=sentence.id,
                 document_id=sentence.document_id,
-                sequence=surface_phrase_nostop,
+                sequence=surface_phrase_nostops,
                 is_lemmatized=False,
                 has_function_words=False,
                 all_function_words=False,
-                words=words_nostop))
-            self.previously_indexed.append(surface_phrase_nostop)
+                words=wordlist_nostops))
+            self.previously_indexed.append(surface_phrase_nostops)
 
         # Definitely make a Sequence of the lemmatized_phrase
         sequences.append(Sequence(start_position=i,
@@ -164,12 +168,12 @@ class SequenceProcessor(object):
         # Maybe make a sequence of the lemmatized_phrase_nostop
         if (lemmatized_has_stops and not
             lemmatized_all_stop_words and
-            wordlist_nostops[0] == words[0] and not
+            wordlist_nostops[0] == wordlist[0] and not
             lemmatized_phrase_nostops in self.previously_indexed):
             sequences.append(Sequence(start_position=i,
                 sentence_id=sentence.id,
                 document_id=sentence.document_id,
-                sequence=lemmatized_phrase_mostops,
+                sequence=lemmatized_phrase_nostops,
                 is_lemmatized=True,
                 has_function_words=False,
                 all_function_words=False,
@@ -180,7 +184,7 @@ class SequenceProcessor(object):
     def finish(self):
         pass
 
-def join_tws(self, words, delimiter, attr):
+def join_tws(words, delimiter, attr):
     """Join either the lemmas or text of words with the delimiter.
     :param list words: A list of TaggedWord objects.
     :param str delimiter: A delimiter to put between the words/lemmas.
