@@ -65,6 +65,35 @@ class SequenceProcessorTests(unittest.TestCase):
             id=1,
             document_id=2)
         result = self.seq_proc.process(sentence)
-        for seq in result:
-            print seq.sequence
-            
+
+def split_sequences(sequences):
+    """The output of the sequencer can be split into four different types of
+    sequences for ease of checking: Sequences of words, sequences of lemmas,
+    sequences of words without stops, and sequences of lemmas without stops.
+    This method performs that split.
+
+    :param list sequences: A list of Sequences to split.
+    :result dict: A dict, in the format ["words"|"lemmas"]["stops"|"nostops"]
+    """
+
+    result = {
+        "words": {
+            "stops": [],
+            "nostops": []
+        },
+        "lemmas": {
+            "stops": [],
+            "nostops": []
+        }
+    }
+    
+    for sequence in sequences:
+        if sequence.is_lemmatized:
+            if sequence.has_function_words:
+                result["lemmas"]["stops"].append(sequence)
+            else:
+                result["lemmas"]["nostops"].append(sequence)
+        elif:
+            if sequence.has_function_words:
+                result["words"]["stops"].append(sequence)
+                #TODO: finish
