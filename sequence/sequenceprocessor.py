@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
+"""
+This file handles breaking down text into Sequence objects, which are
+collections of at most five words.
+"""
+
 import Sequence
 import string #TODO: is this necessary?
 
 class SequenceProcessor(object):
+    """Process given input into Sequences.
+    """
     def __init__(self, reader_writer, grammatical_info_exists):
         # TODO: handle reader_writer once it's finished
         self.reader_writer = reader_writer
