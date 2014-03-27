@@ -14,5 +14,5 @@ class Log(Base):
 
     __tablename__ = "log"
 
-    log_item = Column(String(100), nullable = False, primary_key = True)
-    item_value = Column(Text, nullable = False)
+    log_item = Column(String(100), nullable=False, primary_key=True)
+    item_value = Column(Text, nullable=False)
