@@ -24,7 +24,6 @@ class LoggerTests(unittest.TestCase):
         self.failUnless(logger.get("logtest") == "true [false] ")
 
     def test_get(self):
-        #TODO: write for new get
         """Test the get() method. 
         """
         entry = Log(item_value="true", log_item="logtest")
