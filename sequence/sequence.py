@@ -31,7 +31,9 @@ class Sequence(object):
         contain both the original word and its lemma.
         """
 
-        for item, value in kwargs:
+        words = []
+
+        for item, value in kwargs.items():
             setattr(self, item, value)
 
         self.length = len(words)

@@ -2,6 +2,7 @@
 Tests for the SequenceProcessor class.
 """
 from document.taggedword import TaggedWord
+from document.sentence import Sentence
 from sequence.sequenceprocessor import SequenceProcessor, join_tws, LEMMA, WORD
 import unittest
 
@@ -47,3 +48,15 @@ class SequenceProcessorTests(unittest.TestCase):
             TaggedWord(word="Camelot")]
 
         self.failUnless(self.seq_proc.remove_stops(with_stops) == without_stops)
+
+    def test_process(self):
+        """Test process()
+        """
+        sentence = Sentence(text="first second third",
+            tagged=self.words,
+            id=1,
+            document_id=2)
+        result = self.seq_proc.process(sentence)
+        for seq in result:
+            print seq.sequence
+            

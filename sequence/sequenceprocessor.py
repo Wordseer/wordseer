@@ -105,8 +105,9 @@ class SequenceProcessor(object):
         # TODO: readerwriter
         #for sequence in sequences:
         #    self.reader_writer.index_sequence(sequence)
+        #return True
 
-        return True
+        return sequences
 
     def get_sequence(self, sentence, i, j):
         """Handle the main processing part in the process() loop.
