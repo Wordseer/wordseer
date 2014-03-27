@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from sequence import Sequence
+import Sequence
 import string #TODO: is this necessary?
 
 class SequenceProcessor(object):
@@ -9,6 +9,7 @@ class SequenceProcessor(object):
         self.grammatical_info_exists = grammatical_info_exists
 
         self.stop_words = []
+        self.previously_indexed = []
 
         prepositions = string.split(("about away across against along"
             " around at behind beside besides by despite down during for from"
@@ -60,7 +61,7 @@ class SequenceProcessor(object):
         words.
         :return str: The combined sentence.
         """
-        
+
         result = []
 
         for word in words:
@@ -77,7 +78,7 @@ class SequenceProcessor(object):
         :param list words: A list of TaggedWord objects.
         :return list: The list without stops.
         """
-        
+
         without_stops = []
         for word in words:
             if word.word.lower() not in self.stop_words:
@@ -119,7 +120,7 @@ class SequenceProcessor(object):
         :return list: A list of Sequences.
         """
         sequences = []
-        
+
         wordlist = sentence.tagged[i:j] # all the words
         lemmatized_phrase = self.join_tws(wordlist, " ", "lemma") # only lemmas
         surface_phrase = self.join_tws(wordlist, " ", "word") # only words
@@ -127,13 +128,12 @@ class SequenceProcessor(object):
         if surface_phrase in self.previously_indexed:
             #If we've already seen this sentence, don't bother
             return sequences
-        
+
         wordlist_nostops = self.remove_stops(wordlist)
         lemmatized_phrase_nostops = self.join_tws(wordlist_nostops,
             " ", "lemma")
         surface_phrase_nostops = self.join_tws(wordlist_nostops, " ", "word")
 
-        #TODO: these assignments could maybe be done better
         has_stops = len(wordlist_nostops) < len(wordlist)
         lemmatized_has_stops = len(string.split(" ",
             lemmatized_phrase_nostop)) < len(words)
@@ -150,12 +150,13 @@ class SequenceProcessor(object):
             words=wordlist))
         self.previously_indexed.append(surface_phrase)
 
-        # Maybe make a Sequence of surface_phrase_nostop
+        # If it's not just stops, has stops, and the first word isn't a stop,
+        # and it hasn't been indexed, then make a Sequence from the nostop SP
         if (has_stops and not
             all_stop_words and
             wordlist_nostops[0] == wordlist[0] and not
             surface_phrase_nostop in self.previously_indexed):
-                sequences.append(Sequence(start_position=i,
+            sequences.append(Sequence(start_position=i,
                 sentence_id=sentence.id,
                 document_id=sentence.document_id,
                 sequence=surface_phrase_nostop,
@@ -163,7 +164,7 @@ class SequenceProcessor(object):
                 has_function_words=False,
                 all_function_words=False,
                 words=words_nostop))
-                self.previously_indexed.append(surface_phrase_nostop)
+            self.previously_indexed.append(surface_phrase_nostop)
 
         # Definitely make a Sequence of the lemmatized_phrase
         sequences.append(Sequence(start_position=i,
@@ -177,18 +178,18 @@ class SequenceProcessor(object):
         self.previously_indexed.append(lemmatized_phrase)
 
         # Maybe make a sequence of the lemmatized_phrase_nostop
-        if (not lemmatized_phrase_nostops in self.previously_indexed and
-            lemmatized_has_stops and not
+        if (lemmatized_has_stops and not
             lemmatized_all_stop_words and
-            words_without_stops[0] == words[0]):
-                sequences.append(Sequence(start_position=i,
-                    sentence_id=sentence.id,
-                    document_id=sentence.document_id,
-                    sequence=lemmatized_phrase_mostops,
-                    is_lemmatized=True,
-                    has_function_words=False,
-                    all_function_words=False,
-                    words=wordlist_nostops))
+            wordlist_nostops[0] == words[0] and not
+            lemmatized_phrase_nostops in self.previously_indexed):
+            sequences.append(Sequence(start_position=i,
+                sentence_id=sentence.id,
+                document_id=sentence.document_id,
+                sequence=lemmatized_phrase_mostops,
+                is_lemmatized=True,
+                has_function_words=False,
+                all_function_words=False,
+                words=wordlist_nostops))
 
         return sequences
 
