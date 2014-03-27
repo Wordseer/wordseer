@@ -4,7 +4,7 @@ This file handles breaking down text into Sequence objects, which are
 collections of at most five words.
 """
 
-from sequence.sequence import Sequence
+from .sequence import Sequence
 
 LEMMA = "lemma"
 WORD = "word"
@@ -212,9 +212,9 @@ def join_tws(words, delimiter, attr):
     result = []
 
     for word in words:
-        if attr == "lemma":
+        if attr == LEMMA:
             result.extend([word.lemma, delimiter])
-        if attr == "word":
+        if attr == WORD:
             result.extend([word.word, delimiter])
 
     return "".join(result[:-1])

@@ -2,7 +2,7 @@
 Tests for the SequenceProcessor class.
 """
 from document.taggedword import TaggedWord
-from sequence.sequenceprocessor import SequenceProcessor
+from sequence.sequenceprocessor import SequenceProcessor, join_tws, LEMMA, WORD
 import unittest
 
 class SequenceProcessorTests(unittest.TestCase):
@@ -21,14 +21,12 @@ class SequenceProcessorTests(unittest.TestCase):
     def test_join_lemmas(self):
         """Test join_lemmas()
         """
-        self.failUnless(self.seq_proc.join_tws(self.words, " ", "lemma") ==
-            self.string)
+        self.failUnless(join_tws(self.words, " ", LEMMA) == self.string)
 
     def test_join_words(self):
         """Test join_words()
         """
-        self.failUnless(self.seq_proc.join_tws(self.words, " ", "word") ==
-            self.string)
+        self.failUnless(join_tws(self.words, " ", WORD) == self.string)
 
     def test_remove_stops(self):
         """Test remove_stops()
