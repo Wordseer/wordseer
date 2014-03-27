@@ -52,8 +52,16 @@ class SequenceProcessorTests(unittest.TestCase):
     def test_process(self):
         """Test process()
         """
-        sentence = Sentence(text="first second third",
-            tagged=self.words,
+        sentence = Sentence(text="The quick brown fox jumped over the lazy dog",
+            tagged=[TaggedWord(lemma="the", word="the"),
+                TaggedWord(lemma="quick", word="quick"),
+                TaggedWord(lemma="brown", word="brown"),
+                TaggedWord(lemma="fox", word="fox"),
+                TaggedWord(lemma="jump", word="jumped"),
+                TaggedWord(lemma="over", word="over"),
+                TaggedWord(lemma="the", word="the"),
+                TaggedWord(lemma="lazy", word="lazy"),
+                TaggedWord(lemma="dog", word="dog")],
             id=1,
             document_id=2)
         result = self.seq_proc.process(sentence)

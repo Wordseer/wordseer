@@ -215,7 +215,7 @@ def join_tws(words, delimiter, attr):
     for word in words:
         if attr == LEMMA:
             result.extend([word.lemma, delimiter])
-        if attr == WORD:
+        elif attr == WORD:
             result.extend([word.word, delimiter])
 
     return "".join(result[:-1])
