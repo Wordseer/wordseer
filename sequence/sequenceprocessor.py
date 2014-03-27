@@ -6,12 +6,12 @@ collections of at most five words.
 
 from sequence.sequence import Sequence
 
+LEMMA = "lemma"
+WORD = "word"
+
 class SequenceProcessor(object):
     """Process given input into Sequences.
     """
-
-    LEMMA = "lemma"
-    WORD = "word"
 
     def __init__(self, reader_writer, grammatical_info_exists):
         # TODO: handle reader_writer once it's finished
@@ -188,7 +188,8 @@ def join_tws(words, delimiter, attr):
     """Join either the lemmas or text of words with the delimiter.
     :param list words: A list of TaggedWord objects.
     :param str delimiter: A delimiter to put between the words/lemmas.
-    :param str attr: Either "lemma" to combine lemmas or "word" to combine
+    :param str attr: Either sequenceprocessor.LEMMA to combine lemmas or
+    sequenceprocessor.WORD to combine
     words.
     :return str: The combined sentence.
     """
