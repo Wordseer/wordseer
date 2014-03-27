@@ -4,8 +4,7 @@ This file handles breaking down text into Sequence objects, which are
 collections of at most five words.
 """
 
-import Sequence
-import string #TODO: is this necessary?
+from sequence.sequence import Sequence
 
 class SequenceProcessor(object):
     """Process given input into Sequences.
@@ -18,43 +17,40 @@ class SequenceProcessor(object):
         self.stop_words = []
         self.previously_indexed = []
 
-        prepositions = string.split(("about away across against along"
-            " around at behind beside besides by despite down during for from"
-            " in inside into near of off on onto over through to toward with"
-            " within whence until without upon hither thither unto up"), " ")
+        prepositions = ("about away across against along around at behind"
+            " beside besides by despite down during for from in inside into"
+            " near of off on onto over through to toward with within whence"
+            " until without upon hither thither unto up").split(" ")
 
-        pronouns = string.split(("i its it you your thou thine thee we"
-            " he they me us her them him my mine her hers his our thy thine"
-            " ours their theirs myself itself mimself ourselves herself"
-            " themselves anything something everything nothing anyone"
-            " someone everyone ones such"), " ")
+        pronouns = ("i its it you your thou thine thee we he they me us her"
+            " them him my mine her hers his our thy thine ours their theirs"
+            " myself itself mimself ourselves herself themselves anything"
+            " something everything nothing anyone someone everyone ones"
+            " such").split(" ")
 
-        determiners = string.split(("the a an some any this these each"
-            " that no every all half both twice one two first second other"
-            " another next last many few much little more less most least"
-            " several no own"), " ")
+        determiners = ("the a an some any this these each that no every all"
+            " half both twice one two first second other another next last"
+            " many few much little more less most least several no"
+            " own").split(" ")
 
-        conjunctions = string.split(("and or but so when as while"
-            " because although if though what who where whom when why whose"
-            " which how than nor not"), " ")
+        conjunctions = ("and or but so when as while because although if"
+            " though what who where whom when why whose which how than nor "
+            " not").split(" ")
 
-        modal_verbs = string.split(("can can't don't won't shan't"
-            " shouldn't ca canst might may would wouldst will willst should"
-            " shall must could"), " ")
+        modal_verbs = ("can can't don't won't shan't shouldn't ca canst might"
+            " may would wouldst will willst should shall must could").split(" ")
 
-        primary_verbs = string.split(("is are am be been being went go"
-            " do did doth has have hath was were had"), " ")
+        primary_verbs = ("is are am be been being went go do did doth has have"
+            " hath was were had").split(" ")
 
-        adverbs = string.split(("again very here there today tomorrow"
-            " now then always never sometimes usually often therefore"
-            " however besides moreover though otherwise else instead"
-            " anyway incidentally meanwhile"), " ")
+        adverbs = ("again very here there today tomorrow now then always never"
+            " sometimes usually often therefore however besides moreover though"
+            " otherwise else instead anyway incidentally meanwhile").split(" ")
 
-        punctuation = string.split((". ! @ # $ % ^ & * ( ) _ - -- --- +"
-            " = ` ~ � { } [ ] | \\ : ; \" ' < > ? , . / "), " ")
+        punctuation = (". ! @ # $ % ^ & * ( ) _ - -- --- + = ` ~ � { } [ ] | \\"
+            " : ; \" ' < > ? , . / ").split(" ")
 
-        contractions = string.split((" 's 'nt 'm n't th 'll o s"
-            " 't 'rt "), " ")
+        contractions = (" 's 'nt 'm n't th 'll o s 't 'rt ").split(" ")
 
         self.stop_words.extend(pronouns + prepositions + determiners +
             conjunctions + modal_verbs + primary_verbs + adverbs +
@@ -142,8 +138,8 @@ class SequenceProcessor(object):
         surface_phrase_nostops = self.join_tws(wordlist_nostops, " ", "word")
 
         has_stops = len(wordlist_nostops) < len(wordlist)
-        lemmatized_has_stops = len(string.split(" ",
-            lemmatized_phrase_nostop)) < len(words)
+        lemmatized_has_stops = (len(lemmatized_phrase_nostop.split(" ")) <
+            len(words))
         lemmatized_all_stop_words = len(lemmatized_phrase_nostops) == 0
 
         # Definitely make a Sequence of the surface_phrase
