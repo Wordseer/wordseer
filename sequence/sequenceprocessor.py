@@ -14,6 +14,13 @@ class SequenceProcessor(object):
     """
 
     def __init__(self, reader_writer, grammatical_info_exists):
+        """Set up local variables for the SequenceProcessor.
+
+        :param ReaderWriter reader_writer: A reader_writer to interface with the
+        database to write the sequences to the database.
+        :param boolean grammatical_info_exists: ??
+        """
+
         # TODO: handle reader_writer once it's finished
         self.reader_writer = reader_writer
         self.grammatical_info_exists = grammatical_info_exists
@@ -78,12 +85,13 @@ class SequenceProcessor(object):
         """Iterate and record every five word long sequence. The method records
         using the ReaderWriter a list of sequences present in the given
         sentence.
+
         :param Sentence sentence: The sentence to process,
         :return boolean: True.
         """
+
         #TODO: implement timing?
         sequences = [] # a list of Sequences
-        #TODO: there must be a way to make this nicer
         for i in range(0, len(sentence.tagged)):
             # Iterate through every word
             self.previously_indexed = []
@@ -102,11 +110,13 @@ class SequenceProcessor(object):
 
     def get_sequence(self, sentence, i, j):
         """Handle the main processing part in the process() loop.
+
         :param Sentence sentence: A sentence object to create sequences from.
         :param int i: The index to start the sequence from, inclusive.
         :param int j: The index to stop the sequence from, exclusive.
         :return list: A list of Sequences.
         """
+
         sequences = []
 
         wordlist = sentence.tagged[i:j] # all the words
@@ -118,8 +128,8 @@ class SequenceProcessor(object):
             return sequences
 
         wordlist_nostops = self.remove_stops(wordlist)
-        lemmatized_phrase_nostops = join_tws(wordlist_nostops, " ", self.LEMMA)
-        surface_phrase_nostops = join_tws(wordlist_nostops, " ", self.WORD)
+        lemmatized_phrase_nostops = join_tws(wordlist_nostops, " ", LEMMA)
+        surface_phrase_nostops = join_tws(wordlist_nostops, " ", WORD)
 
         has_stops = len(wordlist_nostops) < len(wordlist)
         lemmatized_has_stops = (len(lemmatized_phrase_nostops.split(" ")) <
@@ -182,6 +192,12 @@ class SequenceProcessor(object):
         return sequences
 
     def finish(self):
+        """Have the reader_writer finish indexing the sequences. This method
+        simply calls finish_indexing_sequences() from the reader_writer object.
+        """
+
+        #TODO: readerwriter stuff goes here
+        #self.reader_writer.finish_indexing_sequences()
         pass
 
 def join_tws(words, delimiter, attr):
@@ -189,8 +205,7 @@ def join_tws(words, delimiter, attr):
     :param list words: A list of TaggedWord objects.
     :param str delimiter: A delimiter to put between the words/lemmas.
     :param str attr: Either sequenceprocessor.LEMMA to combine lemmas or
-    sequenceprocessor.WORD to combine
-    words.
+    sequenceprocessor.WORD to combine words.
     :return str: The combined sentence.
     """
 
