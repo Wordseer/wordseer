@@ -88,15 +88,14 @@ def split_sequences(sequences):
     }
     
     for sequence in sequences:
+        seq_type = "words"
         if sequence.is_lemmatized:
-            if sequence.has_function_words:
-                result["lemmas"]["stops"].append(sequence)
-            else:
-                result["lemmas"]["nostops"].append(sequence)
-        elif:
-            if sequence.has_function_words:
-                result["words"]["stops"].append(sequence)
-            else:
-                result["words"]["nostops"].append(sequence)
+            seq_type = "lemmas"
+
+        stops = "nostops"
+        if sequence.has_function_words:
+            stops = "stops"
+
+        result[seq_type][stops].append(sequence)
 
     return result
