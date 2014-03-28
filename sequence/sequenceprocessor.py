@@ -13,7 +13,7 @@ class SequenceProcessor(object):
     """Process given input into Sequences.
     """
 
-    def __init__(self, reader_writer, grammatical_info_exists):
+    def __init__(self, reader_writer):
         """Set up local variables for the SequenceProcessor.
 
         :param ReaderWriter reader_writer: A reader_writer to interface with the
@@ -23,7 +23,6 @@ class SequenceProcessor(object):
 
         # TODO: handle reader_writer once it's finished
         self.reader_writer = reader_writer
-        self.grammatical_info_exists = grammatical_info_exists
 
         self.stop_words = []
         self.previously_indexed = []
@@ -181,6 +180,7 @@ class SequenceProcessor(object):
             lemmatized_all_stop_words and
             wordlist_nostops[0] == wordlist[0] and not
             lemmatized_phrase_nostops in self.previously_indexed):
+            # We don't add this to previously_indexed 
             sequences.append(Sequence(start_position=i,
                 sentence_id=sentence.id,
                 document_id=sentence.document_id,

@@ -54,17 +54,17 @@ class SequenceProcessorTests(unittest.TestCase):
         """
         sentence = Sentence(text="The quick brown fox jumped over the lazy dog",
             tagged=[TaggedWord(lemma="the", word="the"),
-                TaggedWord(lemma="quick", word="quick"),
-                TaggedWord(lemma="brown", word="brown"),
-                TaggedWord(lemma="fox", word="fox"),
-                TaggedWord(lemma="jump", word="jumped"),
-                TaggedWord(lemma="over", word="over"),
-                TaggedWord(lemma="the", word="the"),
-                TaggedWord(lemma="lazy", word="lazy"),
-                TaggedWord(lemma="dog", word="dog")],
+                TaggedWord(lemma="plant", word="plant"),
+                TaggedWord(lemma="grow", word="grew"),
+                TaggedWord(lemma="well", word="well")],
             id=1,
             document_id=2)
         result = self.seq_proc.process(sentence)
+        sequences = split_sequences(result)
+
+        print Surf
+        for s in sequences["words"]:
+        
 
 def split_sequences(sequences):
     """The output of the sequencer can be split into four different types of
