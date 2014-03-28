@@ -96,4 +96,7 @@ def split_sequences(sequences):
         elif:
             if sequence.has_function_words:
                 result["words"]["stops"].append(sequence)
-                #TODO: finish
+            else:
+                result["words"]["nostops"].append(sequence)
+
+    return result
