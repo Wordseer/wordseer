@@ -1,8 +1,9 @@
 """
 A class to store sequences of words.
 """
+from mixins.kwargstodict import KwargsToDict
 
-class Sequence(object):
+class Sequence(KwargsToDict):
     """A Sequence is a series of words in the order in which they appeared in
     their original sentence.
     """
@@ -33,7 +34,6 @@ class Sequence(object):
 
         words = []
 
-        for item, value in kwargs.items():
-            setattr(self, item, value)
+        super(Sequence, self).__init__(**kwargs)
 
         self.length = len(words)

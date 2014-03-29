@@ -1,6 +1,7 @@
-from comparebydict import CompareByDict
+from mixins.comparebydict import CompareByDict
+from mixins.argstodict import ArgsToDict
 
-class Metadata(CompareByDict):
+class Metadata(CompareByDict, ArgsToDict):
     def __init__(self, *args, **kwargs):
         """
         Instantiate a Metadata instance.
@@ -19,8 +20,7 @@ class Metadata(CompareByDict):
         self.property_name = ""
         self.value = ""
 
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+        super(Metadata, self).__init__(**kwargs)
 
     def __str__(self):
         return self.property_name + ": " + self.value

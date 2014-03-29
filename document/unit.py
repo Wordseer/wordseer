@@ -1,6 +1,7 @@
-from comparebydict import CompareByDict
+from mixins.comparebydict import CompareByDict
+from mixins.kwargstodict import KwargsToDict
 
-class Unit(CompareByDict):
+class Unit(CompareByDict, KwargsToDict):
     """
     Units contain a list of sentences, or of other units. They also have
     metadata, an id, and a name.
@@ -21,8 +22,8 @@ class Unit(CompareByDict):
         self.metadata = []
         self.units = []
         self.sentences = []
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+
+        super(Unit, self).__init__(**kwargs)
 
     def __str__(self):
         s = self.metadata.__str__()

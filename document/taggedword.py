@@ -1,6 +1,7 @@
-from comparebydict import CompareByDict
+from mixins.comparebydict import CompareByDict
+from mixins.kwargstodict import KwargsToDict
 
-class TaggedWord(CompareByDict):
+class TaggedWord(CompareByDict, KwargsToDict):
     """
     This class describes a single tagged word.
     """
@@ -20,8 +21,7 @@ class TaggedWord(CompareByDict):
         self.tag = ""
         self.lemma = ""
 
-        for item, val in kwargs.items():
-            setattr(self, item, val)
+        super(TaggedWord, self).__init__(**kwargs)
 
     def __str__(self):
         return self.word + "/" + self.tag + " - " + self.lemma

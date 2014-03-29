@@ -24,8 +24,7 @@ class Sentence(Unit):
         self.metadata = []
         self.text = ""
 
-        for key, val in kwargs.items():
-            setattr(self, key, val)
+        super(Sentence, self).__init__(**kwargs)
 
     def __str__(self):
         return self.metadata.__str__() + "\n" + self.text

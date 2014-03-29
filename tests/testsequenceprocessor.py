@@ -121,7 +121,6 @@ class SequenceProcessorTests(unittest.TestCase):
                     "dog"]
             }
         }
-        print sequence_sequences
         self.failUnless(sequence_sequences == key)
         
 

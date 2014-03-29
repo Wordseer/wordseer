@@ -128,9 +128,7 @@ class SequenceProcessor(object):
             return sequences
 
         wordlist_nostops = self.remove_stops(wordlist)
-        print wordlist_nostops
         lemmatized_phrase_nostops = join_tws(wordlist_nostops, " ", LEMMA)
-        print lemmatized_phrase_nostops
         surface_phrase_nostops = join_tws(wordlist_nostops, " ", WORD)
 
         # TOOO: Aditi says it's possible to remove these checks, should
