@@ -27,4 +27,4 @@ class Sentence(Unit):
         super(Sentence, self).__init__(**kwargs)
 
     def __str__(self):
-        return self.metadata.__str__() + "\n" + self.text
+        return str(self.metadata) + "\n" + self.text

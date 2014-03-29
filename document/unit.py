@@ -26,12 +26,12 @@ class Unit(CompareByDict, KwargsToDict):
         super(Unit, self).__init__(**kwargs)
 
     def __str__(self):
-        s = self.metadata.__str__()
+        s = str(self.metadata)
 
         for u in self.units:
-            s += u.__str__() + "\n"
+            s += str(u) + "\n"
 
         for s in self.sentences:
-            s += s.__str__() + "\n"
+            s += str(s) + "\n"
 
         return s
