@@ -1,5 +1,5 @@
 from mixins.kwargstodict import KwargsToDict
-
+#TODO: documentation
 class Dependency(KwargsToDict):
     def __init__(self, *args, **kwargs):
         """
@@ -12,6 +12,7 @@ class Dependency(KwargsToDict):
         :key str gov_pos: This variable should not be modified.
         """
 
+        #TODO: designate private variables
         super(Dependency, self).__init__(**kwargs)
 
     def __str__(self):

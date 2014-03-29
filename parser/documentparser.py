@@ -1,5 +1,5 @@
 from sequence.sequenceprocessor import SequenceProcessor
-
+#TODO: documentation
 class DocumentParser(object):
     def __init__(self, reader_writer, parser):
         self.reader_writer = reader_writer
