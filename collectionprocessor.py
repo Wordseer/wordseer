@@ -1,6 +1,8 @@
+import config
 import database
 import logger # TODO: logger is different now
 import os
+from structureextractor import StructureExtractor
 import tokenizer
 
 class CollectionProcessor(object):
@@ -16,14 +18,14 @@ class CollectionProcessor(object):
         Arguments:
         start_from_scratch: If true, then the tables in the database will be
         recreated.
-        """   
+        """
         # Set up database if necessary
         if start_from_scratch is True:
-            with db as database.Database()
+            with database.Database() as db:
                 db.reset()
 
         # TODO: MySQLDataReaderWriter
-        
+
         t = tokenizer.Tokenizer()
 
         # Extract metadata, populate documents, sentences, and doc structure
@@ -37,9 +39,9 @@ class CollectionProcessor(object):
             if os.path.isdir(collection_dir):
                 contents = []
                 for filename in os.listdir(collection_dir):
-                    if os.path.splitext(filename)[1].lower() ==
-                        file_name_extension.lower():
-                            contents.append(filename)
+                    if (os.path.splitext(filename)[1].lower() ==
+                        file_name_extension.lower()):
+                        contents.append(filename)
 
                 docs = [] # list of Documents
 
@@ -58,11 +60,11 @@ class CollectionProcessor(object):
                                 str(len(contents)) + "\t" + filename)
                             logger.log("text_and_metadata_recorded",
                                 num_files_done + "", "update")
-                        except e:
+                        except Exception as e:
                             print("Error on file " + filename)
                             print(e)
-                                
-                    ++num_files_done
+
+                    num_files_done += 1
 
                 logger.log("finished_recording_text_and_metadata", "true",
                     "replace")
@@ -72,6 +74,6 @@ class CollectionProcessor(object):
         # Parse the documents
         if config.GRAMMATICAL_PROCESSING or (config.WORD_TO_WORD_SIMILARITY and
             config.PART_OF_SPEECH_TAGGING):
-                print("Parsing documents")
-                # Initialize the parser
+            print("Parsing documents")
+            # Initialize the parser
                 
