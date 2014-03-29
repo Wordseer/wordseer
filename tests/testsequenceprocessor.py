@@ -6,6 +6,7 @@ from document.sentence import Sentence
 from sequence.sequenceprocessor import (SequenceProcessor, Sequence,
     join_tws, LEMMA, WORD)
 import unittest
+import pprint
 
 class SequenceProcessorTests(unittest.TestCase):
     """Tests for SequenceProcessor.
@@ -99,28 +100,26 @@ class SequenceProcessorTests(unittest.TestCase):
                     "the fox",
                     "the fox jump",
                     "the fox jump over",
-                    "fox",
-                    "fox jump",
                     "fox jump over",
                     "fox jump over the",
-                    "jump",
                     "jump over",
                     "jump over the dog",
                     "over",
                     "over the",
                     "over the dog",
                     "the",
-                    "the dog",
-                    "dog"],
+                    "the dog"],
                 "nostops": [
+                    "fox jump dog",
+                    "jump dog",
                     "fox",
                     "fox jump",
-                    "fox jump dog",
                     "jump",
-                    "jump dog",
                     "dog"]
             }
         }
+
+        pprint.pprint(sequence_sequences)
         self.failUnless(sequence_sequences == key)
         
 

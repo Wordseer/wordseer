@@ -152,7 +152,7 @@ class SequenceProcessor(object):
 
         # If it's not just stops, has stops, and the first word isn't a stop,
         # and it hasn't been indexed, then make a Sequence from the nostop SP
-        if (has_stops and not #TOOD: why is this true?
+        if (has_stops and not # Should have stops to avoid duplicate
             all_stop_words and
             wordlist_nostops[0] == wordlist[0] and not
             surface_phrase_nostops in self.previously_indexed):
@@ -167,6 +167,9 @@ class SequenceProcessor(object):
             self.previously_indexed.append(surface_phrase_nostops)
 
         # Definitely make a Sequence of the lemmatized_phrase
+        print "Lemmatized stop"
+        print lemmatized_phrase
+        print lemmatized_has_stops
         sequences.append(Sequence(start_position=i,
             sentence_id=sentence.id,
             document_id=sentence.document_id,
@@ -182,7 +185,9 @@ class SequenceProcessor(object):
             lemmatized_all_stop_words and
             wordlist_nostops[0] == wordlist[0] and not
             lemmatized_phrase_nostops in self.previously_indexed):
-            # We don't add this to previously_indexed 
+            # We don't add this to previously_indexed
+            print "Lemmatized nostop"
+            print lemmatized_phrase_nostops
             sequences.append(Sequence(start_position=i,
                 sentence_id=sentence.id,
                 document_id=sentence.document_id,
