@@ -21,9 +21,8 @@ class CollectionProcessor(object):
         if start_from_scratch is True:
             with db as database.Database()
                 db.reset()
-        logger = Logger()
 
-        # TODO: MySQLDataReaderWriter?
+        # TODO: MySQLDataReaderWriter
         
         t = tokenizer.Tokenizer()
 
@@ -37,31 +36,31 @@ class CollectionProcessor(object):
             num_files_done = 1
             if os.path.isdir(collection_dir):
                 contents = []
-                for file in os.listdir(collection_dir):
-                    if file[-len(file_name_extension)].lower() ==
+                for filename in os.listdir(collection_dir):
+                    if os.path.splitext(filename)[1].lower() ==
                         file_name_extension.lower():
-                            contents.append(file)
+                            contents.append(filename)
 
                 docs = [] # list of Documents
 
-                for file in contents:
-                    if not "[" + num_files_done + "]" in
+                for filename in contents:
+                    if (not "[" + num_files_done + "]" in
                         logger.get("text_and_metadata_recorded") and
-                        not file[0] == ".":
-                            logger.log("finished_recording_text_and_metadata",
-                                "false", "replace")
-                            try:
-                                docs = extractor.extract(file)
-                                for doc in docs:
-                                    # TODO: readerwriter
-                                    pass
-                                print("\t" + num_files_done + "/" + \
-                                    len(contents) + "\t" + file)
-                                logger.log("text_and_metadata_recorded",
-                                    num_files_done + "", "update")
-                            except e:
-                                print("Error on file " + file)
-                                print(e)
+                        not filename[0] == "."):
+                        logger.log("finished_recording_text_and_metadata",
+                            "false", "replace")
+                        try:
+                            docs = extractor.extract(filename)
+                            for doc in docs:
+                                # TODO: readerwriter
+                                pass
+                            print("\t" + num_files_done + "/" +
+                                str(len(contents)) + "\t" + filename)
+                            logger.log("text_and_metadata_recorded",
+                                num_files_done + "", "update")
+                        except e:
+                            print("Error on file " + filename)
+                            print(e)
                                 
                     ++num_files_done
 
@@ -75,6 +74,4 @@ class CollectionProcessor(object):
             config.PART_OF_SPEECH_TAGGING):
                 print("Parsing documents")
                 # Initialize the parser
-            
-            
-        
+                

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 This file handles breaking down text into Sequence objects, which are
-collections of at most five words.
+collections of at most four words.
 """
 
 from .sequence import Sequence
@@ -81,7 +81,7 @@ class SequenceProcessor(object):
         return without_stops
 
     def process(self, sentence):
-        """Iterate and record every five word long sequence. The method records
+        """Iterate and record every four word long sequence. The method records
         using the ReaderWriter a list of sequences present in the given
         sentence.
 
@@ -98,7 +98,7 @@ class SequenceProcessor(object):
                 # Check every word after the one at i
                 if j - i < 5:
                     # If this word is less than five words away from i,
-                    # create a new Sequence (five or fewer words)
+                    # create a new Sequence (four or fewer words)
                     sequences.extend(self.get_sequence(sentence, i, j))
 
         # TODO: readerwriter
@@ -128,9 +128,13 @@ class SequenceProcessor(object):
             return sequences
 
         wordlist_nostops = self.remove_stops(wordlist)
+        print wordlist_nostops
         lemmatized_phrase_nostops = join_tws(wordlist_nostops, " ", LEMMA)
+        print lemmatized_phrase_nostops
         surface_phrase_nostops = join_tws(wordlist_nostops, " ", WORD)
 
+        # TOOO: Aditi says it's possible to remove these checks, should
+        # see if that's doable after the unit test is written
         has_stops = len(wordlist_nostops) < len(wordlist)
         lemmatized_has_stops = (len(lemmatized_phrase_nostops.split(" ")) <
             len(wordlist))
@@ -150,7 +154,7 @@ class SequenceProcessor(object):
 
         # If it's not just stops, has stops, and the first word isn't a stop,
         # and it hasn't been indexed, then make a Sequence from the nostop SP
-        if (has_stops and not
+        if (has_stops and not #TOOD: why is this true?
             all_stop_words and
             wordlist_nostops[0] == wordlist[0] and not
             surface_phrase_nostops in self.previously_indexed):

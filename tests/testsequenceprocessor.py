@@ -3,7 +3,8 @@ Tests for the SequenceProcessor class.
 """
 from document.taggedword import TaggedWord
 from document.sentence import Sentence
-from sequence.sequenceprocessor import SequenceProcessor, join_tws, LEMMA, WORD
+from sequence.sequenceprocessor import (SequenceProcessor, Sequence,
+    join_tws, LEMMA, WORD)
 import unittest
 
 class SequenceProcessorTests(unittest.TestCase):
@@ -12,7 +13,7 @@ class SequenceProcessorTests(unittest.TestCase):
     def setUp(self):
         """Obtain a SequenceProcessor.
         """
-        self.seq_proc = SequenceProcessor("", True)
+        self.seq_proc = SequenceProcessor("")
 
         self.words = [TaggedWord(lemma="first", word="first"),
             TaggedWord(lemma="second", word="second"),
@@ -54,16 +55,74 @@ class SequenceProcessorTests(unittest.TestCase):
         """
         sentence = Sentence(text="The quick brown fox jumped over the lazy dog",
             tagged=[TaggedWord(lemma="the", word="the"),
-                TaggedWord(lemma="plant", word="plant"),
-                TaggedWord(lemma="grow", word="grew"),
-                TaggedWord(lemma="well", word="well")],
+                TaggedWord(lemma="fox", word="fox"),
+                TaggedWord(lemma="jump", word="jumped"),
+                TaggedWord(lemma="over", word="over"),
+                TaggedWord(lemma="the", word="the"),
+                TaggedWord(lemma="dog", word="dog")],
             id=1,
             document_id=2)
         result = self.seq_proc.process(sentence)
         sequences = split_sequences(result)
+        sequence_sequences = get_sequence_text(sequences)
 
-        print Surf
-        for s in sequences["words"]:
+        # Create four lists of sequences based on the categories and then
+        # check the output
+        key = {
+            "words": {
+                "stops": [
+                    "the",
+                    "the fox",
+                    "the fox jumped",
+                    "the fox jumped over",
+                    "fox",
+                    "fox jumped",
+                    "fox jumped over",
+                    "fox jumped over the",
+                    "jumped",
+                    "jumped over",
+                    "jumped over the dog",
+                    "over",
+                    "over the",
+                    "over the dog"],
+                "nostops": [
+                    "fox",
+                    "fox jumped",
+                    "fox jumped dog",
+                    "jumped",
+                    "jumped dog",
+                    "dog"]
+            },
+            "lemmas": {
+                "stops": [
+                    "the",
+                    "the fox",
+                    "the fox jump",
+                    "the fox jump over",
+                    "fox",
+                    "fox jump",
+                    "fox jump over",
+                    "fox jump over the",
+                    "jump",
+                    "jump over",
+                    "jump over the dog",
+                    "over",
+                    "over the",
+                    "over the dog",
+                    "the",
+                    "the dog",
+                    "dog"],
+                "nostops": [
+                    "fox",
+                    "fox jump",
+                    "fox jump dog",
+                    "jump",
+                    "jump dog",
+                    "dog"]
+            }
+        }
+        print sequence_sequences
+        self.failUnless(sequence_sequences == key)
         
 
 def split_sequences(sequences):
@@ -99,3 +158,16 @@ def split_sequences(sequences):
         result[seq_type][stops].append(sequence)
 
     return result
+
+def get_sequence_text(sequences):
+    """Given the result of split_sequences, replace every Sequence with the text
+    contained in it.
+
+    :param dict sequences: the output of split_sequences
+    """
+    for seq_type, stop_types in sequences.items():
+        for stop_type, seq_list in stop_types.items():
+            for i in range(0, len(seq_list)): #TODO: more pythonic?
+                sequences[seq_type][stop_type][i] = seq_list[i].sequence
+
+    return sequences
