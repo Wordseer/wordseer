@@ -1,3 +1,4 @@
+import argparse
 import config
 import database
 import logger # TODO: logger is different now
@@ -7,7 +8,7 @@ import tokenizer
 
 class CollectionProcessor(object):
     def process(self, collection_dir, document_structure_file_name,
-        file_name_extension, start_from_scratch):
+        file_name_extension, dbname, username, password, start_from_scratch):
         """
         This function:
         1. Sets up the database if necessary
@@ -76,4 +77,31 @@ class CollectionProcessor(object):
             config.PART_OF_SPEECH_TAGGING):
             print("Parsing documents")
             # Initialize the parser
-                
+
+    def main(self, argv): #TODO: make this better
+
+        """
+        options.addOption("r", "reset", false, "Clear database and restart processing");
+		options.addOption("d", "data", true, "The path to your XML data files");
+		options.addOption("s", "structure", true, "The path to the JSON file explaining the structure of the XML files");
+		options.addOption("i", "instance", true, "The short (20-characters or fewer) label to use for this WordSeer instance.");
+
+		options.addOption("h", "help", false, "Print this message");
+        """
+        argparser = argparse.ArgumentParser(description="")
+        argparser.add_argument("-r", action="store_true", dest="reset",
+            help="Clear database and restart processing")
+        argparser.add_argument("-d", action="store", dest="data",
+            help="The path to your XML data files", required=True)
+        argparser.add_argument("-s", action="store", dest="structure",
+            help=("The path to the JSON file explaining the structure of the"
+            " xml files"), required=True)
+        argparser.add_argument("-i", action="store", dest="instance",
+            help=("The short (20-characters or fewer) label to use for this"
+            " WordSeer instance."), required=True)
+
+        args = vars(argparser.parse(argv))
+
+        db_name = "ws_" + args["instance"]
+        self.process(args["data"], args["structure"], "xml", db_name,
+            "wordseer", "wordseer", args["reset"])
