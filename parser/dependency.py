@@ -9,11 +9,11 @@ class Dependency(object):
         and governor.
         :key str governor: The word that governs the dependent.
         :key int gov_index: The index of the governing word in the sentence.
-        :key str dep_pos: Part of speech of the dependent. This variable should
+        :key str gov_pos: Part of speech of the dependent. This variable should
             not be modified.
         :key str dependent: The word that's goverened by the governor.
         :key int dep_index: The index of dependent in the sentence.
-        :key str gov_pos: Part of speech of the governor. This variable should
+        :key str dep_pos: Part of speech of the governor. This variable should
             not be modified.
         """
 
