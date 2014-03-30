@@ -1,13 +1,18 @@
-# TODO: what is syntactic_parse?
+"""
+Container for output of Parser.parse.
+"""
+
 class ParseProducts(object):
     """This class is a container for the results of Parser.parse. It contains
-    a syntactic_parse(?), a list of the dependencies in the parsed sentence,
-    and a list of tagged words in the parsed sentence.
+    a string description of the parse tree, a list of the dependency
+    relationships in the parsed sentence, and a list of tagged words in the
+    parsed sentence.
     """
 
     def __init__(self, syntactic_parse, dependencies, pos_tags):
-        """
-        :param string syntactic_parse:
+        """Instantiate a ParseProducts instance.
+
+        :param string syntactic_parse: A string that describes the parse tree.
         :param list dependencies: A list of Dependencies that were present
         in the parsed sentence.
         :param list pos_tags: A list of TaggedWords that were present in the
