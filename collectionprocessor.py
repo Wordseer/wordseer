@@ -1,7 +1,7 @@
 import argparse
 import config
 import database
-import logger # TODO: logger is different now
+import logger
 import os
 from structureextractor import StructureExtractor
 import tokenizer
@@ -26,6 +26,8 @@ class CollectionProcessor(object):
                 db.reset()
 
         # TODO: MySQLDataReaderWriter
+        #reader_writer = MySQLDataReaderWriter(db, (grammatial_processing or
+        #   word_to_word_similarity))
 
         t = tokenizer.Tokenizer()
 
@@ -56,6 +58,8 @@ class CollectionProcessor(object):
                             docs = extractor.extract(filename)
                             for doc in docs:
                                 # TODO: readerwriter
+                                #reader_writer.create_new_document(doc,
+                                #   num_files_done)
                                 pass
                             print("\t" + num_files_done + "/" +
                                 str(len(contents)) + "\t" + filename)
