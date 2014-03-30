@@ -34,13 +34,11 @@ class DocumentParser(object):
 
         for sentence in document.sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
-                #parse_products = parser.parse(sentence.sentence)
-                #TODO: figure out parsing
-
+                parse_products = parser.parse(sentence.sentence)
                 parsed.add_sentence(sentence, parse_products)
-
                 count += 1
                 current_max = sentence.id
+
                 if count % 50 == 0:
                     average_time = (datetime.now - start_time).total_seconds()
                     print("Average parse speed after " + count +
@@ -52,6 +50,7 @@ class DocumentParser(object):
 
                     parsed = ParsedParagraph()
 
+        #TODO: reader_writer
         #self.write_and_parse(parsed, current_max)
 
     def write_and_parse(self, products, current_max):
