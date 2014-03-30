@@ -1,7 +1,7 @@
-from mixins.kwargstodict import KwargsToDict
 #TODO: documentation
-class Dependency(KwargsToDict):
-    def __init__(self, *args, **kwargs):
+class Dependency(object):
+    def __init__(self, relationship, governor, gov_index, dependent, dep_index,
+        dep_pos, gov_pos):
         """
         :key str relationship:
         :key str governor:
@@ -12,8 +12,13 @@ class Dependency(KwargsToDict):
         :key str gov_pos: This variable should not be modified.
         """
 
-        #TODO: designate private variables
-        super(Dependency, self).__init__(**kwargs)
+        self.relationship = relationship
+        self.governor = governor
+        self.gov_index = gov_index
+        self.dependent = dependent
+        self.dep_index = dep_index
+        self._dep_pos = dep_pos
+        self._gov_pos = gov_pos
 
     def __str__(self):
         return (self.relationship + "(" + self.governor + "-" + self.gov_index +
