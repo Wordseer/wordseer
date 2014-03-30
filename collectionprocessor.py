@@ -82,30 +82,31 @@ class CollectionProcessor(object):
             print("Parsing documents")
             # Initialize the parser
 
-    def main(self, argv): #TODO: make this better
+def main(argv):
+    """This is the root method of the pipeline, this is where the user
+    begins execution. It's meant to be run from the command line, given certain
+    flags.
 
-        """
-        options.addOption("r", "reset", false, "Clear database and restart processing");
-		options.addOption("d", "data", true, "The path to your XML data files");
-		options.addOption("s", "structure", true, "The path to the JSON file explaining the structure of the XML files");
-		options.addOption("i", "instance", true, "The short (20-characters or fewer) label to use for this WordSeer instance.");
+    :param list argv: The flags, usually received from the command line.
+    """
 
-		options.addOption("h", "help", false, "Print this message");
-        """
-        argparser = argparse.ArgumentParser(description="")
-        argparser.add_argument("-r", action="store_true", dest="reset",
-            help="Clear database and restart processing")
-        argparser.add_argument("-d", action="store", dest="data",
-            help="The path to your XML data files", required=True)
-        argparser.add_argument("-s", action="store", dest="structure",
-            help=("The path to the JSON file explaining the structure of the"
-            " xml files"), required=True)
-        argparser.add_argument("-i", action="store", dest="instance",
-            help=("The short (20-characters or fewer) label to use for this"
-            " WordSeer instance."), required=True)
+    argparser = argparse.ArgumentParser(description="")
+    argparser.add_argument("-r", action="store_true", dest="reset",
+        help="Clear database and restart processing")
+    argparser.add_argument("-d", action="store", dest="data",
+        help="The path to your XML data files", required=True)
+    argparser.add_argument("-s", action="store", dest="structure",
+        help=("The path to the JSON file explaining the structure of the"
+        " xml files"), required=True)
+    argparser.add_argument("-i", action="store", dest="instance",
+        help=("The short (20-characters or fewer) label to use for this"
+        " WordSeer instance."), required=True)
 
-        args = vars(argparser.parse(argv))
+    args = vars(argparser.parse(argv))
 
-        db_name = "ws_" + args["instance"]
-        self.process(args["data"], args["structure"], "xml", db_name,
-            "wordseer", "wordseer", args["reset"])
+    db_name = "ws_" + args["instance"]
+    self.process(args["data"], args["structure"], "xml", db_name,
+        "wordseer", "wordseer", args["reset"])
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
