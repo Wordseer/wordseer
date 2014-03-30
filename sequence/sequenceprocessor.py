@@ -167,9 +167,9 @@ class SequenceProcessor(object):
             self.previously_indexed.append(surface_phrase_nostops)
 
         # Definitely make a Sequence of the lemmatized_phrase
-        print "Lemmatized stop"
-        print lemmatized_phrase
-        print lemmatized_has_stops
+        #print "Lemmatized stop"
+        #print lemmatized_phrase
+        #print lemmatized_has_stops
         sequences.append(Sequence(start_position=i,
             sentence_id=sentence.id,
             document_id=sentence.document_id,
@@ -186,8 +186,8 @@ class SequenceProcessor(object):
             wordlist_nostops[0] == wordlist[0] and not
             lemmatized_phrase_nostops in self.previously_indexed):
             # We don't add this to previously_indexed
-            print "Lemmatized nostop"
-            print lemmatized_phrase_nostops
+            #print "Lemmatized nostop"
+            #print lemmatized_phrase_nostops
             sequences.append(Sequence(start_position=i,
                 sentence_id=sentence.id,
                 document_id=sentence.document_id,

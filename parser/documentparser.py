@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from document.parsedparagraph import ParsedParagraph
 import logger
-from parseproducts import ParseProducts
+from .parseproducts import ParseProducts
 from sequence.sequenceprocessor import SequenceProcessor
 
 #TODO: documentation
@@ -15,7 +15,7 @@ class DocumentParser(object):
         self.parser = parser
         self.sequence_processor = SequenceProcessor()
 
-    def parse_document(document):
+    def parse_document(self, document):
         """
         :param Document document:
         """
@@ -46,7 +46,7 @@ class DocumentParser(object):
                     print("Average parse speed after " + count +
                         " sentences: " + str(average_time / count) +
                         " seconds per sentence")
-                    
+
                     #TODO: reader_writer
                     #self.write_and_parse(parsed)
 
