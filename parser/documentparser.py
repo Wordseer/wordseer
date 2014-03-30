@@ -34,7 +34,7 @@ class DocumentParser(object):
 
         for sentence in document.sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
-                parse_products = parser.parse(sentence.sentence)
+                #parse_products = parser.parse(sentence.sentence)
                 #TODO: figure out parsing
 
                 parsed.add_sentence(sentence, parse_products)
@@ -48,12 +48,27 @@ class DocumentParser(object):
                         " seconds per sentence")
                     
                     #TODO: reader_writer
-                    logger.log(LATEST_SENT_ID, str(current_max), logger.REPLACE)
-                    logger.log(LATEST_SEQ_SENT, str(current_max),
-                        logger.REPLACE)
+                    #self.write_and_parse(parsed)
 
                     parsed = ParsedParagraph()
 
-        #TODO: reader_writer
+        #self.write_and_parse(parsed)
+
+    def write_and_parse(self, products, current_max):
+        """Send a ParseProducts object to the ReaderWriter for writing, then
+        process each sentence returned from the ReaderWriter with
+        SequenceProcessor, then call write_sequences on reader_writer.
+
+        :param ParseProducts products: The ParseProducts to send
+        :param int current_max: The highest sentence ID yet processed, used for
+        logging purposes
+        """
+
+        sentences = self.reader_writer.write_parse_products(products)
+
         logger.log(LATEST_SENT_ID, str(current_max), logger.REPLACE)
+        for sentence in sentences:
+            self.sequence_processor.process(sentence)
+
         logger.log(LATEST_SEQ_SENT, str(current_max), logger.REPLACE)
+        self.reader_writer.write_sequences()
