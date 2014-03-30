@@ -1,6 +1,6 @@
+# TODO: real documentation
 class ParseProducts(object):
-    def __init__(syntactic_parse, dependencies, pos_tags):
-        # TODO: real documentation
+    def __init__(self, syntactic_parse, dependencies, pos_tags):
         """
         :param string syntactic_parse:
         :param list dependencies: A list of Dependencies
