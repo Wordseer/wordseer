@@ -1,6 +1,8 @@
 from mixins.comparebydict import CompareByDict
 from mixins.argstodict import ArgsToDict
 
+#TODO: documentation
+
 class Metadata(CompareByDict, ArgsToDict):
     def __init__(self, *args, **kwargs):
         """

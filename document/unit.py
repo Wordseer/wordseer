@@ -10,7 +10,6 @@ class Unit(CompareByDict, KwargsToDict):
     def __init__(self, *args, **kwargs):
         """Construct a Unit.
 
-        Keyword arguments:
         :keyword list sentences: A list of Sentence objects in this unit.
         :keyword list units: A list of Unit objects in this unit.
         :keyword list metadata: A list of Metadata objects to describe this
