@@ -1,9 +1,11 @@
 #TODO: documentation
 class Dependency(object):
+    """This class describes the relationships between words through
+    dependencies."""
     def __init__(self, relationship, governor, gov_index, dependent, dep_index,
         dep_pos, gov_pos):
         """
-        :key str relationship:
+        :key str relationship: The name of the relationship described.
         :key str governor:
         :key int gov_index:
         :key str dependent:
