@@ -3,14 +3,14 @@ from mixins.kwargstodict import KwargsToDict
 class ParsedParagraph(KwargsToDict):
     def __init__(self, **kwargs):
         """
-        :param list sentences:
-        :param list parses:
-        :param str type:
-        :param dict metadata:
-        :param int id:
-        :param float number:
-        :param int narrative_id:
-        :param str text:
+        :key list sentences:
+        :key list parses:
+        :key str type:
+        :key dict metadata:
+        :key int id:
+        :key float number:
+        :key int narrative_id:
+        :key str text:
         """
 
         self.sentences = []

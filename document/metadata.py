@@ -1,22 +1,27 @@
+"""
+Keep track of metadata for Units.
+"""
 from mixins.comparebydict import CompareByDict
 from mixins.argstodict import ArgsToDict
 
 #TODO: documentation
 
 class Metadata(CompareByDict, ArgsToDict):
-    def __init__(self, *args, **kwargs):
+    """This class holds metadata regarding a certain Unit, Sentence,
+    or Document. Each Metadata object describes a certain property.
+    """
+    def __init__(self, **kwargs):
         """
         Instantiate a Metadata instance.
 
-        Keword arguments:
-        property_name
-        parent_property_name
-        value
-        property_ID
-        value_displayed
-        name_displayed
-        display_Name
-        specification
+        :key string property_name: The name of the property.
+        :key string parent_property_name:
+        :key string value: The value of this property.
+        :key int property_ID:
+        :key boolean value_displayed:
+        :key boolean name_displayed:
+        :key string display_name:
+        :key dict specification:
         """
 
         self.property_name = ""

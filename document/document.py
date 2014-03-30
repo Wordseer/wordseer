@@ -2,7 +2,7 @@ from unit import Unit
 
 class Document(Unit):
     """Store information about a Document."""
-    
+
     def __init__(self, *args, **kwargs):
         """Instantiate a new Document.
 
@@ -22,15 +22,14 @@ class Document(Unit):
         self.units = []
         self.sentences = []
 
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+        super(Document, self).__init__(*args, **kwargs)
 
     def __str__(self):
-        s = "<" + self.title + ">" + str(metadata) + "\n"
-        
-        for unit in self.units:
-            s += str(unit) + "\n"
-        for sentence in self.sentences:
-            s += str(sent) + "\n"
+        output = "<" + self.title + ">" + str(self.metadata) + "\n"
 
-        return s
+        for unit in self.units:
+            output += str(unit) + "\n"
+        for sentence in self.sentences:
+            output += str(sentence) + "\n"
+
+        return output

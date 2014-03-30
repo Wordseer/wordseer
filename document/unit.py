@@ -7,7 +7,7 @@ class Unit(CompareByDict, KwargsToDict):
     metadata, an id, and a name.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         """Construct a Unit.
 
         :keyword list sentences: A list of Sentence objects in this unit.
@@ -25,12 +25,12 @@ class Unit(CompareByDict, KwargsToDict):
         super(Unit, self).__init__(**kwargs)
 
     def __str__(self):
-        s = str(self.metadata)
+        output = str(self.metadata)
 
-        for u in self.units:
-            s += str(u) + "\n"
+        for unit in self.units:
+            output += str(unit) + "\n"
 
-        for s in self.sentences:
-            s += str(s) + "\n"
+        for sentence in self.sentences:
+            output += str(sentence) + "\n"
 
-        return s
+        return output

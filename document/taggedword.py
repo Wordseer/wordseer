@@ -5,10 +5,10 @@ class TaggedWord(CompareByDict, KwargsToDict):
     """
     This class describes a single tagged word.
     """
-    
+
     space_before = " "
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         """Instantiate a TaggedWord object.
 
         :keyword int id: The ID for the word.
