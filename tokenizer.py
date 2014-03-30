@@ -21,7 +21,7 @@ class Tokenizer(object):
         """Turn a string of one or more sentences into a list of Sentence
         objects.
 
-        :param str par: One or more sentences, in a string format.
+        :param str txt: One or more sentences, in a string format.
         :return list: A list of document.Sentence objects.
         """
 
