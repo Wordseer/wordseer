@@ -5,11 +5,12 @@ class Dependency(object):
     def __init__(self, relationship, governor, gov_index, dependent, dep_index,
         dep_pos, gov_pos):
         """
-        :key str relationship: The name of the relationship described.
-        :key str governor:
-        :key int gov_index:
-        :key str dependent:
-        :key int dep_index:
+        :key str relationship: The name of the relationship between dependent
+        and governor.
+        :key str governor: The word that governs the dependent.
+        :key int gov_index: The index of the governing word in the sentence.
+        :key str dependent: The word that's goverened by the governor.
+        :key int dep_index: The index of dependent in the sentence.
         :key str dep_pos: This variable should not be modified.
         :key str gov_pos: This variable should not be modified.
         """
