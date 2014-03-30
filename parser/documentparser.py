@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from document.parsedparagraph import ParsedParagraph
 import logger
 from .parseproducts import ParseProducts
@@ -40,7 +40,7 @@ class DocumentParser(object):
                 parsed.add_sentence(sentence, parse_products)
 
                 count += 1
-                current_max = sent.id
+                current_max = sentence.id
                 if count % 50 == 0:
                     average_time = (datetime.now - start_time).total_seconds()
                     print("Average parse speed after " + count +
@@ -48,11 +48,11 @@ class DocumentParser(object):
                         " seconds per sentence")
 
                     #TODO: reader_writer
-                    #self.write_and_parse(parsed)
+                    #self.write_and_parse(parsed, current_max)
 
                     parsed = ParsedParagraph()
 
-        #self.write_and_parse(parsed)
+        #self.write_and_parse(parsed, current_max)
 
     def write_and_parse(self, products, current_max):
         """Send a ParseProducts object to the ReaderWriter for writing, then
