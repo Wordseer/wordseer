@@ -204,7 +204,7 @@ class SequenceProcessor(object):
         simply calls finish_indexing_sequences() from the reader_writer object.
         """
 
-        #TODO: readerwriter stuff goes here
+        #TODO: reader_writer
         #self.reader_writer.finish_indexing_sequences()
         pass
 

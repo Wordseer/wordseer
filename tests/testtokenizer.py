@@ -1,7 +1,7 @@
 """
 Tests for the tokenizer.
 """
-
+#TODO: write parser tests
 import unittest
 import tokenizer
 from document import sentence

@@ -5,6 +5,7 @@ from .parseproducts import ParseProducts
 from sequence.sequenceprocessor import SequenceProcessor
 
 #TODO: documentation
+#TODO: unit tests
 
 LATEST_SENT_ID = "latest_parsed_sentence_id"
 LATEST_SEQ_SENT = "latest_sequence_sentence"
