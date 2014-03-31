@@ -13,6 +13,7 @@ Requires
 * [Stanford CoreNLP](http://nlp.stanford.edu/software/corenlp.shtml):
 Specifically version 3.2.0
 * [Unidecode](https://pypi.python.org/pypi/Unidecode/)
+* [Mock](https://pypi.python.org/pypi/mock) (Only required for unit tests)
 
 
 Installation
@@ -21,6 +22,10 @@ Installation
 `sqlalchemy`, `lxml`, and `Unidecode` can be installed via `pip`:
 
 `pip install SQLAlchemy lxml Unidecode`
+
+If you want to run unit tests, you should install `mock`:
+
+`pip install mock`
 
 `corenlp` must be installed manually, and version *3.2.0* of Stanford's CoreNLP
 library must simply be in a directory accessible to the backend.
