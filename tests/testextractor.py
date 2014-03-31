@@ -182,9 +182,3 @@ def compare_metadata(dict_metadata, other_metadata):
         return False
 
     return True
-
-def main():
-    unittest.main()
-
-if __name__ == "__main__":
-    main()

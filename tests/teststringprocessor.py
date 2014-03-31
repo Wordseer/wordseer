@@ -88,9 +88,3 @@ class SentenceTests(CommonTests, unittest.TestCase):
                     self.failUnless(actual_char != " ")
                 else:
                     self.failUnless(actual_char == " ")
-
-def main():
-    unittest.main()
-
-if __name__ == "__main__":
-    main()
