@@ -10,7 +10,7 @@ class Sentence(Unit):
         Instantiate a Sentence.
 
         :key int id: The ID number for this sentence.
-        :key float number:
+        :key float number: ORPHAN?
         :key int document_id: The ID of the document that contains this
         sentence.
         :key string text: The raw text of this sentence.
@@ -21,7 +21,7 @@ class Sentence(Unit):
         sentence.
         :key list metadata: A list of Metadata objects to describe this
         sentence.
-        :key int total_sentences:
+        :key int total_sentences: OPRHAN?
         """
 
         self.metadata = []

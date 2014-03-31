@@ -13,7 +13,7 @@ class Document(Unit):
         if any.
         :keyword int id: An ID for this document.
         :keyword int total_sentences: The total number of sentences for the
-        document.
+        document. ORPHAN?
         :keyword string title: The title of the document.
         """
 

@@ -15,13 +15,14 @@ class Metadata(CompareByDict, KwargsToDict):
         Instantiate a Metadata instance.
 
         :key string property_name: The name of the property.
-        :key string parent_property_name:
+        :key string parent_property_name: ORPHAN
         :key string value: The value of this property.
-        :key int property_ID:
-        :key boolean value_displayed:
-        :key boolean name_displayed:
-        :key string display_name:
-        :key dict specification:
+        :key int property_ID: ORPHAN
+        :key boolean value_displayed: ORPHAN
+        :key boolean name_displayed: ORPHAN
+        :key string display_name: ORPHAN
+        :key dict specification: The JSON description of this type of metadata
+        field.
         """
 
         self.property_name = ""

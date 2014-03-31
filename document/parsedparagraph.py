@@ -1,16 +1,22 @@
 from mixins.kwargstodict import KwargsToDict
 #TODO: documentation
 class ParsedParagraph(KwargsToDict):
+    """A container for a paragraph that has been parsed, containing both the
+    original text and the result of parsing each sentence with the parser.
+    """
     def __init__(self, **kwargs):
-        """
-        :key list sentences:
-        :key list parses:
-        :key str type:
-        :key dict metadata:
-        :key int id:
-        :key float number:
-        :key int narrative_id:
-        :key str text:
+        """Instantiate a ParsedParagraph.
+        
+        :key list sentences: A list of Sentence objects, representing the
+        sentences in this paragraph
+        :key list parses: A list of ParseProducts, each representing a Sentence
+        from sentences
+        :key str type: ORPHAN?
+        :key dict metadata: ORPHAN?
+        :key int id: ORPHAN?
+        :key float number: ORPHAN?
+        :key int narrative_id: ORPHAN?
+        :key str text: ORPHAN?
         """
 
         self.sentences = []
