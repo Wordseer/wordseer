@@ -35,53 +35,69 @@ class CollectionProcessor(object):
         # tables
         if not "true" in logger.get("finished_recording_text_and_metadata"):
             print("Extracting document text and metadata")
-            extractor = StructureExtractor(str_proc,
-                document_structure_file_name)
-
-            # Extract and record metadata, text for documents in the collection
-            num_files_done = 1
-            if os.path.isdir(collection_dir):
-                contents = []
-                for filename in os.listdir(collection_dir):
-                    if (os.path.splitext(filename)[1].lower() ==
-                        file_name_extension.lower()):
-                        contents.append(filename)
-
-                docs = [] # list of Documents
-
-                for filename in contents:
-                    if (not "[" + num_files_done + "]" in
-                        logger.get("text_and_metadata_recorded") and
-                        not filename[0] == "."):
-                        logger.log("finished_recording_text_and_metadata",
-                            "false", "replace")
-                        try:
-                            docs = extractor.extract(filename)
-                            for doc in docs:
-                                # TODO: readerwriter
-                                #reader_writer.create_new_document(doc,
-                                #   num_files_done)
-                                pass
-                            print("\t" + num_files_done + "/" +
-                                str(len(contents)) + "\t" + filename)
-                            logger.log("text_and_metadata_recorded",
-                                num_files_done + "", "update")
-                        except Exception as e:
-                            print("Error on file " + filename)
-                            print(e)
-
-                    num_files_done += 1
-
-                logger.log("finished_recording_text_and_metadata", "true",
-                    "replace")
-            else:
-                raise IOError("Directory not found: " + collection_dir)
+            self.extract_record_metadata(str_proc,
+                document_structure_file_name, collection_dir)
 
         # Parse the documents
         if config.GRAMMATICAL_PROCESSING or (config.WORD_TO_WORD_SIMILARITY and
             config.PART_OF_SPEECH_TAGGING):
             print("Parsing documents")
-            # Initialize the parser
+            if not "true" in logger.get("finished_grammatical_processing").lower()
+
+    def extract_record_metadata(self, str_proc, document_structure_file_name,
+        collection_dir):
+        """Extract metadata from each file in collection_dir, and populate the
+        documents, sentences, and document structure database tables.
+
+        :param StringProcessor str_proc: An instance of StringProcessor
+        :param str document_structure_file_name: A JSON description of the
+        document structure.
+        :param str collection_dir: The directory from which files should be
+        parsed.
+        """
+        extractor = StructureExtractor(str_proc,
+            document_structure_file_name)
+
+        # Extract and record metadata, text for documents in the collection
+        num_files_done = 1
+        if os.path.isdir(collection_dir):
+            contents = []
+            for filename in os.listdir(collection_dir):
+                if (os.path.splitext(filename)[1].lower() ==
+                    file_name_extension.lower()):
+                    contents.append(filename)
+
+            docs = [] # list of Documents
+
+            for filename in contents:
+                if (not "[" + num_files_done + "]" in
+                    logger.get("text_and_metadata_recorded") and
+                    not filename[0] == "."):
+                    logger.log("finished_recording_text_and_metadata",
+                        "false", "replace")
+                    try:
+                        docs = extractor.extract(filename)
+                        for doc in docs:
+                            # TODO: readerwriter
+                            #reader_writer.create_new_document(doc,
+                            #   num_files_done)
+                            pass
+                        print("\t" + num_files_done + "/" +
+                            str(len(contents)) + "\t" + filename)
+                        logger.log("text_and_metadata_recorded",
+                            num_files_done + "", "update")
+                    except Exception as e:
+                        print("Error on file " + filename)
+                        print(e)
+
+                num_files_done += 1
+
+            logger.log("finished_recording_text_and_metadata", "true",
+                "replace")
+        else:
+            raise IOError("Directory not found: " + collection_dir)
+
+
 
 def main(argv):
     """This is the root method of the pipeline, this is where the user
