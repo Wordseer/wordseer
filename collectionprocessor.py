@@ -12,6 +12,7 @@ import config
 from database import Database
 import logger
 from parser.documentparser import DocumentParser
+from sequence.sequenceprocessor import SequenceProcessor
 from structureextractor import StructureExtractor
 from stringprocessor import StringProcessor
 
@@ -22,7 +23,8 @@ class CollectionProcessor(object):
     """
     def __init__(self, reader_writer):
         self.reader_writer = reader_writer
-    
+        self.str_proc = StringProcessor()
+
     def process(self, collection_dir, docstruc_filename,
         filename_extension, start_from_scratch):
         """
@@ -51,13 +53,11 @@ class CollectionProcessor(object):
         #reader_writer = MySQLDataReaderWriter(db, (grammatial_processing or
         #   word_to_word_similarity))
 
-        self.str_proc = StringProcessor()
-
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
         if not "true" in logger.get("finished_recording_text_and_metadata"):
             print("Extracting document text and metadata")
-            extract_record_metadata(str_proc, collection_dir,
+            self.extract_record_metadata(collection_dir,
                 docstruc_filename, filename_extension)
 
         # Parse the documents
@@ -67,7 +67,11 @@ class CollectionProcessor(object):
             print("Parsing documents")
             self.parse_documents()
 
-    def extract_record_metadata(str_proc, collection_dir, docstruc_filename,
+        if (config.SEQUENCE_INDEXING and
+            "true" in logger.get("finished_sequence_processing").lower()):
+            self.calculate_index_sequences()
+
+    def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):
         """Extract metadata from each file in collection_dir, and populate the
         documents, sentences, and document structure database tables.
@@ -80,7 +84,7 @@ class CollectionProcessor(object):
         :param str filename_extension: The extension of the files that contain
         documents.
         """
-        extractor = StructureExtractor(str_proc, docstruc_filename)
+        extractor = StructureExtractor(self.str_proc, docstruc_filename)
 
         # Extract and record metadata, text for documents in the collection
         num_files_done = 1
@@ -121,6 +125,12 @@ class CollectionProcessor(object):
             "replace")
 
     def parse_documents(self):
+        """Given the documents already loaded into the database from
+        extract_record_metadata, parse each document using
+        DocumentParser.parse_document(). Afterwards, call
+        ReaderWriter.finish_grammatical_processing.
+        """
+
         # TODO: readerwriter
         # document_ids = self.reader_writer.list_document_ids()
         document_ids = range(0, 5)
@@ -133,11 +143,11 @@ class CollectionProcessor(object):
 
         latest_id = int(latest)
 
-        for id in document_ids:
-            if id > latest_id:
+        for doc_id in document_ids:
+            if doc_id > latest_id:
                 #TODO: readerwriter
                 #doc = self.reader_writer.get_document(id)
-                print("Parsing document " + documents_parsed "/" +
+                print("Parsing document " + documents_parsed + "/" +
                     len(document_ids))
                 start_time = datetime.now()
                 document_parser.parse_document(doc)
@@ -146,13 +156,49 @@ class CollectionProcessor(object):
                     "s\n")
                 logger.log("finished_grammatical_processing", "false",
                     logger.REPLACE)
-                logger.log("latest_parsed_document_id", str(id),
+                logger.log("latest_parsed_document_id", str(doc_id),
                     logger.REPLACE)
 
             documents_parsed += 1
 
         #TODO: reader_writer
         #self.reader_writer.finish_grammatical_processing()
+
+    def calculate_index_sequences(self):
+        """Calculate and index sequences, if not already done during grammatical
+        processing."""
+
+        latest_sentence = logger.get("latest_sequence_sentence")
+
+        if len(latest_sentence) == 0:
+            latest_sentence = "0"
+
+        latest_id = int(latest_sentence)
+        # TODO: readerwriter
+        #max_sentence_id = self.reader_writer.get_max_sentence_id
+        max_sentence_id = 0
+        sentences_processed = 0
+        seq_proc = SequenceProcessor(self.reader_writer)
+        #TODO: readerwriter
+        #self.reader_writer.load_sequence_counts()
+        for i in range(latest_id, max_sentence_id):
+            if i > latest_id:
+                #TODO: readerwriter
+                #sentence = self.reader_writer.get_sentence(id)
+                if len(sentence.words) > 0:
+                    latest_id = sentence.id
+                    processed_ok = seq_proc.process(sentence)
+                    if processed_ok:
+                        logger.log("finished_sequence_processing", "false",
+                            logger.REPLACE)
+                        logger.log("latest_sequence_sentence", str(i),
+                            logger.REPLACE)
+                if sentences_processed % 1000 == 0:
+                    #TODO: is garbage collection necessary here?
+                    print("Sequence-processing sentence " + i + "/" +
+                        max_sentence_id)
+
+            sentences_processed += 1
 
 def main(argv):
     """This is the root method of the pipeline, this is where the user
