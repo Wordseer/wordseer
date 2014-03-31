@@ -4,8 +4,6 @@ Keep track of metadata for Units.
 from mixins.comparebydict import CompareByDict
 from mixins.kwargstodict import KwargsToDict
 
-#TODO: documentation
-
 class Metadata(CompareByDict, KwargsToDict):
     """This class holds metadata regarding a certain Unit, Sentence,
     or Document. Each Metadata object describes a certain property.

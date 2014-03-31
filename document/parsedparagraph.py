@@ -1,5 +1,4 @@
 from mixins.kwargstodict import KwargsToDict
-#TODO: documentation
 class ParsedParagraph(KwargsToDict):
     """A container for a paragraph that has been parsed, containing both the
     original text and the result of parsing each sentence with the parser.

@@ -1,7 +1,6 @@
-#TODO: documentation
 class Dependency(object):
-    """This class describes the relationships between words through
-    dependencies."""
+    """This class describes the relationships between two words through a
+    dependency."""
     def __init__(self, relationship, governor, gov_index, gov_pos, dependent,
         dep_index, dep_pos):
         """

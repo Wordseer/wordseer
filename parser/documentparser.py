@@ -4,24 +4,29 @@ import logger
 from .parseproducts import ParseProducts
 from sequence.sequenceprocessor import SequenceProcessor
 
-#TODO: documentation
 #TODO: unit tests
 
 LATEST_SENT_ID = "latest_parsed_sentence_id"
 LATEST_SEQ_SENT = "latest_sequence_sentence"
 
 class DocumentParser(object):
+    """Handle parsing a document.
+    """
     def __init__(self, reader_writer, parser):
         self.reader_writer = reader_writer
         self.parser = parser
         self.sequence_processor = SequenceProcessor()
 
     def parse_document(self, document):
-        """
-        :param Document document:
+        """ Parse a document and write it to the database.
+
+        Given a certain document, this method will parse every sentence in
+        it to a ParsedParagraph object. Ater every 50th sentence it will call
+        write_and_parse and supply the ParseProducts and the latest sentence ID.
+
+        :param Document document: The document to parse and record.
         """
 
-        parse_products = ParseProducts()
         start_time = datetime.now()
         count = 0
         parsed = ParsedParagraph()
@@ -55,13 +60,14 @@ class DocumentParser(object):
         #self.write_and_parse(parsed, current_max)
 
     def write_and_parse(self, products, current_max):
-        """Send a ParseProducts object to the ReaderWriter for writing, then
-        process each sentence returned from the ReaderWriter with
-        SequenceProcessor, then call write_sequences on reader_writer.
+        """Send a ParsedParagraph object to the ReaderWriter for writing, then
+        process each sentence returned from the write_parse_products with
+        SequenceProcessor.process(), then call ReaderWriter.write_sequences().
+        This method also updates the logs with the latest sentence ID and latest
+        sequenced sentence.
 
-        :param ParseProducts products: The ParseProducts to send
-        :param int current_max: The highest sentence ID yet processed, used for
-        logging purposes
+        :param ParsedParagraph products: The ParsedParagraph to send
+        :param int current_max: The highest sentence ID yet processed.
         """
 
         sentences = self.reader_writer.write_parse_products(products)
