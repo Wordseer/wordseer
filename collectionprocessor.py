@@ -17,7 +17,7 @@ class CollectionProcessor(object):
     """Process a collection of files.
     """
     def process(self, collection_dir, docstruc_file_name,
-        file_name_extension, dbname, username, password, start_from_scratch):
+        file_name_extension, start_from_scratch):
         """
         This function relies on several subfunctions to:
         1. Sets up the database if necessary
