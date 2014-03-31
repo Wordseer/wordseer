@@ -15,7 +15,7 @@ class DocumentParser(object):
     def __init__(self, reader_writer, parser):
         self.reader_writer = reader_writer
         self.parser = parser
-        self.sequence_processor = SequenceProcessor()
+        self.sequence_processor = SequenceProcessor(reader_writer)
 
     def parse_document(self, document):
         """ Parse a document and write it to the database.

@@ -51,6 +51,7 @@ class SequenceProcessorTests(unittest.TestCase):
 
         self.failUnless(self.seq_proc.remove_stops(with_stops) == without_stops)
 
+    @unittest.skip("Need clarification")
     def test_process(self):
         """Test process()
         """
