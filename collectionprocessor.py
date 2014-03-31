@@ -15,52 +15,49 @@ from stringprocessor import StringProcessor
 
 #TODO: probably better to move the arguments to instance variables
 
-class CollectionProcessor(object):
-    """Process a collection of files.
+def process(self, collection_dir, docstruc_filename,
+    filename_extension, start_from_scratch):
     """
-    def process(self, collection_dir, docstruc_filename,
-        filename_extension, start_from_scratch):
-        """
-        This function relies on several subfunctions to:
-        1. Sets up the database if necessary
-        2. Extracts metadata, populates the narratives, sentenes, and paragraphs
-        tables
-        3. Processes the sentences by tokenizing and indexing the words
-        4. Processes the sentences by performing grammatical parsing
+    This function relies on several subfunctions to:
+    1. Sets up the database if necessary
+    2. Extracts metadata, populates the narratives, sentenes, and paragraphs
+    tables
+    3. Processes the sentences by tokenizing and indexing the words
+    4. Processes the sentences by performing grammatical parsing
 
-        :param str collection_dir: The directory whose files should be
-        processed.
-        :param str docstructure_file_name: The name of the JSON file that
-        describes the structure in the document files.
-        :param str file_name_extension: Files with this extension will be parsed
-        as documents.
-        :param boolean start_from_scratch: If true, then the tables in the
-        database will be recreated.
-        """
-        # Set up database if necessary
-        if start_from_scratch is True:
-            with Database() as database:
-                database.reset()
+    :param str collection_dir: The directory whose files should be
+    processed.
+    :param str docstructure_file_name: The name of the JSON file that
+    describes the structure in the document files.
+    :param str file_name_extension: Files with this extension will be parsed
+    as documents.
+    :param boolean start_from_scratch: If true, then the tables in the
+    database will be recreated.
+    """
+    # Set up database if necessary
+    if start_from_scratch is True:
+        with Database() as database:
+            database.reset()
 
-        # TODO: MySQLDataReaderWriter
-        #reader_writer = MySQLDataReaderWriter(db, (grammatial_processing or
-        #   word_to_word_similarity))
+    # TODO: MySQLDataReaderWriter
+    #reader_writer = MySQLDataReaderWriter(db, (grammatial_processing or
+    #   word_to_word_similarity))
 
-        str_proc = StringProcessor()
+    str_proc = StringProcessor()
 
-        # Extract metadata, populate documents, sentences, and doc structure
-        # tables
-        if not "true" in logger.get("finished_recording_text_and_metadata"):
-            print("Extracting document text and metadata")
-            extract_record_metadata(str_proc, collection_dir,
-                docstruc_filename, filename_extension)
+    # Extract metadata, populate documents, sentences, and doc structure
+    # tables
+    if not "true" in logger.get("finished_recording_text_and_metadata"):
+        print("Extracting document text and metadata")
+        extract_record_metadata(str_proc, collection_dir,
+            docstruc_filename, filename_extension)
 
-        # Parse the documents
-        if (config.GRAMMATICAL_PROCESSING or (config.WORD_TO_WORD_SIMILARITY and
-            config.PART_OF_SPEECH_TAGGING) and not
-            "true" in logger.get("finished_grammatical_processing").lower()):
-            print("Parsing documents")
-            parse_documents()
+    # Parse the documents
+    if (config.GRAMMATICAL_PROCESSING or (config.WORD_TO_WORD_SIMILARITY and
+        config.PART_OF_SPEECH_TAGGING) and not
+        "true" in logger.get("finished_grammatical_processing").lower()):
+        print("Parsing documents")
+        parse_documents()
 
 def extract_record_metadata(str_proc, collection_dir, docstruc_filename,
     filename_extension):
@@ -141,7 +138,7 @@ def main(argv):
     args = vars(argparser.parse_args(argv))
 
     db_name = "ws_" + args["instance"]
-    self.process(args["data"], args["structure"], "xml", args["reset"])
+    process(args["data"], args["structure"], "xml", args["reset"])
 
 if __name__ == "__main__":
     main(sys.argv[1:])
