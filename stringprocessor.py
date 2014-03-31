@@ -2,8 +2,9 @@
 Methods to handle string parsing, tokenization, tagging, etc.
 """
 
-import config
 from corenlp import StanfordCoreNLP
+
+import config
 from document import taggedword, sentence
 from parser.dependency import Dependency
 from parser.parseproducts import ParseProducts

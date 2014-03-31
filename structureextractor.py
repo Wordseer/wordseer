@@ -4,12 +4,13 @@
     contents.
 """
 
+import json
+from lxml import etree
+
 from document.document import Document
 from document.sentence import Sentence
 from document.unit import Unit
 from document.metadata import Metadata
-import json
-from lxml import etree
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a

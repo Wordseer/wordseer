@@ -4,20 +4,22 @@ line interface to the wordseer backend.
 """
 
 import argparse
-import config
-import database
-import logger
 import os
+import sys
+
+import config
+from database import Database
+import logger
 from structureextractor import StructureExtractor
 from stringprocessor import StringProcessor
 
-#TODO: are dbname, username, password even necessary?
+#TODO: probably better to move the arguments to instance variables
 
 class CollectionProcessor(object):
     """Process a collection of files.
     """
-    def process(self, collection_dir, docstruc_file_name,
-        file_name_extension, start_from_scratch):
+    def process(self, collection_dir, docstruc_filename,
+        filename_extension, start_from_scratch):
         """
         This function relies on several subfunctions to:
         1. Sets up the database if necessary
@@ -37,7 +39,7 @@ class CollectionProcessor(object):
         """
         # Set up database if necessary
         if start_from_scratch is True:
-            with database.Database() as database:
+            with Database() as database:
                 database.reset()
 
         # TODO: MySQLDataReaderWriter
@@ -50,17 +52,17 @@ class CollectionProcessor(object):
         # tables
         if not "true" in logger.get("finished_recording_text_and_metadata"):
             print("Extracting document text and metadata")
-            self.extract_record_metadata(str_proc, collection_dir,
-                docstruc_file_name, filename_extension)
+            extract_record_metadata(str_proc, collection_dir,
+                docstruc_filename, filename_extension)
 
         # Parse the documents
         if (config.GRAMMATICAL_PROCESSING or (config.WORD_TO_WORD_SIMILARITY and
             config.PART_OF_SPEECH_TAGGING) and not
             "true" in logger.get("finished_grammatical_processing").lower()):
             print("Parsing documents")
-            self.parse_documents()
+            parse_documents()
 
-def extract_record_metadata(str_proc, collection_dir, docstruc_file_name,
+def extract_record_metadata(str_proc, collection_dir, docstruc_filename,
     filename_extension):
     """Extract metadata from each file in collection_dir, and populate the
     documents, sentences, and document structure database tables.
@@ -73,14 +75,14 @@ def extract_record_metadata(str_proc, collection_dir, docstruc_file_name,
     :param str filename_extension: The extension of the files that contain
     documents.
     """
-    extractor = StructureExtractor(str_proc, docstruc_file_name)
+    extractor = StructureExtractor(str_proc, docstruc_filename)
 
     # Extract and record metadata, text for documents in the collection
     num_files_done = 1
     contents = []
     for filename in os.listdir(collection_dir):
         if (os.path.splitext(filename)[1].lower() ==
-            file_name_extension.lower()):
+            filename_extension.lower()):
             contents.append(filename)
 
     docs = [] # list of Documents
@@ -113,8 +115,8 @@ def extract_record_metadata(str_proc, collection_dir, docstruc_file_name,
     logger.log("finished_recording_text_and_metadata", "true",
         "replace")
 
-    def parse_documents(self):
-        pass
+def parse_documents():
+    pass
 
 def main(argv):
     """This is the root method of the pipeline, this is where the user
@@ -136,11 +138,10 @@ def main(argv):
         help=("The short (20-characters or fewer) label to use for this"
         " WordSeer instance."), required=True)
 
-    args = vars(argparser.parse(argv))
+    args = vars(argparser.parse_args(argv))
 
     db_name = "ws_" + args["instance"]
-    self.process(args["data"], args["structure"], "xml", db_name,
-        "wordseer", "wordseer", args["reset"])
+    self.process(args["data"], args["structure"], "xml", args["reset"])
 
 if __name__ == "__main__":
     main(sys.argv[1:])
