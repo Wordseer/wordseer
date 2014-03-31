@@ -119,7 +119,7 @@ class SequenceProcessorTests(unittest.TestCase):
             }
         }
 
-        pprint.pprint(sequence_sequences)
+        #pprint.pprint(sequence_sequences)
         self.failUnless(sequence_sequences == key)
         
 
