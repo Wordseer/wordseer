@@ -89,7 +89,7 @@ class CollectionProcessor(object):
 
         # Calculate word-to-word-similarities
         if (config.WORD_TO_WORD_SIMILARITY and not
-            "true" in logger.get("word_similarity_calculations_done"):
+            "true" in logger.get("word_similarity_calculations_done")):
                 print("Calculating Lin Similarities")
                 #TODO: reader_writer
                 #self.reader_writer.calculate_lin_similarities()
@@ -156,7 +156,6 @@ class CollectionProcessor(object):
 
         # TODO: readerwriter
         # document_ids = self.reader_writer.list_document_ids()
-        document_ids = range(0, 5)
         document_parser = DocumentParser(self.reader_writer, self.str_proc)
         documents_parsed = 0
         latest = logger.get("latest_parsed_document_id")
