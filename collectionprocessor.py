@@ -60,42 +60,41 @@ class CollectionProcessor(object):
 
         # Extract and record metadata, text for documents in the collection
         num_files_done = 1
-        if os.path.isdir(collection_dir):
-            contents = []
-            for filename in os.listdir(collection_dir):
-                if (os.path.splitext(filename)[1].lower() ==
-                    file_name_extension.lower()):
-                    contents.append(filename)
+        contents = []
+        for filename in os.listdir(collection_dir):
+            if (os.path.splitext(filename)[1].lower() ==
+                file_name_extension.lower()):
+                contents.append(filename)
 
-            docs = [] # list of Documents
+        docs = [] # list of Documents
 
-            for filename in contents:
-                if (not "[" + num_files_done + "]" in
-                    logger.get("text_and_metadata_recorded") and
-                    not filename[0] == "."):
-                    logger.log("finished_recording_text_and_metadata",
-                        "false", "replace")
-                    try:
-                        docs = extractor.extract(filename)
-                        for doc in docs:
-                            # TODO: readerwriter
-                            #reader_writer.create_new_document(doc,
-                            #   num_files_done)
-                            pass
-                        print("\t" + num_files_done + "/" +
-                            str(len(contents)) + "\t" + filename)
-                        logger.log("text_and_metadata_recorded",
-                            num_files_done + "", "update")
-                    except Exception as e:
-                        print("Error on file " + filename)
-                        print(e)
+        for filename in contents:
+            if (not "[" + num_files_done + "]" in
+                logger.get("text_and_metadata_recorded") and not
+                filename[0] == "."):
+                logger.log("finished_recording_text_and_metadata", "false",
+                    logger.REPLACE)
+                try:
+                    docs = extractor.extract(filename)
+                    for doc in docs:
+                        # TODO: readerwriter
+                        #reader_writer.create_new_document(doc,
+                        #   num_files_done)
+                        pass
 
-                num_files_done += 1
+                    print("\t" + num_files_done + "/" + str(len(contents)) +
+                        "\t" + filename)
+                    logger.log("text_and_metadata_recorded",
+                        num_files_done + "", logger.UPDATE)
 
-            logger.log("finished_recording_text_and_metadata", "true",
-                "replace")
-        else:
-            raise IOError("Directory not found: " + collection_dir)
+                except Exception as e:
+                    print("Error on file " + filename)
+                    print(e)
+
+            num_files_done += 1
+
+        logger.log("finished_recording_text_and_metadata", "true",
+            "replace")
 
 
 
