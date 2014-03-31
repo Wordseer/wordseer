@@ -9,7 +9,7 @@ import os
 import sys
 
 import config
-from database import Database
+from database.database import Database
 import logger
 from parser.documentparser import DocumentParser
 from sequence.sequenceprocessor import SequenceProcessor

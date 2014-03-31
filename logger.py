@@ -4,7 +4,7 @@ database rather than a convential textfile for speedy queries later on in
 the pipeline.
 """
 
-import database
+from database import database
 from models import Log
 from sqlalchemy.orm.exc import NoResultFound
 

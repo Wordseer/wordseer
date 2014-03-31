@@ -1,7 +1,7 @@
 """
 Tests for the Logger class.
 """
-import database
+from database import database
 from models import Log
 import logger
 import unittest
