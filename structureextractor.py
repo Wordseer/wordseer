@@ -16,15 +16,15 @@ class StructureExtractor(object):
     JSON file. It generates document classes (Sentences, Documents, Metadatas,
     etc.) from the input file.
     """
-    def __init__(self, tokenizer, structure_file):
+    def __init__(self, str_proc, structure_file):
         """Create a new StructureExtractor.
 
-        :param Tokenizer tokenizer: A tokenizer object
+        :param StringProcessor str_proc: A StringProcessor object
         :param str structure_file: Path to a JSON file that specifies the
         document structure.
         :return StructureExtractor: a StructureExtractor instance
         """
-        self.t = tokenizer
+        self.str_proc = str_proc
         self.structure_file = open(structure_file, "r")
         self.document_structure = json.load(self.structure_file)
 
@@ -112,7 +112,7 @@ class StructureExtractor(object):
                     sentence_node))
 
         if tokenize:
-            sents = self.t.tokenize(sentence_text)
+            sents = self.str_proc.tokenize(sentence_text)
 
             for sent in sents:
                 sent.metadata = sentence_metadata

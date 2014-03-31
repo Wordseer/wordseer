@@ -4,7 +4,7 @@ import database
 import logger
 import os
 from structureextractor import StructureExtractor
-import tokenizer
+from stringprocessor import StringProcessor
 
 class CollectionProcessor(object):
     def process(self, collection_dir, document_structure_file_name,
@@ -29,13 +29,14 @@ class CollectionProcessor(object):
         #reader_writer = MySQLDataReaderWriter(db, (grammatial_processing or
         #   word_to_word_similarity))
 
-        t = tokenizer.Tokenizer()
+        str_proc = StringProcessor()
 
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
         if not "true" in logger.get("finished_recording_text_and_metadata"):
             print("Extracting document text and metadata")
-            extractor = StructureExtractor(t, document_structure_file_name)
+            extractor = StructureExtractor(str_proc,
+                document_structure_file_name)
 
             # Extract and record metadata, text for documents in the collection
             num_files_done = 1

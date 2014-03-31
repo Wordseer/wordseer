@@ -1,5 +1,5 @@
 """
-Set up the tokenizer using the Stanford NLP library.
+Methods to handle string parsing, tokenization, tagging, etc.
 """
 
 import config
@@ -8,21 +8,20 @@ from document import taggedword, sentence
 from parser.dependency import Dependency
 from parser.parseproducts import ParseProducts
 
-#TODO: rename this class something better
-class Tokenizer(object):
-    """This class takes a string as input and returns a list of Sentences,
-    with each word tagged as a TaggedWord."""
+class StringProcessor(object):
+    """Tokenize or parse a string."""
 
     def __init__(self):
-        """Instantiate a tokenizer. This method merely readies the parser.
-        Note that readying the parser takes some time.
+        """Instantiate and ready the parser. Note that readying the parser takes
+        some time.
         """
 
         self.parser = StanfordCoreNLP(config.CORE_NLP_DIR)
 
     def tokenize(self, txt):
         """Turn a string of one or more sentences into a list of Sentence
-        objects.
+        objects. This method will also tokenize each word in txt, find its PoS,
+        lemma, and space_before.
 
         :param str txt: One or more sentences, in a string format.
         :return list: A list of document.Sentence objects.
@@ -61,11 +60,15 @@ class Tokenizer(object):
             dependencies, tokenize_from_raw(sentence, sent)[0].tagged)
 
 def tokenize_from_raw(parsed_text, txt):
-    """Given the output of a call to raw_parse, produce tokens.
+    """Given the output of a call to raw_parse, produce a list of Sentences
+    and find the PoS, lemmas, and space_befores of each word in each sentence.
+
+    This method does the same thing as tokenize(), but it accepts already parsed
+    data.
 
     :param dict parsed_text: The return value of a call to raw_parse
     :param str txt: The original text.
-    :return list: Same output as tokenize().
+    :return list: A list of document.Sentence objects.
     """
     paragraph = [] # a list of Sentences
 

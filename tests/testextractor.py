@@ -5,11 +5,11 @@ Tests for structureextractor.py.
 from document import metadata, sentence
 import unittest
 from structureextractor import *
-import tokenizer
+import stringprocessor
 import json
 from lxml import etree
 
-t = tokenizer.Tokenizer()
+t = stringprocessor.StringProcessor()
 
 class CommonTests(object):
     """Functionality common to all extractor test cases.

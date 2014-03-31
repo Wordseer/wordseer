@@ -2,11 +2,11 @@
 Tests for the tokenizer.
 """
 #TODO: write parser tests
-import unittest
-import tokenizer
 from document import sentence
+import stringprocessor
+import unittest
 
-t = tokenizer.Tokenizer()
+t = stringprocessor.StringProcessor()
 
 class CommonTests(object):
     """Tests and variables common to all test cases.
