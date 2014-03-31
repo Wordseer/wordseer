@@ -10,6 +10,7 @@ import sys
 import config
 from database import Database
 import logger
+from parser.documentparser import DocumentParser
 from structureextractor import StructureExtractor
 from stringprocessor import StringProcessor
 
@@ -49,7 +50,7 @@ class CollectionProcessor(object):
         #reader_writer = MySQLDataReaderWriter(db, (grammatial_processing or
         #   word_to_word_similarity))
 
-        str_proc = StringProcessor()
+        self.str_proc = StringProcessor()
 
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
@@ -63,7 +64,7 @@ class CollectionProcessor(object):
             config.PART_OF_SPEECH_TAGGING) and not
             "true" in logger.get("finished_grammatical_processing").lower()):
             print("Parsing documents")
-            parse_documents()
+            self.parse_documents()
 
     def extract_record_metadata(str_proc, collection_dir, docstruc_filename,
         filename_extension):
@@ -118,8 +119,20 @@ class CollectionProcessor(object):
         logger.log("finished_recording_text_and_metadata", "true",
             "replace")
 
-    def parse_documents():
-        pass
+    def parse_documents(self):
+        # TODO: readerwriter
+        # document_ids = self.reader_writer.list_document_ids()
+        document_ids = range(0, 5)
+        doc_parser = DocumentParser(self.reader_writer, self.str_proc)
+        docs_parsed = 0
+        latest = logger.get("latest_parsed_document_id")
+
+        if len(latest) == 0:
+            latest = "0"
+
+        latest_id = int(latest)
+
+        for id in document_ids
 
 def main(argv):
     """This is the root method of the pipeline, this is where the user
@@ -140,7 +153,7 @@ def main(argv):
 
     args = vars(argparser.parse_args(argv))
 
-    processor = CollectionProcessor()
+    processor = CollectionProcessor("") #TODO: readerwriter as argument
     processor.process(args["data"], args["structure"], "xml", args["reset"])
 
 if __name__ == "__main__":

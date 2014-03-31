@@ -31,12 +31,11 @@ class DocumentParser(object):
         count = 0
         parsed = ParsedParagraph()
 
-        if logger.get(LATEST_SENT_ID) == "":
+        try:
+            current_max = int(logger.get(LATEST_SENT_ID))
+        except ValueError:
             current_max = 0
             logger.log(LATEST_SENT_ID, str(current_max), logger.REPLACE)
-
-        else:
-            current_max = int(logger.get(LATEST_SENT_ID))
 
         for sentence in document.sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
