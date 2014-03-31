@@ -4,6 +4,7 @@ line interface to the wordseer backend.
 """
 
 import argparse
+from datetime import datetime
 import os
 import sys
 
@@ -123,8 +124,8 @@ class CollectionProcessor(object):
         # TODO: readerwriter
         # document_ids = self.reader_writer.list_document_ids()
         document_ids = range(0, 5)
-        doc_parser = DocumentParser(self.reader_writer, self.str_proc)
-        docs_parsed = 0
+        document_parser = DocumentParser(self.reader_writer, self.str_proc)
+        documents_parsed = 0
         latest = logger.get("latest_parsed_document_id")
 
         if len(latest) == 0:
@@ -132,7 +133,26 @@ class CollectionProcessor(object):
 
         latest_id = int(latest)
 
-        for id in document_ids
+        for id in document_ids:
+            if id > latest_id:
+                #TODO: readerwriter
+                #doc = self.reader_writer.get_document(id)
+                print("Parsing document " + documents_parsed "/" +
+                    len(document_ids))
+                start_time = datetime.now()
+                document_parser.parse_document(doc)
+                seconds_elapsed = (datetime.now() - start_time).total_seconds()
+                print("\tTime to parse document: " + seconds_elapsed +
+                    "s\n")
+                logger.log("finished_grammatical_processing", "false",
+                    logger.REPLACE)
+                logger.log("latest_parsed_document_id", str(id),
+                    logger.REPLACE)
+
+            documents_parsed += 1
+
+        #TODO: reader_writer
+        #self.reader_writer.finish_grammatical_processing()
 
 def main(argv):
     """This is the root method of the pipeline, this is where the user
