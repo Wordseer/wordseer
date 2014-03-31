@@ -71,6 +71,29 @@ class CollectionProcessor(object):
             "true" in logger.get("finished_sequence_processing").lower()):
             self.calculate_index_sequences()
 
+            #TODO: reader_writer
+            #self.reader_writer.finish_indexing_sequences()
+
+        # Calculate word-in-sentence counts and TF-IDFs
+        if not "true" in logger.get("word_counts_done").lower():
+            print("Calculating word counts")
+            #TODO: reader_writer
+            #self.reader_writer.calculate_word_counts()
+            logger.log("word_counts_done", "true", logger.REPLACE)
+
+        # Calculate word TFIDFs
+        if not "true" in logger.get("tfidf_done").lower():
+            print("Calculating TF IDF's")
+            #TODO: reader_writer
+            #self.reader_writer.calculate_tfidfs()
+
+        # Calculate word-to-word-similarities
+        if (config.WORD_TO_WORD_SIMILARITY and not
+            "true" in logger.get("word_similarity_calculations_done"):
+                print("Calculating Lin Similarities")
+                #TODO: reader_writer
+                #self.reader_writer.calculate_lin_similarities()
+
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):
         """Extract metadata from each file in collection_dir, and populate the
@@ -166,7 +189,11 @@ class CollectionProcessor(object):
 
     def calculate_index_sequences(self):
         """Calculate and index sequences, if not already done during grammatical
-        processing."""
+        processing.
+
+        For every sentence in the database, this method calls
+        SequenceProcessor.process() on it.
+        """
 
         latest_sentence = logger.get("latest_sequence_sentence")
 
@@ -176,7 +203,6 @@ class CollectionProcessor(object):
         latest_id = int(latest_sentence)
         # TODO: readerwriter
         #max_sentence_id = self.reader_writer.get_max_sentence_id
-        max_sentence_id = 0
         sentences_processed = 0
         seq_proc = SequenceProcessor(self.reader_writer)
         #TODO: readerwriter
