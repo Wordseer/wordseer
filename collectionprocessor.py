@@ -137,13 +137,8 @@ def main(argv):
     argparser.add_argument("-s", action="store", dest="structure",
         help=("The path to the JSON file explaining the structure of the"
         " xml files"), required=True)
-    argparser.add_argument("-i", action="store", dest="instance",
-        help=("The short (20-characters or fewer) label to use for this"
-        " WordSeer instance."), required=True)
 
     args = vars(argparser.parse_args(argv))
-
-    db_name = "ws_" + args["instance"]
 
     processor = CollectionProcessor()
     processor.process(args["data"], args["structure"], "xml", args["reset"])
