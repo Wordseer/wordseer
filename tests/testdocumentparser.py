@@ -20,10 +20,10 @@ class DocumentParserTests(unittest.TestCase):
         self.mock_parser = MagicMock()
         self.docparser = documentparser.DocumentParser(self.mock_reader_writer,
             self.mock_parser)
+        self.docparser.sequence_processor = MagicMock()
 
-    @patch.object(SequenceProcessor, "process", autospec=True)
     @patch.object(logger, "log", autospec=True)
-    def test_write_and_parse(self, mock_logger, mock_seqproc):
+    def test_write_and_parse(self, mock_logger):
         """Test the write_and_parse method.
 
         This method patches logger.log
@@ -50,3 +50,14 @@ class DocumentParserTests(unittest.TestCase):
         mock_logger.assert_any_call(documentparser.LATEST_SENT_ID,
             str(current_max),
             logger.REPLACE)
+        mock_logger.assert_any_call(documentparser.LATEST_SEQ_SENT,
+            str(current_max),
+            logger.REPLACE)
+
+        # The sequence processor should have been invoked for every sentence
+        self.docparser.sequence_processor.process.assert_any_call(sentences[0])
+        self.docparser.sequence_processor.process.assert_any_call(sentences[1])
+
+        self.mock_reader_writer.write_sequences.assert_called_once_with()
+
+        

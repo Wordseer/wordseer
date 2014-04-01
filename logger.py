@@ -23,7 +23,7 @@ def log(item, value, replace_value):
     value in the form "old [new]".
     :return None: None.
     """
-    print "Not patched!"
+
     entry = Log(log_item=item, item_value=value)
     session = database.Database().session
 
