@@ -51,12 +51,12 @@ class DocumentParser(object):
                         " seconds per sentence")
 
                     #TODO: reader_writer
-                    #self.write_and_parse(parsed, current_max)
+                    self.reader_writer.write_and_parse(parsed, current_max)
 
                     parsed = ParsedParagraph()
 
         #TODO: reader_writer
-        #self.write_and_parse(parsed, current_max)
+        self.reader_writer.write_and_parse(parsed, current_max)
 
     def write_and_parse(self, products, current_max):
         """Send a ParsedParagraph object to the ReaderWriter for writing, then
