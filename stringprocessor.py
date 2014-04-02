@@ -9,8 +9,6 @@ from document import taggedword, sentence
 from parser.dependency import Dependency
 from parser.parseproducts import ParseProducts
 
-import pprint
-
 class StringProcessor(object):
     """Tokenize or parse a string."""
 

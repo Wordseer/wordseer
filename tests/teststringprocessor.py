@@ -4,8 +4,7 @@ Tests for the tokenizer.
 
 import mock
 import unittest
-import pprint
-#TODO: write parser tests
+
 from document import sentence
 from parser.dependency import Dependency
 from parser.parseproducts import ParseProducts
@@ -108,7 +107,7 @@ class ParseTests(unittest.TestCase):
     def test_parse(self, mock_parser, mock_tokenizer):
         """Test the parse method.
         """
-        sentence = "The fox is brown."
+        sent = "The fox is brown."
         parsed_dict = {"sentences":
             [
                 {'dependencies':
@@ -133,7 +132,7 @@ class ParseTests(unittest.TestCase):
         mock_parser.return_value = mock_result
 
         # Run the method
-        result = t.parse(sentence)
+        result = t.parse(sent)
 
         # The result should only contain the middle two dependencies
         expected_deps = []
@@ -146,7 +145,7 @@ class ParseTests(unittest.TestCase):
                 words[dep_index][1]["PartOfSpeech"]))
 
         expected_result = ParseProducts(parsetree,
-            expected_deps, mock_tokenizer(parsed_dict, sentence)[0].tagged)
+            expected_deps, mock_tokenizer(parsed_dict, sent)[0].tagged)
 
         self.failUnless(expected_result == result)
 
@@ -154,7 +153,7 @@ class ParseTests(unittest.TestCase):
         """Check to make sure that parse() will only parse a single sentence.
         """
 
-        sentence = "The fox is brown."
+        sent = "The fox is brown."
         parsed_dict = {"sentences": [mock.MagicMock(name="Sentence1"),
             mock.MagicMock(name="Sentence2")]}
 
@@ -163,15 +162,15 @@ class ParseTests(unittest.TestCase):
         mock_result.__setitem__.side_effect = parsed_dict.__setitem__
         mock_parser.return_value = mock_result
 
-        self.assertRaises(ValueError, t.parse, sentence)
+        self.assertRaises(ValueError, t.parse, sent)
 
     def test_parse_maxlength(self, mock_parser, mock_tokenizer):
         """Check to make sure that parse() uses a rudimentary sentence length
         check.
         """
-        
-        sentence = mock.MagicMock(name="sentence")
 
-        sentence.split.return_value = range(0, 60)
+        sent = mock.MagicMock(name="sentence")
 
-        self.assertRaises(ValueError, t.parse, sentence)
+        sent.split.return_value = range(0, 60)
+
+        self.assertRaises(ValueError, t.parse, sent)
