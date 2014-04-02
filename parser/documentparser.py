@@ -46,12 +46,6 @@ class DocumentParser(object):
                 current_max = sentence.id
 
                 if count % 50 == 0:
-                    print "Count is " + str(count) + ", id is " + str(sentence.id) + " and it's time for parsing"
-                    for i in range(0, len(parsed.sentences)):
-                        print parsed.sentences[i]
-                        print parsed.parses[i]
-                        print current_max
-                        print "---"
                     average_time = (datetime.now() - start_time).total_seconds()
                     print("Average parse speed after " + str(count) +
                         " sentences: " + str(average_time / count) +
@@ -60,11 +54,6 @@ class DocumentParser(object):
                     self.write_and_parse(parsed, current_max)
 
                     parsed = ParsedParagraph()
-        for i in range(0, len(parsed.sentences)):
-            print parsed.sentences[i]
-            print parsed.parses[i]
-            print current_max
-            print "---"
         self.write_and_parse(parsed, current_max)
 
     def write_and_parse(self, products, current_max):
@@ -81,6 +70,7 @@ class DocumentParser(object):
         sentences = self.reader_writer.write_parse_products(products)
 
         logger.log(LATEST_SENT_ID, str(current_max), logger.REPLACE)
+
         for sentence in sentences:
             self.sequence_processor.process(sentence)
 

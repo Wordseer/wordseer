@@ -7,9 +7,9 @@ from mock import MagicMock, patch, call
 
 from document.sentence import Sentence
 from document.parsedparagraph import ParsedParagraph
-import logger
 from parser import documentparser
 
+@patch("parser.documentparser.logger")
 class DocumentParserTests(unittest.TestCase):
     """Run tests on the DocumentParser.
     """
@@ -22,7 +22,7 @@ class DocumentParserTests(unittest.TestCase):
             self.mock_parser)
         self.docparser.sequence_processor = MagicMock()
 
-    @patch.object(logger, "log", autospec=True)
+
     def test_write_and_parse(self, mock_logger):
         """Test the write_and_parse method.
 
@@ -30,7 +30,7 @@ class DocumentParserTests(unittest.TestCase):
         (to make sure that things are logged properly) as well as
         SequenceProcessor. It mocks DataReaderWriter.
         """
-        
+
         sentences = [Sentence(text="This is the first sentence"),
             Sentence(text="This is the second sentence")]
         current_max = 5
@@ -47,12 +47,12 @@ class DocumentParserTests(unittest.TestCase):
             assert_called_once_with(products)
 
         # Logger should have been called twice with specific arguments
-        mock_logger.assert_any_call(documentparser.LATEST_SENT_ID,
+        mock_logger.log.assert_any_call(documentparser.LATEST_SENT_ID,
             str(current_max),
-            logger.REPLACE)
-        mock_logger.assert_any_call(documentparser.LATEST_SEQ_SENT,
+            mock_logger.REPLACE)
+        mock_logger.log.assert_any_call(documentparser.LATEST_SEQ_SENT,
             str(current_max),
-            logger.REPLACE)
+            mock_logger.REPLACE)
 
         # The sequence processor should have been invoked for every sentence
         self.docparser.sequence_processor.process.assert_any_call(sentences[0])
@@ -60,8 +60,13 @@ class DocumentParserTests(unittest.TestCase):
 
         self.mock_reader_writer.write_sequences.assert_called_once_with()
 
-    @patch("parser.documentparser.logger")
     def test_parse_document_long(self, mock_logger):
+        """Test the parse_document method.
+
+        This method supplies a document of sixty sentences to make sure that
+        everything works properly, and mocks out everything except for
+        parse_document().
+        """
         # Mock out the write_and_parse method
         self.docparser.write_and_parse = MagicMock()
 
@@ -73,7 +78,7 @@ class DocumentParserTests(unittest.TestCase):
         mock_sents = []
         for i in range(0, 60):
             mock_sents.append(MagicMock(id=i, name="Sentence " + str(i)))
-    
+
         mock_doc = MagicMock(sentences=mock_sents)
 
         # Configure the mock parser
@@ -99,7 +104,7 @@ class DocumentParserTests(unittest.TestCase):
         for i in range(6, 56):
             parsed.add_sentence(mock_sents[i], mock_products)
 
-        rw_calls.append(call(parsed, 55)
+        rw_calls.append(call(parsed, 55))
         parsed = ParsedParagraph()
 
         for i in range(56, 60):
