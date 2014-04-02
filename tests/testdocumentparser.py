@@ -67,6 +67,7 @@ class DocumentParserTests(unittest.TestCase):
         everything works properly, and mocks out everything except for
         parse_document().
         """
+        latest_sent = 5
         # Mock out the write_and_parse method
         self.docparser.write_and_parse = MagicMock()
 
@@ -94,22 +95,24 @@ class DocumentParserTests(unittest.TestCase):
 
         # The parser should have only been called on sentences with an id > 5
         parse_calls = []
-        for i in range(6, 60):
+        for i in range(latest_sent + 1, 60):
             parse_calls.append(call(mock_sents[i].sentence))
         self.mock_parser.parse.assert_has_calls(parse_calls, any_order=True)
 
         # Write and parse should have been called once for every block of 50
         rw_calls = []
         parsed = ParsedParagraph()
-        for i in range(6, 56):
+        for i in range(latest_sent + 1, 60 - latest_sent + 1):
             parsed.add_sentence(mock_sents[i], mock_products)
 
-        rw_calls.append(call(parsed, 55))
+        rw_calls.append(call(parsed, 60 - latest_sent))
         parsed = ParsedParagraph()
 
-        for i in range(56, 60):
+        for i in range(60 - latest_sent + 1, 60):
             parsed.add_sentence(mock_sents[i], mock_products)
 
         rw_calls.append(call(parsed, 59))
         self.docparser.write_and_parse.assert_has_calls(rw_calls,
             any_order=True)
+
+
