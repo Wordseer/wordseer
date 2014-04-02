@@ -43,22 +43,24 @@ class StringProcessor(object):
         dependencies = []
 
         if len(parsed["sentences"]) > 1:
-            raise ValueError("More than one sentences"
-                " passed in to Parser.parse().")
+            raise ValueError("More than one sentences passed in to"
+                " StringProcessor.parse().")
 
-        for dependency in parsed["sentences"][0]["dependencies"]:
-            if dependency[2] > 1 and dependency[4] > 1: #TODO: why?
-                gov_index = dependency[2] - 1
-                dep_index = dependency[4] - 1
+        for dependency in parsed_sentence["dependencies"]:
+            # We don't want to make a dependency involving ROOT
+            if dependency[2] > 1 and dependency[4] > 1:
+                gov_index = int(dependency[2]) - 1
+                dep_index = int(dependency[4]) - 1
                 dependencies.append(Dependency(dependency[0],
                     dependency[1],
                     gov_index,
                     parsed_sentence["words"][gov_index][1]["PartOfSpeech"],
                     dependency[3],
+                    dep_index,
                     parsed_sentence["words"][dep_index][1]["PartOfSpeech"]))
 
         return ParseProducts(parsed["sentences"][0]["parsetree"],
-            dependencies, tokenize_from_raw(sentence, sent)[0].tagged)
+            dependencies, tokenize_from_raw(parsed, sent)[0].tagged)
 
 def tokenize_from_raw(parsed_text, txt):
     """Given the output of a call to raw_parse, produce a list of Sentences

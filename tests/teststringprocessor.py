@@ -1,10 +1,13 @@
 """
 Tests for the tokenizer.
 """
+
+import mock
+import unittest
+
 #TODO: write parser tests
 from document import sentence
 import stringprocessor
-import unittest
 
 t = stringprocessor.StringProcessor()
 
@@ -89,9 +92,42 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
                 else:
                     self.failUnless(actual_char == " ")
 
+@mock.patch("stringprocessor.StanfordCoreNLP")
+@mock.patch("stringprocessor.Dependency")
 class ParseTests(unittest.TestCase):
     """Tests for the parse() method.
     """
 
     def setUp(self):
-        pass
+        """Mock out the parser for testing.
+        """
+        #t.parser = mock.MagicMock()
+
+    def test_parse(self, mock_dep, mock_parser):
+        """Test the parse method.
+        """
+        sentence = "The fox is brown."
+        parsed_dict = {"sentences":
+            [
+                {'dependencies':
+                    [('det', 'fox', '2', 'The', '1'),
+                    ('nsubj', 'brown', '4', 'fox', '2'),
+                    ('cop', 'brown', '4', 'was', '3'),
+                    ('root', 'ROOT', '0', 'brown', '4')],
+                'parsetree': ('(ROOT (S (NP (DT The) (NN fox)) (VP (VBZ is)'
+                    ' (ADJP (JJ brown)))))')
+                }
+            ]
+        }
+
+        # Set up our mock parse result dict
+        mock_result = mock.MagicMock(spec_set=dict)
+        mock_result.__getitem__.side_effect = parsed_dict.__getitem__
+        mock_result.__setitem__.side_effect = parsed_dict.__setitem__
+
+        mock_parser.raw_parse.return_value = mock_result
+
+        # Run the method
+        t.parse(sentence)
+
+        

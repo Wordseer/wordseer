@@ -114,5 +114,3 @@ class DocumentParserTests(unittest.TestCase):
         rw_calls.append(call(parsed, 59))
         self.docparser.write_and_parse.assert_has_calls(rw_calls,
             any_order=True)
-
-
