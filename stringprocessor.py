@@ -9,6 +9,8 @@ from document import taggedword, sentence
 from parser.dependency import Dependency
 from parser.parseproducts import ParseProducts
 
+import pprint
+
 class StringProcessor(object):
     """Tokenize or parse a string."""
 
@@ -35,9 +37,21 @@ class StringProcessor(object):
     def parse(self, sent, max_length=30):
         """Parse a sentence and extract dependencies, parse trees, etc.
 
+        Note that for max_length, a "word" is defined as something with a space
+        on at least one side. This is not the typical definition of "word".
+        This is done so that length can be checked before resources are
+        committed to processing a very long sentence.
+
         :param str sent: The sentence as a string.
         :param int max_length: The most amount of words to process.
         """
+
+        # This isn't a perfect way to check how many words are in a sentence,
+        # but it's not so bad.
+        if len(sent.split(" ")) > max_length:
+            raise ValueError("Sentence appears to be too long, max length " +
+                "is " + str(max_length))
+        
         parsed = self.parser.raw_parse(sent)
         parsed_sentence = parsed["sentences"][0]
         dependencies = []
@@ -48,7 +62,7 @@ class StringProcessor(object):
 
         for dependency in parsed_sentence["dependencies"]:
             # We don't want to make a dependency involving ROOT
-            if dependency[2] > 1 and dependency[4] > 1:
+            if int(dependency[2]) > 1 and int(dependency[4]) > 1:
                 gov_index = int(dependency[2]) - 1
                 dep_index = int(dependency[4]) - 1
                 dependencies.append(Dependency(dependency[0],

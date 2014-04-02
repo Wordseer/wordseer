@@ -4,9 +4,11 @@ Tests for the tokenizer.
 
 import mock
 import unittest
-
+import pprint
 #TODO: write parser tests
 from document import sentence
+from parser.dependency import Dependency
+from parser.parseproducts import ParseProducts
 import stringprocessor
 
 t = stringprocessor.StringProcessor()
@@ -92,8 +94,8 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
                 else:
                     self.failUnless(actual_char == " ")
 
-@mock.patch("stringprocessor.StanfordCoreNLP")
-@mock.patch("stringprocessor.Dependency")
+@mock.patch.object(stringprocessor, "tokenize_from_raw")
+@mock.patch("stringprocessor.StanfordCoreNLP.raw_parse")
 class ParseTests(unittest.TestCase):
     """Tests for the parse() method.
     """
@@ -103,7 +105,7 @@ class ParseTests(unittest.TestCase):
         """
         #t.parser = mock.MagicMock()
 
-    def test_parse(self, mock_dep, mock_parser):
+    def test_parse(self, mock_parser, mock_tokenizer):
         """Test the parse method.
         """
         sentence = "The fox is brown."
@@ -114,20 +116,62 @@ class ParseTests(unittest.TestCase):
                     ('nsubj', 'brown', '4', 'fox', '2'),
                     ('cop', 'brown', '4', 'was', '3'),
                     ('root', 'ROOT', '0', 'brown', '4')],
-                'parsetree': ('(ROOT (S (NP (DT The) (NN fox)) (VP (VBZ is)'
-                    ' (ADJP (JJ brown)))))')
+                "words": mock.MagicMock(name="WordsDict"),
+                "parsetree": mock.MagicMock(name="parsetree")
                 }
             ]
         }
 
+        deps = parsed_dict["sentences"][0]["dependencies"]
+        words = parsed_dict["sentences"][0]["words"]
+        parsetree = parsed_dict["sentences"][0]["parsetree"]
+
         # Set up our mock parse result dict
-        mock_result = mock.MagicMock(spec_set=dict)
+        mock_result = mock.MagicMock(spec_set=dict, name="Dict")
         mock_result.__getitem__.side_effect = parsed_dict.__getitem__
         mock_result.__setitem__.side_effect = parsed_dict.__setitem__
-
-        mock_parser.raw_parse.return_value = mock_result
+        mock_parser.return_value = mock_result
 
         # Run the method
-        t.parse(sentence)
+        result = t.parse(sentence)
 
+        # The result should only contain the middle two dependencies
+        expected_deps = []
+        for dep in deps[1:3]:
+            dep_index = int(dep[4]) - 1
+            gov_index = int(dep[2]) - 1
+            expected_deps.append(Dependency(dep[0], dep[1], gov_index,
+                words[gov_index][1]["PartOfSpeech"],
+                dep[3], dep_index,
+                words[dep_index][1]["PartOfSpeech"]))
+
+        expected_result = ParseProducts(parsetree,
+            expected_deps, mock_tokenizer(parsed_dict, sentence)[0].tagged)
+
+        self.failUnless(expected_result == result)
+
+    def test_parse_twosentences(self, mock_parser, mock_tokenizer):
+        """Check to make sure that parse() will only parse a single sentence.
+        """
+
+        sentence = "The fox is brown."
+        parsed_dict = {"sentences": [mock.MagicMock(name="Sentence1"),
+            mock.MagicMock(name="Sentence2")]}
+
+        mock_result = mock.MagicMock(spec_set=dict, name="Dict")
+        mock_result.__getitem__.side_effect = parsed_dict.__getitem__
+        mock_result.__setitem__.side_effect = parsed_dict.__setitem__
+        mock_parser.return_value = mock_result
+
+        self.assertRaises(ValueError, t.parse, sentence)
+
+    def test_parse_maxlength(self, mock_parser, mock_tokenizer):
+        """Check to make sure that parse() uses a rudimentary sentence length
+        check.
+        """
         
+        sentence = mock.MagicMock(name="sentence")
+
+        sentence.split.return_value = range(0, 60)
+
+        self.assertRaises(ValueError, t.parse, sentence)

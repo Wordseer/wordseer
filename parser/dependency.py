@@ -1,4 +1,6 @@
-class Dependency(object):
+from mixins.comparebydict import CompareByDict
+
+class Dependency(CompareByDict):
     """This class describes the relationships between two words through a
     dependency."""
     def __init__(self, relationship, governor, gov_index, gov_pos, dependent,
@@ -25,5 +27,6 @@ class Dependency(object):
         self._gov_pos = gov_pos
 
     def __str__(self):
-        return (self.relationship + "(" + self.governor + "-" + self.gov_index +
-            ", " + self.dependent + "-" + self.dep_index + ")")
+        return (self.relationship + "(" + self.governor + "-" +
+            str(self.gov_index) + ", " + self.dependent + "-" +
+            str(self.dep_index) + ")")
