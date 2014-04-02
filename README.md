@@ -21,18 +21,18 @@ Installation
 
 `sqlalchemy`, `lxml`, and `Unidecode` can be installed via `pip`:
 
-`pip install SQLAlchemy lxml Unidecode`
+    pip install SQLAlchemy lxml Unidecode
 
 If you want to run unit tests, you should install `mock`:
 
-`pip install mock`
+    pip install mock
 
 `corenlp` must be installed manually, and version *3.2.0* of Stanford's CoreNLP
 library must simply be in a directory accessible to the backend.
 
 You must also run the `createdb.py` script before running for the first time:
 
-`python2.7 createdb.py`
+    python createdb.py
 
 Use
 ---
@@ -45,4 +45,7 @@ included in `tests/data`.
 Testing
 -------
 
-To test, simply run `runtests.py` from the root directory.
+To run all tests, simply run `runtests.py` from the root directory.
+Alternatively, use the following syntax to run only one module's tests.
+
+    python -m unittest -v tests.testdesiredmodule
