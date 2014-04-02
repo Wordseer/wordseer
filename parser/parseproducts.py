@@ -2,7 +2,9 @@
 Container for output of Parser.parse.
 """
 
-class ParseProducts(object):
+from mixins.comparebydict import CompareByDict
+
+class ParseProducts(CompareByDict):
     """This class is a container for the results of parse(). It contains
     a string description of the parse tree, a list of the dependency
     relationships in the parsed sentence, and a list of tagged words in the

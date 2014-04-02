@@ -1,7 +1,7 @@
 from datetime import datetime
 from document.parsedparagraph import ParsedParagraph
 import logger
-from .parseproducts import ParseProducts
+from parseproducts import ParseProducts
 from sequence.sequenceprocessor import SequenceProcessor
 
 #TODO: unit tests
@@ -39,24 +39,33 @@ class DocumentParser(object):
 
         for sentence in document.sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
-                parse_products = parser.parse(sentence.sentence)
+                # TODO: current_max ^?
+                parse_products = self.parser.parse(sentence.sentence)
                 parsed.add_sentence(sentence, parse_products)
                 count += 1
                 current_max = sentence.id
 
                 if count % 50 == 0:
-                    average_time = (datetime.now - start_time).total_seconds()
-                    print("Average parse speed after " + count +
+                    print "Count is " + str(count) + ", id is " + str(sentence.id) + " and it's time for parsing"
+                    for i in range(0, len(parsed.sentences)):
+                        print parsed.sentences[i]
+                        print parsed.parses[i]
+                        print current_max
+                        print "---"
+                    average_time = (datetime.now() - start_time).total_seconds()
+                    print("Average parse speed after " + str(count) +
                         " sentences: " + str(average_time / count) +
                         " seconds per sentence")
 
-                    #TODO: reader_writer
-                    self.reader_writer.write_and_parse(parsed, current_max)
+                    self.write_and_parse(parsed, current_max)
 
                     parsed = ParsedParagraph()
-
-        #TODO: reader_writer
-        self.reader_writer.write_and_parse(parsed, current_max)
+        for i in range(0, len(parsed.sentences)):
+            print parsed.sentences[i]
+            print parsed.parses[i]
+            print current_max
+            print "---"
+        self.write_and_parse(parsed, current_max)
 
     def write_and_parse(self, products, current_max):
         """Send a ParsedParagraph object to the ReaderWriter for writing, then
@@ -68,7 +77,7 @@ class DocumentParser(object):
         :param ParsedParagraph products: The ParsedParagraph to send
         :param int current_max: The highest sentence ID yet processed.
         """
-
+        #TODO: reader_writer
         sentences = self.reader_writer.write_parse_products(products)
 
         logger.log(LATEST_SENT_ID, str(current_max), logger.REPLACE)
@@ -76,4 +85,5 @@ class DocumentParser(object):
             self.sequence_processor.process(sentence)
 
         logger.log(LATEST_SEQ_SENT, str(current_max), logger.REPLACE)
+        #TODO: reader_writer
         self.reader_writer.write_sequences()
