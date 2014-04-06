@@ -49,10 +49,6 @@ class CollectionProcessor(object):
             with Database() as database:
                 database.reset()
 
-        # TODO: MySQLDataReaderWriter
-        reader_writer = MySQLDataReaderWriter((grammatial_processing or
-           word_to_word_similarity))
-
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
         if not "true" in logger.get("finished_recording_text_and_metadata"):
@@ -244,7 +240,12 @@ def main(argv):
 
     args = vars(argparser.parse_args(argv))
 
-    processor = CollectionProcessor("") #TODO: readerwriter as argument
+    # TODO: MySQLDataReaderWriter
+    #reader_writer = MySQLDataReaderWriter((config.GRAMMATICAL_PROCESSING or
+    #   config.WORD_TO_WORD_SIMILARITY))
+    #processor = CollectionProcessor(reader_writer)
+
+    processor = CollectionProcessor("")
     processor.process(args["data"], args["structure"], "xml", args["reset"])
 
 if __name__ == "__main__":
