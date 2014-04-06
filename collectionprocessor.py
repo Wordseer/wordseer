@@ -57,8 +57,9 @@ class CollectionProcessor(object):
                 docstruc_filename, filename_extension)
 
         # Parse the documents
-        if (config.GRAMMATICAL_PROCESSING or (config.WORD_TO_WORD_SIMILARITY and
-            config.PART_OF_SPEECH_TAGGING) and not
+        if ((config.GRAMMATICAL_PROCESSING or
+            (config.WORD_TO_WORD_SIMILARITY and
+            config.PART_OF_SPEECH_TAGGING)) and not
             "true" in logger.get("finished_grammatical_processing").lower()):
             print("Parsing documents")
             self.parse_documents()

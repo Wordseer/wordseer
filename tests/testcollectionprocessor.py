@@ -68,11 +68,24 @@ class TestCollectionProcessorProcess(TestCollectionProcessor):
         """
         args = ["", "", "", False]
 
+        # Should just extract_record_metadata
         mock_logger.get.return_value = "true"
+        mock_config.SEQUENCE_INDEXING = False
         self.colproc.process(*args)
-        
         self.colproc.extract_record_metadata.assert_called_once()
+        assert self.colproc.calculate_index_sequences.called == False
+        assert self.colproc.parse_documents.called == False
+        self.colproc.extract_record_metadata.reset_mock()
+        
+        # Should run parse_documents
+        mock_config.GRAMMATICAL_PROCESSING.return_value = True
+        mock_logger.get.return_value = "false"
+        self.colproc.process(*args)
+        self.colproc.parse_documents.assert_called_once()
 
+        # Should run calculate_index_sequences() and run the reader_writer
+        mock_config.SEQUENCE_INDEXING = True
+        
 class TestMain(unittest.TestCase):
     """Test the main() method in collectionprocessor.
     """
