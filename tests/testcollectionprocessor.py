@@ -20,16 +20,17 @@ class TestCollectionProcessor(unittest.TestCase):
             self.colproc = collectionprocessor.CollectionProcessor(
                 self.mock_writer)
 
-    @mock.patch("collectionprocessor.StringProcessor")
+    @mock.patch("collectionprocessor.StringProcessor",
+        autospec=stringprocessor.StringProcessor)
     def test_extract_record_metadata(self, mock_str_proc):
         pass
 
-    @mock.patch("collectionprocessor.StringProcessor")
+    @mock.patch("collectionprocessor.StringProcessor",
+        autospec=stringprocessor.StringProcessor)
     def test_parse_documents(self, mock_str_proc):
         pass
 
-    @mock.patch("collectionprocessor.StringProcessor")
-    def test_calculate_index_sequences(self, mock_str_proc):
+    def test_calculate_index_sequences(self):
         pass
 
 class TestCollectionProcessorProcess(TestCollectionProcessor):
@@ -43,9 +44,9 @@ class TestCollectionProcessorProcess(TestCollectionProcessor):
             self.colproc.parse_documents)
         self.colproc.extract_record_metadata = mock.create_autospec(
             self.colproc.extract_record_metadata)
-       
-    @mock.patch("collectionprocessor.StringProcessor")
-    def test_process_reset(self, mock_str_proc):
+
+    @mock.patch("collectionprocessor.Database")
+    def test_process_reset(self):
         """Test that database reset works properly.
         """
         pass
