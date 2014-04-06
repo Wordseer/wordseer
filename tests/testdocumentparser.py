@@ -18,10 +18,10 @@ class DocumentParserTests(unittest.TestCase):
         """
         self.mock_reader_writer = MagicMock()
         self.mock_parser = MagicMock()
-        self.docparser = documentparser.DocumentParser(self.mock_reader_writer,
-            self.mock_parser)
-        self.docparser.sequence_processor = MagicMock()
-
+        with patch("parser.documentparser.SequenceProcessor"):
+            self.docparser = documentparser.DocumentParser(
+                self.mock_reader_writer,
+                self.mock_parser)
 
     def test_write_and_parse(self, mock_logger):
         """Test the write_and_parse method.
