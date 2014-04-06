@@ -50,8 +50,8 @@ class CollectionProcessor(object):
                 database.reset()
 
         # TODO: MySQLDataReaderWriter
-        #reader_writer = MySQLDataReaderWriter(db, (grammatial_processing or
-        #   word_to_word_similarity))
+        reader_writer = MySQLDataReaderWriter((grammatial_processing or
+           word_to_word_similarity))
 
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
@@ -72,27 +72,27 @@ class CollectionProcessor(object):
             self.calculate_index_sequences()
 
             #TODO: reader_writer
-            #self.reader_writer.finish_indexing_sequences()
+            self.reader_writer.finish_indexing_sequences()
 
         # Calculate word-in-sentence counts and TF-IDFs
         if not "true" in logger.get("word_counts_done").lower():
             print("Calculating word counts")
             #TODO: reader_writer
-            #self.reader_writer.calculate_word_counts()
+            self.reader_writer.calculate_word_counts()
             logger.log("word_counts_done", "true", logger.REPLACE)
 
         # Calculate word TFIDFs
         if not "true" in logger.get("tfidf_done").lower():
             print("Calculating TF IDF's")
             #TODO: reader_writer
-            #self.reader_writer.calculate_tfidfs()
+            self.reader_writer.calculate_tfidfs()
 
         # Calculate word-to-word-similarities
         if (config.WORD_TO_WORD_SIMILARITY and not
             "true" in logger.get("word_similarity_calculations_done")):
                 print("Calculating Lin Similarities")
                 #TODO: reader_writer
-                #self.reader_writer.calculate_lin_similarities()
+                self.reader_writer.calculate_lin_similarities()
 
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):
@@ -129,8 +129,8 @@ class CollectionProcessor(object):
                     docs = extractor.extract(filename)
                     for doc in docs:
                         # TODO: readerwriter
-                        #self.reader_writer.create_new_document(doc,
-                        #   num_files_done)
+                        self.reader_writer.create_new_document(doc,
+                           num_files_done)
                         pass
 
                     print("\t" + num_files_done + "/" + str(len(contents)) +
@@ -155,7 +155,7 @@ class CollectionProcessor(object):
         """
 
         # TODO: readerwriter
-        # document_ids = self.reader_writer.list_document_ids()
+        document_ids = self.reader_writer.list_document_ids()
         document_parser = DocumentParser(self.reader_writer, self.str_proc)
         documents_parsed = 0
         latest = logger.get("latest_parsed_document_id")
@@ -168,7 +168,7 @@ class CollectionProcessor(object):
         for doc_id in document_ids:
             if doc_id > latest_id:
                 #TODO: readerwriter
-                #doc = self.reader_writer.get_document(id)
+                doc = self.reader_writer.get_document(id)
                 print("Parsing document " + documents_parsed + "/" +
                     len(document_ids))
                 start_time = datetime.now()
@@ -184,7 +184,7 @@ class CollectionProcessor(object):
             documents_parsed += 1
 
         #TODO: reader_writer
-        #self.reader_writer.finish_grammatical_processing()
+        self.reader_writer.finish_grammatical_processing()
 
     def calculate_index_sequences(self):
         """Calculate and index sequences, if not already done during grammatical
@@ -201,15 +201,15 @@ class CollectionProcessor(object):
 
         latest_id = int(latest_sentence)
         # TODO: readerwriter
-        #max_sentence_id = self.reader_writer.get_max_sentence_id
+        max_sentence_id = self.reader_writer.get_max_sentence_id
         sentences_processed = 0
         seq_proc = SequenceProcessor(self.reader_writer)
         #TODO: readerwriter
-        #self.reader_writer.load_sequence_counts()
+        self.reader_writer.load_sequence_counts()
         for i in range(latest_id, max_sentence_id):
             if i > latest_id:
                 #TODO: readerwriter
-                #sentence = self.reader_writer.get_sentence(id)
+                sentence = self.reader_writer.get_sentence(id)
                 if len(sentence.words) > 0:
                     latest_id = sentence.id
                     processed_ok = seq_proc.process(sentence)
