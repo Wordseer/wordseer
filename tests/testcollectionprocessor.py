@@ -10,7 +10,10 @@ import stringprocessor
 
 @mock.patch("collectionprocessor.StringProcessor")
 class TestCollectionProcessor(unittest.TestCase):
-    @mock.patch("collectionprocessor.StringProcessor")
+    """Test the CollectionProcessor class.
+    """
+    @mock.patch("collectionprocessor.StringProcessor",
+        autospec=stringprocessor.StringProcessor)
     def setUp(self, test):
         """Set up the CollectionProcessor and mock out dependencies.
         """
@@ -19,15 +22,28 @@ class TestCollectionProcessor(unittest.TestCase):
     
     def test_process(self, mock_str_proc):
         self.colproc.calculate_index_sequences = mock.create_autospec(
-            self.colproc.calculate_index_sequences, False, False,
-            name="Mock Calc Index Sequences")
+            self.colproc.calculate_index_sequences)
         self.colproc.parse_documents = mock.create_autospec(
-            self.colproc.parse_documents, name="Mock Parse")
+            self.colproc.parse_documents)
         self.colproc.extract_record_metadata = mock.create_autospec(
-            self.colproc.extract_record_metadata,
-            name="Mock extract record metadata")
+            self.colproc.extract_record_metadata)
         print self.colproc.str_proc
 
-    def test_extract_record_metadat(self, mock_str_proc):
+    def test_extract_record_metadata(self, mock_str_proc):
         pass
 
+    def test_parse_documents(self, mock_str_proc):
+        pass
+
+    def test_calculate_index_sequences(self, mock_str_proc):
+        pass
+
+class TestMain(unittest.TestCase):
+    """Test the main() method in collectionprocessor.
+    """
+
+    @mock.patch("collectionprocessor.CollectionProcessor",
+        autospec=collectionprocessor.CollectionProcessor)
+    def test_main(self, mock_col_proc):
+        collectionprocessor.main("-d test -s test".split(" "))
+        
