@@ -12,13 +12,14 @@ import stringprocessor
 class TestCollectionProcessor(unittest.TestCase):
     """Test the CollectionProcessor class.
     """
-    @mock.patch("collectionprocessor.StringProcessor",
-        autospec=stringprocessor.StringProcessor)
-    def setUp(self, test):
+    def setUp(self):
         """Set up the CollectionProcessor and mock out dependencies.
         """
         self.mock_writer = mock.MagicMock(name="Mock Reader Writer")
-        self.colproc = collectionprocessor.CollectionProcessor(self.mock_writer)
+        with mock.patch("collectionprocessor.StringProcessor",
+            autospec=stringprocessor.StringProcessor):
+            self.colproc = collectionprocessor.CollectionProcessor(
+                self.mock_writer)
     
     def test_process(self, mock_str_proc):
         self.colproc.calculate_index_sequences = mock.create_autospec(
