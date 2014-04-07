@@ -10,7 +10,8 @@ import config
 import logger
 import stringprocessor
 
-class TestCollectionProcessor(unittest.TestCase):
+@mock.patch("collectionprocessor.logger", autospec=logger)
+class TestCollectionProcessor(object):
     """Test the CollectionProcessor class.
     """
     def setUp(self):
@@ -22,23 +23,20 @@ class TestCollectionProcessor(unittest.TestCase):
             self.colproc = collectionprocessor.CollectionProcessor(
                 self.mock_writer)
 
-    @mock.patch("collectionprocessor.logger", autospec=logger)
     @mock.patch("collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor)
     def test_extract_record_metadata(self, mock_str_proc, mock_logger):
         pass
 
-    @mock.patch("collectionprocessor.logger", autospec=logger)
     @mock.patch("collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor)
     def test_parse_documents(self, mock_str_proc, mock_logger):
         pass
 
-    @mock.patch("collectionprocessor.logger", autospec=logger)
     def test_calculate_index_sequences(self, mock_logger):
         pass
 
-class TestCollectionProcessorProcess(TestCollectionProcessor):
+class TestCollectionProcessorProcess(TestCollectionProcessor, unittest.TestCase):
     """Tests specifically for CollectionProcessor.process().
     """
     def setUp(self):
@@ -175,11 +173,11 @@ class TestCollectionProcessorProcess(TestCollectionProcessor):
         assert self.colproc.parse_documents.called == False
         assert self.colproc.extract_record_metadata.called == False
         
-class TestMain(unittest.TestCase):
-    """Test the main() method in collectionprocessor.
-    """
+#class TestMain(unittest.TestCase):
+    #"""Test the main() method in collectionprocessor.
+    #"""
 
-    @mock.patch("collectionprocessor.CollectionProcessor",
-        autospec=collectionprocessor.CollectionProcessor)
-    def test_main(self, mock_col_proc):
-        collectionprocessor.main("-d test -s test".split(" "))
+    #@mock.patch("collectionprocessor.CollectionProcessor",
+        #autospec=collectionprocessor.CollectionProcessor)
+    #def test_main(self, mock_col_proc):
+        #collectionprocessor.main("-d test -s test".split(" "))
