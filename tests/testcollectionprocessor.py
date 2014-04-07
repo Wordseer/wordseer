@@ -108,9 +108,8 @@ class TestCollectionProcessorProcess(TestCollectionProcessor):
         assert self.colproc.extract_record_metadata.called == False
         assert len(self.colproc.reader_writer.method_calls) == 0
 
-    @mock.patch("collectionprocessor.config", autospec=config)
     @mock.patch("collectionprocessor.logger", autospec=logger)
-    def test_process_calc_index_sequences(self, mock_logger, mock_config):
+    def test_process_calc_index_sequences(self, mock_logger):
         """Test that calculate_index_sequences() is called along with
         the reader_writer.
         """
@@ -160,6 +159,21 @@ class TestCollectionProcessorProcess(TestCollectionProcessor):
         assert self.colproc.parse_documents.called == False
         assert self.colproc.extract_record_metadata.called == False
 
+    @mock.patch("collectionprocessor.logger", autospec=logger)
+    def test_process_tfidfs(self, mock_logger):
+        """Test that calculate_lin_similarities() is run.
+        """
+        mock_logger.get.side_effect = self.log_dict.__getitem__
+        
+        self.log_dict["word_similarity_calculations_done"] = "false"
+        self.log_dict["finished_sequence_processing"] = "false"
+        self.colproc.process(*self.args)
+
+        assert self.mock_writer.calculate_lin_similarities.call_count == 1
+        assert len(self.mock_writer.method_calls) == 1
+        assert self.colproc.calculate_index_sequences.called == False
+        assert self.colproc.parse_documents.called == False
+        assert self.colproc.extract_record_metadata.called == False
         
 class TestMain(unittest.TestCase):
     """Test the main() method in collectionprocessor.
