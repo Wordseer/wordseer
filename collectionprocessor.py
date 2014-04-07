@@ -16,8 +16,6 @@ from sequence.sequenceprocessor import SequenceProcessor
 from structureextractor import StructureExtractor
 from stringprocessor import StringProcessor
 
-#TODO: probably better to move the arguments to instance variables
-
 class CollectionProcessor(object):
     """Process a collection of files.
     """

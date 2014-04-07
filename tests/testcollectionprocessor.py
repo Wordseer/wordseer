@@ -172,12 +172,12 @@ class TestCollectionProcessorProcess(TestCollectionProcessor, unittest.TestCase)
         assert self.colproc.calculate_index_sequences.called == False
         assert self.colproc.parse_documents.called == False
         assert self.colproc.extract_record_metadata.called == False
-        
-#class TestMain(unittest.TestCase):
-    #"""Test the main() method in collectionprocessor.
-    #"""
 
-    #@mock.patch("collectionprocessor.CollectionProcessor",
-        #autospec=collectionprocessor.CollectionProcessor)
-    #def test_main(self, mock_col_proc):
-        #collectionprocessor.main("-d test -s test".split(" "))
+class TestMain(unittest.TestCase):
+    """Test the main() method in collectionprocessor.
+    """
+
+    @mock.patch("collectionprocessor.CollectionProcessor",
+        autospec=collectionprocessor.CollectionProcessor)
+    def test_main(self, mock_col_proc):
+        collectionprocessor.main("-d test -s test".split(" "))
