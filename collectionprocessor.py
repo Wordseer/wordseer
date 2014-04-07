@@ -5,6 +5,7 @@ line interface to the wordseer backend.
 
 import argparse
 from datetime import datetime
+import gc
 import os
 import sys
 
@@ -196,7 +197,7 @@ class CollectionProcessor(object):
 
         latest_id = int(latest_sentence)
         # TODO: readerwriter
-        max_sentence_id = self.reader_writer.get_max_sentence_id
+        max_sentence_id = self.reader_writer.get_max_sentence_id()
         sentences_processed = 0
         seq_proc = SequenceProcessor(self.reader_writer)
         #TODO: readerwriter
@@ -205,6 +206,7 @@ class CollectionProcessor(object):
             if i > latest_id:
                 #TODO: readerwriter
                 sentence = self.reader_writer.get_sentence(id)
+                print len(gc.get_objects())
                 if len(sentence.words) > 0:
                     latest_id = sentence.id
                     processed_ok = seq_proc.process(sentence)

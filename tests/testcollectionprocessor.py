@@ -10,23 +10,22 @@ import config
 import logger
 import stringprocessor
 
+def setUpModule():
+    global mock_writer
+    mock_writer = mock.MagicMock(name="Mock Reader Writer")
+    with mock.patch("collectionprocessor.StringProcessor",
+        autospec=stringprocessor.StringProcessor):
+        global colproc
+        colproc = collectionprocessor.CollectionProcessor(mock_writer)
+
 @mock.patch("collectionprocessor.logger", autospec=logger)
-class TestCollectionProcessor(object):
+class TestCollectionProcessor(unittest.TestCase):
     """Test the CollectionProcessor class.
     """
-    def setUp(self):
-        """Set up the CollectionProcessor and mock out dependencies.
-        """
-        self.mock_writer = mock.MagicMock(name="Mock Reader Writer")
-        with mock.patch("collectionprocessor.StringProcessor",
-            autospec=stringprocessor.StringProcessor):
-            self.colproc = collectionprocessor.CollectionProcessor(
-                self.mock_writer)
-
     @mock.patch("collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor)
     def test_extract_record_metadata(self, mock_str_proc, mock_logger):
-        pass
+        print colproc.extract_record_metadata
 
     @mock.patch("collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor)
@@ -40,16 +39,15 @@ class TestCollectionProcessorProcess(TestCollectionProcessor, unittest.TestCase)
     """Tests specifically for CollectionProcessor.process().
     """
     def setUp(self):
-        super(TestCollectionProcessorProcess, self).setUp()
-        self.colproc.calculate_index_sequences = mock.MagicMock(
+        colproc.calculate_index_sequences = mock.MagicMock(
             name="calc_index_sequences",
-            autospec=self.colproc.calculate_index_sequences)
-        self.colproc.parse_documents = mock.MagicMock(
+            autospec=colproc.calculate_index_sequences)
+        colproc.parse_documents = mock.MagicMock(
             name="parse_documents",
-            autospec=self.colproc.parse_documents)
-        self.colproc.extract_record_metadata = mock.MagicMock(
+            autospec=colproc.parse_documents)
+        colproc.extract_record_metadata = mock.MagicMock(
             name="extract_record_metadata",
-            autospec=self.colproc.extract_record_metadata)
+            autospec=colproc.extract_record_metadata)
 
         # Set up the dict that is our "logging database" and set the arguments
         # for calling process()
@@ -63,11 +61,14 @@ class TestCollectionProcessorProcess(TestCollectionProcessor, unittest.TestCase)
         
         self.args = ["", "", "", False]
 
+        # Reset the previously used mocks
+        mock_writer.reset_mock()
+
     @mock.patch("collectionprocessor.Database")
     def test_process_reset(self, mock_db):
         """Test that database reset works properly.
         """
-        self.colproc.process("", "", "", True)
+        colproc.process("", "", "", True)
 
         mock_db.reset.assert_called_once()
 
@@ -82,12 +83,12 @@ class TestCollectionProcessorProcess(TestCollectionProcessor, unittest.TestCase)
         mock_config.SEQUENCE_INDEXING = False
         mock_config.PART_OF_SPEECH_TAGGING = False
         mock_config.GRAMMATICAL_PROCESSING = False
-        self.colproc.process(*self.args)
+        colproc.process(*self.args)
 
-        assert self.colproc.extract_record_metadata.called
-        assert self.colproc.calculate_index_sequences.called == False
-        assert self.colproc.parse_documents.called == False
-        assert len(self.colproc.reader_writer.method_calls) == 0
+        assert colproc.extract_record_metadata.called
+        assert colproc.calculate_index_sequences.called == False
+        assert colproc.parse_documents.called == False
+        assert len(colproc.reader_writer.method_calls) == 0
 
     @mock.patch("collectionprocessor.config", autospec=config)
     @mock.patch("collectionprocessor.logger", autospec=logger)
@@ -99,12 +100,12 @@ class TestCollectionProcessorProcess(TestCollectionProcessor, unittest.TestCase)
         # Should only run parse_documents
         self.log_dict["finished_grammatical_processing"] = "false"
         mock_config.SEQUENCE_INDEXING = False
-        self.colproc.process(*self.args)
+        colproc.process(*self.args)
 
-        assert self.colproc.parse_documents.call_count == 1
-        assert self.colproc.calculate_index_sequences.called == False
-        assert self.colproc.extract_record_metadata.called == False
-        assert len(self.colproc.reader_writer.method_calls) == 0
+        assert colproc.parse_documents.call_count == 1
+        assert colproc.calculate_index_sequences.called == False
+        assert colproc.extract_record_metadata.called == False
+        assert len(colproc.reader_writer.method_calls) == 0
 
     @mock.patch("collectionprocessor.logger", autospec=logger)
     def test_process_calc_index_sequences(self, mock_logger):
@@ -114,13 +115,13 @@ class TestCollectionProcessorProcess(TestCollectionProcessor, unittest.TestCase)
         mock_logger.get.side_effect = self.log_dict.__getitem__
 
         # Should run calculate_index_sequences() and run the reader_writer
-        self.colproc.process(*self.args)
+        colproc.process(*self.args)
 
-        assert self.colproc.calculate_index_sequences.call_count == 1
-        assert self.mock_writer.finish_indexing_sequences.call_count == 1
-        assert len(self.mock_writer.method_calls) == 1
-        assert self.colproc.parse_documents.called == False
-        assert self.colproc.extract_record_metadata.called == False
+        assert colproc.calculate_index_sequences.call_count == 1
+        assert mock_writer.finish_indexing_sequences.call_count == 1
+        assert len(mock_writer.method_calls) == 1
+        assert colproc.parse_documents.called == False
+        assert colproc.extract_record_metadata.called == False
 
     @mock.patch("collectionprocessor.logger", autospec=logger)
     def test_process_calc_word_counts(self, mock_logger):
@@ -131,13 +132,13 @@ class TestCollectionProcessorProcess(TestCollectionProcessor, unittest.TestCase)
 
         self.log_dict["word_counts_done"] = "false"
         self.log_dict["finished_sequence_processing"] = "false"
-        self.colproc.process(*self.args)
+        colproc.process(*self.args)
 
-        assert self.mock_writer.calculate_word_counts.call_count == 1
-        assert len(self.mock_writer.method_calls) == 1
-        assert self.colproc.calculate_index_sequences.called == False
-        assert self.colproc.parse_documents.called == False
-        assert self.colproc.extract_record_metadata.called == False
+        assert mock_writer.calculate_word_counts.call_count == 1
+        assert len(mock_writer.method_calls) == 1
+        assert colproc.calculate_index_sequences.called == False
+        assert colproc.parse_documents.called == False
+        assert colproc.extract_record_metadata.called == False
         mock_logger.log.assert_called_once_with("word_counts_done", "true",
             mock_logger.REPLACE)
 
@@ -149,13 +150,13 @@ class TestCollectionProcessorProcess(TestCollectionProcessor, unittest.TestCase)
 
         self.log_dict["tfidf_done"] = "false"
         self.log_dict["finished_sequence_processing"] = "false"
-        self.colproc.process(*self.args)
+        colproc.process(*self.args)
 
-        assert self.mock_writer.calculate_tfidfs.call_count == 1
-        assert len(self.mock_writer.method_calls) == 1
-        assert self.colproc.calculate_index_sequences.called == False
-        assert self.colproc.parse_documents.called == False
-        assert self.colproc.extract_record_metadata.called == False
+        assert mock_writer.calculate_tfidfs.call_count == 1
+        assert len(mock_writer.method_calls) == 1
+        assert colproc.calculate_index_sequences.called == False
+        assert colproc.parse_documents.called == False
+        assert colproc.extract_record_metadata.called == False
 
     @mock.patch("collectionprocessor.logger", autospec=logger)
     def test_process_tfidfs(self, mock_logger):
@@ -165,13 +166,13 @@ class TestCollectionProcessorProcess(TestCollectionProcessor, unittest.TestCase)
         
         self.log_dict["word_similarity_calculations_done"] = "false"
         self.log_dict["finished_sequence_processing"] = "false"
-        self.colproc.process(*self.args)
+        colproc.process(*self.args)
 
-        assert self.mock_writer.calculate_lin_similarities.call_count == 1
-        assert len(self.mock_writer.method_calls) == 1
-        assert self.colproc.calculate_index_sequences.called == False
-        assert self.colproc.parse_documents.called == False
-        assert self.colproc.extract_record_metadata.called == False
+        assert mock_writer.calculate_lin_similarities.call_count == 1
+        assert len(mock_writer.method_calls) == 1
+        assert colproc.calculate_index_sequences.called == False
+        assert colproc.parse_documents.called == False
+        assert colproc.extract_record_metadata.called == False
 
 class TestMain(unittest.TestCase):
     """Test the main() method in collectionprocessor.
