@@ -27,8 +27,24 @@ If you want to run unit tests, you should install `mock`:
 
     pip install mock
 
-`corenlp` must be installed manually, and version *3.2.0* of Stanford's CoreNLP
-library must simply be in a directory accessible to the backend.
+`corenlp` must be installed manually. Create a file called `setup.py` in
+its root directory containing the following:
+
+    from setuptools import setup, find_packages
+    setup(name='corenlp',
+          version='1.0',
+          packages=find_packages(),
+          package_data = {"": ["*.properties"],
+                "corenlp": ["*.properties"]},
+          )
+
+Then, from the root directory of `corenlp`, execute the following:
+
+    python setup.py install
+
+This should install `corenlp` to your system. In order to complete the setup,
+version *3.2.0* of Stanford's CoreNLP library must simply be in a directory
+accessible to the backend.
 
 You must also run the `createdb.py` script before running for the first time:
 
@@ -39,8 +55,8 @@ Use
 
 After installing the above dependencies, make sure you edit the config file
 for your setup. Particularly make sure to point `CORE_NLP_DIR` to the Stanford
-NLP library. You should then be ready to parse files. Example files are
-included in `tests/data`.
+NLP library. You should then be ready to parse files. Example XML and JSON
+files are included in `tests/data`.
 
 Testing
 -------
