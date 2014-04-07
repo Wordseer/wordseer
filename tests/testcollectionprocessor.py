@@ -7,6 +7,7 @@ import unittest
 
 import collectionprocessor
 import config
+import structureextractor
 import logger
 import stringprocessor
 
@@ -24,8 +25,12 @@ class TestCollectionProcessor(unittest.TestCase):
     """
     @mock.patch("collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor)
-    def test_extract_record_metadata(self, mock_str_proc, mock_logger):
-        print colproc.extract_record_metadata
+    @mock.patch("collectionprocessor.StructureExtractor",
+        autospec=structureextractor.StructureExtractor)
+    def test_extract_record_metadata(self, mock_strucex, mock_str_proc,
+        mock_logger):
+        #colproc.extract_record_metadata(mock.MagicMock(name="collection_dir"))
+        pass
 
     @mock.patch("collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor)
@@ -39,15 +44,15 @@ class TestCollectionProcessorProcess(TestCollectionProcessor, unittest.TestCase)
     """Tests specifically for CollectionProcessor.process().
     """
     def setUp(self):
-        colproc.calculate_index_sequences = mock.MagicMock(
-            name="calc_index_sequences",
-            autospec=colproc.calculate_index_sequences)
-        colproc.parse_documents = mock.MagicMock(
-            name="parse_documents",
-            autospec=colproc.parse_documents)
-        colproc.extract_record_metadata = mock.MagicMock(
-            name="extract_record_metadata",
-            autospec=colproc.extract_record_metadata)
+        colproc.calculate_index_sequences = mock.create_autospec(
+            colproc.calculate_index_sequences)
+            #name="calc_index_sequences",)
+        colproc.parse_documents = mock.create_autospec(
+            colproc.parse_documents)
+            #name="parse_documents",)
+        colproc.extract_record_metadata = mock.create_autospec(
+            colproc.extract_record_metadata)
+            #name="extract_record_metadata",)
 
         # Set up the dict that is our "logging database" and set the arguments
         # for calling process()
