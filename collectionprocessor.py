@@ -66,8 +66,8 @@ class CollectionProcessor(object):
 
         if (config.SEQUENCE_INDEXING and
             "true" in logger.get("finished_sequence_processing").lower()):
+            print "finishing indexing sequences"
             self.calculate_index_sequences()
-
             #TODO: reader_writer
             self.reader_writer.finish_indexing_sequences()
 
