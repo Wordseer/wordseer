@@ -3,6 +3,7 @@ Unit tests for the collectionprocessor module.
 """
 
 import mock
+import os
 import unittest
 
 import collectionprocessor
@@ -27,10 +28,35 @@ class TestCollectionProcessor(unittest.TestCase):
         autospec=stringprocessor.StringProcessor)
     @mock.patch("collectionprocessor.StructureExtractor",
         autospec=structureextractor.StructureExtractor)
-    def test_extract_record_metadata(self, mock_strucex, mock_str_proc,
+    @mock.patch("collectionprocessor.os", autospec=os)
+    def test_extract_record_metadata(self, mock_os, mock_strucex, mock_str_proc,
         mock_logger):
-        #colproc.extract_record_metadata(mock.MagicMock(name="collection_dir"))
-        pass
+        """Test the extract_record_metadata method.
+        """
+        # Set up the input objects
+        collection_dir = mock.create_autospec(str)
+        docstruc_filename = mock.create_autospec(str)
+        filename_extension = ".xml"
+
+        mock_os.listdir.return_value = ["file1.xml", "file2.XmL", "file3.foo",
+            ".file4.xml"]
+        mock_os.path.splitext.side_effect = os.path.splitext
+
+        mock_logger.get.return_value = ""
+        
+        colproc.extract_record_metadata(collection_dir, docstruc_filename,
+            filename_extension)
+
+        # logger.log() should have been called once for each file like this
+        log_calls = []
+        for i in range(0, 2):
+            log_calls.append(mock.call("finished_recording_text_and_metadata",
+                "false", mock_logger.REPLACE))
+            log_calls.append(mock.call("text_and_metadata_recorded", str(i + 1),
+                mock_logger.UPDATE))
+        mock_logger.log.assert_has_calls(log_calls)
+
+        
 
     @mock.patch("collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor)
@@ -40,7 +66,7 @@ class TestCollectionProcessor(unittest.TestCase):
     def test_calculate_index_sequences(self, mock_logger):
         pass
 
-class TestCollectionProcessorProcess(TestCollectionProcessor, unittest.TestCase):
+class TestCollectionProcessorProcess(unittest.TestCase):
     """Tests specifically for CollectionProcessor.process().
     """
     def setUp(self):

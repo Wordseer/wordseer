@@ -116,7 +116,7 @@ class CollectionProcessor(object):
         docs = [] # list of Documents
 
         for filename in contents:
-            if (not "[" + num_files_done + "]" in
+            if (not "[" + str(num_files_done) + "]" in
                 logger.get("text_and_metadata_recorded") and not
                 filename[0] == "."):
                 logger.log("finished_recording_text_and_metadata", "false",
@@ -129,15 +129,15 @@ class CollectionProcessor(object):
                            num_files_done)
                         pass
 
-                    print("\t" + num_files_done + "/" + str(len(contents)) +
-                        "\t" + filename)
+                    print("\t" + str(num_files_done) + "/" + str(len(contents))
+                        + "\t" + filename)
                     logger.log("text_and_metadata_recorded",
-                        num_files_done + "", logger.UPDATE)
+                        str(num_files_done), logger.UPDATE)
 
                 except Exception as e:
                     print("Error on file " + filename)
                     print(e)
-
+                # TODO: gc?
             num_files_done += 1
 
         logger.log("finished_recording_text_and_metadata", "true",
