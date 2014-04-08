@@ -3,8 +3,8 @@ Tests for the SequenceProcessor class.
 """
 from document.taggedword import TaggedWord
 from document.sentence import Sentence
-from sequence.sequenceprocessor import (SequenceProcessor, Sequence,
-    join_tws, LEMMA, WORD)
+from sequence.sequenceprocessor import (SequenceProcessor, join_tws, LEMMA,
+    WORD)
 import unittest
 
 class SequenceProcessorTests(unittest.TestCase):
@@ -118,7 +118,6 @@ class SequenceProcessorTests(unittest.TestCase):
         }
 
         self.failUnless(sequence_sequences == key)
-        
 
 def split_sequences(sequences):
     """The output of the sequencer can be split into four different types of
@@ -140,7 +139,7 @@ def split_sequences(sequences):
             "nostops": []
         }
     }
-    
+
     for sequence in sequences:
         seq_type = "words"
         if sequence.is_lemmatized:

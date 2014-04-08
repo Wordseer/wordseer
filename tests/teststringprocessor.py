@@ -134,9 +134,9 @@ class ParseTests(unittest.TestCase):
         # Run the method
         result = t.parse(sent)
 
-        # The result should only contain the middle two dependencies
+        # The result should not contain the dependency containing ROOT
         expected_deps = []
-        for dep in deps[1:3]:
+        for dep in deps[0:3]:
             dep_index = int(dep[4]) - 1
             gov_index = int(dep[2]) - 1
             expected_deps.append(Dependency(dep[0], dep[1], gov_index,

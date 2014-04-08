@@ -60,7 +60,7 @@ class StringProcessor(object):
 
         for dependency in parsed_sentence["dependencies"]:
             # We don't want to make a dependency involving ROOT
-            if int(dependency[2]) > 1 and int(dependency[4]) > 1:
+            if int(dependency[2]) > 0 and int(dependency[4]) > 0:
                 gov_index = int(dependency[2]) - 1
                 dep_index = int(dependency[4]) - 1
                 dependencies.append(Dependency(dependency[0],
