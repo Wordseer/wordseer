@@ -8,7 +8,7 @@ class Sequence(KwargsToDict):
     their original sentence.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         """Instantiate a Sequence object.
 
         :keyword str sequence_id: The ID of this sequence.
