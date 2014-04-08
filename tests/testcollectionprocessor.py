@@ -8,6 +8,7 @@ import unittest
 
 import collectionprocessor
 import config
+from document.document import Document
 import structureextractor
 import logger
 import stringprocessor
@@ -43,6 +44,10 @@ class TestCollectionProcessor(unittest.TestCase):
         mock_os.path.splitext.side_effect = os.path.splitext
 
         mock_logger.get.return_value = ""
+
+        # Make the structure extractor return useful objects
+        extracted_docs = [mock.create_autospec(Document) for x in range(10)]
+        mock_strucex.extract.return_value = extracted_docs
         
         colproc.extract_record_metadata(collection_dir, docstruc_filename,
             filename_extension)
@@ -57,8 +62,14 @@ class TestCollectionProcessor(unittest.TestCase):
         mock_logger.log.assert_has_calls(log_calls)
 
         # The extractor should have been called on each file
-        strucex_calls = [mock.call(files[1]), mock.call(files[2])]
-        mock_strucex.assert_has_calls(strucex_calls)
+        strucex_calls = [mock.call(files[0]), mock.call(files[1])]
+        for call in strucex_calls:
+            print mock_strucex.extract
+            self.failUnless(call in mock_strucex.extract.call_args_list)
+
+        # The reader writer should be called on every extracted doc
+        createdoc_calls = [mock.call(doc) for doc in extracted_docs]
+        mock_writer.create_new_document.assert_has_calls(createdoc_calls)
 
     @mock.patch("collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor)

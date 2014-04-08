@@ -123,6 +123,8 @@ class CollectionProcessor(object):
                     logger.REPLACE)
                 try:
                     docs = extractor.extract(filename)
+                    print "docs"
+                    print docs
                     for doc in docs:
                         # TODO: readerwriter
                         self.reader_writer.create_new_document(doc,
