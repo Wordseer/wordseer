@@ -60,8 +60,6 @@ class TestCollectionProcessor(unittest.TestCase):
         strucex_calls = [mock.call(files[1]), mock.call(files[2])]
         mock_strucex.assert_has_calls(strucex_calls)
 
-        
-
     @mock.patch("collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor)
     def test_parse_documents(self, mock_str_proc, mock_logger):
@@ -208,12 +206,3 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.calculate_index_sequences.called == False
         assert colproc.parse_documents.called == False
         assert colproc.extract_record_metadata.called == False
-
-class TestMain(unittest.TestCase):
-    """Test the main() method in collectionprocessor.
-    """
-
-    @mock.patch("collectionprocessor.CollectionProcessor",
-        autospec=collectionprocessor.CollectionProcessor)
-    def test_main(self, mock_col_proc):
-        collectionprocessor.main("-d test -s test".split(" "))

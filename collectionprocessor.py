@@ -221,33 +221,3 @@ class CollectionProcessor(object):
                         max_sentence_id)
 
             sentences_processed += 1
-
-def main(argv):
-    """This is the root method of the pipeline, this is where the user
-    begins execution. It's meant to be run from the command line, given certain
-    flags.
-
-    :param list argv: The flags, usually received from the command line.
-    """
-
-    argparser = argparse.ArgumentParser(description="")
-    argparser.add_argument("-r", action="store_true", dest="reset",
-        help="Clear database and restart processing")
-    argparser.add_argument("-d", action="store", dest="data",
-        help="The path to your XML data files", required=True)
-    argparser.add_argument("-s", action="store", dest="structure",
-        help=("The path to the JSON file explaining the structure of the"
-        " xml files"), required=True)
-
-    args = vars(argparser.parse_args(argv))
-
-    # TODO: MySQLDataReaderWriter
-    #reader_writer = MySQLDataReaderWriter((config.GRAMMATICAL_PROCESSING or
-    #   config.WORD_TO_WORD_SIMILARITY))
-    #processor = CollectionProcessor(reader_writer)
-
-    processor = CollectionProcessor("")
-    processor.process(args["data"], args["structure"], "xml", args["reset"])
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
