@@ -209,8 +209,8 @@ class CollectionProcessor(object):
                 print len(gc.get_objects())
                 if len(sentence.words) > 0:
                     latest_id = sentence.id
-                    processed_ok = seq_proc.process(sentence)
-                    if processed_ok:
+                    processed_sequences = seq_proc.process(sentence)
+                    if processed_sequences:
                         logger.log("finished_sequence_processing", "false",
                             logger.REPLACE)
                         logger.log("latest_sequence_sentence", str(i),

@@ -37,9 +37,9 @@ class TestCollectionProcessor(unittest.TestCase):
         collection_dir = mock.create_autospec(str)
         docstruc_filename = mock.create_autospec(str)
         filename_extension = ".xml"
+        files = ["file1.xml", "file2.XmL", "file3.foo", ".file4.xml"]
 
-        mock_os.listdir.return_value = ["file1.xml", "file2.XmL", "file3.foo",
-            ".file4.xml"]
+        mock_os.listdir.return_value = files
         mock_os.path.splitext.side_effect = os.path.splitext
 
         mock_logger.get.return_value = ""
@@ -47,7 +47,7 @@ class TestCollectionProcessor(unittest.TestCase):
         colproc.extract_record_metadata(collection_dir, docstruc_filename,
             filename_extension)
 
-        # logger.log() should have been called once for each file like this
+        # logger.log() should have been called twice for each file like this
         log_calls = []
         for i in range(0, 2):
             log_calls.append(mock.call("finished_recording_text_and_metadata",
@@ -55,6 +55,10 @@ class TestCollectionProcessor(unittest.TestCase):
             log_calls.append(mock.call("text_and_metadata_recorded", str(i + 1),
                 mock_logger.UPDATE))
         mock_logger.log.assert_has_calls(log_calls)
+
+        # The extractor should have been called on each file
+        strucex_calls = [mock.call(files[1]), mock.call(files[2])]
+        mock_strucex.assert_has_calls(strucex_calls)
 
         
 

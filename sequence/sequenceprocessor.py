@@ -86,10 +86,10 @@ class SequenceProcessor(object):
         sentence.
 
         :param Sentence sentence: The sentence to process,
-        :return boolean: True.
+        :return list: A list of Sequence objects, representing the results
+        of processing. These sequences are also sent to the ReaderWriter.
         """
 
-        #TODO: implement timing?
         sequences = [] # a list of Sequences
         for i in range(0, len(sentence.tagged)):
             # Iterate through every word
@@ -104,8 +104,6 @@ class SequenceProcessor(object):
         # TODO: readerwriter
         #for sequence in sequences:
         #    self.reader_writer.index_sequence(sequence)
-        #return True
-        # TODO: return True
         return sequences
 
     def get_sequence(self, sentence, i, j):
@@ -134,8 +132,8 @@ class SequenceProcessor(object):
         # TOOO: Aditi says it's possible to remove these checks, should
         # see if that's doable after the unit test is written
         has_stops = len(wordlist_nostops) < len(wordlist)
-        lemmatized_has_stops = (len(lemmatized_phrase_nostops.split(" ")) <
-            len(wordlist))
+        lemmatized_has_stops = (len(lemmatized_phrase_nostops) <
+            len(lemmatized_phrase))
         all_stop_words = len(wordlist_nostops) == 0
         lemmatized_all_stop_words = len(lemmatized_phrase_nostops) == 0
 
@@ -167,9 +165,6 @@ class SequenceProcessor(object):
             self.previously_indexed.append(surface_phrase_nostops)
 
         # Definitely make a Sequence of the lemmatized_phrase
-        #print "Lemmatized stop"
-        #print lemmatized_phrase
-        #print lemmatized_has_stops
         sequences.append(Sequence(start_position=i,
             sentence_id=sentence.id,
             document_id=sentence.document_id,

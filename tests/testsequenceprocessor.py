@@ -6,7 +6,6 @@ from document.sentence import Sentence
 from sequence.sequenceprocessor import (SequenceProcessor, Sequence,
     join_tws, LEMMA, WORD)
 import unittest
-import pprint
 
 class SequenceProcessorTests(unittest.TestCase):
     """Tests for SequenceProcessor.
@@ -51,7 +50,6 @@ class SequenceProcessorTests(unittest.TestCase):
 
         self.failUnless(self.seq_proc.remove_stops(with_stops) == without_stops)
 
-    @unittest.skip("Need clarification")
     def test_process(self):
         """Test process()
         """
@@ -77,20 +75,19 @@ class SequenceProcessorTests(unittest.TestCase):
                     "the fox",
                     "the fox jumped",
                     "the fox jumped over",
-                    "fox",
-                    "fox jumped",
                     "fox jumped over",
                     "fox jumped over the",
-                    "jumped",
                     "jumped over",
+                    "jumped over the",
                     "jumped over the dog",
                     "over",
                     "over the",
-                    "over the dog"],
+                    "over the dog",
+                    "the",
+                    "the dog"],
                 "nostops": [
                     "fox",
                     "fox jumped",
-                    "fox jumped dog",
                     "jumped",
                     "jumped dog",
                     "dog"]
@@ -104,6 +101,7 @@ class SequenceProcessorTests(unittest.TestCase):
                     "fox jump over",
                     "fox jump over the",
                     "jump over",
+                    "jump over the",
                     "jump over the dog",
                     "over",
                     "over the",
@@ -111,16 +109,14 @@ class SequenceProcessorTests(unittest.TestCase):
                     "the",
                     "the dog"],
                 "nostops": [
-                    "fox jump dog",
-                    "jump dog",
                     "fox",
                     "fox jump",
                     "jump",
+                    "jump dog",
                     "dog"]
             }
         }
 
-        #pprint.pprint(sequence_sequences)
         self.failUnless(sequence_sequences == key)
         
 
