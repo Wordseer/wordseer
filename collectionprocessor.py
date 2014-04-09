@@ -3,11 +3,8 @@ This file has tools to process a collection of files and contains the command
 line interface to the wordseer backend.
 """
 
-import argparse
 from datetime import datetime
-import gc
 import os
-import sys
 
 import config
 from database.database import Database
@@ -86,9 +83,9 @@ class CollectionProcessor(object):
         # Calculate word-to-word-similarities
         if (config.WORD_TO_WORD_SIMILARITY and not
             "true" in logger.get("word_similarity_calculations_done")):
-                print("Calculating Lin Similarities")
-                #TODO: reader_writer
-                self.reader_writer.calculate_lin_similarities()
+            print("Calculating Lin Similarities")
+            #TODO: reader_writer
+            self.reader_writer.calculate_lin_similarities()
 
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):

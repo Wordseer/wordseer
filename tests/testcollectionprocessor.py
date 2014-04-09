@@ -27,13 +27,10 @@ def setUpModule():
 class TestCollectionProcessor(unittest.TestCase):
     """Test the CollectionProcessor class.
     """
-    @mock.patch("collectionprocessor.StringProcessor",
-        autospec=stringprocessor.StringProcessor)
     @mock.patch("collectionprocessor.structureextractor",
         autospec=structureextractor)
     @mock.patch("collectionprocessor.os", autospec=os)
-    def test_extract_record_metadata(self, mock_os, mock_strucex, mock_str_proc,
-        mock_logger):
+    def test_extract_record_metadata(self, mock_os, mock_strucex, mock_logger):
         """Test the extract_record_metadata method.
         """
         # Set up the input objects
@@ -58,7 +55,7 @@ class TestCollectionProcessor(unittest.TestCase):
             for entry in extracted_docs:
                 if entry[0] == filename:
                     return entry[1]
-        
+
         mock_strucex_instance = mock_strucex.StructureExtractor("", "")
         mock_strucex_instance.extract.side_effect = extract_docs
 
@@ -92,14 +89,9 @@ class TestCollectionProcessor(unittest.TestCase):
             num_done += 1
         mock_writer.create_new_document.assert_has_calls(createdoc_calls)
 
-        # And logger should have been called at the end
-        
-
-    @mock.patch("collectionprocessor.StringProcessor",
-        autospec=stringprocessor.StringProcessor)
     @mock.patch("collectionprocessor.DocumentParser",
         autospec=documentparser.DocumentParser)
-    def test_parse_documents(self, mock_dp, mock_str_proc, mock_logger):
+    def test_parse_documents(self, mock_dp, mock_logger):
         """Tests for the test_parse_documents method.
         """
         # Set up the mocks
@@ -154,7 +146,7 @@ class TestCollectionProcessor(unittest.TestCase):
             return sentences[arg]
 
         mock_writer.get_sentence.side_effect = get_sentence
-        
+
         mock_seq_proc_instance = mock_seq_proc("")
         mock_seq_proc_instance.process.return_value = True
 
@@ -201,7 +193,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
             "tfidf_done": "true",
             "word_similarity_calculations_done": "true"
         }
-        
+
         self.args = ["", "", "", False]
 
         # Reset the previously used mocks
@@ -302,11 +294,11 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.extract_record_metadata.called == False
 
     @mock.patch("collectionprocessor.logger", autospec=logger)
-    def test_process_tfidfs(self, mock_logger):
+    def test_process_w2w(self, mock_logger):
         """Test that calculate_lin_similarities() is run.
         """
         mock_logger.get.side_effect = self.log_dict.__getitem__
-        
+
         self.log_dict["word_similarity_calculations_done"] = "false"
         self.log_dict["finished_sequence_processing"] = "false"
         colproc.process(*self.args)
