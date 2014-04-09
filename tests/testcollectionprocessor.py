@@ -9,6 +9,7 @@ import unittest
 import collectionprocessor
 import config
 from document.document import Document
+from parser import documentparser
 import structureextractor
 import logger
 import stringprocessor
@@ -27,8 +28,8 @@ class TestCollectionProcessor(unittest.TestCase):
     """
     @mock.patch("collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor)
-    @mock.patch("collectionprocessor.StructureExtractor",
-        autospec=structureextractor.StructureExtractor)
+    @mock.patch("collectionprocessor.structureextractor",
+        autospec=structureextractor)
     @mock.patch("collectionprocessor.os", autospec=os)
     def test_extract_record_metadata(self, mock_os, mock_strucex, mock_str_proc,
         mock_logger):
@@ -40,15 +41,27 @@ class TestCollectionProcessor(unittest.TestCase):
         filename_extension = ".xml"
         files = ["file1.xml", "file2.XmL", "file3.foo", ".file4.xml"]
 
+        # Configure the mock os
         mock_os.listdir.return_value = files
         mock_os.path.splitext.side_effect = os.path.splitext
 
+        # Configure mock logger
         mock_logger.get.return_value = ""
 
         # Make the structure extractor return useful objects
-        extracted_docs = [mock.create_autospec(Document) for x in range(10)]
-        mock_strucex.extract.return_value = extracted_docs
+        extracted_docs = [
+            ("file1.xml", [mock.create_autospec(Document) for x in range(10)]),
+            ("file2.XmL", [mock.create_autospec(Document) for x in range(10)])]
+
+        def extract_docs(filename):
+            for entry in extracted_docs:
+                if entry[0] == filename:
+                    return entry[1]
         
+        mock_strucex_instance = mock_strucex.StructureExtractor("", "")
+        mock_strucex_instance.extract.side_effect = extract_docs
+
+        # Run the SUT
         colproc.extract_record_metadata(collection_dir, docstruc_filename,
             filename_extension)
 
@@ -59,22 +72,68 @@ class TestCollectionProcessor(unittest.TestCase):
                 "false", mock_logger.REPLACE))
             log_calls.append(mock.call("text_and_metadata_recorded", str(i + 1),
                 mock_logger.UPDATE))
+        log_calls.append(mock.call("finished_recording_text_and_metadata",
+                "true", mock_logger.REPLACE))
         mock_logger.log.assert_has_calls(log_calls)
 
         # The extractor should have been called on each file
         strucex_calls = [mock.call(files[0]), mock.call(files[1])]
         for call in strucex_calls:
-            print mock_strucex.extract
-            self.failUnless(call in mock_strucex.extract.call_args_list)
+            self.failUnless(call in mock_strucex_instance.extract.\
+                call_args_list)
 
         # The reader writer should be called on every extracted doc
-        createdoc_calls = [mock.call(doc) for doc in extracted_docs]
+        createdoc_calls = []
+        num_done = 1
+        for entry in extracted_docs:
+            for doc in entry[1]:
+                createdoc_calls.append(mock.call(doc, num_done))
+            num_done += 1
         mock_writer.create_new_document.assert_has_calls(createdoc_calls)
+
+        # And logger should have been called at the end
+        
 
     @mock.patch("collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor)
-    def test_parse_documents(self, mock_str_proc, mock_logger):
-        pass
+    @mock.patch("collectionprocessor.DocumentParser",
+        autospec=documentparser.DocumentParser)
+    def test_parse_documents(self, mock_dp, mock_str_proc, mock_logger):
+        """Tests for the test_parse_documents method.
+        """
+        # Set up the mocks
+        max_doc = 20
+        mock_writer.list_document_ids.return_value = range(max_doc)
+        mock_dp_instance = mock_dp("", "")
+
+        mock_gotten_doc = mock.create_autospec(Document)
+        mock_writer.get_document.return_value = mock_gotten_doc
+
+        latest = 5
+        mock_logger.get.return_value = str(latest)
+
+        # Run the SUT
+        colproc.parse_documents()
+
+        # Reader writer should have been called for every id greater than
+        # what the logger returned and once at the end
+        get_doc_calls = [mock.call(x) for x in range(latest + 1, max_doc)]
+        mock_writer.get_document.assert_has_calls(get_doc_calls)
+        mock_writer.finish_grammatical_processing.assert_called_once()
+
+        # Document parser should have been called on every doc
+        parse_calls = [mock.call(mock_gotten_doc)
+            for x in range(latest + 1, max_doc)]
+        mock_dp_instance.parse_document.assert_has_calls(parse_calls)
+
+        # Logger should be called twice per doc
+        logger_calls = []
+        for i in range(latest + 1, max_doc):
+            logger_calls.append(mock.call("finished_grammatical_processing",
+                "false", mock_logger.REPLACE))
+            logger_calls.append(mock.call("latest_parsed_document_id",
+                str(i), mock_logger.REPLACE))
+        mock_logger.log.assert_has_calls(logger_calls)
 
     def test_calculate_index_sequences(self, mock_logger):
         pass

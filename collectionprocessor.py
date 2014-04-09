@@ -14,7 +14,7 @@ from database.database import Database
 import logger
 from parser.documentparser import DocumentParser
 from sequence.sequenceprocessor import SequenceProcessor
-from structureextractor import StructureExtractor
+import structureextractor
 from stringprocessor import StringProcessor
 
 class CollectionProcessor(object):
@@ -103,8 +103,8 @@ class CollectionProcessor(object):
         :param str filename_extension: The extension of the files that contain
         documents.
         """
-        extractor = StructureExtractor(self.str_proc, docstruc_filename)
-
+        extractor = structureextractor.StructureExtractor(self.str_proc,
+            docstruc_filename)
         # Extract and record metadata, text for documents in the collection
         num_files_done = 1
         contents = []
@@ -123,13 +123,10 @@ class CollectionProcessor(object):
                     logger.REPLACE)
                 try:
                     docs = extractor.extract(filename)
-                    print "docs"
-                    print docs
                     for doc in docs:
                         # TODO: readerwriter
                         self.reader_writer.create_new_document(doc,
                            num_files_done)
-                        pass
 
                     print("\t" + str(num_files_done) + "/" + str(len(contents))
                         + "\t" + filename)
@@ -139,11 +136,10 @@ class CollectionProcessor(object):
                 except Exception as e:
                     print("Error on file " + filename)
                     print(e)
-                # TODO: gc?
             num_files_done += 1
 
         logger.log("finished_recording_text_and_metadata", "true",
-            "replace")
+            logger.REPLACE)
 
     def parse_documents(self):
         """Given the documents already loaded into the database from
@@ -166,13 +162,13 @@ class CollectionProcessor(object):
         for doc_id in document_ids:
             if doc_id > latest_id:
                 #TODO: readerwriter
-                doc = self.reader_writer.get_document(id)
-                print("Parsing document " + documents_parsed + "/" +
-                    len(document_ids))
+                doc = self.reader_writer.get_document(doc_id)
+                print("Parsing document " + str(documents_parsed) + "/" +
+                    str(len(document_ids)))
                 start_time = datetime.now()
                 document_parser.parse_document(doc)
                 seconds_elapsed = (datetime.now() - start_time).total_seconds()
-                print("\tTime to parse document: " + seconds_elapsed +
+                print("\tTime to parse document: " + str(seconds_elapsed) +
                     "s\n")
                 logger.log("finished_grammatical_processing", "false",
                     logger.REPLACE)
