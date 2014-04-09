@@ -203,8 +203,7 @@ class CollectionProcessor(object):
         for i in range(latest_id, max_sentence_id):
             if i > latest_id:
                 #TODO: readerwriter
-                sentence = self.reader_writer.get_sentence(id)
-                print len(gc.get_objects())
+                sentence = self.reader_writer.get_sentence(i)
                 if len(sentence.words) > 0:
                     latest_id = sentence.id
                     processed_sequences = seq_proc.process(sentence)
@@ -214,8 +213,7 @@ class CollectionProcessor(object):
                         logger.log("latest_sequence_sentence", str(i),
                             logger.REPLACE)
                 if sentences_processed % 1000 == 0:
-                    #TODO: is garbage collection necessary here?
-                    print("Sequence-processing sentence " + i + "/" +
-                        max_sentence_id)
+                    print("Sequence-processing sentence " + str(i) + "/" +
+                        str(max_sentence_id))
 
             sentences_processed += 1
