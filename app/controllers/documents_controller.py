@@ -12,8 +12,9 @@ def document_index():
 
     Eventually, this will be swapped out for the more useful page that shows all
     files in a collection.
-    """
     return render_template("documents_list.html")
+    """
+    return render_template("document_index.html")
 
 @app.route('/document/<id>')
 def document_show(id):
@@ -22,7 +23,7 @@ def document_show(id):
 
     :param int id: The document to retrieve details for.
     """
-    pass
+    return render_template("document_show.html")
 
 @app.route('/document/new')
 def document_new():
@@ -30,7 +31,7 @@ def document_new():
     The new action for documents, which shows a form for uploading
     document files to process.
     """
-    pass
+    return render_template("document_new.html")
 
 @app.route('/document/create/')
 def document_create():
@@ -42,4 +43,4 @@ def document_create():
     obviously I'm still working on that; just implement enough to confirm that
     the file was properly uploaded and would be ready for processing.
     """
-    pass
+    return render_template("document_create.html")
