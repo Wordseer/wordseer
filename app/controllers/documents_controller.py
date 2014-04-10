@@ -1,43 +1,44 @@
-from app import app
-
 """
 This is the controller for pages related to documents.
 """
 
-"""
-The index action, which shows all files for a user.
+from app import app
 
-Eventually, this will be swapped out for the more useful page that shows all
-files in a collection.
-"""
 @app.route('/documents/')
 def document_index():
-    pass
+    """
+    The index action, which shows all files for a user.
 
-"""
-The show action, which shows details for a particular document.
-"""
+    Eventually, this will be swapped out for the more useful page that shows all
+    files in a collection.
+    """
+    return "Blankity blank"
+
 @app.route('/document/<id>')
 def document_show(id):
+    """
+    The show action, which shows details for a particular document.
+
+    :param int id: The document to retrieve details for.
+    """
     pass
 
-"""
-The new action for documents, which shows a form for uploading
-document files to process.
-"""
 @app.route('/document/new')
 def document_new():
+    """
+    The new action for documents, which shows a form for uploading
+    document files to process.
+    """
     pass
-
-"""
-The create action for documents, which takes in document files, processes them,
-and creates the corresponding database records.
-
-NOTE: you don't need to implement the processing and database stuff since
-obviously I'm still working on that; just implement enough to confirm that the
-file was properly uploaded and would be ready for processing.
-"""
 
 @app.route('/document/create/')
 def document_create():
+    """
+    The create action for documents, which takes in document files, processes
+    them, and creates the corresponding database records.
+
+    NOTE: you don't need to implement the processing and database stuff since
+    obviously I'm still working on that; just implement enough to confirm that
+    the file was properly uploaded and would be ready for processing.
+    """
     pass
