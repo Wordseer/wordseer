@@ -3,6 +3,7 @@ This is the controller for pages related to documents.
 """
 
 from app import app
+from flask import render_template
 
 @app.route('/documents/')
 def document_index():
@@ -12,7 +13,7 @@ def document_index():
     Eventually, this will be swapped out for the more useful page that shows all
     files in a collection.
     """
-    return "Blankity blank"
+    return render_template("documents_list.html")
 
 @app.route('/document/<id>')
 def document_show(id):
