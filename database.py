@@ -7,7 +7,8 @@ from config import SQLALCHEMY_MIGRATE_REPO
 from app.models import Base
 from sys import argv
 from sqlalchemy import create_engine
-import os.path
+import os
+import shutil
 import imp
 
 def create():
@@ -38,6 +39,10 @@ def downgrade():
     api.downgrade(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO, v - 1)
     print 'Current database version: ' + str(api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO))
 
+def drop():
+    os.remove(SQLALCHEMY_DATABASE_URI.split('///')[-1])
+    shutil.rmtree(SQLALCHEMY_MIGRATE_REPO)
+
 if __name__ == "__main__":
 
     if argv[1] == "create":
@@ -48,5 +53,7 @@ if __name__ == "__main__":
         upgrade()
     elif argv[1] == "downgrade":
         downgrade()
+    elif argv[1] == "drop":
+        drop()
     else:
         print(str(argv[1]) + " is not a valid database operation.")

@@ -15,7 +15,7 @@ from config import *
 from sqlalchemy.orm import relationship, backref, sessionmaker
 
 # create database connection
-engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
+engine = create_engine(SQLALCHEMY_DATABASE_URI)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -140,54 +140,73 @@ class Unit(Base):
 
     properties = relationship("Property", backref=backref("unit"))
 
-    def __init__(self):
-        """Default empty constructor """
-        pass
-
     def __init__(self, document=None):
-      """Initialize a top-level document unit from a document file.
+        """Constructor for unit.
 
-      Expects a dictionary that has the following entries:
-      - properties (dict): the metadata of the document
-      - subunits (dict): the structure of the subunits
-      - sentences (list): a list of sentences, in order
-      - words (set): the set of all words (or tokens)
+        Has a default empty constructor if called without parameters
+        """
 
-      This is tentative.
+        if document:
+            """Initialize a top-level document unit from a document file.
 
-      """
+            Expects a dictionary that has the following entries:
+            - properties (dict): the metadata of the document
+            - subunits (dict): the structure of the subunits
+            - sentences (list): a list of sentences, in order
+            - words (set): the set of all words (or tokens)
 
-      self.unit_type = "document"
-      self.number = 0
+            This is tentative.
 
-      for name, value in document["properties"].items():
-          prop = Property()
-          prop.name = name
-          prop.value = value
+            """
 
-          prop.save()
-          self.properties.append(prop)
+            self.unit_type = "document"
+            self.number = 0
 
-      for sentence_tuple in document["sentences"]:
-          words = sentence_tuple[1]
-          sentence_text = sentence_tuple[0]
+            for name, value in document["properties"].items():
+                prop = Property()
+                prop.name = name
+                prop.value = value
 
-          sentence = Sentence()
-          sentence.text = sentence_text
+                prop.save()
+                self.properties.append(prop)
 
-          for word_str in words:
-              word = Word()
-              word.word = word_str
-              word.save()
+            for sentence_tuple in document["sentences"]:
+                words = sentence_tuple[1]
+                sentence_text = sentence_tuple[0]
 
-              sentence.words.append(word)
+                sentence = Sentence()
+                sentence.text = sentence_text
 
-          sentence.save()
-          self.sentences.append(sentence)
+                for word_str in words:
+                    word = Word()
+                    word.word = word_str
+                    word.save()
 
-      # TODO: initialize subunits
+                    sentence.words.append(word)
 
-      self.save
+                sentence.save()
+                self.sentences.append(sentence)
+
+            # TODO: initialize subunits
+
+        self.save
+
+    @property
+    def parent(self):
+        """Method for getting a unit's parent.
+
+        This method exists because in the current set up, it has been tricky to
+        define the parent as a relationship.
+        """
+
+        return Unit.get(self.parent_id)
+
+    def __repr__(self):
+        """Return a representation of a unit, which is its type followed by its
+        ordering number
+        """
+
+        return " ".join([self.unit_type, str(self.number)])
 
 class Sentence(Base):
     """A model representing a sentence.

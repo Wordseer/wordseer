@@ -61,6 +61,25 @@ class TestCase(unittest.TestCase):
 
         print("\"Hello World\" unit: ", u2.sentences)
 
+        # Add a child to the unit
+        u3 = Unit()
+        u3.unit_type = "subsection"
+        u3.number = 1
+
+        p2 = Property()
+        p2.name = "title"
+        p2.value = "Foobar"
+
+        u3.properties.append(p2)
+
+        u1.children.append(u3)
+
+        u3.save()
+        u1.save()
+
+        print("Children of u1", u1.children)
+        print("u3's parent", u3.parent)
+
     def test_sample_document(self):
         """Test turning a document file into the corresponding models.
 
