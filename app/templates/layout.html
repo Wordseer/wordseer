@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        {% block head %}
+        <title>{% block title}{% endblock %} - WordSeer</title>
+    </head>
+    <body>
+        <header>
+            <h1>{% block headline}{% endblock %}</h1>
+            <nav></nav>
+        </header>
+        <div>
+            {% block body %}{% endblock %}
+        </div>
+        <footer>
+            {% block footer %}{% endblock %}
+        </footer>
+    </body>
+</html>
