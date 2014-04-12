@@ -4,6 +4,7 @@ This is the controller for pages related to documents.
 
 from app import app
 from .. import forms
+from .. import models
 from flask import render_template
 from flask import request
 from werkzeug import secure_filename
