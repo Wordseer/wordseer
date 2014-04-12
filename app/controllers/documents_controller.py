@@ -5,6 +5,7 @@ This is the controller for pages related to documents.
 from app import app
 from .. import forms
 from flask import render_template
+from flask import request
 from werkzeug import secure_filename
 
 @app.route('/document/')
@@ -33,13 +34,14 @@ def document_upload():
     The new action for documents, which shows a form for uploading
     document files to process.
     """
+
+    if request.method == "POST":
+        # do stuff
+        pass
+    
     form = forms.DocumentUploadForm()
     
-    if form.validate_on_submit():
-        filename = secure_filename(form.uploaded_file.data.filename)
-    else:
-        filename = None
-    return render_template('document_upload.html', form=form, filename=filename)
+    return render_template('document_upload.html', form=form)
 
 @app.route('/document/create/')
 def document_create():
