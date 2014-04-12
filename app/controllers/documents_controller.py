@@ -3,7 +3,9 @@ This is the controller for pages related to documents.
 """
 
 from app import app
+from .. import forms
 from flask import render_template
+from werkzeug import secure_filename
 
 @app.route('/documents/')
 def document_index():
@@ -25,13 +27,19 @@ def document_show(id):
     """
     return render_template("document_show.html")
 
-@app.route('/document/new')
-def document_new():
+@app.route('/document/new', methods=["GET", "POST"])
+def document_upload():
     """
     The new action for documents, which shows a form for uploading
     document files to process.
     """
-    return render_template("document_new.html")
+    form = DocumentUploadForm()
+    
+    if form.validate_on_submit():
+        filename = secure_filename(form.uploaded_file.data.filename)
+    else:
+        filename = None
+    return render_template('document_upload.html', form=form, filename=filename)
 
 @app.route('/document/create/')
 def document_create():
