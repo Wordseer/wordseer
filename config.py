@@ -10,5 +10,5 @@ WTF_CSRF_ENABLED = True
 SECRET_KEY = "secret" #TODO: change this in production
 
 # Upload config
-UPLOAD_FOLDER = os.path.join(basedir, 'app/uploads')
+UPLOAD_DIR = os.path.join(basedir, 'app/uploads')
 ALLOWED_EXTENSIONS = [".xml", ".json"]

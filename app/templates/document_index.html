@@ -2,5 +2,12 @@
 {% block title %}Document List{% endblock %}
 {% block body %}
 <h1>Document List</h1>
-
+<table class="table table-striped">
+    <thead>
+        <tr><th>Filename</th></tr>
+    </thead>
+    {% for file in files %}
+    <tr><td>file</td></tr>
+    {% endfor %}
+</table>
 {% endblock %}

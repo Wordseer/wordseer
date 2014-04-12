@@ -23,7 +23,10 @@ def document_index():
     files in a collection.
     return render_template("documents_list.html")
     """
-    return render_template("document_index.html")
+    # TODO: this simply lists files in a directory, perhaps there are better
+    # options
+    file_list = os.listdir(app.config["UPLOAD_DIR"])
+    return render_template("document_index.html", files=file_list)
 
 @app.route(DOCUMENT_ROUTE + '<id>')
 def document_show(id):
@@ -45,7 +48,7 @@ def document_upload():
         uploaded_file = request.files["uploaded_file"]
         if uploaded_file and allowed_file(uploaded_file.filename):
             filename = secure_filename(uploaded_file.filename)
-            uploaded_file.save(os.path.join(app.config["UPLOAD_FOLDER"],
+            uploaded_file.save(os.path.join(app.config["UPLOAD_DIR"],
                 filename))
             #TODO: send the user somewhere useful?
     
