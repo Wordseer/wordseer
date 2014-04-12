@@ -8,3 +8,7 @@ SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db')
 
 WTF_CSRF_ENABLED = True
 SECRET_KEY = "secret" #TODO: change this in production
+
+# Upload config
+UPLOAD_FOLDER = '/path/to/the/uploads'
+ALLOWED_EXTENSIONS = ["xml", "json"]
