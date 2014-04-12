@@ -43,6 +43,7 @@ class Base(object):
 
     # Define the primary key
     id = Column(Integer, primary_key=True)
+    #FIXME: this overrides the builtin id()
 
     def save(self):
         """Commits this model instance to the database.
@@ -128,9 +129,10 @@ class Unit(Base):
 
     """
 
-    unit_type = Column(String(64), index = True)
-    number = Column(Integer, index = True)
+    unit_type = Column(String(64), index=True)
+    number = Column(Integer, index=True)
     parent_id = Column(Integer, ForeignKey('unit.id'))
+    directory = Column(String, nullable=True)
 
     # Relationships
 
@@ -261,6 +263,20 @@ class Property(Base):
 
     def __repr__(self):
         return "<Property: " + self.name + ">"
+
+class Project(Base):
+    """A model representing a project.
+
+    Projects are collections of associated files, grouped together for the
+    user's convenience.
+    """
+
+    #user = Column() #TODO: each project should be associated with a user
+    directory = Column(String)
+    name = Column(String)
+
+    def __repr__(self):
+        return "<Project (name=" + self.name + " directory=" + directory + ")>"
 
 """
 ##################
