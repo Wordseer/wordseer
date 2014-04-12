@@ -7,4 +7,4 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, app_name + ".db")
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db')
 
 WTF_CSRF_ENABLED = True
-WTF_CSRF_SECRET_KEY = "secret" #TODO: change this in production
+SECRET_KEY = "secret" #TODO: change this in production

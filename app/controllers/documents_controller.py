@@ -7,7 +7,7 @@ from .. import forms
 from flask import render_template
 from werkzeug import secure_filename
 
-@app.route('/documents/')
+@app.route('/document/')
 def document_index():
     """
     The index action, which shows all files for a user.
@@ -33,7 +33,7 @@ def document_upload():
     The new action for documents, which shows a form for uploading
     document files to process.
     """
-    form = DocumentUploadForm()
+    form = forms.DocumentUploadForm()
     
     if form.validate_on_submit():
         filename = secure_filename(form.uploaded_file.data.filename)
