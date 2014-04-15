@@ -24,9 +24,10 @@ def document_index():
     files in a collection.
     return render_template("documents_list.html")
     """
-    # TODO: this simply lists files in a directory, perhaps there are better
-    # options
-    file_list = os.listdir(app.config["UPLOAD_DIR"])
+    file_list = []
+    for unit in models.Unit.all().all():
+        if unit.path:
+            file_list.append(unit)
     return render_template("document_index.html", files=file_list)
 
 @app.route(DOCUMENT_ROUTE + '<id>')
