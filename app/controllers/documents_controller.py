@@ -28,6 +28,7 @@ def document_index():
     for unit in models.Unit.all().all():
         if unit.path:
             file_list.append(unit)
+    #TODO: these paths are ugly
     return render_template("document_index.html", files=file_list)
 
 @app.route(DOCUMENT_ROUTE + '<id>')
