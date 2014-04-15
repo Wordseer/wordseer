@@ -149,53 +149,55 @@ class Unit(Base):
     #    pass
     
     def __init__(self, document=None, **kwargs):
-      """Initialize a top-level document unit from a document file.
-        
-      Expects a dictionary that has the following entries:
-      - properties (dict): the metadata of the document
-      - subunits (dict): the structure of the subunits
-      - sentences (list): a list of sentences, in order
-      - words (set): the set of all words (or tokens)
+        """Initialize a top-level document unit from a document file.
 
-      This is tentative.
+        Expects a dictionary that has the following entries:
+        - properties (dict): the metadata of the document
+        - subunits (dict): the structure of the subunits
+        - sentences (list): a list of sentences, in order
+        - words (set): the set of all words (or tokens)
 
-      The problem with this sort of constructor is that it's difficult
-      to pass in the other types of values (the columns for this table) - David
+        This is tentative.
 
-      """
-        
-      self.unit_type = "document"
-      self.number = 0
+        The problem with this sort of constructor is that it's difficult
+        to pass in the other types of values (the columns for this table).
+        I think adding a kwargs argument will make things better - David
 
-      for name, value in document["properties"].items():
-          prop = Property()
-          prop.name = name
-          prop.value = value
+        """
+        if document:
+            self.unit_type = "document"
+            self.number = 0
 
-          prop.save()
-          self.properties.append(prop)
+            for name, value in document["properties"].items():
+                prop = Property()
+                prop.name = name
+                prop.value = value
 
-      for sentence_tuple in document["sentences"]:
-          words = sentence_tuple[1]
-          sentence_text = sentence_tuple[0]
+                prop.save()
+                self.properties.append(prop)
 
-          sentence = Sentence()
-          sentence.text = sentence_text
+            for sentence_tuple in document["sentences"]:
+                words = sentence_tuple[1]
+                sentence_text = sentence_tuple[0]
 
-          for word_str in words:
-              word = Word()
-              word.word = word_str
-              word.save()
+                sentence = Sentence()
+                sentence.text = sentence_text
 
-              sentence.words.append(word)
+                for word_str in words:
+                    word = Word()
+                    word.word = word_str
+                    word.save()
 
-          sentence.save()
-          self.sentences.append(sentence)
+                    sentence.words.append(word)
 
-      super(Unit, self).__init__(**kwargs)
-      # TODO: initialize subunits
+                sentence.save()
+                self.sentences.append(sentence)
 
-      self.save
+            # TODO: initialize subunits
+
+            self.save
+
+        super(Unit, self).__init__(**kwargs)
 
 class Sentence(Base):
     """A model representing a sentence.
