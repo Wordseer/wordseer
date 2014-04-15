@@ -120,6 +120,7 @@ class Unit(Base):
       unit_type (str): the unit type (document, section, etc.).
       number (int): a sequencing number (e.g. 2 for chapter 2).
       parent_id (int): a link to the parent unit.
+      path (str): The path to this unit, if it exists as a file.
 
     Relationships:
       belongs to: parent (Unit)
@@ -132,7 +133,7 @@ class Unit(Base):
     unit_type = Column(String(64), index=True)
     number = Column(Integer, index=True)
     parent_id = Column(Integer, ForeignKey('unit.id'))
-    directory = Column(String, nullable=True)
+    path = Column(String, nullable=True)
 
     # Relationships
 
@@ -146,10 +147,10 @@ class Unit(Base):
     #def __init__(self):
     #    """Default empty constructor """
     #    pass
-
-    def __init__(self, document=None):
+    
+    def __init__(self, document=None, **kwargs):
       """Initialize a top-level document unit from a document file.
-
+        
       Expects a dictionary that has the following entries:
       - properties (dict): the metadata of the document
       - subunits (dict): the structure of the subunits
@@ -158,8 +159,11 @@ class Unit(Base):
 
       This is tentative.
 
-      """
+      The problem with this sort of constructor is that it's difficult
+      to pass in the other types of values (the columns for this table) - David
 
+      """
+        
       self.unit_type = "document"
       self.number = 0
 
@@ -188,6 +192,7 @@ class Unit(Base):
           sentence.save()
           self.sentences.append(sentence)
 
+      super(Unit, self).__init__(**kwargs)
       # TODO: initialize subunits
 
       self.save

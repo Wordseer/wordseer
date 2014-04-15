@@ -3,8 +3,8 @@ This is the controller for pages related to documents.
 """
 
 from app import app
-from .. import forms
 from .. import models
+from .. import forms
 from flask import render_template
 from flask import request
 from werkzeug import secure_filename
@@ -49,9 +49,12 @@ def document_upload():
         uploaded_file = request.files["uploaded_file"]
         if uploaded_file and allowed_file(uploaded_file.filename):
             filename = secure_filename(uploaded_file.filename)
-            uploaded_file.save(os.path.join(app.config["UPLOAD_DIR"],
-                filename))
+            dest_path = os.path.join(app.config["UPLOAD_DIR"],
+                filename)
+            uploaded_file.save(dest_path)
             #TODO: send the user somewhere useful?
+            unit = models.Unit(path=dest_path)
+            unit.save()
     
     form = forms.DocumentUploadForm()
     
