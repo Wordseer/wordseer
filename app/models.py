@@ -280,11 +280,10 @@ class Project(Base):
     """
 
     #user = Column() #TODO: each project should be associated with a user
-    directory = Column(String)
     name = Column(String)
 
     def __repr__(self):
-        return "<Project (name=" + self.name + " directory=" + directory + ")>"
+        return "<Project (name=" + self.name + ")>"
 
 """
 ##################

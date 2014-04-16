@@ -26,6 +26,6 @@ def projects():
     projects = models.Project.all().all()
 
     for project in projects:
-        print project.name
+        print project
     
     return render_template("projects.html", form=form, projects=projects)
