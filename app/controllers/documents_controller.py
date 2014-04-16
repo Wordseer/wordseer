@@ -10,7 +10,7 @@ from flask import request
 from werkzeug import secure_filename
 import os
 
-DOCUMENT_ROUTE = "/document/"
+DOCUMENT_ROUTE = "/documents/"
 
 def allowed_file(filename):
     return os.path.splitext(filename)[1] in app.config["ALLOWED_EXTENSIONS"]
@@ -31,12 +31,12 @@ def document_index():
     #TODO: these paths are ugly
     return render_template("document_index.html", files=file_list)
 
-@app.route(DOCUMENT_ROUTE + '<id>')
-def document_show(id):
+@app.route(DOCUMENT_ROUTE + '<doc_id>')
+def document_show(doc_id):
     """
     The show action, which shows details for a particular document.
 
-    :param int id: The document to retrieve details for.
+    :param int doc_id: The document to retrieve details for.
     """
     return render_template("document_show.html")
 
