@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Projects{% endblock %}
+{% block body %}
+<h1>Projects</h1>
+<h2>Create Project</h2>
+<form action="/projects/" method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        <label for="name">Project Name</label>
+        <input class="form-control" name="name" id="name"
+            placeholder="Project Name">
+    </div>
+    <button type="submit" class="btn btn-default">Submit</button>
+</form>
+<h2>Existing projects</h2>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Project Name</th></tr>
+    </thead>
+    {% for project in projects %}
+    <tr><td>{{ project.name }}</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

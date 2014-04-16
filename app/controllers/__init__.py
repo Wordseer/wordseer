@@ -1,4 +1,3 @@
-__all__ = [
-    "main_controller",
+__all__ = ["projects_controller",
     "documents_controller",
-]
+    "main_controller"]

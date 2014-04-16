@@ -22,12 +22,9 @@ def projects():
 
     projects = models.Project.all().all()
 
-    for project in projects:
-        print project
-    
     return render_template("projects.html", form=form, projects=projects)
 
-@app.route(PROJECT_ROUTE + "<proj_id>"):
+@app.route(PROJECT_ROUTE + "<proj_id>")
 def project_show(proj_id):
     """
     Show the files contained in a specific project.
