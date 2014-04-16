@@ -15,21 +15,21 @@ DOCUMENT_ROUTE = "/documents/"
 def allowed_file(filename):
     return os.path.splitext(filename)[1] in app.config["ALLOWED_EXTENSIONS"]
 
-@app.route(DOCUMENT_ROUTE)
-def document_index():
-    """
-    The index action, which shows all files for a user.
+#@app.route(DOCUMENT_ROUTE)
+#def document_index():
+    #"""
+    #The index action, which shows all files for a user.
 
-    Eventually, this will be swapped out for the more useful page that shows all
-    files in a collection.
-    return render_template("documents_list.html")
-    """
-    file_list = []
-    for unit in models.Unit.all().all():
-        if unit.path:
-            file_list.append(unit)
-    #TODO: these paths are ugly
-    return render_template("document_index.html", files=file_list)
+    #Eventually, this will be swapped out for the more useful page that shows
+    #all files in a collection.
+    #return render_template("documents_list.html")
+    #"""
+    #file_list = []
+    #for unit in models.Unit.all().all():
+        #if unit.path:
+            #file_list.append(unit)
+    ##TODO: these paths are ugly
+    #return render_template("document_index.html", files=file_list)
 
 @app.route(DOCUMENT_ROUTE + '<doc_id>')
 def document_show(doc_id):
