@@ -1,7 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Document List{% endblock %}
 {% block body %}
-<h1>Document List in project {{ project.name }}</h1>
+<h1>Upload new document to {{ project.name }}</h1>
+<form action="/document/new" method="POST" enctype="multipart/form-data"
+    class="form-inline" role="form">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        <label for="uploaded_file" class="sr-only">File</label>
+        <input type="file" id="uploaded_file" name="uploaded_file">
+        <p class="help-block">File should be JSON or XML.</p>
+    </div>
+    <button type="submit" class="btn btn-default">Submit</button>
+</form>
+<h1>Documents already in {{ project.name }}</h1>
 <table class="table table-striped">
     <thead>
         <tr><th>Filename</th></tr>

@@ -27,13 +27,18 @@ def projects():
 @app.route(PROJECT_ROUTE + "<proj_id>")
 def project_show(proj_id):
     """
-    Show the files contained in a specific project.
+    Show the files contained in a specific project. It also allows the user
+    to upload a new document, much like projects().
 
     :param int proj_id: The ID of the desired project.
     """
+
+    form = forms.DocumentUploadForm()
+    
     files = session.query(Unit).filter(Unit.project == proj_id).\
         filter(Unit.path != None).all()
 
     project = session.query(Project).filter(Project.id == proj_id).one()
 
-    return render_template("document_index.html", files=files, project=project)
+    return render_template("document_index.html", files=files,
+        project=project, form=form)
