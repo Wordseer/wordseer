@@ -1,7 +1,7 @@
 from flask import render_template, request
 
 from app import app
-from .. import models
+from ..models import session, Unit, Project
 from .. import forms
 
 PROJECT_ROUTE = "/projects/"
@@ -17,10 +17,10 @@ def projects():
 
     if request.method == "POST" and form.validate():
         #TODO: is this secure? maybe not
-        project = models.Project(name=form.name.data)
+        project = Project(name=form.name.data)
         project.save()
 
-    projects = models.Project.all().all()
+    projects = Project.all().all()
 
     return render_template("projects.html", form=form, projects=projects)
 
@@ -31,4 +31,9 @@ def project_show(proj_id):
 
     :param int proj_id: The ID of the desired project.
     """
-    pass
+    files = session.query(Unit).filter(Unit.project == proj_id).\
+        filter(Unit.path != None).all()
+
+    project = session.query(Project).filter(Project.id == proj_id).one()
+
+    return render_template("document_index.html", files=files, project=project)

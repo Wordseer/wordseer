@@ -134,6 +134,7 @@ class Unit(Base):
     number = Column(Integer, index=True)
     parent_id = Column(Integer, ForeignKey('unit.id'))
     path = Column(String, nullable=True)
+    project = Column(Integer, ForeignKey("project.id"))
 
     # Relationships
 
