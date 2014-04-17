@@ -22,7 +22,7 @@ def projects():
 
     projects = Project.all().all()
 
-    return render_template("project_list.html", form=form, projects=projects)
+    return render_template("projects_list.html", form=form, projects=projects)
 
 @app.route(PROJECT_ROUTE + "<proj_id>", methods=["GET", "POST"])
 def project_show(proj_id):
@@ -51,5 +51,5 @@ def project_show(proj_id):
 
     project = session.query(Project).filter(Project.id == proj_id).one()
 
-    return render_template("document_list.html", files=files,
+    return render_template("documents_list.html", files=files,
         project=project, form=form)

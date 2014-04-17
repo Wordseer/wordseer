@@ -2,7 +2,7 @@
 {% block title %}Document List{% endblock %}
 {% block body %}
 <h1>Upload new document to {{ project.name }}</h1>
-<form action="/document/new" method="POST" enctype="multipart/form-data"
+<form method="POST" enctype="multipart/form-data"
     class="form-inline" role="form">
     {{ form.hidden_tag() }}
     <div class="form-group">
