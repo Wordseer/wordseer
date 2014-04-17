@@ -1,10 +1,16 @@
+import os
+
 from flask import render_template, request
+from werkzeug import secure_filename
 
 from app import app
 from .. import forms
 from ..models import session, Unit, Project
 
 PROJECT_ROUTE = "/projects/"
+
+def allowed_file(filename):
+    return os.path.splitext(filename)[1] in app.config["ALLOWED_EXTENSIONS"]
 
 @app.route(PROJECT_ROUTE, methods=["GET", "POST"])
 def projects():
@@ -22,7 +28,7 @@ def projects():
 
     projects = Project.all().all()
 
-    return render_template("projects_list.html", form=form, projects=projects)
+    return render_template("project_list.html", form=form, projects=projects)
 
 @app.route(PROJECT_ROUTE + "<proj_id>", methods=["GET", "POST"])
 def project_show(proj_id):
@@ -41,7 +47,7 @@ def project_show(proj_id):
                 filename)
             uploaded_file.save(dest_path)
             #TODO: send the user somewhere useful?
-            unit = models.Unit(path=dest_path, project=proj_id)
+            unit = Unit(path=dest_path, project=proj_id)
             unit.save()
 
     form = forms.DocumentUploadForm()
@@ -51,5 +57,5 @@ def project_show(proj_id):
 
     project = session.query(Project).filter(Project.id == proj_id).one()
 
-    return render_template("documents_list.html", files=files,
+    return render_template("document_list.html", files=files,
         project=project, form=form)

@@ -14,8 +14,8 @@ from .. import models
 
 DOCUMENT_ROUTE = "/documents/"
 
-def allowed_file(filename):
-    return os.path.splitext(filename)[1] in app.config["ALLOWED_EXTENSIONS"]
+#def allowed_file(filename):
+    #return os.path.splitext(filename)[1] in app.config["ALLOWED_EXTENSIONS"]
 
 #@app.route(DOCUMENT_ROUTE)
 #def document_index():
