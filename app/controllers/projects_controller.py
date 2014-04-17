@@ -51,11 +51,14 @@ def project_show(proj_id):
             unit.save()
 
     form = forms.DocumentUploadForm()
-    
-    files = session.query(Unit).filter(Unit.project == proj_id).\
+
+    file_info = {}
+    file_objects = session.query(Unit).filter(Unit.project == proj_id).\
         filter(Unit.path != None).all()
+    for file_object in file_objects:
+        file_info[file_object.id] = os.path.split(file_object.path)[1]
 
     project = session.query(Project).filter(Project.id == proj_id).one()
 
-    return render_template("document_list.html", files=files,
+    return render_template("document_list.html", files=file_info,
         project=project, form=form)

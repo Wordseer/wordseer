@@ -17,8 +17,8 @@
     <thead>
         <tr><th>Filename</th></tr>
     </thead>
-    {% for file in files %}
-    <tr><td>{{ file.path }}</td></tr>
+    {% for id, name in files.iteritems() %}
+    <tr><td>{{ name }}</td></tr>
     {% endfor %}
 </table>
 {% endblock %}
