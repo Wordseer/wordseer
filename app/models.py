@@ -8,11 +8,12 @@ This module contains the model-level logic, built on SQLAlchemy.
 
 """
 
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy import create_engine, Column, Table, Integer, String, Boolean, ForeignKey, Text
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy import (Boolean, Column, create_engine, ForeignKey, Integer,
+    String, Table, Text)
+from sqlalchemy.orm import backref, relationship, sessionmaker
+
 from config import *
-from sqlalchemy.orm import relationship, backref, sessionmaker
 
 # create database connection
 engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)

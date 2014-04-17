@@ -3,8 +3,9 @@ This file stores all the relevant forms for the web application.
 """
 
 from flask_wtf import Form
-from flask_wtf.file import FileField, FileAllowed, FileRequired
+from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import TextField
+
 from app import app
 
 class DocumentUploadForm(Form):

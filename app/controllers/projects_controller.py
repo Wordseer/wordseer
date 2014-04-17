@@ -1,8 +1,8 @@
 from flask import render_template, request
 
 from app import app
-from ..models import session, Unit, Project
 from .. import forms
+from ..models import session, Unit, Project
 
 PROJECT_ROUTE = "/projects/"
 
