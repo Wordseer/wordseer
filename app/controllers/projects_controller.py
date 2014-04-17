@@ -22,9 +22,9 @@ def projects():
 
     projects = Project.all().all()
 
-    return render_template("projects.html", form=form, projects=projects)
+    return render_template("project_list.html", form=form, projects=projects)
 
-@app.route(PROJECT_ROUTE + "<proj_id>")
+@app.route(PROJECT_ROUTE + "<proj_id>", methods=["GET", "POST"])
 def project_show(proj_id):
     """
     Show the files contained in a specific project. It also allows the user
@@ -33,6 +33,17 @@ def project_show(proj_id):
     :param int proj_id: The ID of the desired project.
     """
 
+    if request.method == "POST":
+        uploaded_file = request.files["uploaded_file"]
+        if uploaded_file and allowed_file(uploaded_file.filename):
+            filename = secure_filename(uploaded_file.filename)
+            dest_path = os.path.join(app.config["UPLOAD_DIR"],
+                filename)
+            uploaded_file.save(dest_path)
+            #TODO: send the user somewhere useful?
+            unit = models.Unit(path=dest_path, project=proj_id)
+            unit.save()
+
     form = forms.DocumentUploadForm()
     
     files = session.query(Unit).filter(Unit.project == proj_id).\
@@ -40,5 +51,5 @@ def project_show(proj_id):
 
     project = session.query(Project).filter(Project.id == proj_id).one()
 
-    return render_template("document_index.html", files=files,
+    return render_template("document_list.html", files=files,
         project=project, form=form)

@@ -42,27 +42,27 @@ def document_show(doc_id):
     """
     return render_template("document_show.html")
 
-@app.route(DOCUMENT_ROUTE + 'new', methods=["GET", "POST"])
-def document_upload():
-    """
-    The new action for documents, which shows a form for uploading
-    document files to process.
-    """
+#@app.route(DOCUMENT_ROUTE + 'new', methods=["GET", "POST"])
+#def document_upload():
+    #"""
+    #The new action for documents, which shows a form for uploading
+    #document files to process.
+    #"""
 
-    if request.method == "POST":
-        uploaded_file = request.files["uploaded_file"]
-        if uploaded_file and allowed_file(uploaded_file.filename):
-            filename = secure_filename(uploaded_file.filename)
-            dest_path = os.path.join(app.config["UPLOAD_DIR"],
-                filename)
-            uploaded_file.save(dest_path)
-            #TODO: send the user somewhere useful?
-            unit = models.Unit(path=dest_path)
-            unit.save()
+    #if request.method == "POST":
+        #uploaded_file = request.files["uploaded_file"]
+        #if uploaded_file and allowed_file(uploaded_file.filename):
+            #filename = secure_filename(uploaded_file.filename)
+            #dest_path = os.path.join(app.config["UPLOAD_DIR"],
+                #filename)
+            #uploaded_file.save(dest_path)
+            ##TODO: send the user somewhere useful?
+            #unit = models.Unit(path=dest_path)
+            #unit.save()
     
-    form = forms.DocumentUploadForm()
+    #form = forms.DocumentUploadForm()
     
-    return render_template('document_upload.html', form=form)
+    #return render_template('document_upload.html', form=form)
 
 @app.route(DOCUMENT_ROUTE + 'create/')
 def document_create():
