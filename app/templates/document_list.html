@@ -1,10 +1,22 @@
 {% extends "base.html" %}
+{% block head %}
+<script>
+$('.click-anywhere tr').click(function (e) {
+    if(!$(e.target).is('td input:checkbox') && !$(e.target).is('th') )
+    $(this).find('input:checkbox').trigger('click');
+});
+
+$('.click-anywhere a').click(function (e) {
+    e.stopPropagation();
+});
+</script>
+{% endblock %}
 {% block title %}Document List{% endblock %}
 {% block body %}
 <h1>Documents of {{ project.name }}</h1>
 <h2>Upload new document</h2>
-<form method="POST" enctype="multipart/form-data"
-    class="form-inline" role="form">
+<form method="POST" enctype="multipart/form-data" class="form-inline"
+    role="form">
     {{ form.hidden_tag() }}
     <div class="form-group">
         <label for="uploaded_file" class="sr-only">File</label>
@@ -14,14 +26,26 @@
     <button type="submit" class="btn btn-default">Submit</button>
 </form>
 <h2>Existing documents</h2>
-<table class="table table-striped">
+<table class="table table-striped table-hover click-anywhere">
     <thead>
-        <tr><th>Filename</th></tr>
+        <tr>
+            <th>Filename</th>
+            <th>Select for processing</th>
+        </tr>
     </thead>
-    {% for id, name in files.iteritems() %}
-    <tr><td>
-        <a href="{{ url_for('document_show', doc_id=id) }}">{{ name }}</a>
-    </td></tr>
-    {% endfor %}
+        <tbody>
+        {% for id, name in files.iteritems() %}
+        <tr>
+            <td>
+                <a href="{{ url_for('document_show', doc_id=id) }}">
+                    {{ name }}
+                </a>
+            </td>
+            <td>
+                <input name="{{ id }}" type="checkbox">
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endblock %}
