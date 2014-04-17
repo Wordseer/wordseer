@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Document List{% endblock %}
 {% block body %}
-<h1>Upload new document to {{ project.name }}</h1>
+<h1>Documents of {{ project.name }}</h1>
+<h2>Upload new document</h2>
 <form method="POST" enctype="multipart/form-data"
     class="form-inline" role="form">
     {{ form.hidden_tag() }}
@@ -12,7 +13,7 @@
     </div>
     <button type="submit" class="btn btn-default">Submit</button>
 </form>
-<h1>Documents already in {{ project.name }}</h1>
+<h2>Existing documents</h2>
 <table class="table table-striped">
     <thead>
         <tr><th>Filename</th></tr>
