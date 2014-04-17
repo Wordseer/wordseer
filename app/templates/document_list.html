@@ -18,7 +18,9 @@
         <tr><th>Filename</th></tr>
     </thead>
     {% for id, name in files.iteritems() %}
-    <tr><td>{{ name }}</td></tr>
+    <tr><td>
+        <a href="{{ url_for('document_show', doc_id=id) }}">{{ name }}</a>
+    </td></tr>
     {% endfor %}
 </table>
 {% endblock %}
