@@ -17,6 +17,12 @@ class DocumentUploadForm(Form):
         FileRequired(),
         FileAllowed(app.config["ALLOWED_EXTENSIONS"])])
 
+class DocumentProcessForm(Form):
+    """
+    Allows the user to select which documents should be processed.
+    """
+    pass
+
 class ProjectCreateForm(Form):
     """
     Create new projects. This is simply a one-field form, requiring the
@@ -24,4 +30,3 @@ class ProjectCreateForm(Form):
     """
 
     name = TextField("Project Name")
-    

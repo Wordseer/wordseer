@@ -39,18 +39,20 @@ def project_show(proj_id):
     :param int proj_id: The ID of the desired project.
     """
 
-    if request.method == "POST":
-        uploaded_file = request.files["uploaded_file"]
-        if uploaded_file and allowed_file(uploaded_file.filename):
-            filename = secure_filename(uploaded_file.filename)
-            dest_path = os.path.join(app.config["UPLOAD_DIR"],
-                filename)
-            uploaded_file.save(dest_path)
-            #TODO: send the user somewhere useful?
-            unit = Unit(path=dest_path, project=proj_id)
-            unit.save()
+    upload_form = forms.DocumentUploadForm(prefix="upload")
+    process_form = forms.DocumentProcessForm(prefix="process")
 
-    form = forms.DocumentUploadForm()
+    if request.method == "POST":
+        if upload_form.validate_on_submit():
+            uploaded_file = request.files["uploaded_file"]
+            if uploaded_file and allowed_file(uploaded_file.filename):
+                filename = secure_filename(uploaded_file.filename)
+                dest_path = os.path.join(app.config["UPLOAD_DIR"],
+                    filename)
+                uploaded_file.save(dest_path)
+                #TODO: send the user somewhere useful?
+                unit = Unit(path=dest_path, project=proj_id)
+                unit.save()
 
     file_info = {}
     file_objects = session.query(Unit).filter(Unit.project == proj_id).\
@@ -61,4 +63,4 @@ def project_show(proj_id):
     project = session.query(Project).filter(Project.id == proj_id).one()
 
     return render_template("document_list.html", files=file_info,
-        project=project, form=form)
+        project=project, upload_form=upload_form, process_form=process_form)
