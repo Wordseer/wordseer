@@ -44,7 +44,6 @@ class Base(object):
 
     # Define the primary key
     id = Column(Integer, primary_key=True)
-    #FIXME: this overrides the builtin id()
 
     def save(self):
         """Commits this model instance to the database.

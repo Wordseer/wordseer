@@ -46,16 +46,14 @@ def project_show(proj_id):
     process_form = forms.DocumentProcessForm(prefix="process")
 
     if request.method == "POST":
-        if upload_form.uploaded_file.data:
+        if upload_form.validate():
             uploaded_file = request.files["upload-uploaded_file"]
-            if allowed_file(uploaded_file.filename):
-                filename = secure_filename(uploaded_file.filename)
-                dest_path = os.path.join(app.config["UPLOAD_DIR"],
-                    filename)
-                uploaded_file.save(dest_path)
-                #TODO: send the user somewhere useful?
-                unit = Unit(path=dest_path, project=proj_id)
-                unit.save()
+            filename = secure_filename(uploaded_file.filename)
+            dest_path = os.path.join(app.config["UPLOAD_DIR"],
+                filename)
+            uploaded_file.save(dest_path)
+            unit = Unit(path=dest_path, project=proj_id)
+            unit.save()
         #TODO: check other form as well
 
     file_info = {}
