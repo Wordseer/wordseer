@@ -32,7 +32,7 @@
             {% for id, name in files.iteritems() %}
             <tr>
                 <td>
-                    <a href="{{ url_for('document_show', doc_id=id) }}">
+                    <a href="{{ url_for('document_show', document_id=id) }}">
                         {{ name }}
                     </a>
                 </td>

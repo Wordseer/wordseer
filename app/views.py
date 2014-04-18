@@ -33,8 +33,8 @@ def projects():
 
     return render_template("project_list.html", form=form, projects=projects)
 
-@app.route(PROJECT_ROUTE + "<proj_id>", methods=["GET", "POST"])
-def project_show(proj_id):
+@app.route(PROJECT_ROUTE + "<project_id>", methods=["GET", "POST"])
+def project_show(project_id):
     """
     Show the files contained in a specific project. It also allows the user
     to upload a new document, much like projects().
@@ -57,12 +57,12 @@ def project_show(proj_id):
         #TODO: check other form as well
 
     file_info = {}
-    file_objects = session.query(Unit).filter(Unit.project == proj_id).\
+    file_objects = session.query(Unit).filter(Unit.project == project_id).\
         filter(Unit.path != None).all()
     for file_object in file_objects:
         file_info[file_object.id] = os.path.split(file_object.path)[1]
 
-    project = session.query(Project).filter(Project.id == proj_id).one()
+    project = session.query(Project).filter(Project.id == project_id).one()
 
     return render_template("document_list.html", files=file_info,
         project=project, upload_form=upload_form, process_form=process_form)
@@ -86,8 +86,8 @@ def project_show(proj_id):
     ##TODO: these paths are ugly
     #return render_template("document_index.html", files=file_list)
 
-@app.route(DOCUMENT_ROUTE + '<doc_id>')
-def document_show(doc_id):
+@app.route(DOCUMENT_ROUTE + '<document_id>')
+def document_show(document_id):
     """
     The show action, which shows details for a particular document.
 
