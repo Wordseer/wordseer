@@ -13,16 +13,18 @@
     <button type="submit" class="btn btn-default">Submit</button>
 </form>
 <h2>Existing projects</h2>
-<table class="table table-striped">
+<table class="table table-striped table-hover">
     <thead>
         <tr><th>Project Name</th></tr>
     </thead>
     {% for project in projects %}
-    <tr><td>
+    <tr>
+    <td>
         <a href="{{ url_for('project_show', proj_id=project.id) }}">
             {{ project.name }}
         </a>
-    </td></tr>
+    </td>
+    </tr>
     {% endfor %}
 </table>
 {% endblock %}
