@@ -32,12 +32,13 @@
             {% for id, name in files.iteritems() %}
             <tr>
                 <td>
-                    <a href="{{ url_for('document_show', document_id=id) }}">
+                    <a href="{{ url_for('document_show',
+                        document_id=id, project_id=project.id) }}">
                         {{ name }}
                     </a>
                 </td>
                 <td>
-                    <input name="{{ id }}" type="checkbox" />
+                    <input name="process-{{ id }}" type="checkbox" />
                 </td>
             </tr>
             {% endfor %}
