@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block head %}
+{% block scripts %}
 <script>
 $('.click-anywhere tr').click(function (e) {
     if(!$(e.target).is('td input:checkbox') && !$(e.target).is('th') )
@@ -33,7 +33,7 @@ $('.click-anywhere a').click(function (e) {
             <th>Select for processing</th>
         </tr>
     </thead>
-        <tbody>
+    <tbody>
         {% for id, name in files.iteritems() %}
         <tr>
             <td>
@@ -42,7 +42,7 @@ $('.click-anywhere a').click(function (e) {
                 </a>
             </td>
             <td>
-                <input name="{{ id }}" type="checkbox">
+                <input name="{{ id }}" type="checkbox" />
             </td>
         </tr>
         {% endfor %}
