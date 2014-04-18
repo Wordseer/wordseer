@@ -12,9 +12,6 @@ from models import session, Unit, Project
 PROJECT_ROUTE = "/projects/"
 DOCUMENT_ROUTE = "/documents/"
 
-def allowed_file(filename):
-    return os.path.splitext(filename)[1] in app.config["ALLOWED_EXTENSIONS"]
-
 @app.route(PROJECT_ROUTE, methods=["GET", "POST"])
 def projects():
     """
