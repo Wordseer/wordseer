@@ -1,4 +1,5 @@
 import os
+import pprint
 
 from flask import render_template, request
 from werkzeug import secure_filename
@@ -23,7 +24,7 @@ def projects():
     """
     form = forms.ProjectCreateForm()
 
-    if request.method == "POST" and form.validate():
+    if form.validate_on_submit():
         #TODO: is this secure? maybe not
         project = Project(name=form.name.data)
         project.save()
@@ -45,9 +46,9 @@ def project_show(proj_id):
     process_form = forms.DocumentProcessForm(prefix="process")
 
     if request.method == "POST":
-        if upload_form.validate_on_submit():
-            uploaded_file = request.files["uploaded_file"]
-            if uploaded_file and allowed_file(uploaded_file.filename):
+        if upload_form.uploaded_file.data:
+            uploaded_file = request.files["upload-uploaded_file"]
+            if allowed_file(uploaded_file.filename):
                 filename = secure_filename(uploaded_file.filename)
                 dest_path = os.path.join(app.config["UPLOAD_DIR"],
                     filename)
@@ -55,6 +56,7 @@ def project_show(proj_id):
                 #TODO: send the user somewhere useful?
                 unit = Unit(path=dest_path, project=proj_id)
                 unit.save()
+        #TODO: check other form as well
 
     file_info = {}
     file_objects = session.query(Unit).filter(Unit.project == proj_id).\
