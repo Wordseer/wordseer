@@ -10,5 +10,3 @@ CsrfProtect(app)
 
 from app.views import *
 from app.models import *
-
-#TODO: these imports are all over the place

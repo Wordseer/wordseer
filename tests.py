@@ -3,7 +3,10 @@ import unittest
 
 from app.models import *
 
-class TestCase(unittest.TestCase):
+#TODO: unit tests shouldn't rely on human checking of their output
+#TODO: this outputs too much!
+
+class TestWordseer(unittest.TestCase):
     def setUp(self):
         # TODO: figure out how to set up a test database
         pass
@@ -11,55 +14,98 @@ class TestCase(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_basic_model(self):
-        """Basic sanity test to make sure nothing major has broken.
+    def test_model_word(self):
+        """Test to make sure that the atttributes of the Word model can be
+        properly set.
         """
 
-        # Try creating an instance of all models
-        w1 = Word()
-        w2 = Word()
-        s1 = Sentence()
-        u1 = Unit()
-        p1 = Property()
+        string_1 = "hello"
+        string_2 = "world"
 
-        # Set attributes
-        w1.word = "hello"
-        w2.word = "world"
+        word_1 = Word()
+        word_2 = Word()
 
-        s1.text = "hello world"
+        word_1.word = string_1
+        word_2.word = string_2
 
-        u1.unit_type = "section"
-        u1.number = 1
+        assert word_1.word == string_1
+        assert word_2.word == string_2
 
-        p1.name = "title"
-        p1.value = "Hello World"
+        word_1.save()
+        word_2.save()
 
-        print("Words", w1.word, w2.word)
-        print("Sentence", s1.text)
-        print("Unit", u1.unit_type, u1.number)
-        print("Property", p1.name, p1.value)
+    def test_model_sentence(self):
+        """Test to make sure that Sentence is working properly.
+        """
 
-        # Try relationships
-        s1.words.append(w1)
-        s1.words.append(w2)
+        text = "hello world"
+        sentence = Sentence()
+        sentence.text = text
 
-        u1.sentences.append(s1)
+        assert sentence.text == text
 
-        u1.properties.append(p1)
+        word_1 = Word(word="hello")
+        word_2 = Word(word="world")
 
-        print("sentence.words", s1.words)
-        print("unit.sentences", u1.sentences)
-        print("unit.properties", u1.properties)
+        sentence.words.append(word_1)
+        sentence.words.append(word_2)
 
-        # Try saving all models
-        models = [w1, w2, s1, u1, p1]
-        [ model.save() for model in models ]
+        assert sentence.words == [word_1, word_2]
 
-        # Try querying for the models again
-        p2 = Property.filter(Property.name=='title' and Property.value=='Hello World').first()
-        u2 = p2.unit
+        sentence.save()
 
-        print("\"Hello World\" unit: ", u2.sentences)
+    def test_model_unit(self):
+        """Test to make sure that Unit is working properly.
+        """
+
+        unit_type = "section"
+        number = 1
+
+        unit = Unit()
+
+        unit.unit_type = unit_type
+        unit.number = number
+
+        assert unit.unit_type == unit_type
+        assert unit.number == number
+
+        sentence = Sentence()
+        sentence.words = [Word(word="hello"), Word(word="world")]
+        prop = Property(name="title", value="Hello World")
+
+        unit.sentences.append(sentence)
+        unit.properties.append(prop)
+
+        assert unit.sentences == [sentence]
+        assert unit.properties == [prop]
+
+        unit.save()
+
+        retrieved_prop = session.query(Property).filter(name=="title").\
+            filter(value == "Hello World").first()
+        assert retrieved_prop.unit == unit
+
+    def test_model_property(self):
+        """Test ot make sure that Property is working properly.
+        """
+
+        prop = Property()
+
+        name = "title"
+        value = "Hello World"
+
+        prop.name = name
+        prop.value = value
+
+        assert prop.name == name
+        assert prop.value == value
+
+        prop.save()
+
+        retrieved_prop = session.query(Property).filter(name=="title").\
+            filter(value == "Hello World").first()
+
+        assert retrieved_prop == prop
 
     def test_sample_document(self):
         """Test turning a document file into the corresponding models.
@@ -67,7 +113,7 @@ class TestCase(unittest.TestCase):
         Once a document has been imported as an object, it should use the
         Unit constructor to initialize and save all models for the document.
         """
-
+        #TODO: this doesn't test anything
         # Import the document.
         document = self.import_document("sample_document.txt")
         doc_unit = Unit(document)
@@ -96,7 +142,8 @@ class TestCase(unittest.TestCase):
 
                 if words:
                     if words[0][-1] == ":":
-                        doc_dict["properties"][words[0][:-1]] = " ".join(words[1:])
+                        doc_dict["properties"][words[0][:-1]] = " ".join(
+                            words[1:])
                     else:
                         doc_dict["sentences"].append((line, words))
                 else:

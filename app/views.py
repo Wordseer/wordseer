@@ -52,6 +52,7 @@ def project_show(project_id):
             unit = Unit(path=dest_path, project=project_id)
             unit.save()
         #TODO: check other form as well
+        #TODO: multiple file upload
 
     file_info = {}
     file_objects = session.query(Unit).filter(Unit.project == project_id).\
