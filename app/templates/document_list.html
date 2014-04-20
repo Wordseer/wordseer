@@ -11,9 +11,8 @@
     role="form">
     {{ upload_form.hidden_tag() }}
     <div class="form-group">
-        <label for="upload-uploaded_file" class="sr-only">File</label>
-        {{ upload_form.uploaded_file }}
-        <!--<input type="file" id="upload_uploaded_file" name="upload_uploaded_file">-->
+        {{ upload_form.uploaded_file.label(class="sr-only") }}
+        {{ upload_form.uploaded_file(multiple="multiple") }}
         <p class="help-block">File should be JSON or XML.</p>
     </div>
     <button type="submit" class="btn btn-default">Upload</button>

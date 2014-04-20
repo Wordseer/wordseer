@@ -14,7 +14,7 @@ class DocumentUploadForm(Form):
     and JSON files, and is used by the document_upload view.
     """
 
-    uploaded_file = FileField("Document", validators=[
+    uploaded_file = FileField("File", validators=[
         FileRequired(),
         FileAllowed(app.config["ALLOWED_EXTENSIONS"])
         ])

@@ -42,15 +42,15 @@ def project_show(project_id):
 
     if request.method == "POST":
         if upload_form.validate():
-            uploaded_file = request.files["upload-uploaded_file"]
-            filename = secure_filename(uploaded_file.filename)
-            dest_path = os.path.join(app.config["UPLOAD_DIR"],
-                filename)
-            uploaded_file.save(dest_path)
-            unit = Unit(path=dest_path, project=project_id)
-            unit.save()
+            uploaded_files = request.files.getlist("upload-uploaded_file")
+            for uploaded_file in uploaded_files:
+                filename = secure_filename(uploaded_file.filename)
+                dest_path = os.path.join(app.config["UPLOAD_DIR"],
+                    filename)
+                uploaded_file.save(dest_path)
+                unit = Unit(path=dest_path, project=project_id)
+                unit.save()
         #TODO: check other form as well
-        #TODO: multiple file upload
 
     file_info = {}
     file_objects = session.query(Unit).filter(Unit.project == project_id).\

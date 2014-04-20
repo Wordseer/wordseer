@@ -7,16 +7,16 @@ import os
 import tempfile
 import unittest
 
-import config
+#import config
 #from config import basedir
-#from app import app
+from app import app
 #from app.models import *
 
 # TODO: more elegant way to do this? this code is a horrible mess
 tmp_db = tempfile.NamedTemporaryFile()
-config.SQLALCHEMY_DATABASE_URI = "sqlite:///" + tmp_db.name
-config.SQLALCHEMY_ECHO = False
-config.WTF_CSRF_ENABLED = False
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + tmp_db.name
+app.config["SQLALCHEMY_ECHO"] = False
+app.config["WTF_CSRF_ENABLED"] = False
 from app.models import *
 Base.metadata.create_all(engine)
 import app
@@ -165,7 +165,7 @@ class ViewsTests(unittest.TestCase):
 
     def test_projects_post(self):
         upload_dir = tempfile.mkdtemp()
-        config.UPLOAD_DIR = upload_dir
+        app.config["UPLOAD_DIR"] = upload_dir
         result = client.post("/projects/", data=dict(
             upload_var=(StringIO("Test file"), "test.xml")))
         uploaded_file = open(os.path.join(upload_dir, "test.xml"))

@@ -9,4 +9,4 @@ app.config.from_object('config')
 CsrfProtect(app)
 
 from app.views import *
-from app.models import *
+#from app.models import *
