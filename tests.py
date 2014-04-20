@@ -12,12 +12,14 @@ import config
 #from app.models import *
 
 
-# TODO: more elegant way to do this? importing up here
+# TODO: more elegant way to do this? this code is a horrible mess
 db_file, db_path = tempfile.mkstemp()
 config.SQLALCHEMY_DATABASE_URI = "sqlite:///" + db_path
 config.SQLALCHEMY_ECHO = False
 from app.models import *
-Base.metadata.create_all(engine) 
+Base.metadata.create_all(engine)
+import app
+client = app.app.test_client()
 
 class TestModels(unittest.TestCase):
     def setUp(self):
