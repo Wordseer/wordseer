@@ -5,6 +5,7 @@ This file stores all the relevant forms for the web application.
 from flask_wtf import Form
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import TextField
+from wtforms.validators import Required
 
 from app import app
 
@@ -15,7 +16,8 @@ class DocumentUploadForm(Form):
 
     uploaded_file = FileField("Document", validators=[
         FileRequired(),
-        FileAllowed(app.config["ALLOWED_EXTENSIONS"])])
+        FileAllowed(app.config["ALLOWED_EXTENSIONS"])
+        ])
 
 class DocumentProcessForm(Form):
     """
@@ -29,4 +31,6 @@ class ProjectCreateForm(Form):
     desired name of the project.
     """
 
-    name = TextField("Project Name")
+    name = TextField("Project Name", validators=[
+        Required()
+        ])

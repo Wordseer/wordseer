@@ -160,18 +160,15 @@ class ViewsTests(unittest.TestCase):
     def test_projects_empty_post(self):
         """Test POSTing without a file to the projects view.
         """
-        result = client.post("/projects/", follow_redirects=True)
-        print result.data
+        result = client.post("/projects/")
         assert "no projects" in result.data
 
-    def test_projects_post(self, mock_secure_filename):
-        upload_dir = mkdtemp()
+    def test_projects_post(self):
+        upload_dir = tempfile.mkdtemp()
         config.UPLOAD_DIR = upload_dir
         result = client.post("/projects/", data=dict(
             upload_var=(StringIO("Test file"), "test.xml")))
-        uploaded_file = open(upload_dir + "test.xml")
-        
-        
+        uploaded_file = open(os.path.join(upload_dir, "test.xml"))
 
 @unittest.skip("Should be rewritten to use David's code.")
 class ImportTests(unittest.TestCase):

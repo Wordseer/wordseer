@@ -16,7 +16,7 @@ def projects():
     already created projects owned by the user.
     """
     form = forms.ProjectCreateForm()
-
+    print app.config["UPLOAD_DIR"]
     if form.validate_on_submit():
         #TODO: is this secure? maybe not
         project = Project(name=form.name.data)
@@ -38,6 +38,7 @@ def project_show(project_id):
 
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.DocumentProcessForm(prefix="process")
+
 
     if request.method == "POST":
         if upload_form.validate():
