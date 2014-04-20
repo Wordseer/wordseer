@@ -6,7 +6,7 @@ from app.models import *
 #TODO: unit tests shouldn't rely on human checking of their output
 #TODO: this outputs too much!
 
-class TestWordseer(unittest.TestCase):
+class TestModels(unittest.TestCase):
     def setUp(self):
         # TODO: figure out how to set up a test database
         pass
@@ -107,6 +107,8 @@ class TestWordseer(unittest.TestCase):
 
         assert retrieved_prop == prop
 
+@unittest.skip("Should be rewritten to use David's code.")
+class ImportTests(unittest.TestCase):
     def test_sample_document(self):
         """Test turning a document file into the corresponding models.
 
