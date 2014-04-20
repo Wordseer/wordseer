@@ -2,6 +2,7 @@ import os
 import pprint
 
 from flask import render_template, request
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug import secure_filename
 
 from app import app
@@ -36,6 +37,12 @@ def project_show(project_id):
 
     :param int project_id: The ID of the desired project.
     """
+
+    # Test if this project exists
+    try:
+        session.query(Project).filter(Project.id == project_id).one()
+    except NoResultFound:
+        return render_template("project_not_found.html")
 
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.DocumentProcessForm(prefix="process")
