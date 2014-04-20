@@ -16,7 +16,7 @@ from sqlalchemy.orm import backref, relationship, sessionmaker
 from config import *
 
 # create database connection
-engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
+engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=SQLALCHEMY_ECHO)
 Session = sessionmaker(bind=engine)
 session = Session()
 

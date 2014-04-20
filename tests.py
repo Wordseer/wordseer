@@ -1,15 +1,18 @@
 import os
+import tempfile
 import unittest
+
+import config
+config.SQLALCHEMY_ECHO = False # TODO: more elegant way to do this?
 
 from app.models import *
 
 #TODO: unit tests shouldn't rely on human checking of their output
-#TODO: this outputs too much!
 
 class TestModels(unittest.TestCase):
     def setUp(self):
-        # TODO: figure out how to set up a test database
-        pass
+        self.db_file, db_path = tempfile.mkstemp()
+        config.SQLALCHEMY_DATABASE_URI = "sqlite:///" + db_path
 
     def tearDown(self):
         pass
@@ -81,8 +84,9 @@ class TestModels(unittest.TestCase):
 
         unit.save()
 
-        retrieved_prop = session.query(Property).filter(name=="title").\
-            filter(value == "Hello World").first()
+        retrieved_prop = session.query(Property).\
+            filter(Property.name=="title").\
+            filter(Property.value == "Hello World").first()
         assert retrieved_prop.unit == unit
 
     def test_model_property(self):
