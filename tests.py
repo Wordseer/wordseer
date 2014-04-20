@@ -105,8 +105,6 @@ class TestModels(unittest.TestCase):
             filter(Property.name=="title").\
             filter(Property.value == "Hello World").first()
 
-        print retrieved_prop.unit
-        
         assert retrieved_prop.unit.unit_type == unit.unit_type
         assert retrieved_prop.unit.number == unit.number
 
