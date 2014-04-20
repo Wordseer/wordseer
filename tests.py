@@ -12,8 +12,7 @@ import config
 #from app.models import *
 
 
-# TODO: more elegant way to do this? importing in a function is just
-# terrible
+# TODO: more elegant way to do this? importing up here
 db_file, db_path = tempfile.mkstemp()
 config.SQLALCHEMY_DATABASE_URI = "sqlite:///" + db_path
 config.SQLALCHEMY_ECHO = False
@@ -29,6 +28,7 @@ class TestModels(unittest.TestCase):
 #        self.db_file, db_path = tempfile.mkstemp()
 #        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 #        self.app = app.test_client()
+        pass
 
     def tearDown(self):
         pass
