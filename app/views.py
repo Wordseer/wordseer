@@ -8,11 +8,7 @@ from app import app
 import forms
 from models import session, Unit, Project
 
-#TODO: put these in config?
-PROJECT_ROUTE = "/projects/"
-DOCUMENT_ROUTE = "/documents/"
-
-@app.route(PROJECT_ROUTE, methods=["GET", "POST"])
+@app.route(app.config["PROJECT_ROUTE"], methods=["GET", "POST"])
 def projects():
     """
     This view handles projects. It includes a form at the top to
@@ -30,7 +26,8 @@ def projects():
 
     return render_template("project_list.html", form=form, projects=projects)
 
-@app.route(PROJECT_ROUTE + "<project_id>", methods=["GET", "POST"])
+@app.route(app.config["PROJECT_ROUTE"] + "<project_id>",
+    methods=["GET", "POST"])
 def project_show(project_id):
     """
     Show the files contained in a specific project. It also allows the user
@@ -66,7 +63,8 @@ def project_show(project_id):
         project=project, upload_form=upload_form, process_form=process_form)
 
 
-@app.route(PROJECT_ROUTE + "<project_id>" + DOCUMENT_ROUTE + '<document_id>')
+@app.route(app.config["PROJECT_ROUTE"] + "<project_id>" +
+    app.config["PROJECT_ROUTE"] + '<document_id>')
 def document_show(project_id, document_id):
     """
     The show action, which shows details for a particular document.
@@ -75,7 +73,8 @@ def document_show(project_id, document_id):
     """
     return render_template("document_show.html")
 
-@app.route(PROJECT_ROUTE + "<project_id>" + DOCUMENT_ROUTE + 'create/')
+@app.route(app.config["PROJECT_ROUTE"] + "<project_id>" +
+    app.config["PROJECT_ROUTE"] + 'create/')
 def document_create(project_id):
     """
     The create action for documents, which takes in document files, processes

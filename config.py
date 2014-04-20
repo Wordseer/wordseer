@@ -13,3 +13,7 @@ SECRET_KEY = "secret" #TODO: change this in production
 # Upload config
 UPLOAD_DIR = os.path.join(basedir, 'app/uploads')
 ALLOWED_EXTENSIONS = ["xml", "json"]
+
+# Routing URLS
+PROJECT_ROUTE = "/projects/"
+DOCUMENT_ROUTE = "/documents/"

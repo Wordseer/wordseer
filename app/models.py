@@ -144,11 +144,6 @@ class Unit(Base):
 
     properties = relationship("Property", backref=backref("unit"))
 
-    #FIXME: is this necessary?
-    #def __init__(self):
-    #    """Default empty constructor """
-    #    pass
-    
     def __init__(self, document=None, **kwargs):
         """Initialize a top-level document unit from a document file.
 

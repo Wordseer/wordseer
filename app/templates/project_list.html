@@ -14,24 +14,28 @@
     <button type="submit" class="btn btn-default">Create</button>
 </form>
 <h2>Existing projects</h2>
-<table class="table table-striped table-hover">
-    <thead>
+{% if projects %}
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Project Name</th>
+                <th>Delete Project</th>
+            </tr>
+        </thead>
+        {% for project in projects %}
         <tr>
-            <th>Project Name</th>
-            <th>Delete Project</th>
+        <td>
+            <a href="{{ url_for('project_show', project_id=project.id) }}">
+                {{ project.name }}
+            </a>
+        </td>
+        <td>
+            Delete
+        </td>
         </tr>
-    </thead>
-    {% for project in projects %}
-    <tr>
-    <td>
-        <a href="{{ url_for('project_show', project_id=project.id) }}">
-            {{ project.name }}
-        </a>
-    </td>
-    <td>
-        Delete
-    </td>
-    </tr>
-    {% endfor %}
-</table>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>You own no projects.</p>
+{% endif %}
 {% endblock %}

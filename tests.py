@@ -2,6 +2,7 @@
 Unit tests for the components of the wordseer web interface.
 """
 
+from cStringIO import StringIO
 import os
 import tempfile
 import unittest
@@ -11,11 +12,11 @@ import config
 #from app import app
 #from app.models import *
 
-
 # TODO: more elegant way to do this? this code is a horrible mess
-db_file, db_path = tempfile.mkstemp()
-config.SQLALCHEMY_DATABASE_URI = "sqlite:///" + db_path
+tmp_db = tempfile.NamedTemporaryFile()
+config.SQLALCHEMY_DATABASE_URI = "sqlite:///" + tmp_db.name
 config.SQLALCHEMY_ECHO = False
+config.WTF_CSRF_ENABLED = False
 from app.models import *
 Base.metadata.create_all(engine)
 import app
@@ -132,6 +133,45 @@ class TestModels(unittest.TestCase):
 
         assert retrieved_prop.name == prop.name
         assert retrieved_prop.value == prop.value
+
+class ViewsTests(unittest.TestCase):
+    def setUp(self):
+        """Clear the database for the next unit test.
+        """
+        # TODO: this is awful, hopefully flask.ext.sqlalchemy will save us
+        tmp_db.truncate(0)
+        engine = create_engine("sqlite:///" + tmp_db.name)
+        Base.metadata.create_all(engine)
+
+    def test_no_projects(self):
+        """Test the projects view with no projects present.
+        """
+        result = client.get("/projects/")
+        assert "no projects" in result.data
+
+    def test_projects(self):
+        """Test the projects view with a project present.
+        """
+        new_project = Project(name="test")
+        new_project.save()
+        result = client.get("/projects/")
+        assert "/projects/1" in result.data
+
+    def test_projects_empty_post(self):
+        """Test POSTing without a file to the projects view.
+        """
+        result = client.post("/projects/", follow_redirects=True)
+        print result.data
+        assert "no projects" in result.data
+
+    def test_projects_post(self, mock_secure_filename):
+        upload_dir = mkdtemp()
+        config.UPLOAD_DIR = upload_dir
+        result = client.post("/projects/", data=dict(
+            upload_var=(StringIO("Test file"), "test.xml")))
+        uploaded_file = open(upload_dir + "test.xml")
+        
+        
 
 @unittest.skip("Should be rewritten to use David's code.")
 class ImportTests(unittest.TestCase):
