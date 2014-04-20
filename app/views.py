@@ -16,11 +16,12 @@ def projects():
     already created projects owned by the user.
     """
     form = forms.ProjectCreateForm()
-    print app.config["UPLOAD_DIR"]
+
     if form.validate_on_submit():
         #TODO: is this secure? maybe not
         project = Project(name=form.name.data)
         project.save()
+        os.mkdir(os.path.join(app.config["UPLOAD_DIR"], str(project.id)))
 
     projects = Project.all().all()
 
@@ -39,14 +40,13 @@ def project_show(project_id):
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.DocumentProcessForm(prefix="process")
 
-
     if request.method == "POST":
         if upload_form.validate():
             uploaded_files = request.files.getlist("upload-uploaded_file")
             for uploaded_file in uploaded_files:
                 filename = secure_filename(uploaded_file.filename)
                 dest_path = os.path.join(app.config["UPLOAD_DIR"],
-                    filename)
+                    str(project_id), filename)
                 uploaded_file.save(dest_path)
                 unit = Unit(path=dest_path, project=project_id)
                 unit.save()
