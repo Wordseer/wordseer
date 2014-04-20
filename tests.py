@@ -1,18 +1,34 @@
+"""
+Unit tests for the components of the wordseer web interface.
+"""
+
 import os
 import tempfile
 import unittest
 
 import config
-config.SQLALCHEMY_ECHO = False # TODO: more elegant way to do this?
+#from config import basedir
+#from app import app
+#from app.models import *
 
+
+# TODO: more elegant way to do this? importing in a function is just
+# terrible
+db_file, db_path = tempfile.mkstemp()
+config.SQLALCHEMY_DATABASE_URI = "sqlite:///" + db_path
+config.SQLALCHEMY_ECHO = False
 from app.models import *
-
-#TODO: unit tests shouldn't rely on human checking of their output
+Base.metadata.create_all(engine) 
 
 class TestModels(unittest.TestCase):
     def setUp(self):
-        self.db_file, db_path = tempfile.mkstemp()
-        config.SQLALCHEMY_DATABASE_URI = "sqlite:///" + db_path
+        """Set up the database for the models tests.
+        """
+#        app.config['TESTING'] = True
+#        app.config["SQLALCHEMY_ECHO"] = False
+#        self.db_file, db_path = tempfile.mkstemp()
+#        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
+#        self.app = app.test_client()
 
     def tearDown(self):
         pass
@@ -83,10 +99,13 @@ class TestModels(unittest.TestCase):
         assert unit.properties == [prop]
 
         unit.save()
+        prop.save()
 
         retrieved_prop = session.query(Property).\
             filter(Property.name=="title").\
             filter(Property.value == "Hello World").first()
+
+        print retrieved_prop.unit
         
         assert retrieved_prop.unit.unit_type == unit.unit_type
         assert retrieved_prop.unit.number == unit.number
