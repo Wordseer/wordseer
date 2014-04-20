@@ -87,10 +87,12 @@ class TestModels(unittest.TestCase):
         retrieved_prop = session.query(Property).\
             filter(Property.name=="title").\
             filter(Property.value == "Hello World").first()
-        assert retrieved_prop.unit == unit
+        
+        assert retrieved_prop.unit.unit_type == unit.unit_type
+        assert retrieved_prop.unit.number == unit.number
 
     def test_model_property(self):
-        """Test ot make sure that Property is working properly.
+        """Test to make sure that Property is working properly.
         """
 
         prop = Property()
@@ -109,7 +111,8 @@ class TestModels(unittest.TestCase):
         retrieved_prop = session.query(Property).filter(name=="title").\
             filter(value == "Hello World").first()
 
-        assert retrieved_prop == prop
+        assert retrieved_prop.name == prop.name
+        assert retrieved_prop.value == prop.value
 
 @unittest.skip("Should be rewritten to use David's code.")
 class ImportTests(unittest.TestCase):
