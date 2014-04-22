@@ -9,24 +9,27 @@ from wtforms.validators import Required
 
 from app import app
 
-class DocumentUploadForm(Form):
-    """This is a form to upload files to the server. It handles both XML
-    and JSON files, and is used by the document_upload view.
+class HiddenSubmitted(object):
+    """A mixin to provide a hidden field called "submitted" which has a default
+    value of "true".
     """
 
     submitted = HiddenField(default="true")
+
+class DocumentUploadForm(Form, HiddenSubmitted):
+    """This is a form to upload files to the server. It handles both XML
+    and JSON files, and is used by the document_upload view.
+    """
 
     uploaded_file = FileField("File", validators=[
         FileRequired(),
         FileAllowed(app.config["ALLOWED_EXTENSIONS"])
         ])
 
-class DocumentProcessForm(Form):
+class DocumentProcessForm(Form, HiddenSubmitted):
     """
     Allows the user to select which documents should be processed.
     """
-
-    submitted = HiddenField(default="true")
 
     PROCESS_ALL = "0"
     PROCESS_SELECTED = "1"
