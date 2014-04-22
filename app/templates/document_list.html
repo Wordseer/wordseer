@@ -17,7 +17,8 @@
         {{ upload_form.uploaded_file(multiple="multiple") }}
         <p class="help-block">File should be JSON or XML.</p>
     </div>
-    <button type="submit" class="btn btn-default" name="upload">Upload</button>
+    {{ upload_form.upload_button(class="btn btn-default",
+        name="upload") }}
 </form>
 <h2>Existing documents</h2>
 <form method="POST" role="form">
@@ -46,12 +47,8 @@
             {% endfor %}
         </tbody>
     </table>
-    <h3>Document actions:</h3>
-    <button type="submit" class="btn btn-primary" name="action"
-        value="{{ process_form.PROCESS_ALL }}">
-        Process all</button>
-    <button type="submit" class="btn btn-danger" name="action"
-        value="{{ process_form.DELETE_SELECTED }}">
-        Delete selected</button>
+    <h3>Selected file actions:</h3>
+    {{ process_form.process_button(class="btn btn-primary") }}
+    {{ process_form.delete_button(class="btn btn-danger") }}
 </form>
 {% endblock %}
