@@ -7,11 +7,10 @@
     role="form">
     {{ form.hidden_tag() }}
     <div class="form-group">
-        <label for="name" class="sr-only">Project Name</label>
-        <input class="form-control" name="name" id="name"
-            placeholder="Project Name">
+        {{ form.name.label(class="sr-only") }}
+        {{ form.name(placeholder="Project Name", class="form-control") }}
     </div>
-    <button type="submit" class="btn btn-default">Create</button>
+    {{ form.create_button(class="btn btn-primary") }}
 </form>
 <h2>Existing projects</h2>
 {% if projects %}
@@ -30,7 +29,7 @@
             </a>
         </td>
         <td>
-            Delete
+            Select
         </td>
         </tr>
         {% endfor %}

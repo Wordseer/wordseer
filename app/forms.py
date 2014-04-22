@@ -84,3 +84,5 @@ class ProjectCreateForm(Form):
     name = StringField("Project Name", validators=[
         Required()
         ])
+
+    create_button = ButtonField("Create")
