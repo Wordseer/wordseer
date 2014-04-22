@@ -2,6 +2,8 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='click-anywhere.js') }}">
 </script>
+<script src="{{ url_for('static', filename='check-all.js') }}">
+</script>
 {% endblock %}
 {% block title %}Document List{% endblock %}
 {% block body %}
@@ -24,7 +26,7 @@
         <thead>
             <tr>
                 <th>Filename</th>
-                <th>Select</th>
+                <th>Select (<a href="#" id="check-all">All</a>)</th>
             </tr>
         </thead>
         <tbody>
