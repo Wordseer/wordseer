@@ -15,7 +15,7 @@
         {{ upload_form.uploaded_file(multiple="multiple") }}
         <p class="help-block">File should be JSON or XML.</p>
     </div>
-    <button type="submit" class="btn btn-default">Upload</button>
+    <button type="submit" class="btn btn-default" name="upload">Upload</button>
 </form>
 <h2>Existing documents</h2>
 <form method="POST" role="form">
@@ -37,7 +37,8 @@
                     </a>
                 </td>
                 <td>
-                    <input name="process-{{ id }}" type="checkbox" />
+                    <input name="selected_files" value="{{ id }}"
+                        type="checkbox" />
                 </td>
             </tr>
             {% endfor %}

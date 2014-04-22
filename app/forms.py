@@ -4,7 +4,7 @@ This file stores all the relevant forms for the web application.
 
 from flask_wtf import Form
 from flask_wtf.file import FileAllowed, FileField, FileRequired
-from wtforms import TextField
+from wtforms import TextField, HiddenField
 from wtforms.validators import Required
 
 from app import app
@@ -13,6 +13,8 @@ class DocumentUploadForm(Form):
     """This is a form to upload files to the server. It handles both XML
     and JSON files, and is used by the document_upload view.
     """
+
+    submitted = HiddenField(default="true")
 
     uploaded_file = FileField("File", validators=[
         FileRequired(),
@@ -23,6 +25,8 @@ class DocumentProcessForm(Form):
     """
     Allows the user to select which documents should be processed.
     """
+
+    submitted = HiddenField(default="true")
 
     PROCESS_ALL = "0"
     PROCESS_SELECTED = "1"

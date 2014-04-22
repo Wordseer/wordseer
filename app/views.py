@@ -9,6 +9,18 @@ from app import app
 import forms
 from models import session, Unit, Project
 
+def really_submitted(form):
+    """ WTForms can be really finnicky when it comes to checking if a form
+    has actually been submitted, so this method runs validate_on_submit()
+    on the given form and checks if its "submitted" field has any data. Useful
+    for pages that have two forms on them.
+
+    :arg Form form: A form to check for submission.
+    :returns boolean: True if submitted, false otherwise.
+    """
+
+    return form.validate_on_submit() and form.submitted.data
+
 @app.route(app.config["PROJECT_ROUTE"], methods=["GET", "POST"])
 def projects():
     """
@@ -47,18 +59,22 @@ def project_show(project_id):
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.DocumentProcessForm(prefix="process")
 
-    if request.method == "POST":
-        if upload_form.validate():
-            uploaded_files = request.files.getlist("upload-uploaded_file")
-            for uploaded_file in uploaded_files:
-                filename = secure_filename(uploaded_file.filename)
-                dest_path = os.path.join(app.config["UPLOAD_DIR"],
-                    str(project_id), filename)
-                uploaded_file.save(dest_path)
-                unit = Unit(path=dest_path, project=project_id)
-                unit.save()
-        if process_form.validate():
-            print request.form["action"]
+    if really_submitted(upload_form):
+        print "UPLOAD FORM*************"
+        uploaded_files = request.files.getlist("upload-uploaded_file")
+        for uploaded_file in uploaded_files:
+            filename = secure_filename(uploaded_file.filename)
+            dest_path = os.path.join(app.config["UPLOAD_DIR"],
+                str(project_id), filename)
+            uploaded_file.save(dest_path)
+            unit = Unit(path=dest_path, project=project_id)
+            unit.save()
+
+    if really_submitted(process_form):
+        print "PROCESS FORM************"
+        files = request.form.getlist("process-selected_files")
+        print files
+        print request.form["action"]
 
     file_info = {}
     file_objects = session.query(Unit).filter(Unit.project == project_id).\
