@@ -32,7 +32,6 @@ class DocumentProcessForm(Form, HiddenSubmitted):
     """
 
     PROCESS_ALL = "0"
-    PROCESS_SELECTED = "1"
     DELETE_SELECTED = "-1"
 
 class ProjectCreateForm(Form):
