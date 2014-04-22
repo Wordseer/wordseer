@@ -23,7 +23,10 @@ class DocumentProcessForm(Form):
     """
     Allows the user to select which documents should be processed.
     """
-    pass
+
+    PROCESS_ALL = "0"
+    PROCESS_SELECTED = "1"
+    DELETE_SELECTED = "-1"
 
 class ProjectCreateForm(Form):
     """

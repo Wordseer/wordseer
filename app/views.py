@@ -57,7 +57,8 @@ def project_show(project_id):
                 uploaded_file.save(dest_path)
                 unit = Unit(path=dest_path, project=project_id)
                 unit.save()
-        #TODO: check other form as well
+        if process_form.validate():
+            print request.form["action"]
 
     file_info = {}
     file_objects = session.query(Unit).filter(Unit.project == project_id).\
