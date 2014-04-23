@@ -21,18 +21,20 @@
                 <th>Delete Project</th>
             </tr>
         </thead>
-        {% for project in projects %}
-        <tr>
-        <td>
-            <a href="{{ url_for('project_show', project_id=project.id) }}">
-                {{ project.name }}
-            </a>
-        </td>
-        <td>
-            Select
-        </td>
-        </tr>
-        {% endfor %}
+        <tbody>
+            {% for project in projects %}
+            <tr>
+            <td>
+                <a href="{{ url_for('project_show', project_id=project.id) }}">
+                    {{ project.name }}
+                </a>
+            </td>
+            <td>
+                Select
+            </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 {% else %}
     <p>You own no projects.</p>
