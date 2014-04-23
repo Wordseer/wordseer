@@ -1,7 +1,7 @@
 import os
 import pprint
 
-from flask import render_template, request
+from flask import render_template, request, abort
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug import secure_filename
 
@@ -20,6 +20,17 @@ def really_submitted(form):
     """
 
     return form.validate_on_submit() and form.submitted.data
+
+def render_if_404(model, attribute, value, template, **kwargs):
+    try:
+        session.query(model).filter(attribute == value).one()
+    except NoResultFound:
+        abort(404)
+        #return render_template(template, **kwargs)
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("404.html"), 404
 
 @app.route(app.config["PROJECT_ROUTE"], methods=["GET", "POST"])
 def projects():
@@ -51,10 +62,11 @@ def project_show(project_id):
     """
 
     # Test if this project exists
-    try:
-        session.query(Project).filter(Project.id == project_id).one()
-    except NoResultFound:
-        return render_template("project_not_found.html")
+    #try:
+        #session.query(Project).filter(Project.id == project_id).one()
+    #except NoResultFound:
+        #return render_template("item_not_found.html", item="Project")
+    render_if_404(Project, Project.id, project_id, "item_not_found.html", item="project")
 
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.DocumentProcessForm(prefix="process")
