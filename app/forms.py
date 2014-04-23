@@ -6,8 +6,8 @@ from cgi import escape
 
 from flask_wtf import Form
 from flask_wtf.file import FileAllowed, FileField, FileRequired
-from wtforms.fields import StringField, HiddenField, Field
-from wtforms.widgets import html_params, HTMLString
+from wtforms.fields import StringField, HiddenField, Field, SelectMultipleField
+from wtforms.widgets import html_params, HTMLString, ListWidget, CheckboxInput
 from wtforms.validators import Required
 
 from app import app
@@ -19,7 +19,7 @@ class HiddenSubmitted(object):
 
     submitted = HiddenField(default="true")
 
-# TODO: might be a good idea to move the Button* classes away
+# TODO: might be a good idea to move the *Field and *Widget classes away
 
 class ButtonWidget(object):
     """A widget to conveniently display buttons.
@@ -50,6 +50,16 @@ class ButtonField(Field):
     def _value(self):
         return str(self.text)
 
+class MultiCheckboxField(SelectMultipleField):
+    """
+    A multiple-select, except displays a list of checkboxes.
+
+    Iterating the field will produce subfields, allowing custom rendering of
+    the enclosed checkbox fields.
+    """
+    widget = ListWidget(prefix_label=False)
+    option_widget = CheckboxInput()
+
 class DocumentUploadForm(Form, HiddenSubmitted):
     """This is a form to upload files to the server. It handles both XML
     and JSON files, and is used by the document_upload view.
@@ -70,8 +80,11 @@ class DocumentProcessForm(Form, HiddenSubmitted):
     PROCESS = "0"
     DELETE = "-1"
 
+    files = MultiCheckboxField("Select")
     process_button = ButtonField("Process", name="action", value=PROCESS)
     delete_button = ButtonField("Delete",  name="action", value=DELETE)
+
+    
 
 class ProjectCreateForm(Form):
     """

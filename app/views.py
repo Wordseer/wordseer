@@ -29,33 +29,6 @@ def render_if_404(model, attribute, value, template, **kwargs):
         abort(404)
         #return render_template(template, **kwargs)
 
-def processable(files):
-    """Given a list of files, check to make sure that this collection of files
-    can be processed by wordseer. This means checking to make sure that the
-    list contains one and only one file with the STRUCTURE_EXTENSION extension,
-    as well as actual document files.
-
-    :param list files: A list of Unit ids to check.
-    :return: False if this is not a processable set, otherwise the structure
-    file in a list of one item and the documents in a list.
-    """
-    structures = []
-    documents = []
-    print files
-    for file_id in files:
-        file_unit = session.query(Unit).filter(Unit.id == file_id).one()
-        # Cut off leading period
-        file_ext = os.path.splitext(file_unit.path)[1][1:] 
-        if file_ext == app.config["STRUCTURE_EXTENSION"]:
-            structures.append(file_unit)
-        elif file_ext in app.config["ALLOWED_EXTENSIONS"]:
-            documents.append(file_unit)
-
-    if len(structures) is not 1 or len(documents) < 1:
-        return False 
-
-    return structures, documents
-
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template("404.html"), 404
@@ -113,28 +86,24 @@ def project_show(project_id):
         files = request.form.getlist("process-selected_files")
         if len(files) > 0:
             if request.form["action"] == process_form.DELETE:
-                print "Deleting"
-                print files
+                delete(files)
             elif request.form["action"] == process_form.PROCESS:
-                collection = processable(files)
-                if collection:
-                    print "These files can be processed!"
-                    #TODO: ready for processing
-                else:
-                    process_form.errors.\
-                        append("This set of files can't be processed.")
+                #TODO: process these files.
+                pass
 
     # The template needs access to the ID of each file and its filename.
-    file_info = {}
+    process_form.files.choices = []
     file_objects = session.query(Unit).filter(Unit.project == project_id).\
         filter(Unit.path != None).all()
     for file_object in file_objects:
-        file_info[file_object.id] = os.path.split(file_object.path)[1]
+        process_form.files.choices.append((file_object.id,
+            os.path.split(file_object.path)[1]))
+
+    print process_form.files.choices
 
     project = session.query(Project).filter(Project.id == project_id).one()
 
     return render_template("document_list.html",
-        files=file_info,
         project=project,
         upload_form=upload_form,
         process_form=process_form,
@@ -142,7 +111,7 @@ def project_show(project_id):
 
 
 @app.route(app.config["PROJECT_ROUTE"] + "<project_id>" +
-    app.config["PROJECT_ROUTE"] + '<document_id>')
+    app.config["DOCUMENT_ROUTE"] + '<document_id>')
 def document_show(project_id, document_id):
     """
     The show action, which shows details for a particular document.
@@ -152,7 +121,7 @@ def document_show(project_id, document_id):
     return render_template("document_show.html")
 
 @app.route(app.config["PROJECT_ROUTE"] + "<project_id>" +
-    app.config["PROJECT_ROUTE"] + 'create/')
+    app.config["DOCUMENT_ROUTE"] + 'create/')
 def document_create(project_id):
     """
     The create action for documents, which takes in document files, processes
