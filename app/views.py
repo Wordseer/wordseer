@@ -60,7 +60,6 @@ def project_show(project_id):
     process_form = forms.DocumentProcessForm(prefix="process")
 
     if really_submitted(upload_form):
-        print "UPLOAD FORM*************"
         uploaded_files = request.files.getlist("upload-uploaded_file")
         for uploaded_file in uploaded_files:
             filename = secure_filename(uploaded_file.filename)
@@ -84,8 +83,12 @@ def project_show(project_id):
 
     project = session.query(Project).filter(Project.id == project_id).one()
 
-    return render_template("document_list.html", files=file_info,
-        project=project, upload_form=upload_form, process_form=process_form)
+    return render_template("document_list.html",
+        files=file_info,
+        project=project,
+        upload_form=upload_form,
+        process_form=process_form,
+        allowed_extensions=app.config["ALLOWED_EXTENSIONS"])
 
 
 @app.route(app.config["PROJECT_ROUTE"] + "<project_id>" +

@@ -15,7 +15,16 @@
     <div class="form-group">
         {{ upload_form.uploaded_file.label(class="sr-only") }}
         {{ upload_form.uploaded_file(multiple="multiple") }}
-        <p class="help-block">File should be JSON or XML.</p>
+        <p class="help-block">
+            Allowed extensions:
+            {% for ext in allowed_extensions %}
+                {% if loop.last %}
+                    {{ ext }}.
+                {% else %}
+                    {{ ext }},
+                {% endif %}
+            {% endfor %}
+        </p>
     </div>
     {{ upload_form.upload_button(class="btn btn-default",
         name="upload") }}

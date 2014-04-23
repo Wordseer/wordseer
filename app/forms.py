@@ -24,8 +24,6 @@ class HiddenSubmitted(object):
 class ButtonWidget(object):
     """A widget to conveniently display buttons.
     """
-    #html_params = staticmethod(html_params)
-
     def __call__(self, field, **kwargs):
         if field.name is not None:
             kwargs.setdefault('name', field.name)
