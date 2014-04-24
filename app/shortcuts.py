@@ -2,7 +2,11 @@
 Various methods helpful in the wordseer flask app.
 """
 
+from flask import render_template, abort
+from sqlalchemy.orm.exc import NoResultFound
+
 import exceptions
+from models import session
 
 def really_submitted(form):
     """ WTForms can be really finnicky when it comes to checking if a form
@@ -13,6 +17,9 @@ def really_submitted(form):
     :arg Form form: A form to check for submission.
     :returns boolean: True if submitted, false otherwise.
     """
+
+    print "ONSUBMIT"
+    print form.validate_on_submit()
 
     return form.validate_on_submit() and form.submitted.data
 
@@ -33,3 +40,11 @@ def get_object_or_404(model, attribute, value, exception=None):
             raise exception
         except:
             abort(404)
+
+def not_found(item):
+    """Render the item_not_found.html template with item set to the given item,
+    and return a 404 code.
+
+    :arg str item: The name of the item not found.
+    """
+    return render_template("item_not_found.html", item=item), 404

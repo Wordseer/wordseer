@@ -58,6 +58,15 @@ def project_show(project_id):
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.DocumentProcessForm(prefix="process")
 
+    # The template needs access to the ID of each file and its filename.
+    #process_form.files.choices = []
+    process_form.files.choices = []
+    file_objects = session.query(Unit).filter(Unit.project == project_id).\
+        filter(Unit.path != None).all()
+    for file_object in file_objects:
+        process_form.files.choices.append((file_object.id,
+            os.path.split(file_object.path)[1]))
+
     # First handle the actions of the upload form
     if shortcuts.really_submitted(upload_form):
         uploaded_files = request.files.getlist("upload-uploaded_file")
@@ -71,25 +80,14 @@ def project_show(project_id):
 
     # Then what happened with the document selection
     if shortcuts.really_submitted(process_form):
-        print "PROCESS FORM************"
         files = request.form.getlist("process-files")
+        print files
         if len(files) > 0:
             if request.form["action"] == process_form.DELETE:
                 delete(files)
             elif request.form["action"] == process_form.PROCESS:
                 #TODO: process these files.
                 pass
-
-    # The template needs access to the ID of each file and its filename.
-    process_form.files.choices = []
-    file_objects = session.query(Unit).filter(Unit.project == project_id).\
-        filter(Unit.path != None).all()
-    for file_object in file_objects:
-        process_form.files.choices.append((file_object.id,
-            os.path.split(file_object.path)[1]))
-
-    print "CHOICES"
-    print process_form.files.choices
 
     return render_template("document_list.html",
         project=project,

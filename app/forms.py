@@ -84,8 +84,6 @@ class DocumentProcessForm(Form, HiddenSubmitted):
     process_button = ButtonField("Process", name="action", value=PROCESS)
     delete_button = ButtonField("Delete",  name="action", value=DELETE)
 
-    
-
 class ProjectCreateForm(Form):
     """
     Create new projects. This is simply a one-field form, requiring the
