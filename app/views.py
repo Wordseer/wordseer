@@ -6,6 +6,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug import secure_filename
 
 from app import app
+import exceptions
 import forms
 from models import session, Unit, Project
 
@@ -21,17 +22,27 @@ def really_submitted(form):
 
     return form.validate_on_submit() and form.submitted.data
 
-def render_if_404(model, attribute, value, template, **kwargs):
+def get_object_or_404(model, attribute, value, exception=None):
     #FIXME, see issue tracker
     try:
         session.query(model).filter(attribute == value).one()
     except NoResultFound:
-        abort(404)
-        #return render_template(template, **kwargs)
+        try:
+            raise exception
+        except:
+            abort(404)
+
+@app.errorhandler(exceptions.ProjectNotFoundException)
+def page_not_found(error):
+    return render_template("item_not_found.html", item="project"), 404
+
+@app.errorhandler(exceptions.DocumentNotFoundException)
+def document_not_found(error):
+    return render_template("item_not_found.html", item="document"), 404
 
 @app.errorhandler(404)
 def page_not_found(error):
-    return render_template("404.html"), 404
+    return render_template("item_not_found.html", item="page"), 404
 
 @app.route(app.config["PROJECT_ROUTE"], methods=["GET", "POST"])
 def projects():
@@ -63,8 +74,8 @@ def project_show(project_id):
     """
 
     # Test if this project exists
-    render_if_404(Project, Project.id, project_id, "item_not_found.html",
-        item="project")
+    project = get_object_or_404(Project, Project.id, project_id,
+        exceptions.ProjectNotFoundException)
 
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.DocumentProcessForm(prefix="process")
@@ -83,7 +94,7 @@ def project_show(project_id):
     # Then what happened with the document selection
     if really_submitted(process_form):
         print "PROCESS FORM************"
-        files = request.form.getlist("process-selected_files")
+        files = request.form.getlist("process-files")
         if len(files) > 0:
             if request.form["action"] == process_form.DELETE:
                 delete(files)
@@ -99,9 +110,8 @@ def project_show(project_id):
         process_form.files.choices.append((file_object.id,
             os.path.split(file_object.path)[1]))
 
+    print "CHOICES"
     print process_form.files.choices
-
-    project = session.query(Project).filter(Project.id == project_id).one()
 
     return render_template("document_list.html",
         project=project,

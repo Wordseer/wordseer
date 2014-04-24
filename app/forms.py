@@ -80,7 +80,7 @@ class DocumentProcessForm(Form, HiddenSubmitted):
     PROCESS = "0"
     DELETE = "-1"
 
-    files = MultiCheckboxField("Select")
+    files = MultiCheckboxField("Select", coerce=int)
     process_button = ButtonField("Process", name="action", value=PROCESS)
     delete_button = ButtonField("Delete",  name="action", value=DELETE)
 
