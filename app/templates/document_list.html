@@ -40,19 +40,6 @@
                 </tr>
             </thead>
             <tbody>
-<!--                { for file in files.iteritems() %}
-                <tr>
-                    <td>
-                        <a href="{{ url_for('document_show',
-                            document_id=id, project_id=project.id) }}">
-                            {{ name }}
-                        </a>
-                    </td>
-                    <td>
-                        <input name="process-selected_files" value="{{ id }}"
-                            type="checkbox" />
-                    </td>
-                </tr>-->
             {% for file in process_form.files %}
                 <tr>
                     <td>

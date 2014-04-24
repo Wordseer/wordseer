@@ -34,7 +34,7 @@ def get_object_or_404(model, attribute, value, exception=None):
     
     #FIXME, see issue tracker
     try:
-        session.query(model).filter(attribute == value).one()
+        return session.query(model).filter(attribute == value).one()
     except NoResultFound:
         try:
             raise exception
