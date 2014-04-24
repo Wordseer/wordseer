@@ -1,8 +1,7 @@
 import os
 import pprint
 
-from flask import render_template, request, abort
-from sqlalchemy.orm.exc import NoResultFound
+from flask import render_template, request
 from werkzeug import secure_filename
 
 from app import app
@@ -12,16 +11,16 @@ from models import session, Unit, Project
 import shortcuts
 
 @app.errorhandler(exceptions.ProjectNotFoundException)
-def page_not_found(error):
-    return render_template("item_not_found.html", item="project"), 404
+def project_not_found(error):
+    return shortcuts.not_found("project")
 
 @app.errorhandler(exceptions.DocumentNotFoundException)
 def document_not_found(error):
-    return render_template("item_not_found.html", item="document"), 404
+    return shortcuts.not_found("document")
 
 @app.errorhandler(404)
 def page_not_found(error):
-    return render_template("item_not_found.html", item="page"), 404
+    return shortcuts.not_found("page")
 
 @app.route(app.config["PROJECT_ROUTE"], methods=["GET", "POST"])
 def projects():
@@ -53,14 +52,14 @@ def project_show(project_id):
     """
 
     # Test if this project exists
-    project = get_object_or_404(Project, Project.id, project_id,
+    project = shortcuts.get_object_or_404(Project, Project.id, project_id,
         exceptions.ProjectNotFoundException)
 
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.DocumentProcessForm(prefix="process")
 
     # First handle the actions of the upload form
-    if really_submitted(upload_form):
+    if shortcuts.really_submitted(upload_form):
         uploaded_files = request.files.getlist("upload-uploaded_file")
         for uploaded_file in uploaded_files:
             filename = secure_filename(uploaded_file.filename)
@@ -71,7 +70,7 @@ def project_show(project_id):
             unit.save()
 
     # Then what happened with the document selection
-    if really_submitted(process_form):
+    if shortcuts.really_submitted(process_form):
         print "PROCESS FORM************"
         files = request.form.getlist("process-files")
         if len(files) > 0:
