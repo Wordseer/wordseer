@@ -56,7 +56,7 @@ def project_show(project_id):
         exceptions.ProjectNotFoundException)
 
     upload_form = forms.DocumentUploadForm(prefix="upload")
-    process_form = forms.DocumentProcessForm(prefix="process")
+    process_form = forms.ProcessForm(prefix="process")
 
     # The template needs access to the ID of each file and its filename.
     #process_form.files.choices = []
@@ -82,12 +82,11 @@ def project_show(project_id):
     if shortcuts.really_submitted(process_form):
         files = request.form.getlist("process-files")
         print files
-        if len(files) > 0:
-            if request.form["action"] == process_form.DELETE:
-                delete(files)
-            elif request.form["action"] == process_form.PROCESS:
-                #TODO: process these files.
-                pass
+        if request.form["action"] == process_form.DELETE:
+            delete(files)
+        elif request.form["action"] == process_form.PROCESS:
+            #TODO: process these files.
+            pass
 
     return render_template("document_list.html",
         project=project,

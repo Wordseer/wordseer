@@ -72,7 +72,7 @@ class DocumentUploadForm(Form, HiddenSubmitted):
         FileAllowed(app.config["ALLOWED_EXTENSIONS"])
         ])
 
-class DocumentProcessForm(Form, HiddenSubmitted):
+class ProcessForm(Form, HiddenSubmitted):
     """
     Allows the user to select which documents should be processed.
     """
