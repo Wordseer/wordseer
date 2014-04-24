@@ -9,28 +9,7 @@ from app import app
 import exceptions
 import forms
 from models import session, Unit, Project
-
-def really_submitted(form):
-    """ WTForms can be really finnicky when it comes to checking if a form
-    has actually been submitted, so this method runs validate_on_submit()
-    on the given form and checks if its "submitted" field has any data. Useful
-    for pages that have two forms on them.
-
-    :arg Form form: A form to check for submission.
-    :returns boolean: True if submitted, false otherwise.
-    """
-
-    return form.validate_on_submit() and form.submitted.data
-
-def get_object_or_404(model, attribute, value, exception=None):
-    #FIXME, see issue tracker
-    try:
-        session.query(model).filter(attribute == value).one()
-    except NoResultFound:
-        try:
-            raise exception
-        except:
-            abort(404)
+import shortcuts
 
 @app.errorhandler(exceptions.ProjectNotFoundException)
 def page_not_found(error):

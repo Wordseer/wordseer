@@ -1,3 +1,7 @@
+"""
+Exceptions raised by the wordseer flask app.
+"""
+
 class ProjectNotFoundException(Exception):
     """Called when the requested project could not be found.
     """
