@@ -23,7 +23,7 @@ def really_submitted(form):
 
     return form.validate_on_submit() and form.submitted.data
 
-def get_object_or_404(model, attribute, value, exception=None):
+def get_object_or_exception(model, attribute, value, exception=None):
     """Either get the requested object or raise an exception.
 
     :arg model model: The Model of the requested object.

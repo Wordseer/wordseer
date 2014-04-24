@@ -52,7 +52,7 @@ def project_show(project_id):
     """
 
     # Test if this project exists
-    project = shortcuts.get_object_or_404(Project, Project.id, project_id,
+    project = shortcuts.get_object_or_exception(Project, Project.id, project_id,
         exceptions.ProjectNotFoundException)
 
     upload_form = forms.DocumentUploadForm(prefix="upload")
