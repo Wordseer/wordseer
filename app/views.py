@@ -85,8 +85,8 @@ def project_show(project_id):
             unit = Unit(path=dest_path, project=project_id)
             unit.save()
 
-    # Then what happened with the document selection
-    if shortcuts.really_submitted(process_form):
+    # Or what happened with the document selection
+    elif shortcuts.really_submitted(process_form):
         files = request.form.getlist("process-files")
         if request.form["action"] == process_form.DELETE:
             #TODO: delete these files.
