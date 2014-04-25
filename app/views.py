@@ -89,12 +89,17 @@ def project_show(project_id):
     elif shortcuts.really_submitted(process_form):
         files = request.form.getlist("process-files")
         if request.form["action"] == process_form.DELETE:
+            # Delete every selected file, its database record, and item in
+            # the listing
             for file_id in files:
                 file_model = session.query(Unit).\
                     filter(Unit.id == file_id).one()
+                file_name = os.path.split(file_model.path)[1]
                 os.remove(file_model.path)
                 session.delete(file_model)
                 session.commit()
+                process_form.files.choices.remove((int(file_id), file_name))
+
         elif request.form["action"] == process_form.PROCESS:
             #TODO: process these files.
             pass
