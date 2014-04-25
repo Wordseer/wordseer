@@ -74,7 +74,8 @@ class DocumentUploadForm(Form, HiddenSubmitted):
 
 class ProcessForm(Form, HiddenSubmitted):
     """
-    Allows the user to select which documents should be processed.
+    Allows the user to select which objects should be
+    processed/deleted/whatever.
     """
 
     PROCESS = "0"
@@ -85,6 +86,13 @@ class ProcessForm(Form, HiddenSubmitted):
         ])
     process_button = ButtonField("Process", name="action", value=PROCESS)
     delete_button = ButtonField("Delete",  name="action", value=DELETE)
+
+    def validate_files(form, field):
+        print dir(form.process_button)
+        print form.process_button.data
+        print form.process_button.raw_data
+        print form.process_button.value
+        
 
 class ProjectCreateForm(Form):
     """

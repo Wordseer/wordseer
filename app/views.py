@@ -29,6 +29,7 @@ def projects():
     create a new project, and under the form the page has a listing of
     already created projects owned by the user.
     """
+
     form = forms.ProjectCreateForm()
 
     if form.validate_on_submit():
@@ -81,9 +82,9 @@ def project_show(project_id):
     # Then what happened with the document selection
     if shortcuts.really_submitted(process_form):
         files = request.form.getlist("process-files")
-        print files
         if request.form["action"] == process_form.DELETE:
-            delete(files)
+            #TODO: delete these files.
+            pass
         elif request.form["action"] == process_form.PROCESS:
             #TODO: process these files.
             pass
@@ -93,7 +94,6 @@ def project_show(project_id):
         upload_form=upload_form,
         process_form=process_form,
         allowed_extensions=app.config["ALLOWED_EXTENSIONS"])
-
 
 @app.route(app.config["PROJECT_ROUTE"] + "<project_id>" +
     app.config["DOCUMENT_ROUTE"] + '<document_id>')
@@ -117,4 +117,3 @@ def document_create(project_id):
     the file was properly uploaded and would be ready for processing.
     """
     return render_template("document_create.html")
-
