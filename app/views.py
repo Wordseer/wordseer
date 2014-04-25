@@ -12,14 +12,20 @@ import shortcuts
 
 @app.errorhandler(exceptions.ProjectNotFoundException)
 def project_not_found(error):
+    """This handles the user trying to view a project that does not exist.
+    """
     return shortcuts.not_found("project")
 
 @app.errorhandler(exceptions.DocumentNotFoundException)
 def document_not_found(error):
+    """This handles the user trying to view a document that does not exist.
+    """
     return shortcuts.not_found("document")
 
 @app.errorhandler(404)
 def page_not_found(error):
+    """This handles the user trying to view a general page that does not exist.
+    """
     return shortcuts.not_found("page")
 
 @app.route(app.config["PROJECT_ROUTE"], methods=["GET", "POST"])
