@@ -3,14 +3,16 @@ This file stores all the relevant forms for the web application.
 """
 
 from cgi import escape
+import os
 
 from flask_wtf import Form
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms.fields import StringField, HiddenField, Field, SelectMultipleField
 from wtforms.widgets import html_params, HTMLString, ListWidget, CheckboxInput
-from wtforms.validators import Required
+from wtforms.validators import Required, ValidationError
 
 from app import app
+from models import Unit, session
 
 class HiddenSubmitted(object):
     """A mixin to provide a hidden field called "submitted" which has a default
@@ -88,11 +90,22 @@ class ProcessForm(Form, HiddenSubmitted):
     delete_button = ButtonField("Delete",  name="action", value=DELETE)
 
     def validate_files(form, field):
-        print dir(form.process_button)
-        print form.process_button.data
-        print form.process_button.raw_data
-        print form.process_button.value
-        
+        if form.process_button.data == form.PROCESS:
+            # There must be a JSON file selected
+            struc_count = 0
+            doc_count = 0
+            for selected_file in form.files.data:
+                unit = session.query(Unit).\
+                    filter(Unit.id == selected_file).one()
+                ext = os.path.splitext(unit.path)[1][1:]
+                if ext in app.config["STRUCTURE_EXTENSION"]:
+                    struc_count += 1
+                else:
+                    doc_count += 1
+            if struc_count is not 1:
+                raise ValidationError("Must be exactly one structure file")
+            if doc_count < 1:
+                raise ValidationError("At least one document must be selected")
 
 class ProjectCreateForm(Form):
     """

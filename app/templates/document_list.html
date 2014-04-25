@@ -1,15 +1,9 @@
 {% import "macros.html" as macros %}
-{% extends "base.html" %}
-{% block scripts %}
-<script src="{{ url_for('static', filename='click-anywhere.js') }}">
-</script>
-<script src="{{ url_for('static', filename='check-all.js') }}">
-</script>
-{% endblock %}
+{% extends "item_list.html" %}
 {% block title %}Document List{% endblock %}
-{% block body %}
-<h1>Documents of {{ project.name }}</h1>
-<h2>Upload new document</h2>
+{% block page_header %}Documents of {{ project.name }}{% endblock %}
+{% block creation_header %}Upload new document{% endblock %}
+{% block creation_form %}
 {{ macros.show_errors(upload_form.uploaded_file.errors) }}
 <form method="POST" enctype="multipart/form-data" class="form-inline"
     role="form">
@@ -30,7 +24,9 @@
     </div>
     {{ upload_form.upload_button(class="btn btn-primary", name="upload") }}
 </form>
-<h2>Existing documents</h2>
+{% endblock %}
+{% block list_header %}Existing documents{% endblock %}
+{% block list_form %}
 {% if process_form.files %}
     {{ macros.show_errors(process_form.files.errors) }}
     <form method="POST" role="form">
