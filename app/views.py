@@ -103,7 +103,14 @@ def document_show(project_id, document_id):
 
     :param int doc_id: The document to retrieve details for.
     """
-    return render_template("document_show.html")
+
+    document = shortcuts.get_object_or_exception(Unit, Unit.id, document_id,
+        exceptions.DocumentNotFoundException)
+
+    filename = os.path.split(document.path)[1]
+    
+    return render_template("document_show.html", document=document,
+        filename=filename)
 
 @app.route(app.config["PROJECT_ROUTE"] + "<project_id>" +
     app.config["DOCUMENT_ROUTE"] + 'create/')
