@@ -18,10 +18,9 @@ def really_submitted(form):
     :returns boolean: True if submitted, false otherwise.
     """
 
-    print "ONSUBMIT"
-    print form.validate_on_submit()
-
-    return form.validate_on_submit() and form.submitted.data
+    if form.submitted.data == "true":
+        return form.validate_on_submit()
+    return False
 
 def get_object_or_exception(model, attribute, value, exception=None):
     """Either get the requested object or raise an exception.
