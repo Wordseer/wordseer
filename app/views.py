@@ -65,6 +65,11 @@ def project_show(project_id):
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.ProcessForm(prefix="process")
 
+    print upload_form
+    print upload_form.submitted.data
+    print process_form
+    print process_form.submitted.data
+
     # The template needs access to the ID of each file and its filename.
     #process_form.files.choices = []
     process_form.files.choices = []
@@ -84,6 +89,8 @@ def project_show(project_id):
             uploaded_file.save(dest_path)
             unit = Unit(path=dest_path, project=project_id)
             unit.save()
+            process_form.files.choices.append((unit.id,
+                os.path.split(dest_path)[1]))
 
     # Or what happened with the document selection
     elif shortcuts.really_submitted(process_form):
@@ -104,6 +111,10 @@ def project_show(project_id):
             #TODO: process these files.
             pass
 
+    # TODO: maybe do this a bit better?
+    upload_form.submitted.data = "true"
+    process_form.submitted.data = "true"
+    
     return render_template("document_list.html",
         project=project,
         upload_form=upload_form,

@@ -70,7 +70,7 @@ class DocumentUploadForm(Form, HiddenSubmitted):
     upload_button = ButtonField(text="Upload", name="action")
 
     uploaded_file = FileField("File", validators=[
-        FileRequired(),
+        FileRequired("You must select a file"),
         FileAllowed(app.config["ALLOWED_EXTENSIONS"])
         ])
 
