@@ -82,7 +82,7 @@ class ProcessForm(Form, HiddenSubmitted):
     DELETE = "-1"
 
     files = MultiCheckboxField("Select", coerce=int, validators=[
-        Required()
+        Required("You must select at least one item from the table.")
         ])
     process_button = ButtonField("Process", name="action", value=PROCESS)
     delete_button = ButtonField("Delete",  name="action", value=DELETE)
