@@ -5,12 +5,12 @@
 <h2>Create Project</h2>
 <form method="POST" enctype="multipart/form-data" class="form-inline"
     role="form">
-    {{ form.hidden_tag() }}
+    {{ create_form.hidden_tag() }}
     <div class="form-group">
-        {{ form.name.label(class="sr-only") }}
-        {{ form.name(placeholder="Project Name", class="form-control") }}
+        {{ create_form.name.label(class="sr-only") }}
+        {{ create_form.name(placeholder="Project Name", class="form-control") }}
     </div>
-    {{ form.create_button(class="btn btn-primary") }}
+    {{ create_form.create_button(class="btn btn-primary") }}
 </form>
 <h2>Existing projects</h2>
 {% if projects %}

@@ -36,17 +36,19 @@ def projects():
     already created projects owned by the user.
     """
 
-    form = forms.ProjectCreateForm()
+    create_form = forms.ProjectCreateForm(prefix="create")
 
-    if form.validate_on_submit():
+    if shortcuts.really_submitted(create_form):
         #TODO: is this secure? maybe not
-        project = Project(name=form.name.data)
+        project = Project(name=create_form.name.data)
         project.save()
         os.mkdir(os.path.join(app.config["UPLOAD_DIR"], str(project.id)))
 
     projects = Project.all().all()
 
-    return render_template("project_list.html", form=form, projects=projects)
+    return render_template("project_list.html",
+        create_form=create_form,
+        projects=projects)
 
 @app.route(app.config["PROJECT_ROUTE"] + "<project_id>",
     methods=["GET", "POST"])
@@ -65,13 +67,7 @@ def project_show(project_id):
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.ProcessForm(prefix="process")
 
-    print upload_form
-    print upload_form.submitted.data
-    print process_form
-    print process_form.submitted.data
-
     # The template needs access to the ID of each file and its filename.
-    #process_form.files.choices = []
     process_form.files.choices = []
     file_objects = session.query(Unit).filter(Unit.project == project_id).\
         filter(Unit.path != None).all()
@@ -86,11 +82,17 @@ def project_show(project_id):
             filename = secure_filename(uploaded_file.filename)
             dest_path = os.path.join(app.config["UPLOAD_DIR"],
                 str(project_id), filename)
-            uploaded_file.save(dest_path)
-            unit = Unit(path=dest_path, project=project_id)
-            unit.save()
-            process_form.files.choices.append((unit.id,
-                os.path.split(dest_path)[1]))
+            # TODO: this checks if the file exists, but can we do this
+            # inside the form?
+            if not os.path.isfile(dest_path):
+                uploaded_file.save(dest_path)
+                unit = Unit(path=dest_path, project=project_id)
+                unit.save()
+                process_form.files.choices.append((unit.id,
+                    os.path.split(dest_path)[1]))
+            else:
+                upload_form.uploaded_file.errors.\
+                    append("This file already exists")
 
     # Or what happened with the document selection
     elif shortcuts.really_submitted(process_form):
@@ -115,9 +117,6 @@ def project_show(project_id):
     upload_form.submitted.data = "true"
     process_form.submitted.data = "true"
 
-    print dir(process_form.files)
-    print process_form.files.choices
-    
     return render_template("document_list.html",
         project=project,
         upload_form=upload_form,

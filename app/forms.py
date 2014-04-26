@@ -7,6 +7,7 @@ import os
 
 from flask_wtf import Form
 from flask_wtf.file import FileAllowed, FileField, FileRequired
+from werkzeug import secure_filename
 from wtforms.fields import StringField, HiddenField, Field, SelectMultipleField
 from wtforms.widgets import html_params, HTMLString, ListWidget, CheckboxInput
 from wtforms.validators import Required, ValidationError
@@ -107,7 +108,7 @@ class ProcessForm(Form, HiddenSubmitted):
             if doc_count < 1:
                 raise ValidationError("At least one document must be selected")
 
-class ProjectCreateForm(Form):
+class ProjectCreateForm(Form, HiddenSubmitted):
     """
     Create new projects. This is simply a one-field form, requiring the
     desired name of the project.
