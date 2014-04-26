@@ -17,20 +17,20 @@
     <table class="table table-striped table-hover">
         <thead>
             <tr>
+                <th class="select">Delete Project</th>
                 <th>Project Name</th>
-                <th>Delete Project</th>
             </tr>
         </thead>
         <tbody>
             {% for project in projects %}
             <tr>
+            <td class="select">
+                Select
+            </td>
             <td>
                 <a href="{{ url_for('project_show', project_id=project.id) }}">
                     {{ project.name }}
                 </a>
-            </td>
-            <td>
-                Select
             </td>
             </tr>
             {% endfor %}
