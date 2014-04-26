@@ -9,4 +9,4 @@ app.config.from_object('config')
 CsrfProtect(app)
 
 from app.views import *
-#from app.models import *
+#app.jinja_env.globals['form_token'] = generate_form_token

@@ -1,7 +1,9 @@
 import os
 import shutil
+#import random
+#from string import ascii_letters, digits
 
-from flask import render_template, request
+from flask import render_template, request, send_from_directory
 from werkzeug import secure_filename
 
 from app import app
@@ -9,6 +11,23 @@ import exceptions
 import forms
 from models import session, Unit, Project
 import shortcuts
+
+#TODO: implement after flask-sqlalchemy
+#def generate_form_token():
+    #"""Sets a token to prevent double posts."""
+    #if '_form_token' not in session:
+        #form_token = \
+            #''.join([random.choice(ascii_letters+digits) for i in range(32)])
+        #session['_form_token'] = form_token
+    #return session['_form_token']
+
+#@app.before_request
+#def check_form_token():
+    #"""Checks for a valid form token in POST requests."""
+    #if request.method == 'POST':
+        #token = session.pop('_form_token', None)
+        #if not token or token != request.form.get('_form_token'):
+            #redirect(request.url)
 
 @app.errorhandler(exceptions.ProjectNotFoundException)
 def project_not_found(error):
@@ -76,6 +95,8 @@ def projects():
         process_form=process_form,
         projects=projects)
 
+@app.route(app.config["PROJECT_ROUTE"] + "<project_id>" +
+    app.config["DOCUMENT_ROUTE"] + 'create/')
 @app.route(app.config["PROJECT_ROUTE"] + "<project_id>",
     methods=["GET", "POST"])
 def project_show(project_id):
@@ -170,15 +191,13 @@ def document_show(project_id, document_id):
         project=project,
         filename=filename)
 
-@app.route(app.config["PROJECT_ROUTE"] + "<project_id>" +
-    app.config["DOCUMENT_ROUTE"] + 'create/')
-def document_create(project_id):
+@app.route(app.config["UPLOAD_ROUTE"] + "<file_id>")
+def get_file(file_id):
+    """If the user has permission to view this file, then return it.
     """
-    The create action for documents, which takes in document files, processes
-    them, and creates the corresponding database records.
 
-    NOTE: you don't need to implement the processing and database stuff since
-    obviously I'm still working on that; just implement enough to confirm that
-    the file was properly uploaded and would be ready for processing.
-    """
-    return render_template("document_create.html")
+    unit = session.query(Unit).filter(Unit.id == file_id).one()
+
+    directory, filename = os.path.split(unit.path)
+
+    return send_from_directory(directory, filename)

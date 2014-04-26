@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Document Details{% endblock %}
 {% block body %}
-<h1><a href="{{ url_for('projects') }}">Projects</a> »
-    <a href="{{ url_for('project_show', project_id=project.id) }}">
-            {{ project.name }}
-    </a> » {{ filename }}</h1>
-<p>Lorem ipsum dolor sit amet? Not sure what goes here.</p>
+    <h1><a href="{{ url_for('projects') }}">Projects</a> »
+        <a href="{{ url_for('project_show', project_id=project.id) }}">
+                {{ project.name }}
+        </a> » {{ filename }}</h1>
+    <h2>
+        <a href="{{ url_for('get_file', file_id=document.id) }}">
+            View file
+        </a>
+    </h2>
 {% endblock %}

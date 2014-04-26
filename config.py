@@ -18,3 +18,4 @@ STRUCTURE_EXTENSION = "json"
 # Routing URLS
 PROJECT_ROUTE = "/projects/"
 DOCUMENT_ROUTE = "/documents/"
+UPLOAD_ROUTE = "/uploads/"
