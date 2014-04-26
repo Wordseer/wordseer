@@ -41,18 +41,15 @@ def projects():
 
     process_form.selection.choices = []
     for project in Project.all().all():
-        process_form.selection.choices.append((
-            project.id,
-            project.name
-            ))
+        process_form.add_choice(project.id, project.name)
 
     if shortcuts.really_submitted(create_form):
         #TODO: is this secure? maybe not
         project = Project(name=create_form.name.data)
         project.save()
-        print project.name
-        print project.id
         os.mkdir(os.path.join(app.config["UPLOAD_DIR"], str(project.id)))
+        process_form.add_choice(project.id, project.name)
+
 
     create_form.submitted.data == "true"
     process_form.submitted.data == "true"
@@ -84,8 +81,8 @@ def project_show(project_id):
     file_objects = session.query(Unit).filter(Unit.project_id == project_id).\
         filter(Unit.path != None).all()
     for file_object in file_objects:
-        process_form.selection.choices.append((file_object.id,
-            os.path.split(file_object.path)[1]))
+        process_form.add_choice(file_object.id,
+            os.path.split(file_object.path)[1])
 
     # First handle the actions of the upload form
     if shortcuts.really_submitted(upload_form):
@@ -100,11 +97,10 @@ def project_show(project_id):
                 uploaded_file.save(dest_path)
                 unit = Unit(path=dest_path, project=project)
                 unit.save()
-                process_form.selection.choices.append((unit.id,
-                    os.path.split(dest_path)[1]))
+                process_form.add_choice(unit.id, os.path.split(dest_path)[1])
             else:
                 upload_form.uploaded_file.errors.\
-                    append("This file already exists")
+                    append("A file with this name already exists")
 
     # Or what happened with the document selection
     elif shortcuts.really_submitted(process_form):
@@ -119,7 +115,7 @@ def project_show(project_id):
                 os.remove(file_model.path)
                 session.delete(file_model)
                 session.commit()
-                process_form.selection.choices.remove((int(file_id), file_name))
+                process_form.delete_choice(int(file_id), file_name)
 
         elif request.form["action"] == process_form.PROCESS:
             #TODO: process these files.

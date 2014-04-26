@@ -103,6 +103,34 @@ class ProcessForm(Form, HiddenSubmitted):
     process_button = ButtonField("Process", name="action", value=PROCESS)
     delete_button = ButtonField("Delete",  name="action", value=DELETE)
 
+    def add_choice(self, choice_id, choice_data):
+        """Add a tuple to the choices property of the selection field. A bit
+        shorter than typing out the full command.
+
+        :param choice_id: The first item in the tuple. From a template, this
+        value is reachable as the .id attribute of every item in the selection
+        field.
+        :param choice_data: The second item in the tuple. From a template, this
+        value is reachable as the .data attribute of every item in the selection
+        field.
+        """
+
+        self.selection.choices.append((choice_id, choice_data))
+
+    def delete_choice(self, choice_id, choice_data):
+        """The reverse of add_choice: remove a choice from the choices property
+        of the selection field.
+
+        :param choice_id: The first item in the tuple. From a template, this
+        value is reachable as the .id attribute of every item in the selection
+        field.
+        :param choice_data: The second item in the tuple. From a template, this
+        value is reachable as the .data attribute of every item in the selection
+        field.
+        """
+
+        self.selection.choices.remove((choice_id, choice_data))
+
 class DocumentUploadForm(Form, HiddenSubmitted):
     """This is a form to upload files to the server. It handles both XML
     and JSON files, and is used by the document_upload view.
