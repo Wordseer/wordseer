@@ -39,6 +39,7 @@ def projects():
     create_form = forms.ProjectCreateForm(prefix="create")
     process_form = forms.ProjectProcessForm(prefix="process")
 
+    process_form.selection.choices=[]
     for project in Project.all().all():
         process_form.selection.add_choice(project.id, project.name)
 
@@ -80,17 +81,22 @@ def project_show(project_id):
     # The template needs access to the ID of each file and its filename.
     file_objects = session.query(Unit).filter(Unit.project_id == project_id).\
         filter(Unit.path != None).all()
+    process_form.selection.choices=[]
     for file_object in file_objects:
         process_form.selection.add_choice(file_object.id,
             os.path.split(file_object.path)[1])
 
+    print process_form.selection.choices
+
     # First handle the actions of the upload form
     if shortcuts.really_submitted(upload_form):
+        print "SUBMITTED"
         uploaded_files = request.files.getlist("upload-uploaded_file")
         for uploaded_file in uploaded_files:
             filename = secure_filename(uploaded_file.filename)
             dest_path = os.path.join(app.config["UPLOAD_DIR"],
                 str(project_id), filename)
+            print dest_path
             # TODO: this checks if the file exists, but can we do this
             # inside the form?
             if not os.path.isfile(dest_path):
