@@ -1,0 +1,17 @@
+{% import "macros.html" as macros %}
+{% extends "base.html" %}
+{% block scripts %}
+    <script src="{{ url_for('static', filename='click-anywhere.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='check-all.js') }}">
+    </script>
+{% endblock %}
+{% block body %}
+    <h1>{% block page_header %}{% endblock %}</h1>
+    <h2>{% block create_header %}{% endblock %}</h2>
+    {% block creation_form %}
+    {% endblock %}
+    <h2>{% block list_header %}{% endblock %}</h2>
+    {% block list_form %}
+    {% endblock %}
+{% endblock %}
