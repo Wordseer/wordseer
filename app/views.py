@@ -39,13 +39,20 @@ def projects():
     create_form = forms.ProjectCreateForm(prefix="create")
     process_form = forms.ProjectProcessForm(prefix="process")
 
+    process_form.selection.choices = []
+    for project in Project.all().all():
+        process_form.selection.choices.append((
+            project.id,
+            project.name
+            ))
+
     if shortcuts.really_submitted(create_form):
         #TODO: is this secure? maybe not
         project = Project(name=create_form.name.data)
         project.save()
+        print project.name
+        print project.id
         os.mkdir(os.path.join(app.config["UPLOAD_DIR"], str(project.id)))
-
-    projects = Project.all().all()
 
     create_form.submitted.data == "true"
     process_form.submitted.data == "true"
