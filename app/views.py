@@ -74,7 +74,7 @@ def project_show(project_id):
 
     # The template needs access to the ID of each file and its filename.
     process_form.selection.choices = []
-    file_objects = session.query(Unit).filter(Unit.project == project_id).\
+    file_objects = session.query(Unit).filter(Unit.project_id == project_id).\
         filter(Unit.path != None).all()
     for file_object in file_objects:
         process_form.selection.choices.append((file_object.id,

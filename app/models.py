@@ -134,14 +134,13 @@ class Unit(Base):
     number = Column(Integer, index=True)
     parent_id = Column(Integer, ForeignKey('unit.id'))
     path = Column(String, nullable=True)
-    project = Column(Integer, ForeignKey("project.id"))
+    project_id = Column(Integer, ForeignKey("project.id"))
 
     # Relationships
 
     children = relationship("Unit")
     sentences = relationship("Sentence", backref=backref("unit"))
     properties = relationship("Property", backref=backref("unit"))
-    project = relationship("Project", backref=backref('files'))
 
     def __init__(self, document=None, **kwargs):
         """Initialize a top-level document unit from a document file.
@@ -276,6 +275,7 @@ class Project(Base):
 
     #user = Column() #TODO: each project should be associated with a user
     name = Column(String)
+    files = relationship("Unit", backref=backref('project'))
 
     def __repr__(self):
         return "<Project (name=" + self.name + ")>"
