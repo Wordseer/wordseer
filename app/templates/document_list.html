@@ -1,7 +1,7 @@
 {% import "macros.html" as macros %}
 {% extends "item_list.html" %}
 {% block title %}Document List{% endblock %}
-{% block page_header %}Documents of {{ project.name }}{% endblock %}
+{% block page_header %}{{ project.name }}{% endblock %}
 {% block creation_header %}Upload new document{% endblock %}
 {% block creation_form %}
 {{ macros.show_errors(upload_form.uploaded_file.errors) }}
