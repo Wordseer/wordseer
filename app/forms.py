@@ -13,7 +13,7 @@ from wtforms.widgets import html_params, HTMLString, ListWidget, CheckboxInput
 from wtforms.validators import Required, ValidationError
 
 from app import app
-from models import Unit, session
+from models import Unit, session, Project
 
 class HiddenSubmitted(object):
     """A mixin to provide a hidden field called "submitted" which has a default
@@ -22,25 +22,36 @@ class HiddenSubmitted(object):
 
     submitted = HiddenField(default="true")
 
-def is_processable(files):
-    """Given a list of file IDs, determine if this collection of files can be
-    processed (no more than one struc file, at least one xml file).
+def is_processable(ids=None, units=None):
+    """Given a list of file IDs or Unit objects, determine if this collection of
+    files can be processed (no more than one struc file, at least one xml file).
+    You should provide either ids or units.
 
     :param list files: A list of file IDs to check.
+    :param list units: A list of Unit objects to check.
     :returns boolean: True if processable, raises an exception otherwise.
     """
+
+    #TODO: could be a cleaner way to write this
 
     struc_count = 0
     doc_count = 0
 
-    for file_id in files:
-        unit = session.query(Unit).\
-            filter(Unit.id == file_id).one()
+    if ids:
+        # Turn ids into units
+        units = []
+        for file_id in ids:
+            units.append(session.query(Unit).\
+                filter(Unit.id == file_id).one())
+
+    for unit in units:
+        # Then process the units
         ext = os.path.splitext(unit.path)[1][1:]
         if ext in app.config["STRUCTURE_EXTENSION"]:
             struc_count += 1
         else:
             doc_count += 1
+
     if struc_count is not 1:
         raise ValidationError("Must be exactly one structure file")
     if doc_count < 1:
@@ -149,7 +160,7 @@ class DocumentUploadForm(Form, HiddenSubmitted):
 class DocumentProcessForm(ProcessForm):
     def validate_selection(form, field):
         if form.process_button.data == form.PROCESS:
-            is_processable(form.selection.data)
+            is_processable(ids=form.selection.data)
 
 class ProjectCreateForm(Form, HiddenSubmitted):
     """
@@ -167,5 +178,7 @@ class ProjectProcessForm(ProcessForm):
     def validate_selection(form, field):
         if form.process_button.data == form.PROCESS:
             # the projects must be processable, so get a list of files
-            for project in selection:
-                print project.files
+            for project_id in form.selection.data:
+                project = session.query(Project).\
+                    filter(Project.id == project_id).one()
+                is_processable(units=project.files)
