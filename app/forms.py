@@ -88,7 +88,7 @@ class MultiCheckboxField(SelectMultipleField):
     widget = ListWidget(prefix_label=False)
     option_widget = CheckboxInput()
 
-class ProcessDeleteForm(Form, HiddenSubmitted):
+class ProcessForm(Form, HiddenSubmitted):
     """
     Allows the user to select which objects should be
     processed/deleted/whatever.
@@ -115,7 +115,7 @@ class DocumentUploadForm(Form, HiddenSubmitted):
         FileAllowed(app.config["ALLOWED_EXTENSIONS"])
         ])
 
-class DocumentProcessDeleteForm(ProcessDeleteForm):
+class DocumentProcessForm(ProcessForm):
     def validate_selection(form, field):
         if form.process_button.data == form.PROCESS:
             is_processable(form.selection.data)
@@ -132,7 +132,7 @@ class ProjectCreateForm(Form, HiddenSubmitted):
 
     create_button = ButtonField("Create")
 
-class ProjectProcessDeleteForm(ProcessDeleteForm):
+class ProjectProcessForm(ProcessForm):
     def validate_selection(form, field):
         if form.process_button.data == form.PROCESS:
             # the projects must be processable, so get a list of files

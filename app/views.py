@@ -65,7 +65,7 @@ def project_show(project_id):
         exceptions.ProjectNotFoundException)
 
     upload_form = forms.DocumentUploadForm(prefix="upload")
-    process_form = forms.DocumentProcessDeleteForm(prefix="process")
+    process_form = forms.DocumentProcessForm(prefix="process")
 
     # The template needs access to the ID of each file and its filename.
     process_form.selection.choices = []
