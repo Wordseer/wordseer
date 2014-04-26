@@ -114,6 +114,9 @@ def project_show(project_id):
     # TODO: maybe do this a bit better?
     upload_form.submitted.data = "true"
     process_form.submitted.data = "true"
+
+    print dir(process_form.files)
+    print process_form.files.choices
     
     return render_template("document_list.html",
         project=project,

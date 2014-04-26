@@ -27,7 +27,7 @@
 {% endblock %}
 {% block list_header %}Existing documents{% endblock %}
 {% block list_form %}
-{% if process_form.files %}
+{% if process_form.files.choices %}
     {{ macros.show_errors(process_form.files.errors) }}
     <form method="POST" role="form">
         {{ process_form.hidden_tag() }}
