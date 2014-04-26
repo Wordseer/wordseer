@@ -34,22 +34,24 @@
         <table class="table table-striped table-hover click-anywhere">
             <thead>
                 <tr>
+                    <th class="select">
+                            Select (<a href="#" id="check-all">All</a>)
+                    </th>
                     <th>Filename</th>
-                    <th>Select (<a href="#" id="check-all">All</a>)</th>
                 </tr>
             </thead>
             <tbody>
             {% for file in process_form.files %}
                 <tr>
+                    <td class="select">
+                        {{ file }}
+                    </td>
                     <td>
                         <label for="{{ file.id }}">
                         <a href="{{ url_for('document_show',
                             document_id=file.data,
                             project_id=project.id) }}">{{ file.label.text }}</a>
                         </label>
-                    </td>
-                    <td>
-                        {{ file }}
                     </td>
                 </tr>
             {% endfor %}
