@@ -63,6 +63,21 @@ class MultiCheckboxField(SelectMultipleField):
     widget = ListWidget(prefix_label=False)
     option_widget = CheckboxInput()
 
+class ProcessDeleteForm(Form, HiddenSubmitted):
+    """
+    Allows the user to select which objects should be
+    processed/deleted/whatever.
+    """
+
+    PROCESS = "0"
+    DELETE = "-1"
+
+    selection = MultiCheckboxField("Select", coerce=int, validators=[
+        Required("You must select at least one item from the table.")
+        ])
+    process_button = ButtonField("Process", name="action", value=PROCESS)
+    delete_button = ButtonField("Delete",  name="action", value=DELETE)
+
 class DocumentUploadForm(Form, HiddenSubmitted):
     """This is a form to upload files to the server. It handles both XML
     and JSON files, and is used by the document_upload view.
@@ -75,27 +90,13 @@ class DocumentUploadForm(Form, HiddenSubmitted):
         FileAllowed(app.config["ALLOWED_EXTENSIONS"])
         ])
 
-class ProcessForm(Form, HiddenSubmitted):
-    """
-    Allows the user to select which objects should be
-    processed/deleted/whatever.
-    """
-
-    PROCESS = "0"
-    DELETE = "-1"
-
-    files = MultiCheckboxField("Select", coerce=int, validators=[
-        Required("You must select at least one item from the table.")
-        ])
-    process_button = ButtonField("Process", name="action", value=PROCESS)
-    delete_button = ButtonField("Delete",  name="action", value=DELETE)
-
-    def validate_files(form, field):
+class DocumentProcessDeleteForm(ProcessDeleteForm):
+    def validate_selection(form, field):
         if form.process_button.data == form.PROCESS:
             # There must be a JSON file selected
             struc_count = 0
             doc_count = 0
-            for selected_file in form.files.data:
+            for selected_file in form.selection.data:
                 unit = session.query(Unit).\
                     filter(Unit.id == selected_file).one()
                 ext = os.path.splitext(unit.path)[1][1:]
@@ -119,3 +120,6 @@ class ProjectCreateForm(Form, HiddenSubmitted):
         ])
 
     create_button = ButtonField("Create")
+
+class ProjectProcessDeleteForm(ProcessForm):
+    pass

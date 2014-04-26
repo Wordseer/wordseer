@@ -65,14 +65,14 @@ def project_show(project_id):
         exceptions.ProjectNotFoundException)
 
     upload_form = forms.DocumentUploadForm(prefix="upload")
-    process_form = forms.ProcessForm(prefix="process")
+    process_form = forms.DocumentProcessDeleteForm(prefix="process")
 
     # The template needs access to the ID of each file and its filename.
-    process_form.files.choices = []
+    process_form.selection.choices = []
     file_objects = session.query(Unit).filter(Unit.project == project_id).\
         filter(Unit.path != None).all()
     for file_object in file_objects:
-        process_form.files.choices.append((file_object.id,
+        process_form.selection.choices.append((file_object.id,
             os.path.split(file_object.path)[1]))
 
     # First handle the actions of the upload form
@@ -88,7 +88,7 @@ def project_show(project_id):
                 uploaded_file.save(dest_path)
                 unit = Unit(path=dest_path, project=project_id)
                 unit.save()
-                process_form.files.choices.append((unit.id,
+                process_form.selection.choices.append((unit.id,
                     os.path.split(dest_path)[1]))
             else:
                 upload_form.uploaded_file.errors.\
@@ -96,7 +96,7 @@ def project_show(project_id):
 
     # Or what happened with the document selection
     elif shortcuts.really_submitted(process_form):
-        files = request.form.getlist("process-files")
+        files = request.form.getlist("process-selection")
         if request.form["action"] == process_form.DELETE:
             # Delete every selected file, its database record, and item in
             # the listing
@@ -107,7 +107,7 @@ def project_show(project_id):
                 os.remove(file_model.path)
                 session.delete(file_model)
                 session.commit()
-                process_form.files.choices.remove((int(file_id), file_name))
+                process_form.selection.choices.remove((int(file_id), file_name))
 
         elif request.form["action"] == process_form.PROCESS:
             #TODO: process these files.
