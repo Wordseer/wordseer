@@ -139,10 +139,9 @@ class Unit(Base):
     # Relationships
 
     children = relationship("Unit")
-
     sentences = relationship("Sentence", backref=backref("unit"))
-
     properties = relationship("Property", backref=backref("unit"))
+    project = relationship("Project", backref=backref('files'))
 
     def __init__(self, document=None, **kwargs):
         """Initialize a top-level document unit from a document file.

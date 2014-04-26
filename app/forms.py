@@ -22,6 +22,31 @@ class HiddenSubmitted(object):
 
     submitted = HiddenField(default="true")
 
+def is_processable(files):
+    """Given a list of file IDs, determine if this collection of files can be
+    processed (no more than one struc file, at least one xml file).
+
+    :param list files: A list of file IDs to check.
+    :returns boolean: True if processable, raises an exception otherwise.
+    """
+
+    struc_count = 0
+    doc_count = 0
+
+    for file_id in files:
+        unit = session.query(Unit).\
+            filter(Unit.id == file_id).one()
+        ext = os.path.splitext(unit.path)[1][1:]
+        if ext in app.config["STRUCTURE_EXTENSION"]:
+            struc_count += 1
+        else:
+            doc_count += 1
+    if struc_count is not 1:
+        raise ValidationError("Must be exactly one structure file")
+    if doc_count < 1:
+        raise ValidationError("At least one document must be selected")
+    return True
+
 # TODO: might be a good idea to move the *Field and *Widget classes away
 
 class ButtonWidget(object):
@@ -93,21 +118,7 @@ class DocumentUploadForm(Form, HiddenSubmitted):
 class DocumentProcessDeleteForm(ProcessDeleteForm):
     def validate_selection(form, field):
         if form.process_button.data == form.PROCESS:
-            # There must be a JSON file selected
-            struc_count = 0
-            doc_count = 0
-            for selected_file in form.selection.data:
-                unit = session.query(Unit).\
-                    filter(Unit.id == selected_file).one()
-                ext = os.path.splitext(unit.path)[1][1:]
-                if ext in app.config["STRUCTURE_EXTENSION"]:
-                    struc_count += 1
-                else:
-                    doc_count += 1
-            if struc_count is not 1:
-                raise ValidationError("Must be exactly one structure file")
-            if doc_count < 1:
-                raise ValidationError("At least one document must be selected")
+            is_processable(form.selection.data)
 
 class ProjectCreateForm(Form, HiddenSubmitted):
     """
@@ -121,5 +132,9 @@ class ProjectCreateForm(Form, HiddenSubmitted):
 
     create_button = ButtonField("Create")
 
-class ProjectProcessDeleteForm(ProcessForm):
-    pass
+class ProjectProcessDeleteForm(ProcessDeleteForm):
+    def validate_selection(form, field):
+        if form.process_button.data == form.PROCESS:
+            # the projects must be processable, so get a list of files
+            for project in selection:
+                print project.files
