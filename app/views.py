@@ -91,7 +91,7 @@ def project_show(project_id):
             # inside the form?
             if not os.path.isfile(dest_path):
                 uploaded_file.save(dest_path)
-                unit = Unit(path=dest_path, project=project_id)
+                unit = Unit(path=dest_path, project=project)
                 unit.save()
                 process_form.selection.choices.append((unit.id,
                     os.path.split(dest_path)[1]))
