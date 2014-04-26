@@ -88,21 +88,6 @@ class MultiCheckboxField(SelectMultipleField):
     widget = ListWidget(prefix_label=False)
     option_widget = CheckboxInput()
 
-class ProcessForm(Form, HiddenSubmitted):
-    """
-    Allows the user to select which objects should be
-    processed/deleted/whatever.
-    """
-
-    PROCESS = "0"
-    DELETE = "-1"
-
-    selection = MultiCheckboxField("Select", coerce=int, validators=[
-        Required("You must select at least one item from the table.")
-        ])
-    process_button = ButtonField("Process", name="action", value=PROCESS)
-    delete_button = ButtonField("Delete",  name="action", value=DELETE)
-
     def add_choice(self, choice_id, choice_data):
         """Add a tuple to the choices property of the selection field. A bit
         shorter than typing out the full command.
@@ -130,6 +115,21 @@ class ProcessForm(Form, HiddenSubmitted):
         """
 
         self.selection.choices.remove((choice_id, choice_data))
+
+class ProcessForm(Form, HiddenSubmitted):
+    """
+    Allows the user to select which objects should be
+    processed/deleted/whatever.
+    """
+
+    PROCESS = "0"
+    DELETE = "-1"
+
+    selection = MultiCheckboxField("Select", coerce=int, validators=[
+        Required("You must select at least one item from the table.")
+        ])
+    process_button = ButtonField("Process", name="action", value=PROCESS)
+    delete_button = ButtonField("Delete",  name="action", value=DELETE)
 
 class DocumentUploadForm(Form, HiddenSubmitted):
     """This is a form to upload files to the server. It handles both XML
