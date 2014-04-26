@@ -37,6 +37,7 @@ def projects():
     """
 
     create_form = forms.ProjectCreateForm(prefix="create")
+    process_form = forms.ProjectProcessForm(prefix="process")
 
     if shortcuts.really_submitted(create_form):
         #TODO: is this secure? maybe not
@@ -46,8 +47,12 @@ def projects():
 
     projects = Project.all().all()
 
+    create_form.submitted.data == "true"
+    process_form.submitted.data == "true"
+
     return render_template("project_list.html",
         create_form=create_form,
+        process_form=process_form,
         projects=projects)
 
 @app.route(app.config["PROJECT_ROUTE"] + "<project_id>",
