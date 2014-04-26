@@ -276,6 +276,7 @@ class Project(Base):
     #user = Column() #TODO: each project should be associated with a user
     name = Column(String)
     files = relationship("Unit", backref=backref('project'))
+    path = Column(String)
 
     def __repr__(self):
         return "<Project (name=" + self.name + ")>"

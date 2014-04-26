@@ -1,5 +1,5 @@
 import os
-import pprint
+import shutil
 
 from flask import render_template, request
 from werkzeug import secure_filename
@@ -45,16 +45,31 @@ def projects():
 
     if shortcuts.really_submitted(create_form):
         #TODO: is this secure? maybe not
-        project = Project(name=create_form.name.data)
+        #TODO: can we only save this once?
+        project = Project(
+            name=create_form.name.data)
         project.save()
-        os.mkdir(os.path.join(app.config["UPLOAD_DIR"], str(project.id)))
+        project.path=os.path.join(app.config["UPLOAD_DIR"], str(project.id))
+        project.save()
+        os.mkdir(project.path)
         process_form.selection.add_choice(project.id, project.name)
 
     elif shortcuts.really_submitted(process_form):
-        pass
+        selected_projects = request.form.getlist("process-selection")
+        if request.form["action"] == process_form.DELETE:
+            for project_id in selected_projects:
+                project = session.query(Project).\
+                    filter(Project.id == project_id).one()
+                shutil.rmtree(project.path)
+                process_form.selection.delete_choice(project.id, project.name)
+                session.delete(project)
+                session.commit()
+        if request.form["action"] == process_form.DELETE:
+            #TODO: process the projects
+            pass
 
-    create_form.submitted.data == "true"
-    process_form.submitted.data == "true"
+    create_form.submitted.data = "true"
+    process_form.submitted.data = "true"
 
     return render_template("project_list.html",
         create_form=create_form,
@@ -86,17 +101,13 @@ def project_show(project_id):
         process_form.selection.add_choice(file_object.id,
             os.path.split(file_object.path)[1])
 
-    print process_form.selection.choices
-
     # First handle the actions of the upload form
     if shortcuts.really_submitted(upload_form):
-        print "SUBMITTED"
         uploaded_files = request.files.getlist("upload-uploaded_file")
         for uploaded_file in uploaded_files:
             filename = secure_filename(uploaded_file.filename)
             dest_path = os.path.join(app.config["UPLOAD_DIR"],
                 str(project_id), filename)
-            print dest_path
             # TODO: this checks if the file exists, but can we do this
             # inside the form?
             if not os.path.isfile(dest_path):
