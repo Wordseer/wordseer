@@ -39,7 +39,6 @@ def projects():
     create_form = forms.ProjectCreateForm(prefix="create")
     process_form = forms.ProjectProcessForm(prefix="process")
 
-    process_form.selection.choices = []
     for project in Project.all().all():
         process_form.selection.add_choice(project.id, project.name)
 
@@ -50,7 +49,8 @@ def projects():
         os.mkdir(os.path.join(app.config["UPLOAD_DIR"], str(project.id)))
         process_form.selection.add_choice(project.id, project.name)
 
-    elif shortcuts.
+    elif shortcuts.really_submitted(process_form):
+        pass
 
     create_form.submitted.data == "true"
     process_form.submitted.data == "true"
@@ -78,7 +78,6 @@ def project_show(project_id):
     process_form = forms.DocumentProcessForm(prefix="process")
 
     # The template needs access to the ID of each file and its filename.
-    process_form.selection.choices = []
     file_objects = session.query(Unit).filter(Unit.project_id == project_id).\
         filter(Unit.path != None).all()
     for file_object in file_objects:

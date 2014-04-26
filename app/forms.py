@@ -100,7 +100,7 @@ class MultiCheckboxField(SelectMultipleField):
         field.
         """
 
-        self.selection.choices.append((choice_id, choice_data))
+        self.choices.append((choice_id, choice_data))
 
     def delete_choice(self, choice_id, choice_data):
         """The reverse of add_choice: remove a choice from the choices property
@@ -114,7 +114,7 @@ class MultiCheckboxField(SelectMultipleField):
         field.
         """
 
-        self.selection.choices.remove((choice_id, choice_data))
+        self.choices.remove((choice_id, choice_data))
 
 class ProcessForm(Form, HiddenSubmitted):
     """
@@ -125,9 +125,12 @@ class ProcessForm(Form, HiddenSubmitted):
     PROCESS = "0"
     DELETE = "-1"
 
-    selection = MultiCheckboxField("Select", coerce=int, validators=[
-        Required("You must select at least one item from the table.")
-        ])
+    selection = MultiCheckboxField("Select",
+        coerce=int,
+        validators=[
+            Required("You must select at least one item from the table.")
+        ],
+        choices=[])
     process_button = ButtonField("Process", name="action", value=PROCESS)
     delete_button = ButtonField("Delete",  name="action", value=DELETE)
 
