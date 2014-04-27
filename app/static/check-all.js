@@ -3,6 +3,6 @@
 
 $('#check-all').click(function () {
     var checked = $(this).data('checked');
-    $('form').find(':checkbox').attr('checked', !checked);
+    $('form').find(':checkbox').prop('checked', !checked);
     $(this).data('checked', !checked);
 });
