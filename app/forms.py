@@ -2,18 +2,18 @@
 This file stores all the relevant forms for the web application.
 """
 
-from cgi import escape
 import os
 
 from flask_wtf import Form
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from werkzeug import secure_filename
-from wtforms.fields import StringField, HiddenField, Field, SelectMultipleField
-from wtforms.widgets import html_params, HTMLString, ListWidget, CheckboxInput
+from wtforms.fields import StringField, HiddenField
 from wtforms.validators import Required, ValidationError
 
 from app import app
+from fields import ButtonField, MultiCheckboxField
 from models import Unit, session, Project
+from widgets import ButtonWidget
 
 class HiddenSubmitted(object):
     """A mixin to provide a hidden field called "submitted" which has a default
@@ -57,75 +57,6 @@ def is_processable(ids=None, units=None):
     if doc_count < 1:
         raise ValidationError("At least one document must be selected")
     return True
-
-# TODO: might be a good idea to move the *Field and *Widget classes away
-
-class ButtonWidget(object):
-    """A widget to conveniently display buttons.
-    """
-    def __call__(self, field, **kwargs):
-        if field.name is not None:
-            kwargs.setdefault('name', field.name)
-        if field.value is not None:
-            kwargs.setdefault('value', field.value)
-        kwargs.setdefault('type', "submit")
-        return HTMLString('<button %s>%s</button>' % (
-            html_params(**kwargs),
-            escape(field._value())
-            ))
-
-class ButtonField(Field):
-    """A field to conveniently use buttons in flask forms.
-    """
-    widget = ButtonWidget()
-
-    def __init__(self, text=None, name=None, value=None, **kwargs):
-        super(ButtonField, self).__init__(**kwargs)
-        self.text = text
-        self.value = value
-        if name is not None:
-            self.name = name
-
-    def _value(self):
-        return str(self.text)
-
-class MultiCheckboxField(SelectMultipleField):
-    """
-    A multiple-select, except displays a list of checkboxes.
-
-    Iterating the field will produce subfields, allowing custom rendering of
-    the enclosed checkbox fields.
-    """
-    widget = ListWidget(prefix_label=False)
-    option_widget = CheckboxInput()
-
-    def add_choice(self, choice_id, choice_data):
-        """Add a tuple to the choices property of the selection field. A bit
-        shorter than typing out the full command.
-
-        :param choice_id: The first item in the tuple. From a template, this
-        value is reachable as the .id attribute of every item in the selection
-        field.
-        :param choice_data: The second item in the tuple. From a template, this
-        value is reachable as the .data attribute of every item in the selection
-        field.
-        """
-
-        self.choices.append((choice_id, choice_data))
-
-    def delete_choice(self, choice_id, choice_data):
-        """The reverse of add_choice: remove a choice from the choices property
-        of the selection field.
-
-        :param choice_id: The first item in the tuple. From a template, this
-        value is reachable as the .id attribute of every item in the selection
-        field.
-        :param choice_data: The second item in the tuple. From a template, this
-        value is reachable as the .data attribute of every item in the selection
-        field.
-        """
-
-        self.choices.remove((choice_id, choice_data))
 
 class ProcessForm(Form, HiddenSubmitted):
     """
