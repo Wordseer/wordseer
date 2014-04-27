@@ -5,6 +5,7 @@ from app.models import *
 
 class TestCase(unittest.TestCase):
     def setUp(self):
+        Base.environment = 'test'
 
     def tearDown(self):
         pass
