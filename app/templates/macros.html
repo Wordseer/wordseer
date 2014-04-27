@@ -1,6 +1,6 @@
 {% macro show_errors(error_list) -%}
     {% if error_list %}
-        <div class="bg-danger"><p>Errors have ocurred:</p>
+        <div class="alert alert-danger"><p>Errors have ocurred:</p>
             <ul>
                 {% for error in error_list %}
                     <li>{{ error }}</li>
