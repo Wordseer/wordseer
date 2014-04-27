@@ -4,6 +4,7 @@ import shutil
 #from string import ascii_letters, digits
 
 from flask import render_template, request, send_from_directory
+from flask.views import View
 from werkzeug import secure_filename
 
 from app import app
@@ -46,6 +47,20 @@ def page_not_found(error):
     """This handles the user trying to view a general page that does not exist.
     """
     return shortcuts.not_found("page")
+
+class CLPDView(View):
+    """This is a pluggable view to handle CLPD (Create, List, Process, Delete)
+    views.
+
+    In this application, we have two CLPD views which are in many ways very
+    similar: the project listing and the document listing. With this view,
+    we can reduce the redundancy.
+    """
+
+    def render_template(self):
+        """Render the template with the required data.
+        """
+        render_template(self.template_name)
 
 @app.route(app.config["PROJECT_ROUTE"], methods=["GET", "POST"])
 def projects():
