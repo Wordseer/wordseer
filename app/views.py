@@ -57,10 +57,23 @@ class CLPDView(View):
     we can reduce the redundancy.
     """
 
-    def render_template(self):
-        """Render the template with the required data.
+    def __init__(self,  **kwargs):
+        """Initializes a CLPD view. kwargs are data passed to the view in
+        general.
         """
-        render_template(self.template_name)
+        #self.template = template
+        self.kwargs = kwargs
+
+    def dispatch_request(self, **kwargs):
+        """Render the template with the required data. kwargs are data
+        passed to the URL.
+        """
+        print self.kwargs
+        print other
+        return "hello world"
+        #return render_template(self.template, **kwargs)
+
+app.add_url_rule("/test/<test>", view_func=CLPDView.as_view("test", blah=True))
 
 @app.route("/")
 def home():
