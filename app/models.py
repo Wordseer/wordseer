@@ -8,16 +8,11 @@ This module contains the model-level logic, built on SQLAlchemy.
 
 """
 
+from app import database
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy import create_engine, Column, Table, Integer, String, Boolean, ForeignKey, Text
-from config import *
-from sqlalchemy.orm import relationship, backref, sessionmaker
-
-# create database connection
-engine = create_engine(SQLALCHEMY_DATABASE_URI)
-Session = sessionmaker(bind=engine)
-session = Session()
+from sqlalchemy import Column, Table, Integer, String, Boolean, ForeignKey, Text
+from sqlalchemy.orm import relationship, backref
 
 
 class Base(object):
@@ -29,6 +24,9 @@ class Base(object):
     apply to all models.
 
     """
+
+    # Instantiate class variable for environment. Default to dev
+    environment = 'dev'
 
     @declared_attr
     def __tablename__(cls):
@@ -48,9 +46,11 @@ class Base(object):
         """Commits this model instance to the database.
 
         TODO: should return either True or False depending on its success.
+        TODO: manage sequential saves better.
+
         """
-        session.add(self)
-        session.commit()
+        database[Base.environment].add(self)
+        database[Base.environment].commit()
 
     @classmethod
     def get(cls, id):
@@ -69,7 +69,7 @@ class Base(object):
           Raises an error if not found.
 
         """
-        return session.query(cls).filter(cls.id==id).first()
+        return database[Base.environment].query(cls).filter(cls.id==id).first()
 
     @classmethod
     def all(cls):
@@ -79,7 +79,7 @@ class Base(object):
           Query object containing all records in the table for this model.
 
         """
-        return session.query(cls)
+        return database[Base.environment].query(cls)
 
     # Criteria-based look-up; see SQLAlchemy docs for use
     @classmethod
@@ -96,7 +96,7 @@ class Base(object):
           Query object containing the matching records.
 
         """
-        return session.query(cls).filter(criteria)
+        return database[Base.environment].query(cls).filter(criteria)
 
 # Set the above Base class as the default model.
 Base = declarative_base(cls=Base)

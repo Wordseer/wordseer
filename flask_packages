@@ -4,4 +4,4 @@
 #
 # Use bash flask_packages to install everything (make sure your venv is activated)
 
-pip install flask flask-login flask-openid sqlalchemy sqlalchemy-migrate flask_whooshalchemy==0.54a flask-wtf pytz flask-babel flup inflect
+pip install flask flask-login flask-openid sqlalchemy sqlalchemy-migrate flask-sqlalchemy flask_whooshalchemy==0.54a flask-wtf pytz flask-babel flup inflect mock lxml unidecode pexpect

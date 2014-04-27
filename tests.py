@@ -5,8 +5,6 @@ from app.models import *
 
 class TestCase(unittest.TestCase):
     def setUp(self):
-        # TODO: figure out how to set up a test database
-        pass
 
     def tearDown(self):
         pass
