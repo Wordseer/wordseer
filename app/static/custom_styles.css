@@ -37,3 +37,7 @@ input[readonly] {
 .left-margin {
     margin-left: 5px;
 }
+
+nav {
+    margin-top: 10px;
+}

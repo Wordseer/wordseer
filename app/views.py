@@ -62,6 +62,10 @@ class CLPDView(View):
         """
         render_template(self.template_name)
 
+@app.route("/")
+def home():
+    return render_template("home.html")
+
 @app.route(app.config["PROJECT_ROUTE"], methods=["GET", "POST"])
 def projects():
     """
