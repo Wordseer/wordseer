@@ -1,6 +1,32 @@
 {% import "macros.html" as macros %}
 {% extends "item_list.html" %}
-
+{% block scripts %}
+    {{ super() }}
+	<script>
+		$(document)
+			.on('change', '.btn-file :file', function() {
+				var input = $(this),
+				numFiles = input.get(0).files ? input.get(0).files.length : 1,
+				label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+				input.trigger('fileselect', [numFiles, label]);
+		});
+		
+		$(document).ready( function() {
+			$('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+				
+				var input = $(this).parents('.input-group').find(':text'),
+					log = numFiles > 1 ? numFiles + ' files selected' : label;
+				
+				if( input.length ) {
+					input.val(log);
+				} else {
+					if( log ) alert(log);
+				}
+				
+			});
+		});		
+	</script>
+{% endblock %}
 {% block title %}Document List{% endblock %}
 {% block page_header %}
     <a href="{{ url_for('projects') }}">Projects</a> »
@@ -10,24 +36,21 @@
 {% block creation_header %}Upload new document{% endblock %}
 {% block creation_form %}
     {{ macros.show_errors(upload_form.uploaded_file.errors) }}
-    <form method="POST" enctype="multipart/form-data" class="form-inline"
+    <form method="POST" enctype="multipart/form-data" class="form-inline clearfix"
         role="form">
         {{ upload_form.hidden_tag() }}
-        <div class="form-group">
-            {{ upload_form.uploaded_file.label(class="sr-only") }}
-            {{ upload_form.uploaded_file(multiple="multiple") }}
-            <p class="help-block">
-                Allowed extensions:
-                {% for ext in allowed_extensions %}
-                    {% if loop.last %}
-                        {{ ext }}.
-                    {% else %}
-                        {{ ext }},
-                    {% endif %}
-                {% endfor %}
-            </p>
+        <div class="input-group col-xs-6 col-md-4 pull-left">
+            <span class="input-group-btn">
+                <span class="btn btn-primary btn-file">
+                    {{ upload_form.uploaded_file.label(class="sr-only") }}
+                    {{ upload_form.uploaded_file.label.text }}
+                    {{ upload_form.uploaded_file(multiple="multiple") }}
+                </span>
+            </span>
+            <input type="text" class="form-control" readonly>
         </div>
-        {{ upload_form.upload_button(class="btn btn-primary", name="upload") }}
+        {{ upload_form.upload_button(class="btn btn-primary left-margin",
+            name="upload") }}
     </form>
 {% endblock %}
 
