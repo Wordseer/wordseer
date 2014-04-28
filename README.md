@@ -19,3 +19,8 @@ using the Flask framework and several web framework libraries.
         python database.py migrate
 
     to migrate the model schema into the database.
+
+## Testing
+1. Simply run `runtests.py`:
+
+        python runtests.py

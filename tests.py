@@ -8,14 +8,17 @@ from sqlalchemy import create_engine
 import tempfile
 import unittest
 
-from app import app
+from app import app, database
 from app.models import *
+
+def reset_db():
+    open(app.config["SQLALCHEMY_DATABASE_PATH"], 'w').close()
+    engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
+    Base.metadata.create_all(engine)
 
 class TestModels(unittest.TestCase):
     def setUp(self):
-        open(app.config["SQLALCHEMY_DATABASE_PATH"], 'w').close()
-        engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
-        Base.metadata.create_all(engine)
+        reset_db()
 
     def tearDown(self):
         pass
@@ -88,8 +91,7 @@ class TestModels(unittest.TestCase):
         unit.save()
         prop.save()
 
-        retrieved_prop = session.query(Property).\
-            filter(Property.name=="title").\
+        retrieved_prop = Property.filter(Property.name=="title").\
             filter(Property.value == "Hello World").first()
 
         assert retrieved_prop.unit.unit_type == unit.unit_type
@@ -112,7 +114,7 @@ class TestModels(unittest.TestCase):
 
         prop.save()
 
-        retrieved_prop = session.query(Property).filter(name=="title").\
+        retrieved_prop = Property.filter(name=="title").\
             filter(value == "Hello World").first()
 
         assert retrieved_prop.name == prop.name
@@ -122,15 +124,13 @@ class ViewsTests(unittest.TestCase):
     def setUp(self):
         """Clear the database for the next unit test.
         """
-        # TODO: this is awful, hopefully flask.ext.sqlalchemy will save us
-        tmp_db.truncate(0)
-        engine = create_engine("sqlite:///" + tmp_db.name)
-        Base.metadata.create_all(engine)
+        self.client = app.test_client()
+        reset_db()
 
     def test_no_projects(self):
         """Test the projects view with no projects present.
         """
-        result = client.get("/projects/")
+        result = self.client.get("/projects/")
         assert "no projects" in result.data
 
     def test_projects(self):
@@ -138,19 +138,19 @@ class ViewsTests(unittest.TestCase):
         """
         new_project = Project(name="test")
         new_project.save()
-        result = client.get("/projects/")
+        result = self.client.get("/projects/")
         assert "/projects/1" in result.data
 
     def test_projects_empty_post(self):
         """Test POSTing without a file to the projects view.
         """
-        result = client.post("/projects/")
+        result = self.client.post("/projects/")
         assert "no projects" in result.data
 
     def test_projects_post(self):
         upload_dir = tempfile.mkdtemp()
         app.config["UPLOAD_DIR"] = upload_dir
-        result = client.post("/projects/", data=dict(
+        result = self.client.post("/projects/", data=dict(
             upload_var=(StringIO("Test file"), "test.xml")))
         uploaded_file = open(os.path.join(upload_dir, "test.xml"))
 
