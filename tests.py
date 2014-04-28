@@ -4,14 +4,18 @@ Unit tests for the components of the wordseer web interface.
 
 from cStringIO import StringIO
 import os
+from sqlalchemy import create_engine
 import tempfile
 import unittest
 
 from app import app
+from app.models import *
 
 class TestModels(unittest.TestCase):
     def setUp(self):
-        pass
+        open(app.config["SQLALCHEMY_DATABASE_PATH"], 'w').close()
+        engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
+        Base.metadata.create_all(engine)
 
     def tearDown(self):
         pass
@@ -197,6 +201,3 @@ class ImportTests(unittest.TestCase):
 
         print(doc_dict)
         return doc_dict
-
-if __name__ == '__main__':
-    unittest.main()
