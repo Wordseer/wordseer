@@ -190,12 +190,33 @@ class ViewsTests(unittest.TestCase):
     def test_projects_bad_delete(self):
         """Test deleting without a selection.
         """
-        pass
+
+        project1 = Project(name="test1")
+        project2 = Project(name="test2")
+        project1.save()
+        project2.save()
+
+        result = self.client.post("/projects/", data={
+            "action": "-1",
+            "process-submitted": "true",
+            })
+
+        assert "must select" in result.data
 
     def test_projects_bad_process(self):
         """Test processing an unprocessable project.
         """
-        pass
+
+        project1 = Project(name="test1")
+        project1.save()
+
+        result = self.client.post("/projects/", data={
+            "action": "0",
+            "process-submitted": "true",
+            "process-selection": ["1"]
+            })
+
+        assert "include exactly one json file" in result.data
 
     def test_projects_process(self):
         """Test processing a processable project.

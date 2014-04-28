@@ -53,7 +53,8 @@ def is_processable(ids=None, units=None):
             doc_count += 1
 
     if struc_count is not 1:
-        raise ValidationError("Must be exactly one structure file")
+        raise ValidationError("Selection must include exactly one " +
+            app.config["STRUCTURE_EXTENSION"] + " file")
     if doc_count < 1:
         raise ValidationError("At least one document must be selected")
     return True
@@ -110,6 +111,5 @@ class ProjectProcessForm(ProcessForm):
         if form.process_button.data == form.PROCESS:
             # the projects must be processable, so get a list of files
             for project_id in form.selection.data:
-                project = session.query(Project).\
-                    filter(Project.id == project_id).one()
+                project = Project.filter(Project.id == project_id).one()
                 is_processable(units=project.files)

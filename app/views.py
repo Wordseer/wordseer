@@ -91,8 +91,6 @@ def projects():
     create_form = forms.ProjectCreateForm(prefix="create")
     process_form = forms.ProjectProcessForm(prefix="process")
 
-    print request.form
-
     process_form.selection.choices=[]
     for project in Project.all().all():
         process_form.selection.add_choice(project.id, project.name)
