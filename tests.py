@@ -167,6 +167,21 @@ class ViewsTests(unittest.TestCase):
         assert "test project" in result.data
         assert "/projects/1" in result.data
 
+    @unittest.skip("not quite working")
+    def test_document_show(self):
+        """Test the detail document view.
+        """
+        project = Project(name="test project", path="/test-path/")
+        project.save()
+
+        document = Unit(path="/test-path/test-file.xml", project=project)
+        document.save()
+
+        result = self.client.get("/projects/1/documents/1")
+
+        assert "/uploads/" + str(document.id) in result
+        assert "test-file.xml" in result
+
     @unittest.skip("requires research")
     def test_projects_post(self):
         upload_dir = tempfile.mkdtemp()
