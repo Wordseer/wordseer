@@ -174,8 +174,8 @@ class ViewsTests(unittest.TestCase):
         """Test project deletion.
         """
 
-        project1 = Project(name="test1")
-        project2 = Project(name="test2")
+        project1 = Project(name="test1", path="/test-path/")
+        project2 = Project(name="test2", path="/test-path/")
         project1.save()
         project2.save()
 
@@ -186,6 +186,9 @@ class ViewsTests(unittest.TestCase):
             })
 
         assert "no projects" in result.data
+        mock_shutil.rmtree.assert_any_call(project1.path)
+        mock_shutil.rmtree.assert_any_call(project2.path)
+        assert mock_shutil.rmtree.call_count == 2
 
     def test_projects_bad_delete(self):
         """Test deleting without a selection.
@@ -202,6 +205,8 @@ class ViewsTests(unittest.TestCase):
             })
 
         assert "must select" in result.data
+        assert "/projects/1" in result.data
+        assert "/projects/2" in result.data
 
     def test_projects_bad_process(self):
         """Test processing an unprocessable project.
@@ -274,16 +279,62 @@ class ViewsTests(unittest.TestCase):
         """Try sending an empty post to project_show.
         """
         project = Project(name="test")
+        project.save()
 
-    def test_project_show_delete(self):
+        result = self.client.post("/projects/1", data={
+            "upload-submitted": "true"
+            })
+
+        assert "You must select a file" in result.data
+
+        result = self.client.post("/projects/1", data={
+            "process-submitted": "true"
+            })
+
+        assert "At least one document must be selected"
+
+    @mock.patch("app.views.os", autospec=os)
+    def test_project_show_delete(self, mock_os):
         """Test file deletion.
         """
-        pass
+        project = Project(name="test")
+        project.save()
+
+        unit1 = Unit(project=project, path="/test-path/1.xml")
+        unit2 = Unit(project=project, path="/test-path/2.xml")
+        unit1.save()
+        unit2.save()
+
+        result = self.client.post("/projects/1", data={
+            "process-submitted": "true",
+            "action": "-1",
+            "process-selection": ["1", "2"]
+            })
+
+        assert "no files in this project" in result.data
+        mock_os.remove.assert_any_call(unit1.path)
+        mock_os.remove.assert_any_call(unit2.path)
+        assert mock_os.remove.call_count == 2
 
     def test_project_show_bad_delete(self):
         """Test a bad file delete request.
         """
-        pass
+        project = Project(name="test")
+        project.save()
+
+        unit1 = Unit(project=project, path="/test-path/1.xml")
+        unit2 = Unit(project=project, path="/test-path/2.xml")
+        unit1.save()
+        unit2.save()
+
+        result = self.client.post("/projects/1", data={
+            #"process-submitted": "true",
+            #"action": "-1",
+            })
+
+        assert "must select" in result.data
+        assert "/projects/1/documents/1" in result.data
+        assert "/projects/1/documents/2" in result.data
 
     def test_project_show_process(self):
         """Test processing a processable group of files.

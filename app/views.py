@@ -180,12 +180,11 @@ def project_show(project_id):
             # Delete every selected file, its database record, and item in
             # the listing
             for file_id in files:
-                file_model = session.query(Unit).\
-                    filter(Unit.id == file_id).one()
+                file_model = Unit.filter(Unit.id == file_id).one()
                 file_name = os.path.split(file_model.path)[1]
                 os.remove(file_model.path)
-                session.delete(file_model)
-                session.commit()
+                database.delete(file_model)
+                database.commit()
                 process_form.selection.delete_choice(int(file_id), file_name)
 
         elif request.form["action"] == process_form.PROCESS:
