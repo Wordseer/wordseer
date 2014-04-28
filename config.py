@@ -7,6 +7,7 @@ This module uses classes to set configurations for different environments.
 """
 
 import os
+import tempfile
 
 DEFAULT_ENV = "Development"
 
@@ -54,6 +55,6 @@ class Testing(BaseConfig):
     WTF_CSRF_ENABLED = False
 
     # Set database configurations
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BaseConfig.ROOT,
-        BaseConfig.APP_NAME + "_test.db")
+    SQLALCHEMY_DATABASE_PATH = tempfile.mkstemp()[1]
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLALCHEMY_DATABASE_PATH
     SQLALCHEMY_ECHO = False
