@@ -146,6 +146,8 @@ def project_show(project_id):
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.DocumentProcessForm(prefix="process")
 
+    print request.form
+
     # The template needs access to the ID of each file and its filename.
     file_objects = Unit.filter(Unit.project_id == project_id).\
         filter(Unit.path != None).all()

@@ -162,7 +162,8 @@ class ViewsTests(unittest.TestCase):
         
         result = self.client.post("/projects/", data={
             "create-submitted": "true",
-            "create-name": "test project"})
+            "create-name": "test project"
+            })
 
         assert "test project" in result.data
         assert "/projects/1" in result.data
@@ -193,13 +194,27 @@ class ViewsTests(unittest.TestCase):
         assert "/projects/1/documents/1" in result.data
         assert "/projects/1/documents/2" in result.data
 
-    @unittest.skip("requires research")
-    def test_projects_post(self):
+    def test_project_show_post(self):
+        """Try uploading a file to the project_show view.
+        """
+        project = Project(name="test")
+        project.save()
+        
         upload_dir = tempfile.mkdtemp()
         app.config["UPLOAD_DIR"] = upload_dir
-        result = self.client.post("/projects/", data=dict(
-            upload_var=(StringIO("Test file"), "test.xml")))
-        uploaded_file = open(os.path.join(upload_dir, "test.xml"))
+        os.makedirs(os.path.join(upload_dir, "1"))
+
+        result = self.client.post("/projects/1", data={
+            "upload-submitted": "true",
+            "upload-uploaded_file": (StringIO("Test file"), "test.xml")
+            })
+
+        assert os.path.exists(os.path.join(upload_dir, "1", "test.xml"))
+
+        uploaded_file = open(os.path.join(upload_dir, "1", "test.xml"))
+
+        assert uploaded_file.read() == "Test file"
+        
 
     @unittest.skip("not quite working")
     def test_document_show(self):
