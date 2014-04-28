@@ -8,6 +8,8 @@ This module uses classes to set configurations for different environments.
 
 import os
 
+DEFAULT_ENV = "Development"
+
 class BaseConfig(object):
     """This module contains application-wide configurations. It provides
     variables that are used in other configurations.
@@ -22,7 +24,7 @@ class BaseConfig(object):
     SQLALCHEMY_MIGRATE_REPO = os.path.join(ROOT, 'db')
 
     # Upload config
-    UPLOAD_DIR = os.path.join(basedir, 'app/uploads')
+    UPLOAD_DIR = os.path.join(ROOT, 'app/uploads')
     ALLOWED_EXTENSIONS = ["xml", "json"]
     STRUCTURE_EXTENSION = "json"
 

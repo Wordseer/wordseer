@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_wtf.csrf import CsrfProtect
+from config import DEFAULT_ENV
 
 app = Flask(__name__)
 CsrfProtect(app)
@@ -11,8 +12,7 @@ try:
     environment = os.environ['FLASK_ENV'].title()
     app.config.from_object('.'.join(["config", environment]))
 except KeyError:
-    print("Your Flask environment is not set.")
-    exit(0)
+    app.config.from_object(".".join(["config", DEFAULT_ENV]))
 
 """
 ===============
