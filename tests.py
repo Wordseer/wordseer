@@ -4,12 +4,16 @@ Unit tests for the components of the wordseer web interface.
 
 from cStringIO import StringIO
 import os
-from sqlalchemy import create_engine
 import tempfile
 import unittest
 
+import mock
+from sqlalchemy import create_engine
+
 from app import app, database
 from app.models import *
+
+app.testing = True
 
 def reset_db():
     open(app.config["SQLALCHEMY_DATABASE_PATH"], 'w').close()
@@ -142,11 +146,28 @@ class ViewsTests(unittest.TestCase):
         assert "/projects/1" in result.data
 
     def test_projects_empty_post(self):
-        """Test POSTing without a file to the projects view.
+        """Test POSTing without a project name to the projects view.
         """
         result = self.client.post("/projects/")
         assert "no projects" in result.data
+        assert "This field is required" in result.data
 
+    @mock.patch("app.views.os", autospec=os)
+    def test_projects_valid_post(self, mock_os):
+        """Test POSTing with a valid project name.
+
+        The view should have the name and the path to the project.
+        """
+        mock_os.path.join.return_value = "test_path"
+        
+        result = self.client.post("/projects/", data={
+            "create-submitted": "true",
+            "create-name": "test project"})
+
+        assert "test project" in result.data
+        assert "/projects/1" in result.data
+
+    @unittest.skip("requires research")
     def test_projects_post(self):
         upload_dir = tempfile.mkdtemp()
         app.config["UPLOAD_DIR"] = upload_dir
