@@ -11,9 +11,7 @@ from app import app
 
 class TestModels(unittest.TestCase):
     def setUp(self):
-        """Set up the database for the models tests.
-        """
-        Base.environment = 'test'
+        pass
 
     def tearDown(self):
         pass
