@@ -25,9 +25,6 @@ class Base(object):
 
     """
 
-    # Instantiate class variable for environment. Default to dev
-    environment = 'dev'
-
     @declared_attr
     def __tablename__(cls):
         """Define the table name.
@@ -43,14 +40,14 @@ class Base(object):
     id = Column(Integer, primary_key=True)
 
     def save(self):
-        """Commits this model instance to the database.
+        """Commits this model instance to the database
 
         TODO: should return either True or False depending on its success.
         TODO: manage sequential saves better.
 
         """
-        database[Base.environment].add(self)
-        database[Base.environment].commit()
+        database.add(self)
+        database.commit()
 
     @classmethod
     def get(cls, id):
@@ -69,7 +66,7 @@ class Base(object):
           Raises an error if not found.
 
         """
-        return database[Base.environment].query(cls).filter(cls.id==id).first()
+        return database.query(cls).filter(cls.id==id).first()
 
     @classmethod
     def all(cls):
@@ -79,7 +76,7 @@ class Base(object):
           Query object containing all records in the table for this model.
 
         """
-        return database[Base.environment].query(cls)
+        return database.query(cls)
 
     # Criteria-based look-up; see SQLAlchemy docs for use
     @classmethod
@@ -96,7 +93,7 @@ class Base(object):
           Query object containing the matching records.
 
         """
-        return database[Base.environment].query(cls).filter(criteria)
+        return database.query(cls).filter(criteria)
 
 # Set the above Base class as the default model.
 Base = declarative_base(cls=Base)
