@@ -167,6 +167,40 @@ class ViewsTests(unittest.TestCase):
         assert "test project" in result.data
         assert "/projects/1" in result.data
 
+    def test_no_project_show(self):
+        """Make sure project_show says that there are no files.
+        """
+        project = Project(name="test")
+        project.save()
+        result = self.client.get("/projects/1")
+
+        assert "test" in result.data
+        assert "There are no files in this project" in result.data
+
+    def test_project_show(self):
+        """Make sure project_show shows files.
+        """
+        project = Project(name="test")
+        project.save()
+        document1 = Unit(path="/test/doc1.xml", project=project)
+        document2 = Unit(path="/test/doc2.xml", project=project)
+        document1.save()
+        document2.save()
+        result = self.client.get("/projects/1")
+
+        assert "doc1.xml" in result.data
+        assert "doc2.xml" in result.data
+        assert "/projects/1/documents/1" in result.data
+        assert "/projects/1/documents/2" in result.data
+
+    @unittest.skip("requires research")
+    def test_projects_post(self):
+        upload_dir = tempfile.mkdtemp()
+        app.config["UPLOAD_DIR"] = upload_dir
+        result = self.client.post("/projects/", data=dict(
+            upload_var=(StringIO("Test file"), "test.xml")))
+        uploaded_file = open(os.path.join(upload_dir, "test.xml"))
+
     @unittest.skip("not quite working")
     def test_document_show(self):
         """Test the detail document view.
@@ -181,14 +215,6 @@ class ViewsTests(unittest.TestCase):
 
         assert "/uploads/" + str(document.id) in result
         assert "test-file.xml" in result
-
-    @unittest.skip("requires research")
-    def test_projects_post(self):
-        upload_dir = tempfile.mkdtemp()
-        app.config["UPLOAD_DIR"] = upload_dir
-        result = self.client.post("/projects/", data=dict(
-            upload_var=(StringIO("Test file"), "test.xml")))
-        uploaded_file = open(os.path.join(upload_dir, "test.xml"))
 
 @unittest.skip("Should be rewritten to use David's code.")
 class ImportTests(unittest.TestCase):

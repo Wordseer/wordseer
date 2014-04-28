@@ -147,7 +147,7 @@ def project_show(project_id):
     process_form = forms.DocumentProcessForm(prefix="process")
 
     # The template needs access to the ID of each file and its filename.
-    file_objects = session.query(Unit).filter(Unit.project_id == project_id).\
+    file_objects = Unit.filter(Unit.project_id == project_id).\
         filter(Unit.path != None).all()
     process_form.selection.choices=[]
     for file_object in file_objects:
