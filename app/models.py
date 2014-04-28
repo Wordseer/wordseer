@@ -8,9 +8,8 @@ This module contains the model-level logic, built on SQLAlchemy.
 
 """
 
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy import (Boolean, Column, ForeignKey, Integer,
-    String, Table, Text)
 from sqlalchemy.orm import backref, relationship
 
 from app import database
