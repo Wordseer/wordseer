@@ -10,7 +10,7 @@ from werkzeug import secure_filename
 from app import app
 import exceptions
 import forms
-from models import session, Unit, Project
+from models import Unit, Project
 import shortcuts
 
 #TODO: implement after flask-sqlalchemy

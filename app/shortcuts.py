@@ -6,7 +6,6 @@ from flask import render_template, abort
 from sqlalchemy.orm.exc import NoResultFound
 
 import exceptions
-from models import session
 
 def really_submitted(form):
     """ WTForms can be really finnicky when it comes to checking if a form

@@ -12,7 +12,7 @@ from wtforms.validators import Required, ValidationError
 
 from app import app
 from fields import ButtonField, MultiCheckboxField
-from models import Unit, session, Project
+from models import Unit, Project
 from widgets import ButtonWidget
 
 class HiddenSubmitted(object):
