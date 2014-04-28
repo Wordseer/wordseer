@@ -1,14 +1,18 @@
 # Modified from:
 # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
+from app import app
+import os
+import shutil
+import imp
 
 from migrate.versioning import api
-from config import SQLALCHEMY_DATABASE_URI
-from config import SQLALCHEMY_MIGRATE_REPO
 from app.models import Base
 from sys import argv
 from sqlalchemy import create_engine
-import os.path
-import imp
+
+
+SQLALCHEMY_DATABASE_URI = app.config["SQLALCHEMY_DATABASE_URI"]
+SQLALCHEMY_MIGRATE_REPO = app.config["SQLALCHEMY_MIGRATE_REPO"]
 
 def create():
     create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
@@ -38,6 +42,36 @@ def downgrade():
     api.downgrade(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO, v - 1)
     print 'Current database version: ' + str(api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO))
 
+def drop():
+    os.remove(SQLALCHEMY_DATABASE_URI.split('///')[-1])
+    shutil.rmtree(SQLALCHEMY_MIGRATE_REPO)
+
+def reset():
+    # Remove old database if it's there
+    try:
+        os.remove(SQLALCHEMY_DATABASE_URI.split('///')[-1])
+    except OSError:
+        pass
+
+    engine = create_engine(SQLALCHEMY_DATABASE_URI)
+    Base.metadata.create_all(engine)
+
+def prep_test():
+    try:
+        if os.environ['FLASK_ENV'].lower() == 'testing':
+            try:
+                # Remove old database if it's there
+                os.remove(SQLALCHEMY_DATABASE_URI.split('///')[-1])
+            except OSError:
+                pass
+
+            engine = create_engine(SQLALCHEMY_DATABASE_URI)
+            Base.metadata.create_all(engine)
+        else:
+            print("Your envinronment configurations are not set to testing.")
+    except KeyError:
+        print("Your Flask environment is not set.")
+
 if __name__ == "__main__":
 
     if argv[1] == "create":
@@ -48,5 +82,11 @@ if __name__ == "__main__":
         upgrade()
     elif argv[1] == "downgrade":
         downgrade()
+    elif argv[1] == "drop":
+        drop()
+    elif argv[1] == "reset":
+        prep_test()
+    elif argv[1] == "prep_test":
+        prep_test()
     else:
         print(str(argv[1]) + " is not a valid database operation.")

@@ -9,17 +9,12 @@ This module contains the model-level logic, built on SQLAlchemy.
 """
 
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy import (Boolean, Column, create_engine, ForeignKey, Integer,
+from sqlalchemy import (Boolean, Column, ForeignKey, Integer,
     String, Table, Text)
-from sqlalchemy.orm import backref, relationship, sessionmaker
+from sqlalchemy.orm import backref, relationship
 
+from app import database
 from config import *
-
-# create database connection
-engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=SQLALCHEMY_ECHO)
-Session = sessionmaker(bind=engine)
-session = Session()
-
 
 class Base(object):
     """This is a customized version of SQLAlchemy's Base object.
@@ -46,12 +41,14 @@ class Base(object):
     id = Column(Integer, primary_key=True)
 
     def save(self):
-        """Commits this model instance to the database.
+        """Commits this model instance to the database
 
         TODO: should return either True or False depending on its success.
+        TODO: manage sequential saves better.
+
         """
-        session.add(self)
-        session.commit()
+        database.add(self)
+        database.commit()
 
     @classmethod
     def get(cls, id):
@@ -70,7 +67,7 @@ class Base(object):
           Raises an error if not found.
 
         """
-        return session.query(cls).filter(cls.id==id).first()
+        return database.query(cls).filter(cls.id==id).first()
 
     @classmethod
     def all(cls):
@@ -80,7 +77,7 @@ class Base(object):
           Query object containing all records in the table for this model.
 
         """
-        return session.query(cls)
+        return database.query(cls)
 
     # Criteria-based look-up; see SQLAlchemy docs for use
     @classmethod
@@ -97,7 +94,7 @@ class Base(object):
           Query object containing the matching records.
 
         """
-        return session.query(cls).filter(criteria)
+        return database.query(cls).filter(criteria)
 
 # Set the above Base class as the default model.
 Base = declarative_base(cls=Base)
@@ -188,10 +185,26 @@ class Unit(Base):
                 self.sentences.append(sentence)
 
             # TODO: initialize subunits
-
             self.save
 
         super(Unit, self).__init__(**kwargs)
+
+    @property
+    def parent(self):
+        """Method for getting a unit's parent.
+
+        This method exists because in the current set up, it has been tricky to
+        define the parent as a relationship.
+        """
+
+        return Unit.get(self.parent_id)
+
+    def __repr__(self):
+        """Return a representation of a unit, which is its type followed by its
+        ordering number.
+        """
+
+        return " ".join([self.unit_type, str(self.number)])
 
 class Sentence(Base):
     """A model representing a sentence.

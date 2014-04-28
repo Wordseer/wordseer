@@ -1,21 +1,57 @@
+"""
+==========================
+Application Configurations
+==========================
+
+This module uses classes to set configurations for different environments.
+"""
+
 import os
-basedir = os.path.abspath(os.path.dirname(__file__))
-# assuming application name is same as folder
-app_name = os.path.basename(basedir) 
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, app_name + ".db")
-SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db')
-SQLALCHEMY_ECHO = True
+class BaseConfig(object):
+    """This module contains application-wide configurations. It provides
+    variables that are used in other configurations.
+    """
 
-WTF_CSRF_ENABLED = True
-SECRET_KEY = "secret" #TODO: change this in production
+    # Set root folder and application name
+    ROOT = os.path.abspath(os.path.dirname(__file__))
+    # assuming application name is same as folder
+    APP_NAME = os.path.basename(ROOT)
 
-# Upload config
-UPLOAD_DIR = os.path.join(basedir, 'app/uploads')
-ALLOWED_EXTENSIONS = ["xml", "json"]
-STRUCTURE_EXTENSION = "json"
+    # Migration settings for flask-migrate
+    SQLALCHEMY_MIGRATE_REPO = os.path.join(ROOT, 'db')
 
-# Routing URLS
-PROJECT_ROUTE = "/projects/"
-DOCUMENT_ROUTE = "/documents/"
-UPLOAD_ROUTE = "/uploads/"
+    # Upload config
+    UPLOAD_DIR = os.path.join(basedir, 'app/uploads')
+    ALLOWED_EXTENSIONS = ["xml", "json"]
+    STRUCTURE_EXTENSION = "json"
+
+    # Routing URLS
+    PROJECT_ROUTE = "/projects/"
+    DOCUMENT_ROUTE = "/documents/"
+    UPLOAD_ROUTE = "/uploads/"
+
+class Development(BaseConfig):
+    """ This class has settings specific for the development environment.
+    """
+
+    # CSRF settings for forms
+    WTF_CSRF_ENABLED = True
+    SECRET_KEY = "secret" #TODO: change this in production
+
+    # Set database configurations
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BaseConfig.ROOT,
+        BaseConfig.APP_NAME + "_dev.db")
+    SQLALCHEMY_ECHO = True
+
+class Testing(BaseConfig):
+    """ This class has settings specific for the testing environment.
+    """
+
+    # CSRF settings for forms
+    WTF_CSRF_ENABLED = False
+
+    # Set database configurations
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BaseConfig.ROOT,
+        BaseConfig.APP_NAME + "_test.db")
+    SQLALCHEMY_ECHO = False

@@ -7,31 +7,13 @@ import os
 import tempfile
 import unittest
 
-#import config
-#from config import basedir
 from app import app
-#from app.models import *
-
-# TODO: more elegant way to do this? this code is a horrible mess
-tmp_db = tempfile.NamedTemporaryFile()
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + tmp_db.name
-app.config["SQLALCHEMY_ECHO"] = False
-app.config["WTF_CSRF_ENABLED"] = False
-from app.models import *
-Base.metadata.create_all(engine)
-import app
-client = app.app.test_client()
 
 class TestModels(unittest.TestCase):
     def setUp(self):
         """Set up the database for the models tests.
         """
-#        app.config['TESTING'] = True
-#        app.config["SQLALCHEMY_ECHO"] = False
-#        self.db_file, db_path = tempfile.mkstemp()
-#        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
-#        self.app = app.test_client()
-        pass
+        Base.environment = 'test'
 
     def tearDown(self):
         pass
