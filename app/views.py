@@ -8,6 +8,7 @@ from flask.views import View
 from werkzeug import secure_filename
 
 from app import app
+from app import database
 import exceptions
 import forms
 from models import Unit, Project
@@ -90,6 +91,8 @@ def projects():
     create_form = forms.ProjectCreateForm(prefix="create")
     process_form = forms.ProjectProcessForm(prefix="process")
 
+    print request.form
+
     process_form.selection.choices=[]
     for project in Project.all().all():
         process_form.selection.add_choice(project.id, project.name)
@@ -109,12 +112,11 @@ def projects():
         selected_projects = request.form.getlist("process-selection")
         if request.form["action"] == process_form.DELETE:
             for project_id in selected_projects:
-                project = session.query(Project).\
-                    filter(Project.id == project_id).one()
+                project = Project.filter(Project.id == project_id).one()
                 shutil.rmtree(project.path)
                 process_form.selection.delete_choice(project.id, project.name)
-                session.delete(project)
-                session.commit()
+                database.delete(project)
+                database.commit()
         if request.form["action"] == process_form.DELETE:
             #TODO: process the projects
             pass
@@ -145,8 +147,6 @@ def project_show(project_id):
 
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.DocumentProcessForm(prefix="process")
-
-    print request.form
 
     # The template needs access to the ID of each file and its filename.
     file_objects = Unit.filter(Unit.project_id == project_id).\

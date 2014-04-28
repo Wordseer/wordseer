@@ -4,6 +4,7 @@ Unit tests for the components of the wordseer web interface.
 
 from cStringIO import StringIO
 import os
+import shutil
 import tempfile
 import unittest
 
@@ -153,7 +154,7 @@ class ViewsTests(unittest.TestCase):
         assert "This field is required" in result.data
 
     @mock.patch("app.views.os", autospec=os)
-    def test_projects_valid_post(self, mock_os):
+    def test_projects_valid_create_post(self, mock_os):
         """Test POSTing with a valid project name.
 
         The view should have the name and the path to the project.
@@ -167,6 +168,39 @@ class ViewsTests(unittest.TestCase):
 
         assert "test project" in result.data
         assert "/projects/1" in result.data
+
+    @mock.patch("app.views.shutil", autospec=shutil)
+    def test_projects_delete_post(self, mock_shutil):
+        """Test project deletion.
+        """
+
+        project1 = Project(name="test1")
+        project2 = Project(name="test2")
+        project1.save()
+        project2.save()
+
+        result = self.client.post("/projects/", data={
+            "action": "-1",
+            "process-submitted": "true",
+            "process-selection": ["1", "2"]
+            })
+
+        assert "no projects" in result.data
+
+    def test_projects_bad_delete(self):
+        """Test deleting without a selection.
+        """
+        pass
+
+    def test_projects_bad_process(self):
+        """Test processing an unprocessable project.
+        """
+        pass
+
+    def test_projects_process(self):
+        """Test processing a processable project.
+        """
+        pass
 
     def test_no_project_show(self):
         """Make sure project_show says that there are no files.
@@ -214,7 +248,30 @@ class ViewsTests(unittest.TestCase):
         uploaded_file = open(os.path.join(upload_dir, "1", "test.xml"))
 
         assert uploaded_file.read() == "Test file"
-        
+
+    def test_project_show_no_post(self):
+        """Try sending an empty post to project_show.
+        """
+        project = Project(name="test")
+
+    def test_project_show_delete(self):
+        """Test file deletion.
+        """
+        pass
+
+    def test_project_show_bad_delete(self):
+        """Test a bad file delete request.
+        """
+        pass
+
+    def test_project_show_process(self):
+        """Test processing a processable group of files.
+        """
+        pass
+
+    def test_project_show_bad_process(self):
+        """Test processing an unprocessable group of files.
+        """
 
     @unittest.skip("not quite working")
     def test_document_show(self):
