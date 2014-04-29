@@ -146,12 +146,29 @@ class ViewsTests(unittest.TestCase):
         result = self.client.get("/projects/")
         assert "/projects/1" in result.data
 
+    def test_projects_bad_create(self):
+        """Test creating an existing project.
+        """
+        project = Project(name="test")
+        project.save()
+
+        result = self.client.post("/projects/", data={
+            "create-submitted": "true",
+            "create-name": "test"
+            })
+
+        assert "already exists" in result.data
+
     def test_projects_empty_post(self):
         """Test POSTing without a project name to the projects view.
         """
-        result = self.client.post("/projects/")
+        result = self.client.post("/projects/", data={
+            "create-submitted": "true",
+            "create-name": ""
+            })
+        
         assert "no projects" in result.data
-        assert "This field is required" in result.data
+        assert "You must provide a name" in result.data
 
     @mock.patch("app.views.os", autospec=os)
     def test_projects_valid_create_post(self, mock_os):

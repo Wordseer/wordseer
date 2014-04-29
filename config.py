@@ -53,6 +53,7 @@ class Testing(BaseConfig):
 
     # CSRF settings for forms
     WTF_CSRF_ENABLED = False
+    SECRET_KEY = "secret" #TODO: change this in production
 
     # Set database configurations
     SQLALCHEMY_DATABASE_PATH = tempfile.mkstemp()[1]

@@ -100,10 +100,14 @@ class ProjectCreateForm(Form, HiddenSubmitted):
     """
 
     name = StringField("Project Name", validators=[
-        Required()
+        Required("You must provide a name")
         ])
 
     create_button = ButtonField("Create")
+
+    def validate_name(form, field):
+        if Project.filter(Project.name == field.data).count() > 0:
+            raise ValidationError("A project with this name already exists")
 
 class ProjectProcessForm(ProcessForm):
     def validate_selection(form, field):
