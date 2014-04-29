@@ -50,32 +50,32 @@ def page_not_found(error):
     """
     return shortcuts.not_found("page")
 
-class CLPDView(View):
-    """This is a pluggable view to handle CLPD (Create, List, Process, Delete)
-    views.
+#class CLPDView(View):
+    #"""This is a pluggable view to handle CLPD (Create, List, Process, Delete)
+    #views.
 
-    In this application, we have two CLPD views which are in many ways very
-    similar: the project listing and the document listing. With this view,
-    we can reduce the redundancy.
-    """
+    #In this application, we have two CLPD views which are in many ways very
+    #similar: the project listing and the document listing. With this view,
+    #we can reduce the redundancy.
+    #"""
 
-    def __init__(self,  **kwargs):
-        """Initializes a CLPD view. kwargs are data passed to the view in
-        general.
-        """
-        #self.template = template
-        self.kwargs = kwargs
+    #def __init__(self,  **kwargs):
+        #"""Initializes a CLPD view. kwargs are data passed to the view in
+        #general.
+        #"""
+        ##self.template = template
+        #self.kwargs = kwargs
 
-    def dispatch_request(self, **kwargs):
-        """Render the template with the required data. kwargs are data
-        passed to the URL.
-        """
-        print self.kwargs
-        print other
-        return "hello world"
-        #return render_template(self.template, **kwargs)
+    #def dispatch_request(self, **kwargs):
+        #"""Render the template with the required data. kwargs are data
+        #passed to the URL.
+        #"""
+        #print self.kwargs
+        #print other
+        #return "hello world"
+        ##return render_template(self.template, **kwargs)
 
-app.add_url_rule("/test/<test>", view_func=CLPDView.as_view("test", blah=True))
+#app.add_url_rule("/test/<test>", view_func=CLPDView.as_view("test", blah=True))
 
 @app.route("/")
 def home():
