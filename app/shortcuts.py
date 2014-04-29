@@ -2,10 +2,8 @@
 Various methods helpful in the wordseer flask app.
 """
 
-from flask import render_template, abort
+from flask import abort, render_template
 from sqlalchemy.orm.exc import NoResultFound
-
-import exceptions
 
 def really_submitted(form):
     """ WTForms can be really finnicky when it comes to checking if a form
@@ -29,14 +27,14 @@ def get_object_or_exception(model, attribute, value, exception=None):
     :arg value: The required value of the attribute.
     :arg exception: The exception to raise on failure.
     """
-    
+
     #FIXME, see issue tracker
     try:
         return model.filter(attribute == value).one()
     except NoResultFound:
         try:
             raise exception
-        except:
+        except TypeError:
             abort(404)
 
 def not_found(item):

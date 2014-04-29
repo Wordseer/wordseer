@@ -6,14 +6,12 @@ import os
 
 from flask_wtf import Form
 from flask_wtf.file import FileAllowed, FileField, FileRequired
-from werkzeug import secure_filename
 from wtforms.fields import StringField, HiddenField
 from wtforms.validators import Required, ValidationError
 
-from app import app
-from fields import ButtonField, MultiCheckboxField
-from models import Unit, Project
-from widgets import ButtonWidget
+from ..app import app
+from .fields import ButtonField, MultiCheckboxField
+from .models import Unit, Project
 
 class HiddenSubmitted(object):
     """A mixin to provide a hidden field called "submitted" which has a default
@@ -59,8 +57,7 @@ def is_processable(ids=None, units=None):
     return True
 
 class ProcessForm(Form, HiddenSubmitted):
-    """
-    Allows the user to select which objects should be
+    """Allows the user to select which objects should be
     processed/deleted/whatever.
     """
 
@@ -74,7 +71,7 @@ class ProcessForm(Form, HiddenSubmitted):
         ],
         choices=[])
     process_button = ButtonField("Process", name="action", value=PROCESS)
-    delete_button = ButtonField("Delete",  name="action", value=DELETE)
+    delete_button = ButtonField("Delete", name="action", value=DELETE)
 
 class DocumentUploadForm(Form, HiddenSubmitted):
     """This is a form to upload files to the server. It handles both XML
@@ -89,13 +86,17 @@ class DocumentUploadForm(Form, HiddenSubmitted):
         ])
 
 class DocumentProcessForm(ProcessForm):
+    """A ProcessForm configured to validate selections of documents.
+    """
     def validate_selection(form, field):
+        """If the selection is for processing, then run is_processable on the
+        selected files.
+        """
         if form.process_button.data == form.PROCESS:
             is_processable(ids=form.selection.data)
 
 class ProjectCreateForm(Form, HiddenSubmitted):
-    """
-    Create new projects. This is simply a one-field form, requiring the
+    """Create new projects. This is simply a one-field form, requiring the
     desired name of the project.
     """
 
@@ -106,13 +107,19 @@ class ProjectCreateForm(Form, HiddenSubmitted):
     create_button = ButtonField("Create")
 
     def validate_name(form, field):
+        """Make sure there are no projects with this name existing.
+        """
         if Project.filter(Project.name == field.data).count() > 0:
             raise ValidationError("A project with this name already exists")
 
 class ProjectProcessForm(ProcessForm):
+    """A ProcessForm configured to validate selections of projects.
+    """
     def validate_selection(form, field):
+        """If the selection is for processing, then run is_processable on the
+        files of each selected project.
+        """
         if form.process_button.data == form.PROCESS:
-            # the projects must be processable, so get a list of files
             for project_id in form.selection.data:
                 project = Project.filter(Project.id == project_id).one()
                 is_processable(units=project.files)

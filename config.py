@@ -38,7 +38,6 @@ class BaseConfig(object):
     SECURITY_REGISTERABLE = True
     SECURITY_CHANGEABLE = True
     SECURITY_RECOVERABLE = True
-    
 
 class Development(BaseConfig):
     """ This class has settings specific for the development environment.

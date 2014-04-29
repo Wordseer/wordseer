@@ -5,7 +5,7 @@ Custom fields for this flask application.
 from wtforms.fields import Field, SelectMultipleField
 from wtforms.widgets import ListWidget, CheckboxInput
 
-from widgets import ButtonWidget
+from .widgets import ButtonWidget
 
 class ButtonField(Field):
     """A field to conveniently use buttons in flask forms.

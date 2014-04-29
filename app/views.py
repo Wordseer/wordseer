@@ -1,3 +1,7 @@
+"""
+These are all the view functions for the app.
+"""
+
 import os
 import shutil
 import random
@@ -5,15 +9,15 @@ from string import ascii_letters, digits
 
 from flask import (redirect, render_template, request, send_from_directory,
     session)
-from flask.views import View
+#from flask.views import View
 from werkzeug import secure_filename
 
-from app import app
-from app import database
-import exceptions
-import forms
-from models import Unit, Project
-import shortcuts
+from ..app import app
+from ..app import database
+from . import exceptions
+from . import forms
+from .models import Unit, Project
+from . import shortcuts
 
 def generate_form_token():
     """Sets a token to prevent double posts."""
@@ -78,6 +82,8 @@ def page_not_found(error):
 
 @app.route("/")
 def home():
+    """Display the home page.
+    """
     return render_template("home.html")
 
 @app.route(app.config["PROJECT_ROUTE"], methods=["GET", "POST"])
@@ -91,7 +97,7 @@ def projects():
     create_form = forms.ProjectCreateForm(prefix="create")
     process_form = forms.ProjectProcessForm(prefix="process")
 
-    process_form.selection.choices=[]
+    process_form.selection.choices = []
     for project in Project.all().all():
         process_form.selection.add_choice(project.id, project.name)
 
@@ -101,7 +107,7 @@ def projects():
         project = Project(
             name=create_form.name.data)
         project.save()
-        project.path=os.path.join(app.config["UPLOAD_DIR"], str(project.id))
+        project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
         project.save()
         os.mkdir(project.path)
         process_form.selection.add_choice(project.id, project.name)
@@ -149,7 +155,7 @@ def project_show(project_id):
     # The template needs access to the ID of each file and its filename.
     file_objects = Unit.filter(Unit.project_id == project_id).\
         filter(Unit.path != None).all()
-    process_form.selection.choices=[]
+    process_form.selection.choices = []
     for file_object in file_objects:
         process_form.selection.add_choice(file_object.id,
             os.path.split(file_object.path)[1])
@@ -216,7 +222,7 @@ def document_show(project_id, document_id):
         exceptions.DocumentNotFoundException)
 
     filename = os.path.split(document.path)[1]
-    
+
     return render_template("document_show.html",
         document=document,
         project=project,
