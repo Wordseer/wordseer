@@ -1,9 +1,10 @@
 import os
 import shutil
-#import random
-#from string import ascii_letters, digits
+import random
+from string import ascii_letters, digits
 
-from flask import render_template, request, send_from_directory
+from flask import (redirect, render_template, request, send_from_directory,
+    session)
 from flask.views import View
 from werkzeug import secure_filename
 
@@ -15,21 +16,21 @@ from models import Unit, Project
 import shortcuts
 
 #TODO: implement after flask-sqlalchemy
-#def generate_form_token():
-    #"""Sets a token to prevent double posts."""
-    #if '_form_token' not in session:
-        #form_token = \
-            #''.join([random.choice(ascii_letters+digits) for i in range(32)])
-        #session['_form_token'] = form_token
-    #return session['_form_token']
+def generate_form_token():
+    """Sets a token to prevent double posts."""
+    if '_form_token' not in session:
+        form_token = ''.join(
+            [random.choice(ascii_letters+digits) for i in range(32)])
+        session['_form_token'] = form_token
+    return session['_form_token']
 
-#@app.before_request
-#def check_form_token():
-    #"""Checks for a valid form token in POST requests."""
-    #if request.method == 'POST':
-        #token = session.pop('_form_token', None)
-        #if not token or token != request.form.get('_form_token'):
-            #redirect(request.url)
+@app.before_request
+def check_form_token():
+    """Checks for a valid form token in POST requests."""
+    if request.method == 'POST':
+        token = session.pop('_form_token', None)
+        if not token or token != request.form.get('_form_token'):
+            redirect(request.url)
 
 @app.errorhandler(exceptions.ProjectNotFoundException)
 def project_not_found(error):
