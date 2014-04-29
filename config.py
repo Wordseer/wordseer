@@ -34,6 +34,12 @@ class BaseConfig(object):
     DOCUMENT_ROUTE = "/documents/"
     UPLOAD_ROUTE = "/uploads/"
 
+    #Login settings
+    SECURITY_REGISTERABLE = True
+    SECURITY_CHANGEABLE = True
+    SECURITY_RECOVERABLE = True
+    
+
 class Development(BaseConfig):
     """ This class has settings specific for the development environment.
     """

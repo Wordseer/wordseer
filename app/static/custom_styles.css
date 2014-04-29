@@ -37,3 +37,12 @@ input[readonly] {
 nav {
     margin-top: 10px;
 }
+
+.alert h2:first-child {
+    margin-top: 0;
+}
+
+form + .alert {
+    margin-top: 15px;
+}
+    
