@@ -423,7 +423,6 @@ class ViewsTests(unittest.TestCase):
 
         assert "At least one document must be selected" in result.data
 
-    @unittest.skip("not quite working")
     def test_document_show(self):
         """Test the detail document view.
         """
@@ -435,8 +434,8 @@ class ViewsTests(unittest.TestCase):
 
         result = self.client.get("/projects/1/documents/1")
 
-        assert "/uploads/" + str(document.id) in result
-        assert "test-file.xml" in result
+        assert "/uploads/" + str(document.id) in result.data
+        assert "test-file.xml" in result.data
 
 @unittest.skip("Should be rewritten to use David's code.")
 class ImportTests(unittest.TestCase):
