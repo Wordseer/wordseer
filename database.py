@@ -1,12 +1,11 @@
 # Modified from:
 # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
-from app import app
+from app import app, db
 import os
 import shutil
 import imp
 
 from migrate.versioning import api
-from app.models import Base
 from sys import argv
 from sqlalchemy import create_engine
 
@@ -53,8 +52,7 @@ def reset():
     except OSError:
         pass
 
-    engine = create_engine(SQLALCHEMY_DATABASE_URI)
-    Base.metadata.create_all(engine)
+    db.create_all()
 
 def prep_test():
     try:
@@ -65,8 +63,7 @@ def prep_test():
             except OSError:
                 pass
 
-            engine = create_engine(SQLALCHEMY_DATABASE_URI)
-            Base.metadata.create_all(engine)
+            db.create_all()
         else:
             print("Your envinronment configurations are not set to testing.")
     except KeyError:

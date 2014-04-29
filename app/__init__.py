@@ -18,11 +18,9 @@ Database Set Up
 ===============
 """
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from flask.ext.sqlalchemy import SQLAlchemy
+db = SQLAlchemy(app)
 
-# Set up database sessions for different environments
-database = sessionmaker(bind=create_engine(app.config["SQLALCHEMY_DATABASE_URI"]))()
 
 from app.controllers import *
 from app.models import *

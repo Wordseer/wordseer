@@ -55,7 +55,7 @@ class TestCase(unittest.TestCase):
         [ model.save() for model in models ]
 
         # Try querying for the models again
-        p2 = Property.filter(Property.name=='title' and Property.value=='Hello World').first()
+        p2 = Property.query.filter(Property.name=='title' and Property.value=='Hello World').first()
         u2 = p2.unit
 
         print("\"Hello World\" unit: ", u2.sentences)
