@@ -9,13 +9,18 @@ This module contains the model-level logic, built on SQLAlchemy.
 """
 
 from app import db
+from sqlalchemy.ext.declarative import declared_attr
 
-
-class Base():
+class Base(object):
     """This is a mixin to add to Flask-SQLAlchemy's db.Model class.
     """
 
     # Define the primary key
+    id = db.Column(db.Integer, primary_key=True)
+
+    @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
 
     def save(self):
         """Commits this model instance to the database
@@ -54,7 +59,6 @@ class Unit(db.Model, Base):
 
     """
 
-    id = db.Column(db.Integer, primary_key=True)
     unit_type = db.Column(db.String(64), index = True)
     number = db.Column(db.Integer, index = True)
     parent_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
@@ -154,7 +158,6 @@ class Sentence(db.Model, Base):
 
     """
 
-    id = db.Column(db.Integer, primary_key=True)
     unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
     text = db.Column(db.Text, index = True)
 
@@ -178,7 +181,6 @@ class Word(db.Model, Base):
 
     """
 
-    id = db.Column(db.Integer, primary_key=True)
     word = db.Column(db.String, index = True)
 
     def __repr__(self):
@@ -202,7 +204,6 @@ class Property(db.Model, Base):
     """
 
     # Schema
-    id = db.Column(db.Integer, primary_key=True)
     unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
     name = db.Column(db.String, index = True)
     value = db.Column(db.String, index = True)
