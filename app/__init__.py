@@ -1,6 +1,8 @@
 import os
 from flask import Flask
+from flask.ext.security import Security, SQLAlchemyUserDatastore
 from flask_wtf.csrf import CsrfProtect
+
 from config import DEFAULT_ENV
 
 app = Flask(__name__)
@@ -27,6 +29,15 @@ from sqlalchemy.orm import sessionmaker
 database = sessionmaker(
     bind=create_engine(app.config["SQLALCHEMY_DATABASE_URI"]))()
 
-from app.views import *
+"""
+Authentication setup
+"""
+
 from app.models import *
-#app.jinja_env.globals['form_token'] = generate_form_token
+
+user_datastore = SQLAlchemyUserDatastore(database, User, Role)
+security = Security(app, user_datastore)
+
+from app.views import *
+
+app.jinja_env.globals['form_token'] = generate_form_token

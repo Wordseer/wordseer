@@ -8,9 +8,12 @@ This module contains the model-level logic, built on SQLAlchemy.
 
 """
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table, Text
+from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
+from sqlalchemy import (Boolean, Column, ForeignKey, Integer, String, Table,
+    Text, Table, DateTime)
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import backref, relationship
+
 
 from app import database
 from config import *
@@ -292,6 +295,26 @@ class Project(Base):
 
     def __repr__(self):
         return "<Project (name=" + self.name + ")>"
+
+roles_users = Table('roles_users', Base.metadata,
+        Column('user_id', Integer, ForeignKey('user.id')),
+        Column('role_id', Integer, ForeignKey('role.id')))
+
+class Role(Base, RoleMixin):
+    """Represents a flask-security user role.
+    """
+    name = Column(String(80), unique=True)
+    description = Column(String(255))
+
+class User(Base, UserMixin):
+    """Represents a flask-security user.
+    """
+    email = Column(String(255), unique=True)
+    password = Column(String(255))
+    active = Column(Boolean())
+    confirmed_at = Column(DateTime())
+    roles = relationship('Role', secondary=roles_users,
+        backref=backref('users', lazy='dynamic'))
 
 """
 ##################
