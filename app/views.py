@@ -15,7 +15,6 @@ import forms
 from models import Unit, Project
 import shortcuts
 
-#TODO: implement after flask-sqlalchemy
 def generate_form_token():
     """Sets a token to prevent double posts."""
     if '_form_token' not in session:

@@ -8,7 +8,9 @@
             </ul>
         </div>
     {% endif %}
-    {{ field.label }} {{ field(**kwargs)|safe }}
+    <div class="form-group">
+        {{ field.label }} {{ field(**kwargs)|safe }}
+    </div>
 {% endmacro %}
 
 {% macro render_field(field) %}
