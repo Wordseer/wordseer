@@ -227,7 +227,7 @@ def get_file(file_id):
     """If the user has permission to view this file, then return it.
     """
 
-    unit = session.query(Unit).filter(Unit.id == file_id).one()
+    unit = Unit.filter(Unit.id == file_id).one()
 
     directory, filename = os.path.split(unit.path)
 

@@ -437,6 +437,20 @@ class ViewsTests(unittest.TestCase):
         assert "/uploads/" + str(document.id) in result.data
         assert "test-file.xml" in result.data
 
+    def test_get_file(self):
+        """Run tests on the get_file view.
+        """
+
+        file_path = os.path.join(app.config["UPLOAD_DIR"], "upload_test.txt")
+
+        document = Unit(path=file_path)
+        document.save()
+
+        result = self.client.get("/uploads/1")
+
+        with open(file_path) as test_file:
+            assert result.data == test_file.read()
+
 @unittest.skip("Should be rewritten to use David's code.")
 class ImportTests(unittest.TestCase):
     def test_sample_document(self):
