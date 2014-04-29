@@ -226,7 +226,21 @@ class ViewsTests(unittest.TestCase):
     def test_projects_process(self):
         """Test processing a processable project.
         """
-        pass
+        project = Project(name="test")
+        project.save()
+
+        unit1 = Unit(project=project, path="/test-path/1.xml")
+        unit2 = Unit(project=project, path="/test-path/2.json")
+        unit1.save()
+        unit2.save()
+
+        result = self.client.post("/projects/", data={
+            "process-submitted": "true",
+            "action": "0",
+            "process-selection": ["1"]
+            })
+
+        assert "Errors have occurred" not in result.data
 
     def test_no_project_show(self):
         """Make sure project_show says that there are no files.
@@ -254,7 +268,7 @@ class ViewsTests(unittest.TestCase):
         assert "/projects/1/documents/1" in result.data
         assert "/projects/1/documents/2" in result.data
 
-    def test_project_show_post(self):
+    def test_project_show_upload(self):
         """Try uploading a file to the project_show view.
         """
         project = Project(name="test")
@@ -270,10 +284,34 @@ class ViewsTests(unittest.TestCase):
             })
 
         assert os.path.exists(os.path.join(upload_dir, "1", "test.xml"))
+        assert "/projects/1/documents/1" in result.data
+        assert "test.xml" in result.data
 
         uploaded_file = open(os.path.join(upload_dir, "1", "test.xml"))
 
         assert uploaded_file.read() == "Test file"
+
+    def test_project_show_double_upload(self):
+        """Try uploading two files with the same name to the project_show view.
+        """
+        project = Project(name="test")
+        project.save()
+
+        upload_dir = tempfile.mkdtemp()
+        app.config["UPLOAD_DIR"] = upload_dir
+        os.makedirs(os.path.join(upload_dir, "1"))
+
+        self.client.post("/projects/1", data={
+            "upload-submitted": "true",
+            "upload-uploaded_file": (StringIO("Test file"), "test.xml")
+            })
+
+        result = self.client.post("/projects/1", data={
+            "upload-submitted": "true",
+            "upload-uploaded_file": (StringIO("Test file 2"), "test.xml")
+            })
+
+        assert "already exists" in result.data
 
     def test_project_show_no_post(self):
         """Try sending an empty post to project_show.
@@ -328,8 +366,8 @@ class ViewsTests(unittest.TestCase):
         unit2.save()
 
         result = self.client.post("/projects/1", data={
-            #"process-submitted": "true",
-            #"action": "-1",
+            "process-submitted": "true",
+            "action": "-1",
             })
 
         assert "must select" in result.data
@@ -339,11 +377,51 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_process(self):
         """Test processing a processable group of files.
         """
-        pass
+        project = Project(name="test")
+        project.save()
+
+        unit1 = Unit(project=project, path="/test-path/1.xml")
+        unit2 = Unit(project=project, path="/test-path/2.json")
+        unit1.save()
+        unit2.save()
+
+        result = self.client.post("/projects/1", data={
+            "process-submitted": "true",
+            "action": "0",
+            "process-selection": ["1", "2"]
+            })
+
+        assert "Errors have occurred" not in result.data
 
     def test_project_show_bad_process(self):
         """Test processing an unprocessable group of files.
         """
+        project = Project(name="test")
+        project.save()
+
+        unit1 = Unit(project=project, path="/test-path/1.xml")
+        unit2 = Unit(project=project, path="/test-path/2.xml")
+        unit1.save()
+        unit2.save()
+
+        result = self.client.post("/projects/1", data={
+            "process-submitted": "true",
+            "action": "0",
+            "process-selection": ["1", "2"]
+            })
+
+        assert "must include exactly one" in result.data
+
+        unit1.path = "/test-path/1.json"
+        unit1.save()
+
+        result = self.client.post("/projects/1", data={
+            "process-submitted": "true",
+            "action": "0",
+            "process-selection": ["1"]
+            })
+
+        assert "At least one document must be selected" in result.data
 
     @unittest.skip("not quite working")
     def test_document_show(self):

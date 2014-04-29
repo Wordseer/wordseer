@@ -41,8 +41,7 @@ def is_processable(ids=None, units=None):
         # Turn ids into units
         units = []
         for file_id in ids:
-            units.append(session.query(Unit).\
-                filter(Unit.id == file_id).one())
+            units.append(Unit.filter(Unit.id == file_id).one())
 
     for unit in units:
         # Then process the units
@@ -86,7 +85,7 @@ class DocumentUploadForm(Form, HiddenSubmitted):
 
     uploaded_file = FileField("File", validators=[
         FileRequired("You must select a file"),
-        FileAllowed(app.config["ALLOWED_EXTENSIONS"])
+        FileAllowed(app.config["ALLOWED_EXTENSIONS"], "Invalid file type")
         ])
 
 class DocumentProcessForm(ProcessForm):
