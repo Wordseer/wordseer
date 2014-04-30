@@ -222,7 +222,7 @@ class Project(db.Model, Base):
     user's convenience.
     """
 
-    #user = Column() #TODO: each project should be associated with a user
+    user = db.Column(db.Integer)
     name = db.Column(db.String)
     files = db.relationship("Unit", backref='project')
     path = db.Column(db.String)

@@ -9,6 +9,7 @@ from string import ascii_letters, digits
 
 from flask import (redirect, render_template, request, send_from_directory,
     session)
+from flask.ext.login import current_user #TODO: is this really right?
 #from flask.views import View
 from werkzeug import secure_filename
 
@@ -16,7 +17,7 @@ from app import app
 from app import db
 from . import exceptions
 from . import forms
-from .models import Unit, Project
+from .models import Unit, Project, User
 from . import shortcuts
 
 def generate_form_token():
