@@ -475,6 +475,58 @@ class ViewsTests(unittest.TestCase):
         with open(file_path) as test_file:
             assert result.data == test_file.read()
 
+class AuthTests(unittest.TestCase):
+    """Make sure that users can only see the pages and such that they
+    should be seeing.
+    """
+    @classmethod
+    def setUpClass(cls):
+        reset_db()
+        cls.client = app.test_client()
+        user_datastore.create_user(email="foo@foo.com", password="password")
+        user_datastore.create_user(email="bar@bar.com", password="password")
+        db.session.commit()
+        with cls.client.session_transaction() as sess:
+            sess["user_id"] = User.query.filter(User.id == 1).one().get_id()
+            sess["_fresh"] = True
+
+        project = Project(name="Bar's project", user=2)
+        project.save()
+
+        cls.file_path = os.path.join(app.config["UPLOAD_DIR"],
+            "upload_test.txt")
+        unit = Unit(project=project, path=cls.file_path)
+        unit.save()
+
+    def test_list_projects(self):
+        """Test to make sure that bar's projects aren't listed for foo.
+        """
+        result = self.client.get("/projects")
+
+        assert "Bar's project" not in result.data
+
+    def test_view_project(self):
+        """Test to make sure that foo can't see bar's project.
+        """
+        result = self.client.get("/projects/1")
+
+        assert "Bar's project" not in result.data
+
+    def test_view_document(self):
+        """Test to make sure that foo can't see bar's file.
+        """
+        result = self.client.get("/projects/1/documents/1")
+
+        assert "/uploads/1" not in result.data
+
+    def test_get_document(self):
+        """Test to make sure that foo can't get bar's file.
+        """
+        result = self.client.get("/uploads/1")
+
+        with open(self.file_path) as test_file:
+            assert result.data is not test_file.read()
+
 @unittest.skip("Should be rewritten to use David's code.")
 class ImportTests(unittest.TestCase):
     def test_sample_document(self):
