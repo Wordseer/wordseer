@@ -12,8 +12,8 @@ from flask import (redirect, render_template, request, send_from_directory,
 #from flask.views import View
 from werkzeug import secure_filename
 
-from ..app import app
-from ..app import database
+from app import app
+from app import db
 from . import exceptions
 from . import forms
 from .models import Unit, Project
@@ -98,7 +98,7 @@ def projects():
     process_form = forms.ProjectProcessForm(prefix="process")
 
     process_form.selection.choices = []
-    for project in Project.all().all():
+    for project in Project.query.all():
         process_form.selection.add_choice(project.id, project.name)
 
     if shortcuts.really_submitted(create_form):
@@ -116,11 +116,11 @@ def projects():
         selected_projects = request.form.getlist("process-selection")
         if request.form["action"] == process_form.DELETE:
             for project_id in selected_projects:
-                project = Project.filter(Project.id == project_id).one()
+                project = Project.query.filter(Project.id == project_id).one()
                 shutil.rmtree(project.path)
                 process_form.selection.delete_choice(project.id, project.name)
-                database.delete(project)
-                database.commit()
+                db.session.delete(project)
+                db.session.commit()
         if request.form["action"] == process_form.DELETE:
             #TODO: process the projects
             pass
@@ -153,7 +153,7 @@ def project_show(project_id):
     process_form = forms.DocumentProcessForm(prefix="process")
 
     # The template needs access to the ID of each file and its filename.
-    file_objects = Unit.filter(Unit.project_id == project_id).\
+    file_objects = Unit.query.filter(Unit.project_id == project_id).\
         filter(Unit.path != None).all()
     process_form.selection.choices = []
     for file_object in file_objects:
@@ -186,11 +186,11 @@ def project_show(project_id):
             # Delete every selected file, its database record, and item in
             # the listing
             for file_id in files:
-                file_model = Unit.filter(Unit.id == file_id).one()
+                file_model = Unit.query.filter(Unit.id == file_id).one()
                 file_name = os.path.split(file_model.path)[1]
                 os.remove(file_model.path)
-                database.delete(file_model)
-                database.commit()
+                db.session.delete(file_model)
+                db.session.commit()
                 process_form.selection.delete_choice(int(file_id), file_name)
 
         elif request.form["action"] == process_form.PROCESS:
@@ -233,7 +233,7 @@ def get_file(file_id):
     """If the user has permission to view this file, then return it.
     """
 
-    unit = Unit.filter(Unit.id == file_id).one()
+    unit = Unit.query.filter(Unit.id == file_id).one()
 
     directory, filename = os.path.split(unit.path)
 

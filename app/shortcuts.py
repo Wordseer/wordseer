@@ -30,7 +30,7 @@ def get_object_or_exception(model, attribute, value, exception=None):
 
     #FIXME, see issue tracker
     try:
-        return model.filter(attribute == value).one()
+        return model.query.filter(attribute == value).one()
     except NoResultFound:
         try:
             raise exception

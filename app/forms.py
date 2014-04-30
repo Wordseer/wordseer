@@ -9,7 +9,7 @@ from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms.fields import StringField, HiddenField
 from wtforms.validators import Required, ValidationError
 
-from ..app import app
+from app import app
 from .fields import ButtonField, MultiCheckboxField
 from .models import Unit, Project
 
@@ -39,7 +39,7 @@ def is_processable(ids=None, units=None):
         # Turn ids into units
         units = []
         for file_id in ids:
-            units.append(Unit.filter(Unit.id == file_id).one())
+            units.append(Unit.query.filter(Unit.id == file_id).one())
 
     for unit in units:
         # Then process the units
@@ -109,7 +109,7 @@ class ProjectCreateForm(Form, HiddenSubmitted):
     def validate_name(form, field):
         """Make sure there are no projects with this name existing.
         """
-        if Project.filter(Project.name == field.data).count() > 0:
+        if Project.query.filter(Project.name == field.data).count() > 0:
             raise ValidationError("A project with this name already exists")
 
 class ProjectProcessForm(ProcessForm):
@@ -121,5 +121,5 @@ class ProjectProcessForm(ProcessForm):
         """
         if form.process_button.data == form.PROCESS:
             for project_id in form.selection.data:
-                project = Project.filter(Project.id == project_id).one()
+                project = Project.query.filter(Project.id == project_id).one()
                 is_processable(units=project.files)

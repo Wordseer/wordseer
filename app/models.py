@@ -224,7 +224,7 @@ class Project(db.Model, Base):
 
     #user = Column() #TODO: each project should be associated with a user
     name = db.Column(db.String)
-    files = db.relationship("Unit", db.backref='project')
+    files = db.relationship("Unit", backref='project')
     path = db.Column(db.String)
 
     def __repr__(self):

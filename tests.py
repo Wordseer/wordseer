@@ -11,7 +11,7 @@ import unittest
 import mock
 from sqlalchemy import create_engine
 
-from app import app, database
+from app import app, db
 from app.models import *
 
 app.testing = True
@@ -19,7 +19,7 @@ app.testing = True
 def reset_db():
     open(app.config["SQLALCHEMY_DATABASE_PATH"], 'w').close()
     engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
-    Base.metadata.create_all(engine)
+    db.Model.metadata.create_all(engine)
 
 class TestModels(unittest.TestCase):
     def setUp(self):
