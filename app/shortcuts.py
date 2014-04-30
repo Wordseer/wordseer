@@ -3,7 +3,10 @@ Various methods helpful in the wordseer flask app.
 """
 
 from flask import abort, render_template
+from flask_security.core import current_user
 from sqlalchemy.orm.exc import NoResultFound
+
+from app import app
 
 def really_submitted(form):
     """ WTForms can be really finnicky when it comes to checking if a form

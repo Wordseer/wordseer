@@ -9,7 +9,8 @@ from string import ascii_letters, digits
 
 from flask import (redirect, render_template, request, send_from_directory,
     session)
-from flask.ext.login import current_user #TODO: is this really right?
+from flask_security.core import current_user
+from flask_security.decorators import login_required
 #from flask.views import View
 from werkzeug import secure_filename
 
@@ -88,6 +89,7 @@ def home():
     return render_template("home.html")
 
 @app.route(app.config["PROJECT_ROUTE"], methods=["GET", "POST"])
+@login_required
 def projects():
     """
     This view handles projects. It includes a form at the top to
@@ -99,14 +101,15 @@ def projects():
     process_form = forms.ProjectProcessForm(prefix="process")
 
     process_form.selection.choices = []
-    for project in Project.query.all():
+    for project in Project.query.filter(Project.user == current_user.id).all():
         process_form.selection.add_choice(project.id, project.name)
 
     if shortcuts.really_submitted(create_form):
         #TODO: is this secure? maybe not
         #TODO: can we only save this once?
         project = Project(
-            name=create_form.name.data)
+            name=create_form.name.data,
+            user=current_user.id)
         project.save()
         project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
         project.save()
@@ -138,6 +141,7 @@ def projects():
     app.config["DOCUMENT_ROUTE"] + 'create/')
 @app.route(app.config["PROJECT_ROUTE"] + "<project_id>",
     methods=["GET", "POST"])
+@login_required
 def project_show(project_id):
     """
     Show the files contained in a specific project. It also allows the user
@@ -149,6 +153,10 @@ def project_show(project_id):
     # Test if this project exists
     project = shortcuts.get_object_or_exception(Project, Project.id, project_id,
         exceptions.ProjectNotFoundException)
+
+    # Test if this user can see it
+    if project.user is not current_user.id:
+        return app.login_manager.unauthorized()
 
     upload_form = forms.DocumentUploadForm(prefix="upload")
     process_form = forms.DocumentProcessForm(prefix="process")
@@ -210,6 +218,7 @@ def project_show(project_id):
 
 @app.route(app.config["PROJECT_ROUTE"] + "<project_id>" +
     app.config["DOCUMENT_ROUTE"] + '<document_id>')
+@login_required
 def document_show(project_id, document_id):
     """
     The show action, which shows details for a particular document.
@@ -219,6 +228,11 @@ def document_show(project_id, document_id):
 
     project = shortcuts.get_object_or_exception(Project, Project.id,
         project_id, exceptions.ProjectNotFoundException)
+
+    # Test if this user can see it
+    if project.user is not current_user.id:
+        return app.login_manager.unauthorized()
+
     document = shortcuts.get_object_or_exception(Unit, Unit.id, document_id,
         exceptions.DocumentNotFoundException)
 
@@ -230,11 +244,16 @@ def document_show(project_id, document_id):
         filename=filename)
 
 @app.route(app.config["UPLOAD_ROUTE"] + "<file_id>")
+@login_required
 def get_file(file_id):
     """If the user has permission to view this file, then return it.
     """
 
     unit = Unit.query.filter(Unit.id == file_id).one()
+
+    # Test if this user can see it
+    if unit.project.user is not current_user.id or not unit.path:
+        return app.login_manager.unauthorized()
 
     directory, filename = os.path.split(unit.path)
 

@@ -31,6 +31,7 @@ def migrate():
     tmp_module = imp.new_module('old_model')
     old_model = api.create_model(SQLALCHEMY_DATABASE_URI,
         SQLALCHEMY_MIGRATE_REPO)
+    #FIXME
     exec old_model in tmp_module.__dict__
     script = api.make_update_script_for_model(SQLALCHEMY_DATABASE_URI,
         SQLALCHEMY_MIGRATE_REPO, tmp_module.meta, db.metadata)
