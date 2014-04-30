@@ -9,38 +9,22 @@ This module contains the model-level logic, built on SQLAlchemy.
 """
 
 from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
-from sqlalchemy import (Boolean, Column, ForeignKey, Integer, String, Table,
-    Text, Table, DateTime)
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.ext.declarative import declared_attr
 
+from app import db
 
-from app import database
-from config import *
+#from config import *
 
 class Base(object):
-    """This is a customized version of SQLAlchemy's Base object.
-
-    It serves to abstract away some of the SQL language and logic to add more
-    of a object-oriented style to the models. The language used still mimics
-    SQLAlchemy, to avoid confusion.  It also has default configurations that
-    apply to all models.
-
+    """This is a mixin to add to Flask-SQLAlchemy's db.Model class.
     """
+
+    # Define the primary key
+    id = db.Column(db.Integer, primary_key=True)
 
     @declared_attr
     def __tablename__(cls):
-        """Define the table name.
-
-        By default, it is the pluraized lower case version of the class name
-
-        """
-
-        # Set table name to be lower case of class name
         return cls.__name__.lower()
-
-    # Define the primary key
-    id = Column(Integer, primary_key=True)
 
     def save(self):
         """Commits this model instance to the database
@@ -49,57 +33,8 @@ class Base(object):
         TODO: manage sequential saves better.
 
         """
-        database.add(self)
-        database.commit()
-
-    @classmethod
-    def get(cls, id):
-        """Look up a single instance based on its primary key.
-
-        The method name is borrowed from Django.
-
-        TODO: should throw an error if not found.
-
-        Args:
-          id (int): the primary key of the record.
-
-        Returns:
-          An instance of the model, if the record is found.
-
-          Raises an error if not found.
-
-        """
-        return database.query(cls).filter(cls.id==id).first()
-
-    @classmethod
-    def all(cls):
-        """Get all records for this model.
-
-        Returns:
-          Query object containing all records in the table for this model.
-
-        """
-        return database.query(cls)
-
-    # Criteria-based look-up; see SQLAlchemy docs for use
-    @classmethod
-    def filter(cls, criteria):
-        """Query this model's table based on a criteria.
-
-        See the ORM documentation for SQLAlchemy for the different operators
-        that can be used in the criteria parameter.
-
-        Args:
-          criteria: an SQLAlchemy-style criteria.
-
-        Returns:
-          Query object containing the matching records.
-
-        """
-        return database.query(cls).filter(criteria)
-
-# Set the above Base class as the default model.
-Base = declarative_base(cls=Base)
+        db.session.add(self)
+        db.session.commit()
 
 """
 ######
@@ -107,7 +42,7 @@ Models
 ######
 """
 
-class Unit(Base):
+class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.
 
     This can be either a full document, a section or chapter of a document,
@@ -125,21 +60,21 @@ class Unit(Base):
       belongs to: parent (Unit)
       has many: children (Unit), sentences, properties
 
-    TODO: implement relationships
+    TODO: implement db.relationships
 
     """
 
-    unit_type = Column(String(64), index=True)
-    number = Column(Integer, index=True)
-    parent_id = Column(Integer, ForeignKey('unit.id'))
-    path = Column(String, nullable=True)
-    project_id = Column(Integer, ForeignKey("project.id"))
+    unit_type = db.Column(db.String(64), index = True)
+    number = db.Column(db.Integer, index = True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
+    path = db.Column(db.String, nullable=True)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     # Relationships
 
-    children = relationship("Unit")
-    sentences = relationship("Sentence", backref=backref("unit"))
-    properties = relationship("Property", backref=backref("unit"))
+    children = db.relationship("Unit")
+    sentences = db.relationship("Sentence", backref='unit')
+    properties = db.relationship("Property", backref='unit')
 
     def __init__(self, document=None, **kwargs):
         """Initialize a top-level document unit from a document file.
@@ -196,10 +131,10 @@ class Unit(Base):
         """Method for getting a unit's parent.
 
         This method exists because in the current set up, it has been tricky to
-        define the parent as a relationship.
+        define the parent as a db.relationship.
         """
 
-        return Unit.get(self.parent_id)
+        return Unit.query.get(self.parent_id)
 
     def __repr__(self):
         """Return a representation of a unit, which is its type followed by its
@@ -208,7 +143,7 @@ class Unit(Base):
 
         return " ".join([self.unit_type, str(self.number)])
 
-class Sentence(Base):
+class Sentence(db.Model, Base):
     """A model representing a sentence.
 
     The sentence model is treated like "leaf" units. It has a link to its
@@ -227,18 +162,17 @@ class Sentence(Base):
 
     """
 
-    unit_id = Column(Integer, ForeignKey('unit.id'))
-    text = Column(Text, index = True)
+    unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
+    text = db.Column(db.Text, index = True)
 
-    words = relationship("Word",
-        secondary="word_in_sentence",
-        backref="sentences"
+    words = db.relationship("Word", secondary="word_in_sentence",
+        backref=db.backref('sentences', lazy="dynamic")
     )
 
     def __repr__(self):
         return "<Sentence: " + self.text + ">"
 
-class Word(Base):
+class Word(db.Model, Base):
     """A model representing a word.
 
     Words are the most basic building blocks of everything.
@@ -251,12 +185,12 @@ class Word(Base):
 
     """
 
-    word = Column(String, index = True)
+    word = db.Column(db.String, index = True)
 
     def __repr__(self):
         return "<Word: " + self.word + ">"
 
-class Property(Base):
+class Property(db.Model, Base):
     """A model representing a property of a unit.
 
     Metadata about units are stored as properties, which have a link to the
@@ -274,14 +208,14 @@ class Property(Base):
     """
 
     # Schema
-    unit_id = Column(Integer, ForeignKey('unit.id'))
-    name = Column(String, index = True)
-    value = Column(String, index = True)
+    unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
+    name = db.Column(db.String, index = True)
+    value = db.Column(db.String, index = True)
 
     def __repr__(self):
         return "<Property: " + self.name + ">"
 
-class Project(Base):
+class Project(db.Model, Base):
     """A model representing a project.
 
     Projects are collections of associated files, grouped together for the
@@ -289,32 +223,32 @@ class Project(Base):
     """
 
     #user = Column() #TODO: each project should be associated with a user
-    name = Column(String)
-    files = relationship("Unit", backref='project')
-    path = Column(String)
+    name = db.Column(db.String)
+    files = db.relationship("Unit", db.backref='project')
+    path = db.Column(db.String)
 
     def __repr__(self):
         return "<Project (name=" + self.name + ")>"
 
-roles_users = Table('roles_users', Base.metadata,
-        Column('user_id', Integer, ForeignKey('user.id')),
-        Column('role_id', Integer, ForeignKey('role.id')))
+roles_users = db.Table('roles_users',
+        db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+        db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
 
-class Role(Base, RoleMixin):
+class Role(db.Model, Base, RoleMixin):
     """Represents a flask-security user role.
     """
-    name = Column(String(80), unique=True)
-    description = Column(String(255))
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
 
-class User(Base, UserMixin):
+class User(db.Model, Base, UserMixin):
     """Represents a flask-security user.
     """
-    email = Column(String(255), unique=True)
-    password = Column(String(255))
-    active = Column(Boolean())
-    confirmed_at = Column(DateTime())
-    roles = relationship('Role', secondary=roles_users,
-        backref=backref('users', lazy='dynamic'))
+    email = db.Column(db.String(255), unique=True)
+    password = db.Column(db.String(255))
+    active = db.Column(db.Boolean())
+    confirmed_at = db.Column(db.DateTime())
+    roles = db.relationship('Role', secondary=roles_users,
+                            backref=db.backref('users', lazy='dynamic'))
 
 """
 ##################
@@ -323,7 +257,7 @@ Association Tables
 """
 
 # Many-to-many table between words and sentences
-word_in_sentence = Table("word_in_sentence", Base.metadata,
-    Column('word_id', Integer, ForeignKey('word.id')),
-    Column('sentence_id', Integer, ForeignKey('sentence.id'))
+word_in_sentence = db.Table("word_in_sentence",
+    db.Column('word_id', db.Integer, db.ForeignKey('word.id')),
+    db.Column('sentence_id', db.Integer, db.ForeignKey('sentence.id'))
 )

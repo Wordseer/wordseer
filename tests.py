@@ -96,7 +96,7 @@ class TestModels(unittest.TestCase):
         unit.save()
         prop.save()
 
-        retrieved_prop = Property.filter(Property.name=="title").\
+        retrieved_prop = Property.query.filter(Property.name=="title").\
             filter(Property.value == "Hello World").first()
 
         assert retrieved_prop.unit.unit_type == unit.unit_type
@@ -119,7 +119,7 @@ class TestModels(unittest.TestCase):
 
         prop.save()
 
-        retrieved_prop = Property.filter(name=="title").\
+        retrieved_prop = Property.query.filter(name=="title").\
             filter(value == "Hello World").first()
 
         assert retrieved_prop.name == prop.name

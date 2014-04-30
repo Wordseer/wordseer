@@ -22,12 +22,8 @@ Database Set Up
 ===============
 """
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-# Set up database sessions for different environments
-database = sessionmaker(
-    bind=create_engine(app.config["SQLALCHEMY_DATABASE_URI"]))()
+from flask.ext.sqlalchemy import SQLAlchemy
+db = SQLAlchemy(app)
 
 """
 Authentication setup
@@ -35,7 +31,7 @@ Authentication setup
 
 from app.models import *
 
-user_datastore = SQLAlchemyUserDatastore(database, User, Role)
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
 from app.views import *

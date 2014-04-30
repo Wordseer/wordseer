@@ -1,18 +1,16 @@
 # Modified from:
 # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
 import os
+from sys import argv
 
 os.environ['FLASK_ENV'] = "development"
 
-from app import app
-import shutil
-import imp
+from app import app, db
 
 from migrate.versioning import api
-from app.models import Base
-from sys import argv
+import imp
+import shutil
 from sqlalchemy import create_engine
-
 
 SQLALCHEMY_DATABASE_URI = app.config["SQLALCHEMY_DATABASE_URI"]
 SQLALCHEMY_MIGRATE_REPO = app.config["SQLALCHEMY_MIGRATE_REPO"]
@@ -35,7 +33,7 @@ def migrate():
         SQLALCHEMY_MIGRATE_REPO)
     exec old_model in tmp_module.__dict__
     script = api.make_update_script_for_model(SQLALCHEMY_DATABASE_URI,
-        SQLALCHEMY_MIGRATE_REPO, tmp_module.meta, Base.metadata)
+        SQLALCHEMY_MIGRATE_REPO, tmp_module.meta, db.metadata)
     open(migration, "wt").write(script)
     api.upgrade(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
     print('New migration saved as ' + migration)
@@ -64,8 +62,7 @@ def reset():
     except OSError:
         pass
 
-    engine = create_engine(SQLALCHEMY_DATABASE_URI)
-    Base.metadata.create_all(engine)
+    db.create_all()
 
 def prep_test():
     try:
@@ -76,8 +73,7 @@ def prep_test():
             except OSError:
                 pass
 
-            engine = create_engine(SQLALCHEMY_DATABASE_URI)
-            Base.metadata.create_all(engine)
+            db.create_all()
         else:
             print("Your envinronment configurations are not set to testing.")
     except KeyError:
