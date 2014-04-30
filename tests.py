@@ -11,7 +11,7 @@ import unittest
 import mock
 from sqlalchemy import create_engine
 
-from app import app, db
+from app import app, db, user_datastore
 from app.models import *
 
 app.testing = True
@@ -131,6 +131,11 @@ class ViewsTests(unittest.TestCase):
         """
         self.client = app.test_client()
         reset_db()
+        user_datastore.create_user(email="foo@foo.com", password="password")
+        db.session.commit()
+        with self.client.session_transaction() as sess:
+            sess["user_id"] = User.query.filter(User.id == 1).one().get_id()
+            sess["_fresh"] = True
 
     def test_no_projects(self):
         """Test the projects view with no projects present.
@@ -141,7 +146,7 @@ class ViewsTests(unittest.TestCase):
     def test_projects(self):
         """Test the projects view with a project present.
         """
-        new_project = Project(name="test")
+        new_project = Project(name="test", user=1)
         new_project.save()
         result = self.client.get("/projects/")
         assert "/projects/1" in result.data
@@ -149,7 +154,7 @@ class ViewsTests(unittest.TestCase):
     def test_projects_bad_create(self):
         """Test creating an existing project.
         """
-        project = Project(name="test")
+        project = Project(name="test", user=1)
         project.save()
 
         result = self.client.post("/projects/", data={
@@ -191,8 +196,8 @@ class ViewsTests(unittest.TestCase):
         """Test project deletion.
         """
 
-        project1 = Project(name="test1", path="/test-path/")
-        project2 = Project(name="test2", path="/test-path/")
+        project1 = Project(name="test1", path="/test-path/", user=1)
+        project2 = Project(name="test2", path="/test-path/", user=1)
         project1.save()
         project2.save()
 
@@ -211,8 +216,8 @@ class ViewsTests(unittest.TestCase):
         """Test deleting without a selection.
         """
 
-        project1 = Project(name="test1")
-        project2 = Project(name="test2")
+        project1 = Project(name="test1", user=1)
+        project2 = Project(name="test2", user=1)
         project1.save()
         project2.save()
 
@@ -229,7 +234,7 @@ class ViewsTests(unittest.TestCase):
         """Test processing an unprocessable project.
         """
 
-        project1 = Project(name="test1")
+        project1 = Project(name="test1", user=1)
         project1.save()
 
         result = self.client.post("/projects/", data={
@@ -243,7 +248,7 @@ class ViewsTests(unittest.TestCase):
     def test_projects_process(self):
         """Test processing a processable project.
         """
-        project = Project(name="test")
+        project = Project(name="test", user=1)
         project.save()
 
         unit1 = Unit(project=project, path="/test-path/1.xml")
@@ -262,7 +267,7 @@ class ViewsTests(unittest.TestCase):
     def test_no_project_show(self):
         """Make sure project_show says that there are no files.
         """
-        project = Project(name="test")
+        project = Project(name="test", user=1)
         project.save()
         result = self.client.get("/projects/1")
 
@@ -272,7 +277,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show(self):
         """Make sure project_show shows files.
         """
-        project = Project(name="test")
+        project = Project(name="test", user=1)
         project.save()
         document1 = Unit(path="/test/doc1.xml", project=project)
         document2 = Unit(path="/test/doc2.xml", project=project)
@@ -288,7 +293,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_upload(self):
         """Try uploading a file to the project_show view.
         """
-        project = Project(name="test")
+        project = Project(name="test", user=1)
         project.save()
         
         upload_dir = tempfile.mkdtemp()
@@ -311,7 +316,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_double_upload(self):
         """Try uploading two files with the same name to the project_show view.
         """
-        project = Project(name="test")
+        project = Project(name="test", user=1)
         project.save()
 
         upload_dir = tempfile.mkdtemp()
@@ -333,7 +338,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_no_post(self):
         """Try sending an empty post to project_show.
         """
-        project = Project(name="test")
+        project = Project(name="test", user=1)
         project.save()
 
         result = self.client.post("/projects/1", data={
@@ -352,7 +357,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_delete(self, mock_os):
         """Test file deletion.
         """
-        project = Project(name="test")
+        project = Project(name="test", user=1)
         project.save()
 
         unit1 = Unit(project=project, path="/test-path/1.xml")
@@ -374,7 +379,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_bad_delete(self):
         """Test a bad file delete request.
         """
-        project = Project(name="test")
+        project = Project(name="test", user=1)
         project.save()
 
         unit1 = Unit(project=project, path="/test-path/1.xml")
@@ -394,7 +399,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_process(self):
         """Test processing a processable group of files.
         """
-        project = Project(name="test")
+        project = Project(name="test", user=1)
         project.save()
 
         unit1 = Unit(project=project, path="/test-path/1.xml")
@@ -413,7 +418,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_bad_process(self):
         """Test processing an unprocessable group of files.
         """
-        project = Project(name="test")
+        project = Project(name="test", user=1)
         project.save()
 
         unit1 = Unit(project=project, path="/test-path/1.xml")
@@ -443,7 +448,7 @@ class ViewsTests(unittest.TestCase):
     def test_document_show(self):
         """Test the detail document view.
         """
-        project = Project(name="test project", path="/test-path/")
+        project = Project(name="test project", path="/test-path/", user=1)
         project.save()
 
         document = Unit(path="/test-path/test-file.xml", project=project)
@@ -460,7 +465,9 @@ class ViewsTests(unittest.TestCase):
 
         file_path = os.path.join(app.config["UPLOAD_DIR"], "upload_test.txt")
 
-        document = Unit(path=file_path)
+        project = Project(user=1)
+
+        document = Unit(path=file_path, project=project)
         document.save()
 
         result = self.client.get("/uploads/1")
