@@ -39,13 +39,20 @@ class BaseConfig(object):
     SECURITY_CHANGEABLE = True
     SECURITY_RECOVERABLE = True
 
+    SECRET_KEY = "secret" #TODO: change this in production
+
+    #Email settings
+    #TODO: change in production
+    SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = False
+    SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
+    SECURITY_SEND_REGISTER_EMAIL = False
+
 class Development(BaseConfig):
     """ This class has settings specific for the development environment.
     """
 
     # CSRF settings for forms
     WTF_CSRF_ENABLED = True
-    SECRET_KEY = "secret" #TODO: change this in production
 
     # Set database configurations
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BaseConfig.ROOT,
@@ -58,7 +65,6 @@ class Testing(BaseConfig):
 
     # CSRF settings for forms
     WTF_CSRF_ENABLED = False
-    SECRET_KEY = "secret" #TODO: change this in production
 
     # Set database configurations
     SQLALCHEMY_DATABASE_PATH = tempfile.mkstemp()[1]
