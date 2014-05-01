@@ -64,21 +64,42 @@ class CLPDView(View):
     we can reduce the redundancy.
     """
 
-    def __init__(self,  **kwargs):
+    def __init__(self, template, create_form, process_form, **kwargs):
         """Initializes a CLPD view. kwargs are data passed to the view in
         general.
         """
-        #self.template = template
-        self.kwargs = kwargs
+        self.template = template
+        self.create_form = create_form(prefix="create")
+        self.process_form = process_form(prefix="process")
+
+    def set_choices(self, **kwargs):
+        """Set the appropriate choices for the list view.
+        """
+        raise NotImplementedError()
+
+    def handle_create(self, **kwargs):
+        """Perform actions necessary for the create_form.
+        """
+        raise NotImplementedError()
+
+    def handle_process(self, **kwargs):
+        """Perform actions necessary for the process_form.
+        """
+        raise NotImplementedError()
 
     def dispatch_request(self, **kwargs):
         """Render the template with the required data. kwargs are data
         passed to the URL.
         """
-        print self.kwargs
-        print other
-        return "hello world"
-        #return render_template(self.template, **kwargs)
+        self.set_choices(**kwargs)
+
+        if shortcuts.really_submitted(create_form):
+            self.handle_create(**kwargs)
+
+        elif shortcuts.really_submitted(process_form):
+            self.handle_process(**kwargs)
+
+        return render_template(template, **kwargs)
 
 app.add_url_rule("/test/<test>", view_func=CLPDView.as_view("test", blah=True))
 
@@ -87,6 +108,43 @@ def home():
     """Display the home page.
     """
     return render_template("home.html")
+
+def ProjectsCLPD(CLPDView):
+    def __init__(self):
+        super(ProjectsCLPD, self).__init__("project_list.html",
+            forms.ProjectCreateForm, forms.ProjectProcessForm)
+
+    def set_choices(self, **kwargs):
+        self.process_form.selection.choices = []
+        for project in Project.query.filter(Project.user ==
+            current_user.id).all():
+            self.process_form.selection.add_choice(project.id, project.name)
+
+    def handle_create(self, **kwargs):
+        #TODO: is this secure? maybe not
+        #TODO: can we only save this once?
+        project = Project(
+            name=self.create_form.name.data,
+            user=current_user.id)
+        project.save()
+        project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
+        project.save()
+        os.mkdir(project.path)
+        self.process_form.selection.add_choice(project.id, project.name)
+
+    def handle_process(self, **kwargs):
+        selected_projects = request.form.getlist("process-selection")
+        if request.form["action"] == self.process_form.DELETE:
+            for project_id in selected_projects:
+                project = Project.query.filter(Project.id == project_id).one()
+                shutil.rmtree(project.path)
+                self.process_form.selection.delete_choice(project.id,
+                    project.name)
+                db.session.delete(project)
+                db.session.commit()
+        if request.form["action"] == self.process_form.PROCESS:
+            #TODO: process the projects
+            pass
 
 @app.route(app.config["PROJECT_ROUTE"], methods=["GET", "POST"])
 @login_required
