@@ -527,6 +527,54 @@ class AuthTests(unittest.TestCase):
         with open(self.file_path) as test_file:
             assert result.data is not test_file.read()
 
+class LoggedOutTests(unittest.TestCase):
+    """Make sure that logged out users can't see much of anything.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the DB and create a dummy project and document.
+        """
+        reset_db()
+        cls.client = app.test_client()
+
+        project = Project(name="Bar's project", user=2)
+        project.save()
+
+        cls.file_path = os.path.join(app.config["UPLOAD_DIR"],
+            "upload_test.txt")
+        unit = Unit(project=project, path=cls.file_path)
+        unit.save()
+
+    def test_list_projects(self):
+        """Test to make sure that unauthed users can't see project lists.
+        """
+        result = self.client.get("/projects")
+
+        assert "Bar's project" not in result.data
+
+    def test_list_files(self):
+        """Test to make sure that unauthed users can't see a specific project.
+        """
+        result = self.client.get("/projects/1")
+
+        assert "upload_test.txt" not in result.data
+
+    def test_file_show(self):
+        """Test to make sure that unauthed users can't see a specific file.
+        """
+        result = self.client.get("/projects/1/documents/1")
+
+        assert "View file" not in result.data
+
+    def test_file_get(self):
+        """Make sure unauthed users can't get a specific file.
+        """
+        result = self.client.get("/uploads/1")
+
+        with open(self.file_path) as test_file:
+            assert result.data is not test_file.read()
+
 @unittest.skip("Should be rewritten to use David's code.")
 class ImportTests(unittest.TestCase):
     def test_sample_document(self):
