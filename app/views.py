@@ -64,6 +64,9 @@ class CLPDView(View):
     we can reduce the redundancy.
     """
 
+    decorators = [login_required]
+    methods = ["GET", "POST"]
+
     def __init__(self, template, create_form, process_form, **kwargs):
         """Initializes a CLPD view. kwargs are data passed to the view in
         general.
@@ -87,21 +90,29 @@ class CLPDView(View):
         """
         raise NotImplementedError()
 
+    def reset_fields(self):
+        """If necessary, reset fields.
+        """
+        pass
+
     def dispatch_request(self, **kwargs):
         """Render the template with the required data. kwargs are data
         passed to the URL.
         """
         self.set_choices(**kwargs)
 
-        if shortcuts.really_submitted(create_form):
+        if shortcuts.really_submitted(self.create_form):
             self.handle_create(**kwargs)
 
-        elif shortcuts.really_submitted(process_form):
+        elif shortcuts.really_submitted(self.process_form):
             self.handle_process(**kwargs)
 
-        return render_template(template, **kwargs)
+        self.reset_fields()
 
-app.add_url_rule("/test/<test>", view_func=CLPDView.as_view("test", blah=True))
+        return render_template(self.template,
+            create_form=self.create_form,
+            process_form=self.process_form,
+            **kwargs)
 
 @app.route("/")
 def home():
@@ -109,7 +120,7 @@ def home():
     """
     return render_template("home.html")
 
-def ProjectsCLPD(CLPDView):
+class ProjectsCLPD(CLPDView):
     def __init__(self):
         super(ProjectsCLPD, self).__init__("project_list.html",
             forms.ProjectCreateForm, forms.ProjectProcessForm)
@@ -121,7 +132,6 @@ def ProjectsCLPD(CLPDView):
             self.process_form.selection.add_choice(project.id, project.name)
 
     def handle_create(self, **kwargs):
-        #TODO: is this secure? maybe not
         #TODO: can we only save this once?
         project = Project(
             name=self.create_form.name.data,
@@ -146,54 +156,12 @@ def ProjectsCLPD(CLPDView):
             #TODO: process the projects
             pass
 
-@app.route(app.config["PROJECT_ROUTE"], methods=["GET", "POST"])
-@login_required
-def projects():
-    """
-    This view handles projects. It includes a form at the top to
-    create a new project, and under the form the page has a listing of
-    already created projects owned by the user.
-    """
+    def reset_fields(self):
+        self.create_form.submitted.data = "true"
+        self.process_form.submitted.dat = "true"
 
-    create_form = forms.ProjectCreateForm(prefix="create")
-    process_form = forms.ProjectProcessForm(prefix="process")
-
-    process_form.selection.choices = []
-    for project in Project.query.filter(Project.user == current_user.id).all():
-        process_form.selection.add_choice(project.id, project.name)
-
-    if shortcuts.really_submitted(create_form):
-        #TODO: is this secure? maybe not
-        #TODO: can we only save this once?
-        project = Project(
-            name=create_form.name.data,
-            user=current_user.id)
-        project.save()
-        project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
-        project.save()
-        os.mkdir(project.path)
-        process_form.selection.add_choice(project.id, project.name)
-
-    elif shortcuts.really_submitted(process_form):
-        selected_projects = request.form.getlist("process-selection")
-        if request.form["action"] == process_form.DELETE:
-            for project_id in selected_projects:
-                project = Project.query.filter(Project.id == project_id).one()
-                shutil.rmtree(project.path)
-                process_form.selection.delete_choice(project.id, project.name)
-                db.session.delete(project)
-                db.session.commit()
-        if request.form["action"] == process_form.DELETE:
-            #TODO: process the projects
-            pass
-
-    create_form.submitted.data = "true"
-    process_form.submitted.data = "true"
-
-    return render_template("project_list.html",
-        create_form=create_form,
-        process_form=process_form,
-        projects=projects)
+app.add_url_rule(app.config["PROJECT_ROUTE"],
+    view_func=ProjectsCLPD.as_view("projects"))
 
 @app.route(app.config["PROJECT_ROUTE"] + "<project_id>" +
     app.config["DOCUMENT_ROUTE"] + 'create/')
