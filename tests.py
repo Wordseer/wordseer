@@ -301,8 +301,8 @@ class ViewsTests(unittest.TestCase):
         os.makedirs(os.path.join(upload_dir, "1"))
 
         result = self.client.post("/projects/1", data={
-            "upload-submitted": "true",
-            "upload-uploaded_file": (StringIO("Test file"), "test.xml")
+            "create-submitted": "true",
+            "create-uploaded_file": (StringIO("Test file"), "test.xml")
             })
 
         assert os.path.exists(os.path.join(upload_dir, "1", "test.xml"))
@@ -324,13 +324,13 @@ class ViewsTests(unittest.TestCase):
         os.makedirs(os.path.join(upload_dir, "1"))
 
         self.client.post("/projects/1", data={
-            "upload-submitted": "true",
-            "upload-uploaded_file": (StringIO("Test file"), "test.xml")
+            "create-submitted": "true",
+            "create-uploaded_file": (StringIO("Test file"), "test.xml")
             })
 
         result = self.client.post("/projects/1", data={
-            "upload-submitted": "true",
-            "upload-uploaded_file": (StringIO("Test file 2"), "test.xml")
+            "create-submitted": "true",
+            "create-uploaded_file": (StringIO("Test file 2"), "test.xml")
             })
 
         assert "already exists" in result.data
@@ -342,7 +342,7 @@ class ViewsTests(unittest.TestCase):
         project.save()
 
         result = self.client.post("/projects/1", data={
-            "upload-submitted": "true"
+            "create-submitted": "true"
             })
 
         assert "You must select a file" in result.data
