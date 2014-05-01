@@ -125,7 +125,7 @@ def projects():
                 process_form.selection.delete_choice(project.id, project.name)
                 db.session.delete(project)
                 db.session.commit()
-        if request.form["action"] == process_form.DELETE:
+        if request.form["action"] == process_form.PROCESS:
             #TODO: process the projects
             pass
 
