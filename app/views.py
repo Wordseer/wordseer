@@ -156,17 +156,24 @@ def home():
     return render_template("home.html")
 
 class ProjectsCLPD(CLPDView):
+    """A CLPD view for the list of a user's projects.
+    """
     def __init__(self):
         super(ProjectsCLPD, self).__init__("project_list.html",
             forms.ProjectCreateForm, forms.ProjectProcessForm)
 
     def set_choices(self, **kwargs):
+        """Every choice is in the form of (project.id, project.name).
+        """
         self.process_form.selection.choices = []
         for project in Project.query.filter(Project.user ==
             current_user.id).all():
             self.process_form.selection.add_choice(project.id, project.name)
 
     def handle_create(self, **kwargs):
+        """Created projects are created in the database with a name, a user,
+        and a path. Their path is also created.
+        """
         #TODO: can we only save this once?
         project = Project(
             name=self.create_form.name.data,
@@ -178,6 +185,9 @@ class ProjectsCLPD(CLPDView):
         self.process_form.selection.add_choice(project.id, project.name)
 
     def handle_process(self, **kwargs):
+        """For deletion, delete call delete_object on the object and delete
+        its path. For processing, send the project to the processor.
+        """
         selected_projects = request.form.getlist("process-selection")
         if request.form["action"] == self.process_form.DELETE:
             for project_id in selected_projects:
@@ -192,6 +202,8 @@ app.add_url_rule(app.config["PROJECT_ROUTE"],
 
 #TODO: rename this?
 class ProjectCLPD(CLPDView):
+    """CLPD view for listing files in a project.
+    """
     def __init__(self):
         super(ProjectCLPD, self).__init__("document_list.html",
             forms.DocumentUploadForm, forms.DocumentProcessForm)
@@ -199,17 +211,20 @@ class ProjectCLPD(CLPDView):
             app.config["ALLOWED_EXTENSIONS"]
 
     def pre_tests(self, **kwargs):
+        """Make sure this project exists and make sure that this user can see
+        the project.
+        """
         self.project = shortcuts.get_object_or_exception(Project, Project.id,
             kwargs["project_id"], exceptions.ProjectNotFoundException)
 
         self.template_kwargs["project"] = self.project
 
-        # Test if this user can see it
         if self.project.user is not current_user.id:
             return app.login_manager.unauthorized()
 
     def set_choices(self, **kwargs):
-        # The template needs access to the ID of each file and its filename.
+        """The template needs the choices in the form of (id, filename).
+        """
         file_objects = Unit.query.filter(Unit.project_id == self.project.id).\
             filter(Unit.path != None).all()
         self.process_form.selection.choices = []
@@ -218,6 +233,10 @@ class ProjectCLPD(CLPDView):
                 os.path.split(file_object.path)[1])
 
     def handle_create(self, **kwargs):
+        """For every file, check if it exists and if not then upload it to
+        the project directory and create a database record with its filename and
+        path.
+        """
         uploaded_files = request.files.getlist("create-uploaded_file")
         for uploaded_file in uploaded_files:
             filename = secure_filename(uploaded_file.filename)
@@ -233,9 +252,13 @@ class ProjectCLPD(CLPDView):
                     os.path.split(dest_path)[1])
             else:
                 self.create_form.uploaded_file.errors.\
-                    append("A file with this name already exists")
+                    append("A file with name " + os.path.split(dest_path)[1] +
+                    " already exists")
 
     def handle_process(self, **kwargs):
+        """If deleting, delete every database record and file. If processing,
+        then send files to the processor.
+        """
         files = request.form.getlist("process-selection")
         if request.form["action"] == self.process_form.DELETE:
             # Delete every selected file, its database record, and item in
@@ -244,6 +267,8 @@ class ProjectCLPD(CLPDView):
                 file_model = Unit.query.filter(Unit.id == file_id).one()
                 file_name = os.path.split(file_model.path)[1]
                 self.delete_object(file_model, file_name)
+        elif request.form["action"] == self.process_form.PROCESS:
+            pass
 
 app.add_url_rule(app.config["PROJECT_ROUTE"] + "<project_id>",
     view_func=ProjectCLPD.as_view("project_show"))        
