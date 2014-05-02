@@ -47,9 +47,22 @@ class BaseConfig(object):
     SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
     SECURITY_SEND_REGISTER_EMAIL = False
 
+    #Email server settings
+    #TODO: change in production
+    MAIL_SERVER = "localhost"
+    MAIL_PORT = 25
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = None
+    MAIL_PASSWORD = None
+    MAIL_DEFAULT_SENDER = None
+    MAIL_MAX_EMAILS = None
+
 class Development(BaseConfig):
     """ This class has settings specific for the development environment.
     """
+
+    DEBUG = True
 
     # CSRF settings for forms
     WTF_CSRF_ENABLED = True
