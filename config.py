@@ -9,8 +9,8 @@ This module uses classes to set configurations for different environments.
 import os
 import tempfile
 
-# Change this for your use case
-DEFAULT_ENV = "Production"
+#TODO: Change this for your use case
+DEFAULT_ENV = "Development"
 
 class BaseConfig(object):
     """This module contains application-wide configurations. It provides
