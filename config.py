@@ -9,12 +9,15 @@ This module uses classes to set configurations for different environments.
 import os
 import tempfile
 
-DEFAULT_ENV = "Development"
+# Change this for your use case
+DEFAULT_ENV = "Production"
 
 class BaseConfig(object):
     """This module contains application-wide configurations. It provides
     variables that are used in other configurations.
     """
+
+    PROPAGATE_EXCEPTIONS = True
 
     # Set root folder and application name
     ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -39,13 +42,28 @@ class BaseConfig(object):
     SECURITY_CHANGEABLE = True
     SECURITY_RECOVERABLE = True
 
-    SECRET_KEY = "secret" #TODO: change this in production
+    SECRET_KEY = "secret"
 
     #Email settings
     #TODO: change in production
     SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = False
     SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
     SECURITY_SEND_REGISTER_EMAIL = False
+
+class Production(BaseConfig):
+    """Config for the production server.
+    """
+
+    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BaseConfig.ROOT,
+        BaseConfig.APP_NAME + ".db")
+
+    SECRET_KEY = "secret" #TODO: change this in production
+
+    # Emailing settings
+    SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = True
+    SECURITY_SEND_PASSWORD_CHANGE_EMAIL = True
+    SECURITY_SEND_REGISTER_EMAIL = True
 
     #Email server settings
     #TODO: change in production
@@ -61,7 +79,6 @@ class BaseConfig(object):
 class Development(BaseConfig):
     """ This class has settings specific for the development environment.
     """
-
     DEBUG = True
 
     # CSRF settings for forms
@@ -75,6 +92,7 @@ class Development(BaseConfig):
 class Testing(BaseConfig):
     """ This class has settings specific for the testing environment.
     """
+    DEBUG = True
 
     # CSRF settings for forms
     WTF_CSRF_ENABLED = False

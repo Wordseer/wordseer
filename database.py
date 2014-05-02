@@ -3,8 +3,6 @@
 import os
 from sys import argv
 
-os.environ['FLASK_ENV'] = "development"
-
 from app import app, db
 
 from migrate.versioning import api
@@ -13,6 +11,7 @@ import shutil
 from sqlalchemy import create_engine
 
 SQLALCHEMY_DATABASE_URI = app.config["SQLALCHEMY_DATABASE_URI"]
+print SQLALCHEMY_DATABASE_URI
 SQLALCHEMY_MIGRATE_REPO = app.config["SQLALCHEMY_MIGRATE_REPO"]
 
 def create():
