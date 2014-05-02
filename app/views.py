@@ -83,6 +83,25 @@ class CLPDView(View):
         self.process_form = process_form(prefix="process")
         self.template_kwargs = {}
 
+    def delete_object(self, obj, data):
+        """Given a Unit or Project object, delete their files,
+        database records, and entries in the process form's choices.
+        :arg obj: A Unit or Project objects.
+        :arg data: The second part of the tuple in the process form, the first
+        item being the object's id.
+        """
+
+        if os.path.isdir(obj.path):
+            shutil.rmtree(obj.path)
+            for unit in obj.files:
+                db.session.delete(unit)
+            db.session.commit()
+        else:
+            os.remove(obj.path)
+        self.process_form.selection.delete_choice(obj.id, data)
+        db.session.delete(obj)
+        db.session.commit()
+
     def set_choices(self, **kwargs):
         """Set the appropriate choices for the list view.
         """
@@ -163,11 +182,7 @@ class ProjectsCLPD(CLPDView):
         if request.form["action"] == self.process_form.DELETE:
             for project_id in selected_projects:
                 project = Project.query.filter(Project.id == project_id).one()
-                shutil.rmtree(project.path)
-                self.process_form.selection.delete_choice(project.id,
-                    project.name)
-                db.session.delete(project)
-                db.session.commit()
+                self.delete_object(project, project.name)
         if request.form["action"] == self.process_form.PROCESS:
             #TODO: process the projects
             pass
@@ -204,7 +219,6 @@ class ProjectCLPD(CLPDView):
 
     def handle_create(self, **kwargs):
         uploaded_files = request.files.getlist("create-uploaded_file")
-        print uploaded_files
         for uploaded_file in uploaded_files:
             filename = secure_filename(uploaded_file.filename)
             dest_path = os.path.join(app.config["UPLOAD_DIR"],
@@ -229,11 +243,7 @@ class ProjectCLPD(CLPDView):
             for file_id in files:
                 file_model = Unit.query.filter(Unit.id == file_id).one()
                 file_name = os.path.split(file_model.path)[1]
-                os.remove(file_model.path)
-                db.session.delete(file_model)
-                db.session.commit()
-                self.process_form.selection.delete_choice(int(file_id),
-                    file_name)
+                self.delete_object(file_model, file_name)
 
 app.add_url_rule(app.config["PROJECT_ROUTE"] + "<project_id>",
     view_func=ProjectCLPD.as_view("project_show"))        
