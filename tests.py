@@ -192,12 +192,14 @@ class ViewsTests(unittest.TestCase):
         assert "/projects/1" in result.data
 
     @mock.patch("app.views.shutil", autospec=shutil)
-    def test_projects_delete_post(self, mock_shutil):
+    @mock.patch("app.views.os", autospec=os)
+    def test_projects_delete_post(self, mock_os, mock_shutil):
         """Test project deletion.
         """
+        mock_os.path.isdir.return_value = True
 
-        project1 = Project(name="test1", path="/test-path/", user=1)
-        project2 = Project(name="test2", path="/test-path/", user=1)
+        project1 = Project(name="test1", path=app.config["UPLOAD_DIR"], user=1)
+        project2 = Project(name="test2", path=app.config["UPLOAD_DIR"], user=1)
         project1.save()
         project2.save()
 
@@ -301,8 +303,8 @@ class ViewsTests(unittest.TestCase):
         os.makedirs(os.path.join(upload_dir, "1"))
 
         result = self.client.post("/projects/1", data={
-            "upload-submitted": "true",
-            "upload-uploaded_file": (StringIO("Test file"), "test.xml")
+            "create-submitted": "true",
+            "create-uploaded_file": (StringIO("Test file"), "test.xml")
             })
 
         assert os.path.exists(os.path.join(upload_dir, "1", "test.xml"))
@@ -324,13 +326,13 @@ class ViewsTests(unittest.TestCase):
         os.makedirs(os.path.join(upload_dir, "1"))
 
         self.client.post("/projects/1", data={
-            "upload-submitted": "true",
-            "upload-uploaded_file": (StringIO("Test file"), "test.xml")
+            "create-submitted": "true",
+            "create-uploaded_file": (StringIO("Test file"), "test.xml")
             })
 
         result = self.client.post("/projects/1", data={
-            "upload-submitted": "true",
-            "upload-uploaded_file": (StringIO("Test file 2"), "test.xml")
+            "create-submitted": "true",
+            "create-uploaded_file": (StringIO("Test file 2"), "test.xml")
             })
 
         assert "already exists" in result.data
@@ -342,7 +344,7 @@ class ViewsTests(unittest.TestCase):
         project.save()
 
         result = self.client.post("/projects/1", data={
-            "upload-submitted": "true"
+            "create-submitted": "true"
             })
 
         assert "You must select a file" in result.data
@@ -357,6 +359,8 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_delete(self, mock_os):
         """Test file deletion.
         """
+        mock_os.path.isdir.return_value = False
+        
         project = Project(name="test", user=1)
         project.save()
 

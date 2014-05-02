@@ -35,21 +35,21 @@
 
 {% block creation_header %}Upload new document{% endblock %}
 {% block creation_form %}
-    {{ macros.show_errors(upload_form.uploaded_file.errors) }}
+    {{ macros.show_errors(create_form.uploaded_file.errors) }}
     <form method="POST" enctype="multipart/form-data" class="form-inline clearfix"
         role="form">
-        {{ upload_form.hidden_tag() }}
+        {{ create_form.hidden_tag() }}
         <div class="input-group col-xs-6 col-md-4 pull-left">
             <span class="input-group-btn">
                 <span class="btn btn-primary btn-file">
-                    {{ upload_form.uploaded_file.label(class="sr-only") }}
-                    {{ upload_form.uploaded_file.label.text }}
-                    {{ upload_form.uploaded_file(multiple="multiple") }}
+                    {{ create_form.uploaded_file.label(class="sr-only") }}
+                    {{ create_form.uploaded_file.label.text }}
+                    {{ create_form.uploaded_file(multiple="multiple") }}
                 </span>
             </span>
             <input type="text" class="form-control" readonly>
         </div>
-        {{ upload_form.upload_button(class="btn btn-primary left-margin",
+        {{ create_form.upload_button(class="btn btn-primary left-margin",
             name="upload") }}
     </form>
 {% endblock %}
