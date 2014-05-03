@@ -217,7 +217,7 @@ class ProjectCLPD(CLPDView):
             forms.DocumentUploadForm, forms.DocumentProcessForm,
             forms.ConfirmDeleteForm)
         self.template_kwargs["allowed_extensions"] = \
-            app.config["ALLOWED_EXTENSIONS"]
+            [ "." + ext for ext in app.config["ALLOWED_EXTENSIONS"]]
 
     def pre_tests(self, **kwargs):
         """Make sure this project exists and make sure that this user can see
