@@ -18,7 +18,10 @@ def really_submitted(form):
     :returns boolean: True if submitted, false otherwise.
     """
 
+    print form.submitted.data
+
     if form.submitted.data == "true":
+        print form.validate_on_submit()
         return form.validate_on_submit()
     return False
 

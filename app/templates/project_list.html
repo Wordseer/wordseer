@@ -18,7 +18,6 @@
         {{ create_form.create_button(class="btn btn-primary") }}
     </form>
 {% endblock %}
-
 {% block list_header %}Existing projects{% endblock %}
 {% block list_form %}
     {% if process_form.selection.choices %}
@@ -54,9 +53,13 @@
             </table>
             <h3>Selected file actions:</h3>
             {{ process_form.process_button(class="btn btn-primary") }}
-            {{ process_form.delete_button(class="btn btn-danger") }}
+            {{ process_form.delete_button(class="btn btn-danger confirm-delete") }}
         </form>
     {% else %}
         <p>You own no projects.</p>
     {% endif %}
 {% endblock %}
+{% block toplevel %}
+    {{ macros.modal_confirmation() }}
+{% endblock %}
+

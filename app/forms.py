@@ -124,7 +124,7 @@ class ProjectProcessForm(ProcessForm):
                 project = Project.query.filter(Project.id == project_id).one()
                 is_processable(units=project.files)
 
-class DeleteConfirmForm(Form, HiddenSubmitted):
+class ConfirmDeleteForm(Form, HiddenSubmitted):
     """A form that will ask users to confirm their deletions.
     """
     DELETE = "1"

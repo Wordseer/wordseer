@@ -69,7 +69,8 @@ class CLPDView(View):
     decorators = [login_required]
     methods = ["GET", "POST"]
 
-    def __init__(self, template, create_form, process_form, **kwargs):
+    def __init__(self, template, create_form, process_form,
+        confirm_delete_form):
         """Initializes a CLPD view. kwargs are data passed to the view in
         general.
 
@@ -77,10 +78,13 @@ class CLPDView(View):
         :arg Form create_form: The form to use for creation.
         :arg Form process_form: The form to use for listing, processing,
         and deleting.
+        :arg Form confirm_delete_form: The form to use for confirming a
+        deletion.
         """
         self.template = template
         self.create_form = create_form(prefix="create")
         self.process_form = process_form(prefix="process")
+        self.confirm_delete_form = confirm_delete_form(prefix="confirm_delete")
         self.template_kwargs = {}
 
     def delete_object(self, obj, data):
@@ -160,7 +164,8 @@ class ProjectsCLPD(CLPDView):
     """
     def __init__(self):
         super(ProjectsCLPD, self).__init__("project_list.html",
-            forms.ProjectCreateForm, forms.ProjectProcessForm)
+            forms.ProjectCreateForm, forms.ProjectProcessForm,
+            forms.ConfirmDeleteForm)
 
     def set_choices(self, **kwargs):
         """Every choice is in the form of (project.id, project.name).
@@ -188,8 +193,11 @@ class ProjectsCLPD(CLPDView):
         """For deletion, delete call delete_object on the object and delete
         its path. For processing, send the project to the processor.
         """
+        print "***********IN PROCESS***********"
+        print request.form
         selected_projects = request.form.getlist("process-selection")
         if request.form["action"] == self.process_form.DELETE:
+            print "*********DELETING***********"
             for project_id in selected_projects:
                 project = Project.query.filter(Project.id == project_id).one()
                 self.delete_object(project, project.name)
@@ -206,7 +214,8 @@ class ProjectCLPD(CLPDView):
     """
     def __init__(self):
         super(ProjectCLPD, self).__init__("document_list.html",
-            forms.DocumentUploadForm, forms.DocumentProcessForm)
+            forms.DocumentUploadForm, forms.DocumentProcessForm,
+            forms.ConfirmDeleteForm)
         self.template_kwargs["allowed_extensions"] = \
             app.config["ALLOWED_EXTENSIONS"]
 
