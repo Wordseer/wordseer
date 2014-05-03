@@ -32,9 +32,22 @@
 
 {% macro render_field(field, label_class = "", field_class = "") -%}
     {% set placeholder = field.label.text %}
-    <div class="form-group {% if field.errors %}error{% endif %}">
-        {{ field.label(class=label_class) }}
-        {{ field(placeholder=field.label.text, class="form-control " +
-            field_class) }}
-    </div>
+    {% if field.type == "FileField" %}
+        <div class="input-group col-xs-6 col-md-4 pull-left">
+            <span class="input-group-btn">
+                <span class="btn btn-primary btn-file">
+                    {{ field.label(class="sr-only") }}
+                    {{ field.label.text }}
+                    {{ field(**kwargs) }}
+                </span>
+            </span>
+            <input type="text" class="form-control" readonly>
+        </div>
+    {% else %}
+        <div class="form-group {% if field.errors %}error{% endif %}">
+            {{ field.label(class=label_class) }}
+            {{ field(placeholder=field.label.text, class="form-control " +
+                field_class) }}
+        </div>
+    {% endif %}
 {%- endmacro %}

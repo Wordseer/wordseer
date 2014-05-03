@@ -39,16 +39,8 @@
     <form method="POST" enctype="multipart/form-data"
         class="form-inline clearfix" role="form">
         {{ create_form.hidden_tag() }}
-        <div class="input-group col-xs-6 col-md-4 pull-left">
-            <span class="input-group-btn">
-                <span class="btn btn-primary btn-file">
-                    {{ create_form.uploaded_file.label(class="sr-only") }}
-                    {{ create_form.uploaded_file.label.text }}
-                    {{ create_form.uploaded_file(multiple="multiple") }}
-                </span>
-            </span>
-            <input type="text" class="form-control" readonly>
-        </div>
+        {{ macros.render_field(create_form.uploaded_file,
+                multiple = "multiple") }}
         {{ create_form.upload_button(class="btn btn-primary left-margin",
             name="upload") }}
     </form>
