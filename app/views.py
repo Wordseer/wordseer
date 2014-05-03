@@ -174,11 +174,11 @@ class ProjectsCLPD(CLPDView):
         """Created projects are created in the database with a name, a user,
         and a path. Their path is also created.
         """
-        #TODO: can we only save this once?
         project = Project(
             name=self.create_form.name.data,
             user=current_user.id)
-        project.save()
+        db.session.add(project)
+        db.session.flush()
         project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
         project.save()
         os.mkdir(project.path)
