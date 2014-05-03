@@ -270,11 +270,11 @@ class ProjectCLPD(CLPDView):
         elif request.form["action"] == self.process_form.PROCESS:
             pass
 
-app.add_url_rule(app.config["PROJECT_ROUTE"] + "<project_id>",
+app.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
     view_func=ProjectCLPD.as_view("project_show"))        
 
-@app.route(app.config["PROJECT_ROUTE"] + "<project_id>" +
-    app.config["DOCUMENT_ROUTE"] + '<document_id>')
+@app.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" +
+    app.config["DOCUMENT_ROUTE"] + '<int:document_id>')
 @login_required
 def document_show(project_id, document_id):
     """
@@ -300,7 +300,7 @@ def document_show(project_id, document_id):
         project=project,
         filename=filename)
 
-@app.route(app.config["UPLOAD_ROUTE"] + "<file_id>")
+@app.route(app.config["UPLOAD_ROUTE"] + "<int:file_id>")
 @login_required
 def get_file(file_id):
     """If the user has permission to view this file, then return it.
