@@ -9,10 +9,30 @@
         </div>
     {% endif %}
     <div class="form-group">
-        {{ field.label }} {{ field(**kwargs)|safe }}
+        {% if field.type == 'BooleanField' %}
+            {{ render_boolean(field, **kwargs) }}
+        {% else %}
+            {{ field.label }} {{ field(placeholder=field.label.text,
+                class="form-control", **kwargs)|safe }}
+        {% endif %}
     </div>
 {% endmacro %}
 
 {% macro render_field(field) %}
-    {{ field(**kwargs)|safe }}
+    <div class="form-group">
+        {% if field.type == 'BooleanField' %}
+            {{ render_boolean(field, **kwargs) }}
+        {% else %}
+            {{ field(**kwargs)|safe }}
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro render_boolean(field) %}
+    <div class="checkbox">
+        <label>
+            {{ field(**kwargs) }}
+            {{ field.label }}
+        </label>
+    </div>
 {% endmacro %}

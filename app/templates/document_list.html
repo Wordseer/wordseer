@@ -36,8 +36,8 @@
 {% block creation_header %}Upload new document{% endblock %}
 {% block creation_form %}
     {{ macros.show_errors(create_form.uploaded_file.errors) }}
-    <form method="POST" enctype="multipart/form-data" class="form-inline clearfix"
-        role="form">
+    <form method="POST" enctype="multipart/form-data"
+        class="form-inline clearfix" role="form">
         {{ create_form.hidden_tag() }}
         <div class="input-group col-xs-6 col-md-4 pull-left">
             <span class="input-group-btn">

@@ -29,3 +29,12 @@
   </div>
 </div>
 {% endmacro %}
+
+{% macro render_field(field, label_class = "", field_class = "") -%}
+    {% set placeholder = field.label.text %}
+    <div class="form-group {% if field.errors %}error{% endif %}">
+        {{ field.label(class=label_class) }}
+        {{ field(placeholder=field.label.text, class="form-control " +
+            field_class) }}
+    </div>
+{%- endmacro %}

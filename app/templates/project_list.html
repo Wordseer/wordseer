@@ -9,12 +9,7 @@
     <form method="POST" enctype="multipart/form-data" class="form-inline"
         role="form">
         {{ create_form.hidden_tag() }}
-        <div class="form-group">
-            {{ create_form.name.label(class="sr-only") }}
-            {{ create_form.name(
-                    placeholder="Project Name",
-                    class="form-control") }}
-        </div>
+        {{ macros.render_field(create_form.name, label_class="sr-only") }}
         {{ create_form.create_button(class="btn btn-primary") }}
     </form>
 {% endblock %}
