@@ -466,8 +466,9 @@ class ViewsTests(unittest.TestCase):
     def test_get_file(self):
         """Run tests on the get_file view.
         """
-
-        file_path = os.path.join(app.config["UPLOAD_DIR"], "upload_test.txt")
+        file_handle, file_path = tempfile.mkstemp()
+        file_handle = os.fdopen(file_handle, "r+")
+        file_handle.write("foobar")
 
         project = Project(user=1)
 
@@ -477,7 +478,7 @@ class ViewsTests(unittest.TestCase):
         result = self.client.get("/uploads/1")
 
         with open(file_path) as test_file:
-            assert result.data == test_file.read()
+            assert result.data == file_handle.read()
 
 class AuthTests(unittest.TestCase):
     """Make sure that users can only see the pages and such that they
@@ -497,8 +498,11 @@ class AuthTests(unittest.TestCase):
         project = Project(name="Bar's project", user=2)
         project.save()
 
-        cls.file_path = os.path.join(app.config["UPLOAD_DIR"],
-            "upload_test.txt")
+        file_handle, file_path = tempfile.mkstemp()
+        file_handle = os.fdopen(file_handle, "r+")
+        file_handle.write("foobar")
+
+        cls.file_path = os.path.join(file_path)
         unit = Unit(project=project, path=cls.file_path)
         unit.save()
 
@@ -545,8 +549,11 @@ class LoggedOutTests(unittest.TestCase):
         project = Project(name="Bar's project", user=2)
         project.save()
 
-        cls.file_path = os.path.join(app.config["UPLOAD_DIR"],
-            "upload_test.txt")
+        cls.file_handle, cls.file_path = tempfile.mkstemp()
+        cls.file = os.fdopen(cls.file_handle, "r+")
+        cls.file.write("foobar")
+        cls.file_name = os.path.split(cls.file_path)[1]
+        
         unit = Unit(project=project, path=cls.file_path)
         unit.save()
 
@@ -562,7 +569,7 @@ class LoggedOutTests(unittest.TestCase):
         """
         result = self.client.get("/projects/1")
 
-        assert "upload_test.txt" not in result.data
+        assert self.file_name not in result.data
 
     def test_file_show(self):
         """Test to make sure that unauthed users can't see a specific file.
