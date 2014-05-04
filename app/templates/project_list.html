@@ -10,7 +10,8 @@
         role="form">
         {{ create_form.hidden_tag() }}
         {{ macros.render_field(create_form.name, label_class="sr-only") }}
-        {{ create_form.create_button(class="btn btn-primary") }}
+        {{ create_form.create_button(class="btn btn-primary",
+            icon="glyphicon-ok") }}
     </form>
 {% endblock %}
 {% block list_header %}Existing projects{% endblock %}
@@ -47,8 +48,10 @@
                 </tbody>
             </table>
             <h3>Selected file actions:</h3>
-            {{ process_form.process_button(class="btn btn-primary") }}
-            {{ process_form.delete_button(class="btn btn-danger") }}
+            {{ process_form.process_button(class="btn btn-primary",
+                icon="glyphicon-tasks") }}
+            {{ process_form.delete_button(class="btn btn-danger",
+                icon="glyphicon-remove") }}
         </form>
     {% else %}
         <p>You own no projects.</p>

@@ -42,7 +42,7 @@
         {{ macros.render_field(create_form.uploaded_file,
                 multiple="multiple", accept=allowed_extensions|join(", ")) }}
         {{ create_form.upload_button(class="btn btn-primary left-margin",
-            name="upload") }}
+            icon="glyphicon-cloud-upload") }}
         <p class="help-block">
             Allowed extensions: {{ allowed_extensions|join(", ") }}.
         </p>
@@ -84,8 +84,10 @@
                 </tbody>
             </table>
             <h3>Selected file actions:</h3>
-            {{ process_form.process_button(class="btn btn-primary") }}
-            {{ process_form.delete_button(class="btn btn-danger") }}
+            {{ process_form.process_button(class="btn btn-primary",
+                icon="glyphicon-tasks") }}
+            {{ process_form.delete_button(class="btn btn-danger",
+                icon="glyphicon-remove") }}
         </form>
     {% else %}
         <p>There are no files in this project.</p>
