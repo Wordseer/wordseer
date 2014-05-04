@@ -21,12 +21,12 @@ def reset_db():
     engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
     db.Model.metadata.create_all(engine)
 
+def tearDownModule():
+    os.remove(app.config["SQLALCHEMY_DATABASE_PATH"])
+
 class TestModels(unittest.TestCase):
     def setUp(self):
         reset_db()
-
-    def tearDown(self):
-        pass
 
     def test_model_word(self):
         """Test to make sure that the atttributes of the Word model can be

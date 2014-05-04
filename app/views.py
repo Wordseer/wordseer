@@ -223,8 +223,9 @@ class ProjectCLPD(CLPDView):
         """Make sure this project exists and make sure that this user can see
         the project.
         """
-        self.project = shortcuts.get_object_or_exception(Project, Project.id,
-            kwargs["project_id"], exceptions.ProjectNotFoundException)
+        self.project = shortcuts.get_object_or_exception(Project,
+            Project.id == kwargs["project_id"],
+            exceptions.ProjectNotFoundException)
 
         self.template_kwargs["project"] = self.project
 
@@ -292,21 +293,18 @@ def document_show(project_id, document_id):
     :param int doc_id: The document to retrieve details for.
     """
 
-    project = shortcuts.get_object_or_exception(Project, Project.id,
-        project_id, exceptions.ProjectNotFoundException)
+    document = shortcuts.get_object_or_exception(Unit,
+        Unit.id == document_id, exceptions.DocumentNotFoundException)
 
     # Test if this user can see it
-    if project.user is not current_user.id:
+    if document.project.user is not current_user.id:
         return app.login_manager.unauthorized()
-
-    document = shortcuts.get_object_or_exception(Unit, Unit.id, document_id,
-        exceptions.DocumentNotFoundException)
 
     filename = os.path.split(document.path)[1]
 
     return render_template("document_show.html",
         document=document,
-        project=project,
+        project=document.project,
         filename=filename)
 
 @app.route(app.config["UPLOAD_ROUTE"] + "<int:file_id>")

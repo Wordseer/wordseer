@@ -25,18 +25,16 @@ def really_submitted(form):
         return form.validate_on_submit()
     return False
 
-def get_object_or_exception(model, attribute, value, exception=None):
+def get_object_or_exception(model, condition, exception=None):
     """Either get the requested object or raise an exception.
 
     :arg model model: The Model of the requested object.
-    :arg attribute: The attribute of the Model of the requested object.
-    :arg value: The required value of the attribute.
+    :arg condition: The condition to pass to the query object.
     :arg exception: The exception to raise on failure.
     """
 
-    #FIXME, see issue tracker
     try:
-        return model.query.filter(attribute == value).one()
+        return model.query.filter(condition).one()
     except NoResultFound:
         try:
             raise exception
