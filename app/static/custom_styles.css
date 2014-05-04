@@ -53,3 +53,7 @@ form + .alert {
     display: block;
     padding: 15px 15px;
 }
+
+input + div.alert {
+    margin-top: 15px;
+}
