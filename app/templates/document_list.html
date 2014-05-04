@@ -29,8 +29,10 @@
 {% endblock %}
 {% block title %}Document List{% endblock %}
 {% block page_header %}
-    <a href="{{ url_for('projects') }}">Projects</a> »
-    {{ project.name }}
+    {{ macros.breadcrumbs([
+        (url_for('projects'), "Projects"),
+        ("", project.name)
+        ])}}
 {% endblock %}
 
 {% block creation_header %}Upload new document{% endblock %}
