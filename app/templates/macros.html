@@ -81,3 +81,40 @@
         {% endif %}
     {% endfor %}
 {%- endmacro %}
+
+{% macro selection_table(choices, type, table_class, heading, link_dest) %}
+    <table class="{{ table_class }}">
+        <thead>
+            <tr>
+                <th class="select">
+                    Select (<a href="#" id="check-all">All</a>)
+                </th>
+                <th>
+                    {{ heading }}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for choice in choices %}
+                <tr>
+                    <td>
+                        {{ choice }}
+                    </td>
+                    <td>
+                        <label for="{{ choice.id }}">
+                            {% if "project" in type %}
+                                <a href="{{ url_for(link_dest,
+                                    project_id=choice.data, **kwargs) }}">
+                            {% elif "document" in type %}
+                                <a href="{{ url_for(link_dest,
+                                    document_id=choice.data, **kwargs) }}">
+                            {% endif %}
+                                {{ choice.label.text }}
+                            </a>
+                        </label>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
