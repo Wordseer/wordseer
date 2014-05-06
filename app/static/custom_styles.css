@@ -42,7 +42,7 @@ nav {
     margin-top: 0;
 }
 
-form + .alert {
+form + div.alert, input+div.alert, div.form-group+div.alert {
     margin-top: 15px;
 }
 
@@ -52,8 +52,4 @@ form + .alert {
     position: relative;
     display: block;
     padding: 15px 15px;
-}
-
-input + div.alert {
-    margin-top: 15px;
 }

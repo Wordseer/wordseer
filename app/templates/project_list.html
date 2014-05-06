@@ -8,8 +8,12 @@
 {% block creation_form %}
     <form method="POST" enctype="multipart/form-data" class="form-inline"
         role="form">
+        {% if create_form.errors %}
+            {{ macros.render_errors(create_form.name.errors) }}
+        {% endif %}
         {{ create_form.hidden_tag() }}
-        {{ macros.render_field(create_form.name, label_class="sr-only") }}
+        {{ macros.render_field(create_form.name, label_class="sr-only",
+            show_errors=False) }}
         {{ create_form.create_button(class="btn btn-primary",
             icon="glyphicon-ok") }}
     </form>

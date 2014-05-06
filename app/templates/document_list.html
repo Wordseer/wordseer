@@ -41,12 +41,13 @@
         class="form-inline clearfix" role="form">
         {{ create_form.hidden_tag() }}
         {{ macros.render_field(create_form.uploaded_file,
-                multiple="multiple", accept=allowed_extensions|join(", ")) }}
-        {{ create_form.upload_button(class="btn btn-primary left-margin",
-            icon="glyphicon-cloud-upload") }}
-        <p class="help-block">
-            Allowed extensions: {{ allowed_extensions|join(", ") }}.
-        </p>
+                multiple="multiple",
+                accept=allowed_extensions|join(", "),
+                button=create_form.upload_button(
+                    class="btn btn-primary left-margin",
+                    icon="glyphicon-cloud-upload"),
+                help=("Allowed extensions: " + allowed_extensions|join(", ") +
+                    ".")) }}
     </form>
 {% endblock %}
 
