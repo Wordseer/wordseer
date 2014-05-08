@@ -2,7 +2,7 @@
 Container for output of Parser.parse.
 """
 
-from mixins.comparebydict import CompareByDict
+from wordseerbackend.mixins.comparebydict import CompareByDict
 
 class ParseProducts(CompareByDict):
     """This class is a container for the results of parse(). It contains

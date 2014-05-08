@@ -6,30 +6,30 @@ import mock
 import os
 import unittest
 
-import collectionprocessor
-import config
-from document.document import Document
-from parser import documentparser
-from sequence import sequenceprocessor
-import structureextractor
-import logger
-import stringprocessor
+from wordseerbackend import collectionprocessor
+from wordseerbackend import config
+from wordseerbackend.document.document import Document
+from wordseerbackend.parser import documentparser
+from wordseerbackend.sequence import sequenceprocessor
+from wordseerbackend import stringprocessor
+from wordseerbackend import structureextractor
+from wordseerbackend import logger
 
 def setUpModule():
     global mock_writer
     mock_writer = mock.MagicMock(name="Mock Reader Writer")
-    with mock.patch("collectionprocessor.StringProcessor",
+    with mock.patch("wordseerbackend.collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor):
         global colproc
         colproc = collectionprocessor.CollectionProcessor(mock_writer)
 
-@mock.patch("collectionprocessor.logger", autospec=logger)
+@mock.patch("wordseerbackend.collectionprocessor.logger", autospec=logger)
 class TestCollectionProcessor(unittest.TestCase):
     """Test the CollectionProcessor class.
     """
-    @mock.patch("collectionprocessor.structureextractor",
+    @mock.patch("wordseerbackend.collectionprocessor.structureextractor",
         autospec=structureextractor)
-    @mock.patch("collectionprocessor.os", autospec=os)
+    @mock.patch("wordseerbackend.collectionprocessor.os", autospec=os)
     def test_extract_record_metadata(self, mock_os, mock_strucex, mock_logger):
         """Test the extract_record_metadata method.
         """
@@ -89,7 +89,7 @@ class TestCollectionProcessor(unittest.TestCase):
             num_done += 1
         mock_writer.create_new_document.assert_has_calls(createdoc_calls)
 
-    @mock.patch("collectionprocessor.DocumentParser",
+    @mock.patch("wordseerbackend.collectionprocessor.DocumentParser",
         autospec=documentparser.DocumentParser)
     def test_parse_documents(self, mock_dp, mock_logger):
         """Tests for the test_parse_documents method.
@@ -128,7 +128,7 @@ class TestCollectionProcessor(unittest.TestCase):
                 str(i), mock_logger.REPLACE))
         mock_logger.log.assert_has_calls(logger_calls)
 
-    @mock.patch("collectionprocessor.SequenceProcessor",
+    @mock.patch("wordseerbackend.collectionprocessor.SequenceProcessor",
         autospec=sequenceprocessor.SequenceProcessor)
     def test_calculate_index_sequences(self, mock_seq_proc, mock_logger):
         """Tests for the calculate_index_sequences method.
@@ -199,7 +199,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         # Reset the previously used mocks
         mock_writer.reset_mock()
 
-    @mock.patch("collectionprocessor.Database")
+    @mock.patch("wordseerbackend.collectionprocessor.Database")
     def test_process_reset(self, mock_db):
         """Test that database reset works properly.
         """
@@ -207,8 +207,8 @@ class TestCollectionProcessorProcess(unittest.TestCase):
 
         mock_db.reset.assert_called_once()
 
-    @mock.patch("collectionprocessor.config", autospec=config)
-    @mock.patch("collectionprocessor.logger", autospec=logger)
+    @mock.patch("wordseerbackend.collectionprocessor.config", autospec=config)
+    @mock.patch("wordseerbackend.collectionprocessor.logger", autospec=logger)
     def test_process_e_r_m(self, mock_logger, mock_config):
         """Test that extract_record_metadata() is called properly.
         """
@@ -225,8 +225,8 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.parse_documents.called == False
         assert len(colproc.reader_writer.method_calls) == 0
 
-    @mock.patch("collectionprocessor.config", autospec=config)
-    @mock.patch("collectionprocessor.logger", autospec=logger)
+    @mock.patch("wordseerbackend.collectionprocessor.config", autospec=config)
+    @mock.patch("wordseerbackend.collectionprocessor.logger", autospec=logger)
     def test_process_parse_documents(self, mock_logger, mock_config):
         """Test that parse_documents is called properly
         """
@@ -242,7 +242,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.extract_record_metadata.called == False
         assert len(colproc.reader_writer.method_calls) == 0
 
-    @mock.patch("collectionprocessor.logger", autospec=logger)
+    @mock.patch("wordseerbackend.collectionprocessor.logger", autospec=logger)
     def test_process_calc_index_sequences(self, mock_logger):
         """Test that calculate_index_sequences() is called along with
         the reader_writer.
@@ -258,7 +258,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.parse_documents.called == False
         assert colproc.extract_record_metadata.called == False
 
-    @mock.patch("collectionprocessor.logger", autospec=logger)
+    @mock.patch("wordseerbackend.collectionprocessor.logger", autospec=logger)
     def test_process_calc_word_counts(self, mock_logger):
         """Test that ReaderWriter.calculate_word_counts() is called along with
         the logs being updated.
@@ -277,7 +277,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         mock_logger.log.assert_called_once_with("word_counts_done", "true",
             mock_logger.REPLACE)
 
-    @mock.patch("collectionprocessor.logger", autospec=logger)
+    @mock.patch("wordseerbackend.collectionprocessor.logger", autospec=logger)
     def test_process_tfidfs(self, mock_logger):
         """Test that ReaderWriter.calculate_tfidfs() is called.
         """
@@ -293,7 +293,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.parse_documents.called == False
         assert colproc.extract_record_metadata.called == False
 
-    @mock.patch("collectionprocessor.logger", autospec=logger)
+    @mock.patch("wordseerbackend.collectionprocessor.logger", autospec=logger)
     def test_process_w2w(self, mock_logger):
         """Test that calculate_lin_similarities() is run.
         """

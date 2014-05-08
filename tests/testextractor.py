@@ -2,14 +2,15 @@
 Tests for structureextractor.py.
 """
 
-from document import metadata, sentence
 import unittest
-from structureextractor import *
-import stringprocessor
 import json
 from lxml import etree
 
-t = stringprocessor.StringProcessor()
+from wordseerbackend.document import metadata, sentence
+from wordseerbackend.structureextractor import *
+from wordseerbackend.stringprocessor import StringProcessor
+
+t = StringProcessor()
 
 class CommonTests(object):
     """Functionality common to all extractor test cases.

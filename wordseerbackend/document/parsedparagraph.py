@@ -1,5 +1,5 @@
-from mixins.kwargstodict import KwargsToDict
-from mixins.comparebydict import CompareByDict
+from wordseerbackend.mixins.comparebydict import CompareByDict
+from wordseerbackend.mixins.kwargstodict import KwargsToDict
 
 class ParsedParagraph(KwargsToDict, CompareByDict):
     """A container for a paragraph that has been parsed, containing both the

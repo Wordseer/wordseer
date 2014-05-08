@@ -2,8 +2,12 @@
 Configuration file for the pipeline.
 """
 
-# NLP locations
-CORE_NLP_DIR = "stanford-corenlp/"
+import os
+
+WORDSEER_DIR = os.path.dirname(os.path.realpath(__file__))
+
+# NLP locations. Paths should be absolute.
+CORE_NLP_DIR = os.path.join(WORDSEER_DIR, "stanford-corenlp/")
 
 # Processing options
 GRAMMATICAL_PROCESSING = True
@@ -12,4 +16,4 @@ WORD_TO_WORD_SIMILARITY = True
 SEQUENCE_INDEXING = True
 
 # Database options
-DB_URL = 'sqlite:///wordseer.db'
+DB_URL = "sqlite:///" + os.path.join(WORDSEER_DIR, 'wordseer.db')
