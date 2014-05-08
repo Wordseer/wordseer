@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-This file handles breaking down text into Sequence objects, which are
+This module handles breaking down text into Sequence objects, which are
 collections of at most four words.
+
+The SequenceProcessor requires a database reader/writer to be initialized.
+The most interesting method to the user is the process() method. This method
+expects a single Sentence object, and it will extract all Sequences from
+this sentence and record them in the database.
 """
 
 from .sequence import Sequence
@@ -16,7 +21,7 @@ class SequenceProcessor(object):
     def __init__(self, reader_writer):
         """Set up local variables for the SequenceProcessor.
 
-        :param ReaderWriter reader_writer: A reader_writer to interface with the
+        :param ReaderWriter reader_writer: A reader/writer to interface with the
         database to write the sequences to the database.
         :param boolean grammatical_info_exists: ??
         """

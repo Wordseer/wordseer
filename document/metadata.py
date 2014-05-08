@@ -1,5 +1,6 @@
 """
-Keep track of metadata for Units.
+Metadata objects can describe a Unit, a Sentence, or a Document. They are
+used to store certain information about the object in question.
 """
 from mixins.comparebydict import CompareByDict
 from mixins.kwargstodict import KwargsToDict

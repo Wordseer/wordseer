@@ -1,3 +1,8 @@
+"""
+Document objects represent the topmost division of a file; an entire
+file is considered a document.
+"""
+
 from unit import Unit
 
 class Document(Unit):

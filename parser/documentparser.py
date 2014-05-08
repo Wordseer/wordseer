@@ -1,3 +1,12 @@
+"""
+The DocumentParser takes in a Document object and parses it by creating a
+ParsedParagraph object for every sentence in the Document.
+
+The ParsedParagraph will then be written to the database, and each sentence
+returned from the write_parse_products method will be passed to
+SequenceProcessor.process().
+"""
+
 from datetime import datetime
 from document.parsedparagraph import ParsedParagraph
 import logger
