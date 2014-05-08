@@ -19,10 +19,11 @@ class CommonTests(object):
         """Set up some common variables.
 
         :param str path: The path that contains both the structure_file and
-        input_file.
+            input_file.
         :param str structure_file: The file with a JSON description of the
-        XML structure.
+            XML structure.
         :param str input_file: The XML file to test.
+        
         """
         self.structure_file = path + structure_file
         self.input_file = path + input_file

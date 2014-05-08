@@ -22,7 +22,7 @@ class StructureExtractor(object):
 
         :param StringProcessor str_proc: A StringProcessor object
         :param str structure_file: Path to a JSON file that specifies the
-        document structure.
+            document structure.
         :return StructureExtractor: a StructureExtractor instance
         """
         self.str_proc = str_proc
@@ -34,7 +34,7 @@ class StructureExtractor(object):
         structure_file given in the constructor for rules to identify documents.
 
         :param file/str infile: The file to extract; readable objects or paths
-        as strings are acceptable.
+            as strings are acceptable.
         :return list: A list of Document objects
         """
 
@@ -89,7 +89,7 @@ class StructureExtractor(object):
 
         :param dict structure: A JSON description of the structure
         :param etree node: An lxml etree object of the node to get sentences
-        from
+            from.
         :param boolean tokenize: if True, then the sentences will be tokenized
         :return list: A list of Sentences.
         """
@@ -211,7 +211,7 @@ def get_xpath_text(xpath_pattern, node):
     :param string xpath_pattern: The pattern to find matches for.
     :param etree node: The node to find matches under
     :return list: A list of strings, with one string for every node that matches
-    xpath_pattern
+        xpath_pattern
     """
 
     values = [] # a list of strings

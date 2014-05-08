@@ -12,15 +12,14 @@ REPLACE = "replace"
 UPDATE = "update"
 
 def log(item, value, replace_value):
-    """
-    Add a new log entry to the log table.
+    """Add a new log entry to the log table.
 
     :param str item: The item to log (think of it as a title).
     :param str value: The value of the logged item.
     :param str replace_value: if set to logger.REPLACE, this entry will replace
-    the previous entry with the same value. If set to logger.UPDATE, then this
-    entry will add on to the previous entry's value with this entry's
-    value in the form "old [new]".
+        the previous entry with the same value. If set to logger.UPDATE, then
+        this entry will add on to the previous entry's value with this entry's
+        value in the form "old [new]".
     :return None: None.
     """
 
@@ -49,7 +48,7 @@ def get(item):
 
     :param string item: The item to retrieve.
     :return string: The value of the given item, blank if the item does
-    not exist, the first one if there are several instances.
+        not exist, the first one if there are several instances.
     """
 
     session = database.Database().session

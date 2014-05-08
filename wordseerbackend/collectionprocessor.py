@@ -32,13 +32,13 @@ class CollectionProcessor(object):
         4. Processes the sentences by performing grammatical parsing
 
         :param str collection_dir: The directory whose files should be
-        processed.
+            processed.
         :param str docstructure_file_name: The name of the JSON file that
-        describes the structure in the document files.
+            describes the structure in the document files.
         :param str file_name_extension: Files with this extension will be parsed
-        as documents.
+            as documents.
         :param boolean start_from_scratch: If true, then the tables in the
-        database will be recreated.
+            database will be recreated.
         """
         # Set up database if necessary
         if start_from_scratch is True:
@@ -94,11 +94,11 @@ class CollectionProcessor(object):
 
         :param StringProcessor str_proc: An instance of StringProcessor
         :param str collection_dir: The directory from which files should be
-        parsed.
+            parsed.
         :param str docstruc_file_name: A JSON description of the
-        document structure.
+            document structure.
         :param str filename_extension: The extension of the files that contain
-        documents.
+            documents.
         """
         extractor = structureextractor.StructureExtractor(self.str_proc,
             docstruc_filename)

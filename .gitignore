@@ -1,4 +1,5 @@
-java
+*.java
 *.pyc
 *.db
 *corenlp*
+_build

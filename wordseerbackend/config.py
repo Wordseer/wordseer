@@ -7,7 +7,7 @@ import os
 WORDSEER_DIR = os.path.dirname(os.path.realpath(__file__))
 
 # NLP locations. Paths should be absolute.
-CORE_NLP_DIR = os.path.join(WORDSEER_DIR, "stanford-corenlp/")
+CORE_NLP_DIR = os.path.join(WORDSEER_DIR, "../stanford-corenlp/")
 
 # Processing options
 GRAMMATICAL_PROCESSING = True
