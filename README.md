@@ -1,4 +1,4 @@
-py_wordseerbackend
+wordseerbackend
 ==================
 
 This is intended to implement the functionality of
@@ -65,3 +65,14 @@ To run all tests, simply run `runtests.py` from the root directory.
 Alternatively, use the following syntax to run only one module's tests.
 
     python -m unittest -v tests.testdesiredmodule
+
+Documentation
+-------------
+
+Documentation is available 
+[on readthedocs](http://wordseerbackend.readthedocs.org/en/latest/).
+If you want to build the documentation, you will need to install `sphinx`:
+
+    pip install sphinx
+
+Then run `make html` in the `docs` directory.
