@@ -2,12 +2,14 @@
 Open, close, and manage database connections.
 """
 
-import config
-import logging
 import os.path
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Log, Base
+
+from wordseerbackend.models import Log, Base
+from wordseerbackend import config
+#import wordseerbackend.logging
 
 class Database(object):
     """

@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-This file handles breaking down text into Sequence objects, which are
+This module handles breaking down text into Sequence objects, which are
 collections of at most four words.
+
+The SequenceProcessor requires a database reader/writer to be initialized.
+The most interesting method to the user is the process() method. This method
+expects a single Sentence object, and it will extract all Sequences from
+this sentence and record them in the database.
 """
 
 from .sequence import Sequence
@@ -16,8 +21,8 @@ class SequenceProcessor(object):
     def __init__(self, reader_writer):
         """Set up local variables for the SequenceProcessor.
 
-        :param ReaderWriter reader_writer: A reader_writer to interface with the
-        database to write the sequences to the database.
+        :param ReaderWriter reader_writer: A reader/writer to interface with the
+            database to write the sequences to the database.
         :param boolean grammatical_info_exists: ??
         """
 
@@ -87,7 +92,7 @@ class SequenceProcessor(object):
 
         :param Sentence sentence: The sentence to process,
         :return list: A list of Sequence objects, representing the results
-        of processing. These sequences are also sent to the ReaderWriter.
+            of processing. These sequences are also sent to the ReaderWriter.
         """
 
         sequences = [] # a list of Sequences
@@ -196,7 +201,8 @@ class SequenceProcessor(object):
 
     def finish(self):
         """Have the reader_writer finish indexing the sequences. This method
-        simply calls finish_indexing_sequences() from the reader_writer object.
+            simply calls finish_indexing_sequences() from the reader_writer
+            object.
         """
 
         #TODO: reader_writer
@@ -205,10 +211,11 @@ class SequenceProcessor(object):
 
 def join_tws(words, delimiter, attr):
     """Join either the lemmas or text of words with the delimiter.
+
     :param list words: A list of TaggedWord objects.
     :param str delimiter: A delimiter to put between the words/lemmas.
     :param str attr: Either sequenceprocessor.LEMMA to combine lemmas or
-    sequenceprocessor.WORD to combine words.
+        sequenceprocessor.WORD to combine words.
     :return str: The combined sentence.
     """
 

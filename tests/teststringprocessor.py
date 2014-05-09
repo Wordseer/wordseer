@@ -5,10 +5,10 @@ Tests for the tokenizer.
 import mock
 import unittest
 
-from document import sentence
-from parser.dependency import Dependency
-from parser.parseproducts import ParseProducts
-import stringprocessor
+from wordseerbackend.document import sentence
+from wordseerbackend.parser.dependency import Dependency
+from wordseerbackend.parser.parseproducts import ParseProducts
+from wordseerbackend import stringprocessor
 
 t = stringprocessor.StringProcessor()
 
@@ -94,7 +94,7 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
                     self.failUnless(actual_char == " ")
 
 @mock.patch.object(stringprocessor, "tokenize_from_raw")
-@mock.patch("stringprocessor.StanfordCoreNLP.raw_parse")
+@mock.patch("wordseerbackend.stringprocessor.StanfordCoreNLP.raw_parse")
 class ParseTests(unittest.TestCase):
     """Tests for the parse() method.
     """

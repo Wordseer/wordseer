@@ -1,11 +1,13 @@
 """
 Tests for the SequenceProcessor class.
 """
-from document.taggedword import TaggedWord
-from document.sentence import Sentence
-from sequence.sequenceprocessor import (SequenceProcessor, join_tws, LEMMA,
-    WORD)
+
 import unittest
+
+from wordseerbackend.document.taggedword import TaggedWord
+from wordseerbackend.document.sentence import Sentence
+from wordseerbackend.sequence.sequenceprocessor import (SequenceProcessor,
+    join_tws, LEMMA, WORD)
 
 class SequenceProcessorTests(unittest.TestCase):
     """Tests for SequenceProcessor.
