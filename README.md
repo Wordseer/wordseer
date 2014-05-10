@@ -27,6 +27,10 @@ If you want to run unit tests, you should install `mock`:
 
     pip install mock
 
+Or, you can simply use the `requirements.txt` file:
+
+    pip install -r requirements.txt
+
 `corenlp` must be installed manually. Create a file called `setup.py` in
 its root directory containing the following:
 
