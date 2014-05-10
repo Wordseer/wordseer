@@ -3,3 +3,4 @@
 *.db
 *corenlp*
 _build
+venv
