@@ -40,8 +40,5 @@ and if they have been done yet. If it is and they haven't, then call
 
 The methods listed above are the methods that interface with the real processing
 code. Here is a short description of how they work and fit into the overall
-pipeline.
-
-:meth:`~wordseerbackend.collectionprocessor.CollectionProcessor.extract_record_metadata`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+pipeline. More detailed documentation can be found on their respective pages
+in this documentation.
