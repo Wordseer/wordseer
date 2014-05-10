@@ -2,7 +2,7 @@ Pipeline path
 =============
 
 CollectionProcessor
-###################
+-------------------
 
 The entry point for data to be processed is at
 :class:`~wordseerbackend.collectionprocessor`, specifically at
@@ -43,4 +43,5 @@ code. Here is a short description of how they work and fit into the overall
 pipeline.
 
 :meth:`~wordseerbackend.collectionprocessor.CollectionProcessor.extract_record_metadata`
-*******************************************************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
