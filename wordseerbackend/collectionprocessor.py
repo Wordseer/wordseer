@@ -1,6 +1,6 @@
 """
-This file has tools to process a collection of files and contains the command
-line interface to the wordseer backend.
+This file has tools to process a collection of files. This is the interface
+between the input and the pipeline.
 """
 
 from datetime import datetime
@@ -92,6 +92,16 @@ class CollectionProcessor(object):
         """Extract metadata from each file in collection_dir, and populate the
         documents, sentences, and document structure database tables.
 
+        For every document file in ``collection_dir``, this extracts any
+        documents from it using the
+        :class:`~wordseerbackend.collectionprocessor.CollectionProcessor`
+        and the provided ``docstruc_filename``.
+
+        Then, every document extracted is recorded with
+        ``create_new_document`` from the reader/writer. Once all documents
+        have been extracted, ``finished_recording_text_and_metadata`` is set to
+        ``true`` using the :mod:`~wordseerbackend.logger`.
+
         :param StringProcessor str_proc: An instance of StringProcessor
         :param str collection_dir: The directory from which files should be
             parsed.
@@ -102,6 +112,7 @@ class CollectionProcessor(object):
         """
         extractor = structureextractor.StructureExtractor(self.str_proc,
             docstruc_filename)
+
         # Extract and record metadata, text for documents in the collection
         num_files_done = 1
         contents = []
@@ -139,10 +150,14 @@ class CollectionProcessor(object):
             logger.REPLACE)
 
     def parse_documents(self):
-        """Given the documents already loaded into the database from
-        extract_record_metadata, parse each document using
-        DocumentParser.parse_document(). Afterwards, call
-        ReaderWriter.finish_grammatical_processing.
+        """Parse documents in the database using
+        :meth:`~wordseerbackend.parser.documentparser.DocumentParser.parse_document`.
+
+        Given the documents already loaded into the database from
+        :meth:`~wordseerbackend.collectionprocessor.CollectionProcessor.extract_record_metadata`,
+        parse each document using
+        :meth:`~wordseerbackend.parser.documentparser.DocumentParser.parse_document`.
+        Afterwards, call ``finish_grammatical_processing`` on the reader/writer.
         """
 
         # TODO: readerwriter
@@ -181,8 +196,11 @@ class CollectionProcessor(object):
         """Calculate and index sequences, if not already done during grammatical
         processing.
 
-        For every sentence in the database, this method calls
-        SequenceProcessor.process() on it.
+        For every sentence logged in the database with an ID less than the
+        ID returned by ``get_max_setnece_id``, this method retrieves it and
+        calls
+        :meth:`~wordseerbackend.sequenceprocessor.SequenceProcessor.process()`
+        on it.
         """
 
         latest_sentence = logger.get("latest_sequence_sentence")
