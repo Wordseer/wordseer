@@ -24,12 +24,13 @@ class CollectionProcessor(object):
     def process(self, collection_dir, docstruc_filename,
         filename_extension, start_from_scratch):
         """
-        This function relies on several subfunctions to:
-        1. Sets up the database if necessary
-        2. Extracts metadata, populates the narratives, sentenes, and paragraphs
-        tables
-        3. Processes the sentences by tokenizing and indexing the words
-        4. Processes the sentences by performing grammatical parsing
+        This function relies on several methods to:
+        
+        1. Set up the database if necessary
+        2. Extract metadata, populate the narratives, sentences, and paragraphs
+            tables
+        3. Process the sentences by tokenizing and indexing the words
+        4. Process the sentences by performing grammatical parsing
 
         :param str collection_dir: The directory whose files should be
             processed.
@@ -199,7 +200,7 @@ class CollectionProcessor(object):
         For every sentence logged in the database with an ID less than the
         ID returned by ``get_max_setnece_id``, this method retrieves it and
         calls
-        :meth:`~wordseerbackend.sequenceprocessor.SequenceProcessor.process()`
+        :meth:`~wordseerbackend.sequenceprocessor.SequenceProcessor.process`
         on it.
         """
 
