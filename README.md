@@ -7,7 +7,9 @@ from PHP.
 
 ## Installation ##
 
-### Requirements ###
+Installation of requirements is easy with `pip install`:
+
+    pip install -r requirements.txt
 
 ## Documentation ##
 
