@@ -45,7 +45,6 @@ class BaseConfig(object):
     SECRET_KEY = "secret"
 
     #Email settings
-    #TODO: change in production
     SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = False
     SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
     SECURITY_SEND_REGISTER_EMAIL = False
