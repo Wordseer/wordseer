@@ -1,3 +1,6 @@
+"""Initialize the WordSeer website.
+"""
+
 from flask import Flask
 from . import config
 
