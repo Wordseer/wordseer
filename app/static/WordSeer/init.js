@@ -7,7 +7,7 @@ goog.require('goog.string.StringBuffer');
 
 // Begin ExjtJS initialization.
 Ext.Loader.setPath({
-	'WordSeer': '../../src/js',
+	'WordSeer': './',
 	'Ext.ux.desktop':'../../lib/desktop/js',
 	'MyDesktop':'../../lib/desktop',
 	'Skirtle':'../../lib/skirtle', //<- component column files
@@ -25,7 +25,7 @@ guide.
 */
 Ext.application({
     name: 'WordSeer',
-    appFolder: '../../src/js',
+    appFolder: './',
     requires: [
         'WordSeer.view.widget.DocumentBrowserWidget',
         'WordSeer.view.widget.DocumentViewerWidget',
