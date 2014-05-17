@@ -14,3 +14,7 @@ Installation of requirements is easy with `pip install`:
 ## Documentation ##
 
 Documentation will be available on readthedocs.
+
+## Testing ##
+
+Simply run `runtests.py` from the root directory.
