@@ -32,3 +32,11 @@ RELATIONS = {("none",): "search",
     ("poss",): "possessed by",
     }
 
+#TODO: unify these options with the pipeline
+
+STOPWORDS = (u"'ve ’s ’ 're does o t went was is had be were did are have "
+    "do has being am 's been go 'm the and so are for be but this what 's did "
+    "had they doth a to is that was as are at an of with . , ; ? ' \" : "
+    "`").split();
+
+PUNCTUATION = list(u"!@#$%^&*()_+-=~`,./;;\"'{}[]|’\\");
