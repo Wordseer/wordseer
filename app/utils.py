@@ -1,5 +1,6 @@
 from flask import request
 
+from app import app
 from app import db
 
 def table_exists(table):
@@ -18,3 +19,11 @@ def table_exists(table):
     except ValueError:
         return False
     return True
+
+def get_name_from_relation(relation):
+    """Given a relation, return a human-readable name. This method is configured
+    using a dict in config.py.
+    """
+    for relations, name in app.config["RELATIONS"].iteritems():
+        if relation in relations:
+            return name

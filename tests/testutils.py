@@ -5,6 +5,7 @@ Unit tests for the Utils module.
 import unittest
 
 from app import db
+from app import app
 from app import utils
 
 class TestUtils(unittest.TestCase):
@@ -20,3 +21,11 @@ class TestUtils(unittest.TestCase):
             self.failUnless(utils.table_exists(table_name))
 
         self.failIf(utils.table_exists("foobarbazfoo"))
+
+    def test_get_name_from_relation(self):
+        """Make sure that get_name_from_relation correctly recognizes all
+        known relationships.
+        """
+        for relations, name in app.config["RELATIONS"].iteritems():
+            for relation in relations:
+                assert utils.get_name_from_relation(relation) == name
