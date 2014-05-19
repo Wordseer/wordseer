@@ -8,18 +8,19 @@ import random
 from string import ascii_letters, digits
 
 from flask import (redirect, render_template, request, send_from_directory,
-    session)
+    session, current_app)
 from flask_security.core import current_user
 from flask_security.decorators import login_required
 from flask.views import View
 from werkzeug import secure_filename
 
-from app import app
 from app import db
+from app.models import User
 from . import exceptions
 from . import forms
-from .models import Unit, Project, User
+from .models import Unit, Project
 from . import shortcuts
+from . import uploader
 
 def generate_form_token():
     """Sets a token to prevent double posts."""
@@ -29,7 +30,7 @@ def generate_form_token():
         session['_form_token'] = form_token
     return session['_form_token']
 
-@app.before_request
+@uploader.before_request
 def check_form_token():
     """Checks for a valid form token in POST requests."""
     if request.method == 'POST':
@@ -37,19 +38,19 @@ def check_form_token():
         if not token or token != request.form.get('_form_token'):
             redirect(request.url)
 
-@app.errorhandler(exceptions.ProjectNotFoundException)
+@uploader.errorhandler(exceptions.ProjectNotFoundException)
 def project_not_found(error):
     """This handles the user trying to view a project that does not exist.
     """
     return shortcuts.not_found("project")
 
-@app.errorhandler(exceptions.DocumentNotFoundException)
+@uploader.errorhandler(exceptions.DocumentNotFoundException)
 def document_not_found(error):
     """This handles the user trying to view a document that does not exist.
     """
     return shortcuts.not_found("document")
 
-@app.errorhandler(404)
+@uploader.errorhandler(404)
 def page_not_found(error):
     """This handles the user trying to view a general page that does not exist.
     """
@@ -153,7 +154,7 @@ class CLPDView(View):
             process_form=self.process_form,
             **self.template_kwargs)
 
-@app.route("/")
+@uploader.route("/")
 def home():
     """Display the home page.
     """
@@ -184,7 +185,7 @@ class ProjectsCLPD(CLPDView):
             user=current_user.id)
         db.session.add(project)
         db.session.flush()
-        project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
+        project.path = os.path.join(current_app.config["UPLOAD_DIR"], str(project.id))
         project.save()
         os.mkdir(project.path)
         self.process_form.selection.add_choice(project.id, project.name)
@@ -205,7 +206,7 @@ class ProjectsCLPD(CLPDView):
             #TODO: process the projects
             pass
 
-app.add_url_rule(app.config["PROJECT_ROUTE"],
+uploader.add_url_rule(current_app.config["PROJECT_ROUTE"],
     view_func=ProjectsCLPD.as_view("projects"))
 
 #TODO: rename this?
@@ -217,7 +218,7 @@ class ProjectCLPD(CLPDView):
             forms.DocumentUploadForm, forms.DocumentProcessForm,
             forms.ConfirmDeleteForm)
         self.template_kwargs["allowed_extensions"] = \
-            [ "." + ext for ext in app.config["ALLOWED_EXTENSIONS"]]
+            [ "." + ext for ext in current_app.config["ALLOWED_EXTENSIONS"]]
 
     def pre_tests(self, **kwargs):
         """Make sure this project exists and make sure that this user can see
@@ -250,7 +251,7 @@ class ProjectCLPD(CLPDView):
         uploaded_files = request.files.getlist("create-uploaded_file")
         for uploaded_file in uploaded_files:
             filename = secure_filename(uploaded_file.filename)
-            dest_path = os.path.join(app.config["UPLOAD_DIR"],
+            dest_path = os.path.join(current_app.config["UPLOAD_DIR"],
                 str(self.project.id), filename)
             # TODO: this checks if the file exists, but can we do this
             # inside the form?
@@ -280,11 +281,11 @@ class ProjectCLPD(CLPDView):
         elif request.form["action"] == self.process_form.PROCESS:
             pass
 
-app.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
+uploader.add_url_rule(current_app.config["PROJECT_ROUTE"] + "<int:project_id>",
     view_func=ProjectCLPD.as_view("project_show"))        
 
-@app.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" +
-    app.config["DOCUMENT_ROUTE"] + '<int:document_id>')
+@uploader.route(current_app.config["PROJECT_ROUTE"] + "<int:project_id>" +
+    current_app.config["DOCUMENT_ROUTE"] + '<int:document_id>')
 @login_required
 def document_show(project_id, document_id):
     """
@@ -307,7 +308,7 @@ def document_show(project_id, document_id):
         project=document.project,
         filename=filename)
 
-@app.route(app.config["UPLOAD_ROUTE"] + "<int:file_id>")
+@uploader.route(current_app.config["UPLOAD_ROUTE"] + "<int:file_id>")
 @login_required
 def get_file(file_id):
     """If the user has permission to view this file, then return it.

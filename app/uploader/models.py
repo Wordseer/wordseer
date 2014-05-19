@@ -1,14 +1,10 @@
 """
+Data models for the uploader.
 
-===========
-Data Models
-===========
-
-This module contains the model-level logic, built on SQLAlchemy.
-
+This module contains the model-level logic specific to the uploader blueprint,
+built on SQLAlchemy.
 """
 
-from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from sqlalchemy.ext.declarative import declared_attr
 
 from app import db
@@ -229,26 +225,6 @@ class Project(db.Model, Base):
 
     def __repr__(self):
         return "<Project (name=" + self.name + ")>"
-
-roles_users = db.Table('roles_users',
-        db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-        db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
-
-class Role(db.Model, Base, RoleMixin):
-    """Represents a flask-security user role.
-    """
-    name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(255))
-
-class User(db.Model, Base, UserMixin):
-    """Represents a flask-security user.
-    """
-    email = db.Column(db.String(255), unique=True)
-    password = db.Column(db.String(255))
-    active = db.Column(db.Boolean())
-    confirmed_at = db.Column(db.DateTime())
-    roles = db.relationship('Role', secondary=roles_users,
-                            backref=db.backref('users', lazy='dynamic'))
 
 """
 ##################

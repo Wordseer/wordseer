@@ -92,6 +92,7 @@ class Testing(BaseConfig):
     """ This class has settings specific for the testing environment.
     """
     DEBUG = True
+    TESTING = True
 
     # CSRF settings for forms
     WTF_CSRF_ENABLED = False

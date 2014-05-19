@@ -1,4 +1,5 @@
 import os
+
 from flask import Flask
 from flask.ext.security import Security, SQLAlchemyUserDatastore
 from flask_wtf.csrf import CsrfProtect
@@ -24,16 +25,14 @@ Database Set Up
 
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
+from . import models
 
 """
 Authentication setup
 """
 
-from app.models import *
-
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+user_datastore = SQLAlchemyUserDatastore(db, models.User, models.Role)
 security = Security(app, user_datastore)
 
-from app.views import *
-
-app.jinja_env.globals['form_token'] = generate_form_token
+from app.uploader import uploader
+app.register_blueprint(uploader)

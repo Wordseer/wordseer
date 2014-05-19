@@ -14,8 +14,6 @@ from sqlalchemy import create_engine
 from app import app, db, user_datastore
 from app.models import *
 
-app.testing = True
-
 def reset_db():
     open(app.config["SQLALCHEMY_DATABASE_PATH"], 'w').close()
     engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
