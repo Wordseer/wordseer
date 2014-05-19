@@ -12,6 +12,7 @@ import mock
 from sqlalchemy import create_engine
 
 from app import app, db, user_datastore
+from app.uploader.models import *
 from app.models import *
 
 def reset_db():
@@ -173,7 +174,7 @@ class ViewsTests(unittest.TestCase):
         assert "no projects" in result.data
         assert "You must provide a name" in result.data
 
-    @mock.patch("app.views.os", autospec=os)
+    @mock.patch("app.uploader.views.os", autospec=os)
     def test_projects_valid_create_post(self, mock_os):
         """Test POSTing with a valid project name.
 
@@ -190,7 +191,7 @@ class ViewsTests(unittest.TestCase):
         assert "/projects/1" in result.data
 
     @mock.patch("app.views.shutil", autospec=shutil)
-    @mock.patch("app.views.os", autospec=os)
+    @mock.patch("app.uploader.views.os", autospec=os)
     def test_projects_delete_post(self, mock_os, mock_shutil):
         """Test project deletion.
         """

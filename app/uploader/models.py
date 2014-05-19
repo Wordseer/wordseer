@@ -9,8 +9,6 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from app import db
 
-#from config import *
-
 class Base(object):
     """This is a mixin to add to Flask-SQLAlchemy's db.Model class.
     """

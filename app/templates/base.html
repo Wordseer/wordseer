@@ -28,7 +28,8 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand" href="{{ url_for('home') }}">
+                        <a class="navbar-brand"
+                            href="{{ url_for('uploader.home') }}">
                             WordSeer
                         </a>
                     </div>
@@ -38,7 +39,8 @@
                         id="bs-example-navbar-collapse-1">
                         {% if current_user.is_authenticated() %}
                             <ul class="nav navbar-nav">
-                                <li><a href="{{ url_for('projects') }}">
+                                <li><a
+                                    href="{{ url_for('uploader.projects') }}">
                                     Projects
                                 </a></li>
                             </ul>

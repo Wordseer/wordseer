@@ -21,9 +21,10 @@
     {% if process_form.selection.choices %}
         <form method="POST" role="form">
             {{ process_form.hidden_tag() }}
-            {{ macros.selection_table(process_form.selection, "project",
+            {{ macros.selection_table(process_form.selection,
+                "project",
                 "table table-striped table-hover click-anywhere",
-                "Project Name", "project_show") }}
+                "Project Name", "uploader.project_show") }}
             <h3>Selected file actions:</h3>
             {{ process_form.process_button(class="btn btn-primary",
                 icon="glyphicon-tasks") }}

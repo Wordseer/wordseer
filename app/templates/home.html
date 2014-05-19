@@ -9,12 +9,13 @@
         <p>
             {% if current_user.is_authenticated() %}
                 <a class="btn btn-primary btn-lg"
-                    href="{{ url_for('projects') }}" role="button">
+                    href="{{ url_for('uploader.projects') }}" role="button">
                     Projects
                 </a>
             {% else %}
                 <a class="btn btn-primary btn-lg"
-                    href="{{ url_for_security('login') }}" role="button">
+                    href="{{ url_for_security('uploader.login') }}"
+                    role="button">
                     Log in
                 </a>
             {% endif %}

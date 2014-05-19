@@ -8,7 +8,7 @@
 {% block title %}Document List{% endblock %}
 {% block page_header %}
     {{ macros.breadcrumbs([
-        (url_for('projects'), "Projects"),
+        (url_for('uploader.projects'), "Projects"),
         ("", project.name)
         ])}}
 {% endblock %}
@@ -37,7 +37,7 @@
             {{ process_form.hidden_tag() }}
             {{ macros.selection_table(process_form.selection, "document",
                 "table table-striped table-hover click-anywhere",
-                "File Name", "document_show", project_id=project.id) }}
+                "File Name", "uploader.document_show", project_id=project.id) }}
 
             <h3>Selected file actions:</h3>
             {{ process_form.process_button(class="btn btn-primary",
