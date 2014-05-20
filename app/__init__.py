@@ -34,5 +34,5 @@ Authentication setup
 user_datastore = SQLAlchemyUserDatastore(db, models.User, models.Role)
 security = Security(app, user_datastore)
 
-from app.uploader import uploader
-app.register_blueprint(uploader)
+from app.uploader import uploader as uploader_bp
+app.register_blueprint(uploader_bp)

@@ -10,7 +10,7 @@ import os
 import tempfile
 
 #TODO: Change this for your use case
-DEFAULT_ENV = "Development"
+DEFAULT_ENV = "Testing"
 
 class BaseConfig(object):
     """This module contains application-wide configurations. It provides
@@ -92,7 +92,6 @@ class Testing(BaseConfig):
     """ This class has settings specific for the testing environment.
     """
     DEBUG = True
-    TESTING = True
 
     # CSRF settings for forms
     WTF_CSRF_ENABLED = False

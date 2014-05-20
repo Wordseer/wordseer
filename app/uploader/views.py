@@ -195,11 +195,8 @@ class ProjectsCLPD(CLPDView):
         """For deletion, delete call delete_object on the object and delete
         its path. For processing, send the project to the processor.
         """
-        print "***********IN PROCESS***********"
-        print request.form
         selected_projects = request.form.getlist("process-selection")
         if request.form["action"] == self.process_form.DELETE:
-            print "*********DELETING***********"
             for project_id in selected_projects:
                 project = Project.query.filter(Project.id == project_id).one()
                 self.delete_object(project, project.name)
@@ -215,6 +212,7 @@ class ProjectCLPD(CLPDView):
     """CLPD view for listing files in a project.
     """
     def __init__(self):
+        print "Logged in: " + str(current_user.is_authenticated())
         super(ProjectCLPD, self).__init__("document_list.html",
             forms.DocumentUploadForm, forms.DocumentProcessForm,
             forms.ConfirmDeleteForm)
@@ -231,7 +229,7 @@ class ProjectCLPD(CLPDView):
 
         self.template_kwargs["project"] = self.project
 
-        if self.project.user is not current_user.id:
+        if self.project.user != current_user.id:
             return app.login_manager.unauthorized()
 
     def set_choices(self, **kwargs):
@@ -299,7 +297,7 @@ def document_show(project_id, document_id):
         Unit.id == document_id, exceptions.DocumentNotFoundException)
 
     # Test if this user can see it
-    if document.project.user is not current_user.id:
+    if document.project.user != current_user.id:
         return app.login_manager.unauthorized()
 
     filename = os.path.split(document.path)[1]
@@ -318,7 +316,7 @@ def get_file(file_id):
     unit = Unit.query.filter(Unit.id == file_id).one()
 
     # Test if this user can see it
-    if unit.project.user is not current_user.id or not unit.path:
+    if unit.project.user != current_user.id or not unit.path:
         return app.login_manager.unauthorized()
 
     directory, filename = os.path.split(unit.path)

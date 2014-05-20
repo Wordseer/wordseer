@@ -11,17 +11,19 @@ import unittest
 import mock
 from sqlalchemy import create_engine
 
-from app import app, db, user_datastore
+from app import app as application
+from app import db
+from app import user_datastore
 from app.uploader.models import *
 from app.models import *
 
 def reset_db():
-    open(app.config["SQLALCHEMY_DATABASE_PATH"], 'w').close()
-    engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
+    open(application.config["SQLALCHEMY_DATABASE_PATH"], 'w').close()
+    engine = create_engine(application.config["SQLALCHEMY_DATABASE_URI"])
     db.Model.metadata.create_all(engine)
 
 def tearDownModule():
-    os.remove(app.config["SQLALCHEMY_DATABASE_PATH"])
+    os.remove(application.config["SQLALCHEMY_DATABASE_PATH"])
 
 class TestModels(unittest.TestCase):
     def setUp(self):
@@ -128,7 +130,7 @@ class ViewsTests(unittest.TestCase):
     def setUp(self):
         """Clear the database for the next unit test.
         """
-        self.client = app.test_client()
+        self.client = application.test_client()
         reset_db()
         user_datastore.create_user(email="foo@foo.com", password="password")
         db.session.commit()
@@ -190,15 +192,17 @@ class ViewsTests(unittest.TestCase):
         assert "test project" in result.data
         assert "/projects/1" in result.data
 
-    @mock.patch("app.views.shutil", autospec=shutil)
+    @mock.patch("app.uploader.views.shutil", autospec=shutil)
     @mock.patch("app.uploader.views.os", autospec=os)
     def test_projects_delete_post(self, mock_os, mock_shutil):
         """Test project deletion.
         """
         mock_os.path.isdir.return_value = True
 
-        project1 = Project(name="test1", path=app.config["UPLOAD_DIR"], user=1)
-        project2 = Project(name="test2", path=app.config["UPLOAD_DIR"], user=1)
+        project1 = Project(name="test1", path=application.config["UPLOAD_DIR"],
+            user=1)
+        project2 = Project(name="test2", path=application.config["UPLOAD_DIR"],
+            user=1)
         project1.save()
         project2.save()
 
@@ -298,7 +302,7 @@ class ViewsTests(unittest.TestCase):
         project.save()
         
         upload_dir = tempfile.mkdtemp()
-        app.config["UPLOAD_DIR"] = upload_dir
+        application.config["UPLOAD_DIR"] = upload_dir
         os.makedirs(os.path.join(upload_dir, "1"))
 
         result = self.client.post("/projects/1", data={
@@ -321,7 +325,7 @@ class ViewsTests(unittest.TestCase):
         project.save()
 
         upload_dir = tempfile.mkdtemp()
-        app.config["UPLOAD_DIR"] = upload_dir
+        application.config["UPLOAD_DIR"] = upload_dir
         os.makedirs(os.path.join(upload_dir, "1"))
 
         self.client.post("/projects/1", data={
@@ -354,7 +358,7 @@ class ViewsTests(unittest.TestCase):
 
         assert "At least one document must be selected"
 
-    @mock.patch("app.views.os", autospec=os)
+    @mock.patch("app.uploader.views.os", autospec=os)
     def test_project_show_delete(self, mock_os):
         """Test file deletion.
         """
@@ -486,7 +490,7 @@ class AuthTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         reset_db()
-        cls.client = app.test_client()
+        cls.client = application.test_client()
         user_datastore.create_user(email="foo@foo.com", password="password")
         user_datastore.create_user(email="bar@bar.com", password="password")
         db.session.commit()
@@ -543,7 +547,7 @@ class LoggedOutTests(unittest.TestCase):
         """Reset the DB and create a dummy project and document.
         """
         reset_db()
-        cls.client = app.test_client()
+        cls.client = application.test_client()
 
         project = Project(name="Bar's project", user=2)
         project.save()
