@@ -1,0 +1,71 @@
+/* Copyright 2012 Aditi Muralidharan. See the file "LICENSE" for the full license governing this code. */Ext.define('WordSeer.view.visualize.organizetool.objects.Rectangle', {
+
+    alternateClassName: ['Rectangle'],
+    
+    statics: {         
+        
+        createRectangle:function(h, w, dataset, svg, drag, expand, selector, x) {
+        
+            var group = svg.insert("rect", selector)
+                .style("stroke", "#443322")
+                .style("fill", "#F1F1C1")
+                .attr("oldfill", "#F1F1C1")
+                .attr("id", "group" + x + "")
+                .attr("class", "foreground")
+                .attr("type", "group")
+                .attr("layer", 2)
+                .attr("use", "container")
+                .attr("shape", "rectangle")
+                .attr("parent", "none")
+                .attr("z", x)
+                .attr("height", h)
+                .attr("width", w)
+                .attr("transform", "translate(0,0)")
+                .call(function(d){ 
+                    MenuOT.giveMenu(this);
+                })
+                .call(drag);
+  
+            svg.insert("rect", selector)
+                .style("stroke", "#5F4F3F")
+                .style("fill", "#5F4F3F")
+                .attr("id", "group" + x + "")
+                .attr("class", "foreground")
+                .attr("type", "group")
+                .attr("layer", 2)
+                .attr("use", "expand")
+                .attr("z", (x - 0.1))
+                .attr("x", w / 2)
+                .attr("y", h )
+                .attr("height", 13)
+                .attr("width", 13)
+                .attr("transform", "translate(0,0)")
+                .call(function(d){ 
+                    MenuOT.giveMenu(this);
+                })
+                .call(expand);
+                
+            svg.insert("text", selector)
+                .attr("id", "group" + x + "")
+                .attr("class", "foreground")
+                .attr("type", "group")
+                .attr("layer", 2)
+                .attr("use", "text")
+                .attr("z", (x + 0.5))
+                //XOFFSET YOFFSET
+                .attr("x", 100 + 25)
+                .attr("y", 50 - 35)
+                .attr("text-anchor", "middle")
+                .attr("transform", "translate(0,0)")
+                .text("group " + x)
+                .call(function(d) { Text.makeEditable(this, false); })
+                .call(function(d){ 
+                    MenuOT.giveMenu(this);
+                })
+                //.call(drag);
+            
+        }
+    
+    }
+    
+}) 
