@@ -11,7 +11,7 @@ import os
 import tempfile
 
 #TODO: Change this for your use case
-DEFAULT_ENV = "Testing"
+DEFAULT_ENV = "Development"
 
 class BaseConfig(object):
     """This module contains application-wide configurations. It provides

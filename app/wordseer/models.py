@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from app import db
 from app.models import Base
+from app.models import User
 
 class Set(object):
     """This is the basic Set class.

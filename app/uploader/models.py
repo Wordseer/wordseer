@@ -8,12 +8,6 @@ built on SQLAlchemy.
 from app import db
 from app.models import Base
 
-"""
-######
-Models
-######
-"""
-
 class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.
 
