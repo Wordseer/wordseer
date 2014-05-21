@@ -8,7 +8,5 @@ import unittest
 
 os.environ['FLASK_ENV'] = "testing"
 
-import tests
-
-suite = unittest.TestLoader().loadTestsFromModule(tests)
+suite = unittest.TestLoader().discover('tests')
 results = unittest.TextTestRunner(verbosity=2).run(suite)
