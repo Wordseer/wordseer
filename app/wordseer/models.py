@@ -7,6 +7,8 @@ from app import db
 from app.models import Base
 from app.models import User
 
+#TODO: these might all be many-to-many, futher research required
+
 class Set(object):
     """This is the basic Set class.
 
@@ -20,7 +22,7 @@ class Set(object):
         creation_date (str): A date.DateTime object of when this Set was created
     """
 
-    user_id = db.Column(db.Integer) #TODO: foreignkey
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     name = db.Column(db.String)
     creation_date = db.Column(db.Date)
 
@@ -31,7 +33,7 @@ class SequenceSet(db.Model, Base, Set):
         sequences (list?): A list of Sequences (by ID) in this SequenceSet
     """
 
-    #sequences = db.relationship() TODO: relationship
+    #sequences = db.relationship("Sequence") TODO: relationship
     pass
 
 class SentenceSet(db.Model, Base, Set):
@@ -41,8 +43,7 @@ class SentenceSet(db.Model, Base, Set):
         sentences (list?): A list of Sentences (by ID) in this SentenceSet
     """
 
-    #sentences = db.relationship() TODO: relationship
-    pass
+    sentences = db.relationship("Sentence", backref="set")
 
 class DocumentSet(db.Model, Base, Set):
     """A Set that can have a list of Documents in it.
@@ -51,8 +52,7 @@ class DocumentSet(db.Model, Base, Set):
         document (list?): A list of Documents (by ID) in this DocumentSet
     """
 
-    #documents = db.relationship() TODO: relationship
-    pass
+    documents = db.relationship("Unit", backref="set")
 
 class CachedSentences(db.Model, Base):
     """Cached list of sentences for a query.
@@ -68,5 +68,5 @@ class CachedSentences(db.Model, Base):
         sentences (list?): A list of Sentences connected with this query.
     """
 
-    #sentences = db.relationship() TODO: relationship
+    #sentences = db.relationship("Sentence")
     pass

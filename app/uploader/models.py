@@ -35,6 +35,7 @@ class Unit(db.Model, Base):
     parent_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
     path = db.Column(db.String, nullable=True)
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    set_id = db.Column(db.Integer, db.ForeignKey("set.id"))
 
     # Relationships
 
@@ -188,7 +189,7 @@ class Project(db.Model, Base):
     user's convenience.
     """
 
-    user = db.Column(db.Integer)
+    user = db.Column(db.Integer) #TODO: not a real relationship
     name = db.Column(db.String)
     files = db.relationship("Unit", backref='project')
     path = db.Column(db.String)
