@@ -49,7 +49,7 @@ class GetAssociatedUsers(View):
         words = self.get_associated_words(ids, word)
         return JSONEncoder(words)
 
-    def get_associated_words(self, ids, word)
+    def get_associated_words(self, ids, word):
         """Find the relevant adjectives, nouns, and verbs.
 
         Args:
