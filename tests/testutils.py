@@ -6,7 +6,7 @@ import unittest
 
 from app import db
 from app import app
-from app import utils
+from app.wordseer import utils
 
 class TestUtils(unittest.TestCase):
     """Test the Utils module.
