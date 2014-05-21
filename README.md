@@ -1,7 +1,12 @@
 # A Flask-based back end for WordSeer
 
-This is the server-side code for the WordSeer application, written in Python
-using the Flask framework and several web framework libraries.
+[WordSeer](http://wordseer.berkeley.edu/) is a tool for natural language
+analysis of digital corpora. This repository is a rewrite of the [original 
+implementation](https://bitbucket.org/silverasm/wordseer/overview) into python
+from PHP.
+
+This is the server-side and web interface code for the WordSeer application,
+written in Python using the Flask framework and several web framework libraries.
 
 ## Running the application
 1.  Create a virtualenv
