@@ -4,23 +4,7 @@
 from sqlalchemy.ext.declarative import declared_attr
 
 from app import db
-
-class Base(object):
-    """This is a mixin to add to Flask-SQLAlchemy's db.Model class.
-    """
-
-    # Define the primary key
-    id = db.Column(db.Integer, primary_key=True)
-
-    @declared_attr
-    def __tablename__(cls):
-        return cls.__name__.lower()
-
-    def save(self):
-        """Commits this model instance to the database.
-        """
-        db.session.add(self)
-        db.session.commit()
+from app.models import Base
 
 class Set(object):
     """This is the basic Set class.
