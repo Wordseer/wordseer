@@ -1,14 +1,9 @@
 """Initialize the WordSeer website.
 """
 
-from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
-from . import config
+from flask import Blueprint
 
-app = Flask(__name__)
-
-app.config.from_object(config)
-db = SQLAlchemy(app)
+uploader = Blueprint('wordseer', __name__, template_folder='templates')
 
 from . import views
-from .models import *
+from . import models
