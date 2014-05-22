@@ -22,7 +22,10 @@ class Set(object):
         creation_date (str): A date.DateTime object of when this Set was created
     """
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    @declared_attr
+    def user_id(cls):
+        return cls.__table__.c.get(db.Integer, db.ForeignKey("user.id"))
+
     name = db.Column(db.String)
     creation_date = db.Column(db.Date)
 
