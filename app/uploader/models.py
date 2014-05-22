@@ -23,7 +23,7 @@ class Unit(db.Model, Base):
       path (str): The path to this unit, if it exists as a file.
 
     Relationships:
-      belongs to: parent (Unit)
+      belongs to: parent (Unit), set (DocumentSet)
       has many: children (Unit), sentences, properties
 
     TODO: implement db.relationships
@@ -35,7 +35,6 @@ class Unit(db.Model, Base):
     parent_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
     path = db.Column(db.String, nullable=True)
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
-    set_id = db.Column(db.Integer, db.ForeignKey("set.id"))
 
     # Relationships
 
@@ -123,6 +122,7 @@ class Sentence(db.Model, Base):
 
     Relationships:
       belongs to: unit
+      belongs to: sentenceset
       has many: words
 
     NOTE: should test sentence reconstruction using the actual word model.

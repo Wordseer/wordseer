@@ -9,6 +9,26 @@ from app.models import User
 
 #TODO: these might all be many-to-many, futher research required
 
+# Association tables
+sentences_xref_sentencesets = db.Table("sentences_xref_sentencesets",
+    db.metadata,
+    db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id")),
+    db.Column("sentenceset_id", db.Integer, db.ForeignKey("sentenceset.id"))
+)
+
+#TODO: are we going to have a Document object?
+documents_xref_documentsets = db.Table("documents_xref_documentsets",
+    db.metadata,
+    db.Column("document_id", db.Integer, db.ForeignKey("unit.id")),
+    db.Column("documentset_id", db.Integer, db.ForeignKey("documentset.id"))
+)
+
+sentences_xref_queries = db.Table("sentences_xref_queries",
+    db.metadata,
+    db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id")),
+    db.Column("query_id", db.Integer, db.ForeignKey("cachedsentences.id"))
+)
+
 class Set(object):
     """This is the basic Set class.
 
@@ -24,7 +44,7 @@ class Set(object):
 
     @declared_attr
     def user_id(cls):
-        return cls.__table__.c.get(db.Integer, db.ForeignKey("user.id"))
+        return db.Column(db.Integer, db.ForeignKey("user.id"))
 
     name = db.Column(db.String)
     creation_date = db.Column(db.Date)
@@ -46,7 +66,9 @@ class SentenceSet(db.Model, Base, Set):
         sentences (list?): A list of Sentences (by ID) in this SentenceSet
     """
 
-    sentences = db.relationship("Sentence", backref="set")
+    sentences = db.relationship("Sentence",
+        secondary=sentences_xref_sentencesets,
+        backref="sets")
 
 class DocumentSet(db.Model, Base, Set):
     """A Set that can have a list of Documents in it.
@@ -55,7 +77,9 @@ class DocumentSet(db.Model, Base, Set):
         document (list?): A list of Documents (by ID) in this DocumentSet
     """
 
-    documents = db.relationship("Unit", backref="set")
+    documents = db.relationship("Unit",
+        secondary=documents_xref_documentsets,
+        backref="sets")
 
 class CachedSentences(db.Model, Base):
     """Cached list of sentences for a query.
@@ -71,5 +95,5 @@ class CachedSentences(db.Model, Base):
         sentences (list?): A list of Sentences connected with this query.
     """
 
-    #sentences = db.relationship("Sentence")
-    pass
+    sentences = db.relationship("Sentence",
+        secondary=sentences_xref_queries)

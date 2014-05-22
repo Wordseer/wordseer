@@ -53,4 +53,5 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary=roles_users,
         backref=db.backref('users', lazy='dynamic'))
 
-    sets = db.relationship("Set", backref="user")
+    sentence_sets = db.relationship("SentenceSet", backref="user")
+    document_sets = db.relationship("DocumentSet", backref="user")
