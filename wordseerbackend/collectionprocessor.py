@@ -6,13 +6,13 @@ between the input and the pipeline.
 from datetime import datetime
 import os
 
-import config
-from database.database import Database
-import logger
-from parser.documentparser import DocumentParser
-from sequence.sequenceprocessor import SequenceProcessor
-import structureextractor
-from stringprocessor import StringProcessor
+from . import config
+from .database.database import Database
+from . import logger
+from .parser.documentparser import DocumentParser
+from .sequence.sequenceprocessor import SequenceProcessor
+from . import structureextractor
+from .stringprocessor import StringProcessor
 
 class CollectionProcessor(object):
     """Process a collection of files.

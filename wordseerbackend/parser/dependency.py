@@ -1,4 +1,4 @@
-from wordseerbackend.mixins.comparebydict import CompareByDict
+from ..mixins.comparebydict import CompareByDict
 
 class Dependency(CompareByDict):
     """This class describes the relationships between two words through a

@@ -9,10 +9,10 @@ SequenceProcessor.process().
 
 from datetime import datetime
 
-from wordseerbackend.document.parsedparagraph import ParsedParagraph
-from wordseerbackend import logger
-from wordseerbackend.parser.parseproducts import ParseProducts
-from wordseerbackend.sequence.sequenceprocessor import SequenceProcessor
+from ..document.parsedparagraph import ParsedParagraph
+from .. import logger
+from ..parser.parseproducts import ParseProducts
+from ..sequence.sequenceprocessor import SequenceProcessor
 
 LATEST_SENT_ID = "latest_parsed_sentence_id"
 LATEST_SEQ_SENT = "latest_sequence_sentence"

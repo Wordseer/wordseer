@@ -1,7 +1,7 @@
 """
 A class to store sequences of words.
 """
-from wordseerbackend.mixins.kwargstodict import KwargsToDict
+from ..mixins.kwargstodict import KwargsToDict
 
 class Sequence(KwargsToDict):
     """A Sequence is a series of words in the order in which they appeared in

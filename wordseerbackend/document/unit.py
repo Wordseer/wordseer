@@ -1,5 +1,5 @@
-from wordseerbackend.mixins.comparebydict import CompareByDict
-from wordseerbackend.mixins.kwargstodict import KwargsToDict
+from ..mixins.comparebydict import CompareByDict
+from ..mixins.kwargstodict import KwargsToDict
 
 class Unit(CompareByDict, KwargsToDict):
     """

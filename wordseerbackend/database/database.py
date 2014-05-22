@@ -7,8 +7,8 @@ import os.path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from wordseerbackend.models import Log, Base
-from wordseerbackend import config
+from ..models import Log, Base
+from .. import config
 #import wordseerbackend.logging
 
 class Database(object):

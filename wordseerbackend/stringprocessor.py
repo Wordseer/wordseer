@@ -4,10 +4,10 @@ Methods to handle string parsing, tokenization, tagging, etc.
 
 from corenlp import StanfordCoreNLP
 
-import config
-from document import taggedword, sentence
-from parser.dependency import Dependency
-from parser.parseproducts import ParseProducts
+from . import config
+from .document import taggedword, sentence
+from .parser.dependency import Dependency
+from .parser.parseproducts import ParseProducts
 
 class StringProcessor(object):
     """Tokenize or parse a string."""

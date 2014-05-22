@@ -2,8 +2,9 @@
 Metadata objects can describe a Unit, a Sentence, or a Document. They are
 used to store certain information about the object in question.
 """
-from wordseerbackend.mixins.comparebydict import CompareByDict
-from wordseerbackend.mixins.kwargstodict import KwargsToDict
+
+from ..mixins.comparebydict import CompareByDict
+from ..mixins.kwargstodict import KwargsToDict
 
 class Metadata(CompareByDict, KwargsToDict):
     """This class holds metadata regarding a certain Unit, Sentence,

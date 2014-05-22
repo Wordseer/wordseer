@@ -3,10 +3,10 @@ Manage log writing and reading to the database. Many events are stored in a
 database rather than a convential textfile for speedy queries later on in
 the pipeline.
 """
-
-from database import database
-from models import Log
 from sqlalchemy.orm.exc import NoResultFound
+
+from .database import database
+from .models import Log
 
 REPLACE = "replace"
 UPDATE = "update"
