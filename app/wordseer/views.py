@@ -8,8 +8,9 @@ from flask.views import View
 
 from app import app
 from . import utils
+from . import models
 
-class GetAssociatedUsers(View):
+class GetAssociatedWords(View):
     """Return adjectives, nouns, and verbs with high TF-IDF scores that
     tend to occur within 10 sentences of the given word.
     """
@@ -59,7 +60,7 @@ class GetAssociatedUsers(View):
         Returns:
             list of 
         """
-        id_string = join()
+        ids = ", ".join(ids)
         context_conditions = ""
         table_id = ""
         query_id_where = ""
@@ -67,13 +68,14 @@ class GetAssociatedUsers(View):
         if request.args.get("query_id"):
             table = "filtered_sent_ids"
 
-            #TODO: lots of code that I can't figure out goes here
+            #TODO: missing global variables
+            table = "cached_filtered_sent_ids"
+            query_id_where = "don'tuse" #TODO
 
-        #TODO: sqlalchemy calls
+        #TODO: sqlalchemy calls, unknown tables
 
         sentence_ids = []
         sentence_numbers = []
         document_ids = []
 
         #TODO: process sqlalchemy results
-

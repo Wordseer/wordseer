@@ -1,3 +1,9 @@
+"""Blueprint for the uploader.
+
+The uploader handles creation and deletion of files and projects, as well as
+sending them to the processing pipeline.
+"""
+
 import os
 
 from flask import Blueprint

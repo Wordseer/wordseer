@@ -1,4 +1,6 @@
 """Blueprint for the WordSeer interface.
+
+This interface allows users to interact with the actual wordseer application.
 """
 import os
 

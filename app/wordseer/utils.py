@@ -66,8 +66,13 @@ def get_word_ids(word):
     """
 
     if request.args.get("all_word_forms") == "on":
-        #TODO: sqlalchemy query
-        pass
+        if not "*" in word:
+            result = models.Word.query.filter(word == word.strip()).all()
+        else:
+            query_word = word.replace("%", "*")
+            result = models.Word.query.filter(Word.word.like(query_word)).all()
+
+        if len(result)
     else:
         return get_lemma_variant_ids(word)
 

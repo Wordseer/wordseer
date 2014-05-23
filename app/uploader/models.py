@@ -8,6 +8,18 @@ built on SQLAlchemy.
 from app import db
 from app.models import Base
 
+# Association tables
+word_in_sentence = db.Table("word_in_sentence",
+    db.Column('word_id', db.Integer, db.ForeignKey('word.id')),
+    db.Column('sentence_id', db.Integer, db.ForeignKey('sentence.id'))
+)
+
+word_in_sequence = db.Table("word_in_sequence",
+    db.Column("word_id", db.Integer, db.ForeignKey("word.id")),
+    db.Column("sequence_id", db.Integer, db.ForeignKey("sequence.id"))
+)
+
+# Models
 class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.
 
@@ -41,6 +53,7 @@ class Unit(db.Model, Base):
     children = db.relationship("Unit")
     sentences = db.relationship("Sentence", backref='unit')
     properties = db.relationship("Property", backref='unit')
+    sequences = db.relationship("Sequence", backref="document")
 
     def __init__(self, document=None, **kwargs):
         """Initialize a top-level document unit from a document file.
@@ -135,6 +148,7 @@ class Sentence(db.Model, Base):
     words = db.relationship("Word", secondary="word_in_sentence",
         backref=db.backref('sentences', lazy="dynamic")
     )
+    sequences = db.relationship("Sequence", backref="sentence")
 
     def __repr__(self):
         return "<Sentence: " + self.text + ">"
@@ -156,6 +170,19 @@ class Word(db.Model, Base):
 
     def __repr__(self):
         return "<Word: " + self.word + ">"
+
+class Sequence(db.Model, Base):
+    """A Sequence is a series of words.
+    """
+
+    start_position = db.Column(db.Integer)
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
+    document_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
+    sequence = db.Column(db.String)
+    is_lemmatized = db.Column(db.Boolean)
+    all_function_words = db.Column(db.Boolean)
+    length = db.Column(db.Integer)
+    words = db.relationship("Word", secondary=word_in_sequence)
 
 class Property(db.Model, Base):
     """A model representing a property of a unit.
@@ -196,15 +223,3 @@ class Project(db.Model, Base):
 
     def __repr__(self):
         return "<Project (name=" + self.name + ")>"
-
-"""
-##################
-Association Tables
-##################
-"""
-
-# Many-to-many table between words and sentences
-word_in_sentence = db.Table("word_in_sentence",
-    db.Column('word_id', db.Integer, db.ForeignKey('word.id')),
-    db.Column('sentence_id', db.Integer, db.ForeignKey('sentence.id'))
-)
