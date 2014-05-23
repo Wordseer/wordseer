@@ -2,7 +2,8 @@
 {% extends "item_list.html" %}
 {% block scripts %}
     {{ super() }}
-	<script src="{{ url_for('static', filename='upload-input-group.js') }}">
+	<script src="{{ url_for('uploader.static',
+        filename='upload-input-group.js') }}">
 	</script>
 {% endblock %}
 {% block title %}Document List{% endblock %}

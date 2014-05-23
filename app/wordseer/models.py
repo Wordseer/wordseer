@@ -7,8 +7,6 @@ from app import db
 from app.models import Base
 from app.models import User
 
-#TODO: these might all be many-to-many, futher research required
-
 # Association tables
 sentences_xref_sentencesets = db.Table("sentences_xref_sentencesets",
     db.metadata,
@@ -36,7 +34,7 @@ class Set(object):
     A Set model has an association with a User and has some properties like a
     name and a creation date.
 
-    Kwargs:
+    Keyword Args:
         user_id (int): The ID of the user that owns this Set
         name (str): The name of this Set
         creation_date (str): A date.DateTime object of when this Set was created

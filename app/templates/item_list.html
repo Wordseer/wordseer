@@ -1,11 +1,13 @@
 {% import "macros.html" as macros %}
 {% extends "base.html" %}
 {% block scripts %}
-    <script src="{{ url_for('static', filename='click-anywhere.js') }}">
+    <script src="{{ url_for('uploader.static',
+        filename='click-anywhere.js') }}">
     </script>
-    <script src="{{ url_for('static', filename='check-all.js') }}">
+    <script src="{{ url_for('uploader.static', filename='check-all.js') }}">
     </script>
-    <script src="{{ url_for('static', filename='modal_on_delete.js') }}">
+    <script src="{{ url_for('uploader.static',
+        filename='modal_on_delete.js') }}">
     </script>
 {% endblock %}
 {% block body %}
