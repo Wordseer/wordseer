@@ -34,7 +34,7 @@ class TestCollectionProcessor(unittest.TestCase):
         """Test the extract_record_metadata method.
         """
         # Set up the input objects
-        collection_dir = mock.create_autospec(str)
+        collection_dir = "/foobar/"
         docstruc_filename = mock.create_autospec(str)
         filename_extension = ".xml"
         files = ["file1.xml", "file2.XmL", "file3.foo", ".file4.xml"]
@@ -42,14 +42,18 @@ class TestCollectionProcessor(unittest.TestCase):
         # Configure the mock os
         mock_os.listdir.return_value = files
         mock_os.path.splitext.side_effect = os.path.splitext
+        mock_os.path.join.side_effect = os.path.join
 
         # Configure mock logger
         mock_logger.get.return_value = ""
 
         # Make the structure extractor return useful objects
         extracted_docs = [
-            ("file1.xml", [mock.create_autospec(Document) for x in range(10)]),
-            ("file2.XmL", [mock.create_autospec(Document) for x in range(10)])]
+            (os.path.join(collection_dir, files[0]),
+                [mock.create_autospec(Document) for x in range(10)]),
+            (os.path.join(collection_dir, files[1]),
+                [mock.create_autospec(Document) for x in range(10)])
+        ]
 
         def extract_docs(filename):
             for entry in extracted_docs:
@@ -65,17 +69,21 @@ class TestCollectionProcessor(unittest.TestCase):
 
         # logger.log() should have been called twice for each file like this
         log_calls = []
+
         for i in range(0, 2):
             log_calls.append(mock.call("finished_recording_text_and_metadata",
                 "false", mock_logger.REPLACE))
             log_calls.append(mock.call("text_and_metadata_recorded", str(i + 1),
                 mock_logger.UPDATE))
+
         log_calls.append(mock.call("finished_recording_text_and_metadata",
                 "true", mock_logger.REPLACE))
         mock_logger.log.assert_has_calls(log_calls)
 
         # The extractor should have been called on each file
-        strucex_calls = [mock.call(files[0]), mock.call(files[1])]
+        strucex_calls = [mock.call(extracted_docs[0][0]),
+            mock.call(extracted_docs[1][0])
+        ]
         for call in strucex_calls:
             self.failUnless(call in mock_strucex_instance.extract.\
                 call_args_list)

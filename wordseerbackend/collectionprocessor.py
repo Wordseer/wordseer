@@ -131,7 +131,8 @@ class CollectionProcessor(object):
                 logger.log("finished_recording_text_and_metadata", "false",
                     logger.REPLACE)
                 try:
-                    docs = extractor.extract(filename)
+                    docs = extractor.extract(os.path.join(collection_dir,
+                        filename))
                     for doc in docs:
                         # TODO: readerwriter
                         self.reader_writer.create_new_document(doc,
