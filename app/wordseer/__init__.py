@@ -13,3 +13,4 @@ wordseer = Blueprint('wordseer', __name__,
 
 from . import views
 from . import models
+
