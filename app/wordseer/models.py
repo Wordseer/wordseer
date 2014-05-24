@@ -95,3 +95,4 @@ class CachedSentences(db.Model, Base):
 
     sentences = db.relationship("Sentence",
         secondary=sentences_xref_queries)
+

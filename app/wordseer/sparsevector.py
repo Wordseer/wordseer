@@ -75,18 +75,16 @@ class SparseVector(object):
         return SparseVector(result)
 
     def normalize(self):
-        """Return the normalized (unit) vector for this SparseVector.
-        
-        Returns:
-            SparseVector: This SparseVector, but normalized.
+        """Normalize (make into a unit vector) this vector.
         """
 
         total = 0
 
         for feature_id, feature_value in self.features.iteritems():
-            total += abs(self.features[feature_id])
+            total += abs(feature_value)
 
         if total > 0:
             for feature_id, feature_value in self.features.iteritems():
-                feature_value /= total
+                self.features[feature_id] /= total
+
 
