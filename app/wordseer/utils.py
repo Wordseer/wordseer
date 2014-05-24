@@ -1,3 +1,7 @@
+"""
+Various utilities for use in the view methods.
+"""
+
 from flask import request
 
 from app import app
@@ -67,7 +71,7 @@ def get_word_ids(word):
 
     if request.args.get("all_word_forms") == "on":
         if not "*" in word:
-            result = models.Word.query.filter(word == word.strip()).all()
+            result = models.Word.query.filter(Word.word == word.strip()).all()
         else:
             query_word = word.replace("%", "*")
             result = models.Word.query.filter(Word.word.like(query_word)).all()
@@ -79,9 +83,17 @@ def get_word_ids(word):
 def get_lemma_variant_ids(word):
     """Returns an array of word id's for all the words that have the same lemma
     as this one.
+
+    Arguments:
+        word (str): A word to get lemmas for.
+
+    Returns:
+        list: A list of the IDs of all known words with the same lemma.
     """
 
     word = word.trim()
-    ids = []
-    #TODO: sql query
+    result = Word.query.filter(Word.word == word).all()
+    ids = [word.id for word in result]
+
     return ids
+
