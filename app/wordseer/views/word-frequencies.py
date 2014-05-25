@@ -9,6 +9,7 @@ from sqlalchemy.sql import func
 
 from app import app
 from app import db
+from . import uploader
 from . import utils
 from . import models
 
@@ -62,3 +63,7 @@ class WordFrequencies(object):
                 })
 
         return answer
+
+uploader.app_url_rule('/word-frequencies/get-frequent-words',
+    view_func=GetFrequentWords.as_view("get_frequent_views"))
+

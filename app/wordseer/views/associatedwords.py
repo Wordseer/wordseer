@@ -7,6 +7,7 @@ from flask.json import JSONEncoder
 from flask.views import View
 
 from app import app
+from . import uploader
 from . import utils
 from . import models
 
@@ -79,3 +80,7 @@ class GetAssociatedWords(View):
         document_ids = []
 
         #TODO: process sqlalchemy results
+
+uploader.add_url_rule("/word-frequencies/word-frequencies",
+    view_func=GetAssociatedWords.as_view("word-frequencies"))
+
