@@ -31,8 +31,13 @@ Or, you can simply use the `requirements.txt` file:
 
     pip install -r requirements.txt
 
-`corenlp` must be installed manually. Create a file called `setup.py` in
-its root directory containing the following:
+`corenlp` must be installed manually. Clone the repository:
+
+    git clone https://github.com/silverasm/stanford-corenlp-python.git
+    cd stanford-corenlp-python
+
+Create a file called `setup.py` in its root directory containing the
+following:
 
     from setuptools import setup, find_packages
     setup(name='corenlp',
