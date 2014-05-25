@@ -58,7 +58,7 @@ class GetAssociatedWords(View):
             word (str): The word itself.
 
         Returns:
-            list of 
+            list of
         """
         ids = ", ".join(ids)
         context_conditions = ""
