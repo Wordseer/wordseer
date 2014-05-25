@@ -27,7 +27,6 @@ class StringProcessor(object):
         :param str txt: One or more sentences, in a string format.
         :return list: A list of document.Sentence objects.
         """
-
         parsed_text = self.parser.raw_parse(txt)
 
         return tokenize_from_raw(parsed_text, txt)
@@ -49,7 +48,7 @@ class StringProcessor(object):
         if len(sent.split(" ")) > max_length:
             raise ValueError("Sentence appears to be too long, max length " +
                 "is " + str(max_length))
-        
+
         parsed = self.parser.raw_parse(sent)
         parsed_sentence = parsed["sentences"][0]
         dependencies = []
@@ -106,3 +105,4 @@ def tokenize_from_raw(parsed_text, txt):
             tagged=tagged_words, words=word_list))
 
     return paragraph
+

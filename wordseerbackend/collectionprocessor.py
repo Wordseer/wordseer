@@ -25,7 +25,7 @@ class CollectionProcessor(object):
         filename_extension, start_from_scratch):
         """
         This function relies on several methods to:
-        
+
         1. Set up the database if necessary
         2. Extract metadata, populate the narratives, sentences, and paragraphs
             tables
@@ -95,7 +95,7 @@ class CollectionProcessor(object):
 
         For every document file in ``collection_dir``, this extracts any
         documents from it using the
-        :class:`~wordseerbackend.collectionprocessor.CollectionProcessor`
+        :class:`~wordseerbackend.structureextractor.StructureExtractor`
         and the provided ``docstruc_filename``.
 
         Then, every document extracted is recorded with

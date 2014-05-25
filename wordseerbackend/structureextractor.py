@@ -37,7 +37,6 @@ class StructureExtractor(object):
             as strings are acceptable.
         :return list: A list of Document objects
         """
-
         documents = []
         doc = etree.parse(infile)
         units = self.extract_unit_information(self.document_structure, doc)
@@ -60,6 +59,7 @@ class StructureExtractor(object):
         :param etree parent_node: An lxml element tree of the parent node.
         :return list: A list of Units
         """
+
         units = []
         xpaths = structure["xpaths"]
 
@@ -74,14 +74,17 @@ class StructureExtractor(object):
                 children = []
                 if "units" in structure.keys():
                     for child_struc in structure["units"]:
-                        children.extend(
-                            self.extract_unit_information(child_struc, node))
+                        children.extend(self.extract_unit_information(
+                            child_struc,
+                            node)
+                        )
                 else:
                     current_unit.sentences = self.get_sentences(structure, node,
                         True)
 
                 current_unit.units = children
                 units.append(current_unit)
+
         return units
 
     def get_sentences(self, structure, parent_node, tokenize):
@@ -114,7 +117,6 @@ class StructureExtractor(object):
 
         if tokenize:
             sents = self.str_proc.tokenize(sentence_text)
-
             for sent in sents:
                 sent.metadata = sentence_metadata
                 result_sentences.append(sent)
