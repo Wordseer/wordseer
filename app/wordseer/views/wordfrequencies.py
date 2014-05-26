@@ -41,12 +41,12 @@ class WordFrequencies(object):
                     filter(models.Word.word.like(word)).\
                     limit(PAGE_SIZE).offset(offset).all()
 
-                for row in result:
+                for word in result:
                     answer.append({
-                        "id": row["id"],
-                        "word": row["word"],
-                        "pos": row["pos"],
-                        "sentence_count": row["sentence_count"],
+                        "id": word.id,
+                        "word": word.word,
+                        "pos": word.pos,
+                        "sentence_count": len(word.sentences),
                     })
         else:
             result = db.session.query(models.Word.sentences,
@@ -54,12 +54,12 @@ class WordFrequencies(object):
                 order_by(models.Word.sentences.desc()).subquery().\
                 limit(PAGE_SIZE).offset(offset).all()
 
-            for row in result:
+            for word in result:
                 answer.append({
-                    "id": row["id"],
-                    "word": row["word"],
-                    "pos": row["pos"],
-                    "sentence_count": row["sentence_count"],
+                    "id": word.id,
+                    "word": word.word.,
+                    "pos": word.pos,
+                    "sentence_count": word.sentence_count,
                 })
 
         return answer
