@@ -28,7 +28,22 @@ class WordFrequencies(object):
             return JSONEncoder(results)
 
     def get_word_frequencies(self, words, page):
-        answer = {}
+        """Get the frequencies of the given words, returning the given page
+        of the pagination.
+
+        Arguments:
+            words (string): A string of comma separated words (TODO: why not
+                make this a list?
+            page (int): This function automatically paginates the result
+                of the database query. Each page contains ``PAGE_SIZE`` number
+                of entries, a config variable set at the top of this file.
+
+        Retruns:
+            list: A list in which every item is a dict which holds the id,
+                word, pos, and length of the sentences attributes of every
+                word retrieved from the database.
+        """
+        answer = []
         offset = page * PAGE_SIZE
 
         if words:
