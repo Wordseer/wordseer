@@ -76,7 +76,15 @@ def get_word_ids(word):
             query_word = word.replace("%", "*")
             result = models.Word.query.filter(Word.word.like(query_word)).all()
 
-        if len(result)
+        if len(result):
+            ids = []
+            for row in result:
+                ids.append(row.id)
+            return ids
+
+        else:
+            return []
+
     else:
         return get_lemma_variant_ids(word)
 
@@ -92,8 +100,12 @@ def get_lemma_variant_ids(word):
     """
 
     word = word.trim()
-    result = Word.query.filter(Word.word == word).all()
-    ids = [word.id for word in result]
+    result = models.Word.query.filter(models.Word.word == word).all()
+    lemmas = [word.lemma for word in result]
 
-    return ids
+    if lemmas:
+        result = models.Word.query.filter(models.Word.lemma in lemmas)
+        return [word.id for word in result]
+
+    return []
 

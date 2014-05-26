@@ -9,9 +9,9 @@ from sqlalchemy.sql import func
 
 from app import app
 from app import db
-from . import uploader
-from . import utils
-from . import models
+from .. import wordseer
+from .. import utils
+from .. import models
 
 PAGE_SIZE = 100
 
