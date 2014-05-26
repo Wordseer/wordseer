@@ -11,7 +11,8 @@ class SparseVector(object):
 
         Arguments:
             feature_list (dict): A dictionary containing the features of this
-                vector in the format {id: value}.
+                vector in the format ``{id: value}``, where ``value`` is an
+                ``int``.
         """
         self.features = feature_list
 
@@ -36,13 +37,13 @@ class SparseVector(object):
                 result[feature_id] = feature_value
 
         return SparseVector(result)
-    
+
     def __mul__(self, other):
         """Multiply this vector by the other as a dot product.
 
         Arguments:
             other (SparseVector): The vector to multiply by.
-        
+
         Returns:
             SparseVector: The result of the multiplication.
         """
@@ -55,13 +56,13 @@ class SparseVector(object):
             except NameError:
                 pass
         return dot_product
-    
+
     def __rmul__(self, other):
         """Multiply this vector by other, a scalar value.
 
         Arguments:
             other (scalar): The scalar to multiply by.
-        
+
         Returns:
             SparseVector: This SparseVector, with a scalar multiplication
                 applied.
@@ -76,6 +77,9 @@ class SparseVector(object):
 
     def normalize(self):
         """Normalize (make into a unit vector) this vector.
+
+        After this opration, the sum of all of the ``value``s of this vector
+        will equal 1.
         """
 
         total = 0

@@ -7,9 +7,9 @@ from flask.json import JSONEncoder
 from flask.views import View
 
 from app import app
-from . import uploader
-from . import utils
-from . import models
+from .. import wordseer
+from .. import utils
+from .. import models
 
 class GetAssociatedWords(View):
     """Return adjectives, nouns, and verbs with high TF-IDF scores that
@@ -81,6 +81,6 @@ class GetAssociatedWords(View):
 
         #TODO: process sqlalchemy results
 
-uploader.add_url_rule("/word-frequencies/word-frequencies",
+wordseer.add_url_rule("/word-frequencies/word-frequencies",
     view_func=GetAssociatedWords.as_view("word-frequencies"))
 

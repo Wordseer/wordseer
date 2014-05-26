@@ -15,7 +15,7 @@ from .. import models
 
 PAGE_SIZE = 100
 
-class WordFrequencies(object):
+class WordFrequencies(View):
     def dispatch(self):
         """Dispatch the request to this page.
         """
@@ -72,13 +72,13 @@ class WordFrequencies(object):
             for word in result:
                 answer.append({
                     "id": word.id,
-                    "word": word.word.,
+                    "word": word.word,
                     "pos": word.pos,
                     "sentence_count": word.sentence_count,
                 })
 
         return answer
 
-uploader.app_url_rule('/word-frequencies/get-frequent-words',
-    view_func=GetFrequentWords.as_view("get_frequent_views"))
+wordseer.add_url_rule('/word-frequencies/get-frequent-words',
+    view_func=WordFrequencies.as_view("word_frequencies"))
 
