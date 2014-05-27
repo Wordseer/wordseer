@@ -33,7 +33,7 @@ class SparseVector(object):
         for feature_id, feature_value in other.features.iteritems():
             try:
                 result[feature_id] += feature_value
-            except NameError:
+            except KeyError:
                 result[feature_id] = feature_value
 
         return SparseVector(result)
@@ -53,7 +53,7 @@ class SparseVector(object):
             try:
                 dot_product += (self.features[feature_id] * \
                         other_feature_value)
-            except NameError:
+            except KeyError:
                 pass
         return dot_product
 
@@ -76,19 +76,41 @@ class SparseVector(object):
         return SparseVector(result)
 
     def normalize(self):
-        """Normalize (make into a unit vector) this vector.
+        """Return the normalized (unit vector) version of this vector, that
+        is, all the components (features) sum to 1.
 
-        After this opration, the sum of all of the ``value``s of this vector
-        will equal 1.
+        Returns:
+            SparseVector: the unit vector for this vector.
         """
 
+        unit_features = {}
         total = 0
 
+        total = sum(self.features.values())
+
         for feature_id, feature_value in self.features.iteritems():
-            total += abs(feature_value)
+            unit_features[feature_id] = feature_value / float(total)
 
-        if total > 0:
-            for feature_id, feature_value in self.features.iteritems():
-                self.features[feature_id] /= total
+        return SparseVector(unit_features)
 
+    def __eq__(self, other):
+        """Check if this SparseVector is equivalent to another one.
+
+
+        Returns:
+            boolean: If ``other`` has a ``features`` attribute that is
+                identical to this object's ``features`` attribute, then
+                ``True``. otherwise, ``False``.
+        """
+
+        try:
+            return self.features == other.features
+        except AttributeError:
+            return False
+
+    def __str__(self):
+        """Give a string representation of this object.
+        """
+
+        return "SparseVector <" + str(self.features) + ">"
 
