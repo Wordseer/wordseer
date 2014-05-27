@@ -6,8 +6,11 @@ from flask import request
 from flask.json import JSONDecoder
 from flask.json import JSONEncoder
 from flask.views import View
+from sqlalchemy.sql import func
 
 from app import app
+from app import db
+from ...uploader.models import Sentence
 
 class GetDistribution(View):
     def dispatch(self):
@@ -43,8 +46,33 @@ class GetDistribution(View):
             narrative_id (int): The int of the narrative to retrieve info for.
 
         Returns:
-            dict: A dict with the items ``length``, ``min``, and ``max``,
-                respectively containing the number of sentences, the minimum
-                present sentence ID, and the maximum present sentence ID.
+            KeyedTuple: A KeyedTuple with the items ``length``, ``min``, and
+                ``max``, respectively containing the number of sentences, the
+                minimum present sentence ID, and the maximum present sentence ID.
         """
+
+        #result = Sentence.query.filter(Sentence.narrative_id == narrative_id
+
+        result = db.session.query(func.min(Sentence.id).alias("min"),
+            func.max(Sentence.id).alias("max"),
+            func.count(Sentence.id).alias("length")).\
+                filter(Sentence.narrative == narrative_id)
+
+        return result
+
+    def get_grammatical_ocurrences(narrative, dependency_id):
+        """
+
+        Arguments:
+            narrative (int): The ID of the narrative to query.
+            dependency_id (int):
+        """
+
+        ids = []
+        #FIXME
+        result = Sentence.query.filter(Sentence.narrative_id == narrative).\
+                filter(Sentence.dependency == dependency_id).\
+                order_by(Sentence.id)
+        return result
+
 
