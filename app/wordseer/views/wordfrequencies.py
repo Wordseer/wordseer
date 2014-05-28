@@ -49,12 +49,16 @@ class WordFrequencies(View):
         if words:
             wordlist = words.split(",")
             for word in wordlist:
-                #TODO: this query might need work
-                result = db.session.query(models.Word.sentences,
-                    func.count('*').label("sentence_count")).\
-                    order_by(models.Word.sentences.desc()).subquery().\
-                    filter(models.Word.word.like(word)).\
-                    limit(PAGE_SIZE).offset(offset).all()
+                result = db.session.query(models.Word,
+                    func.count(models.word_in_sentence.c.word_id).\
+                        label("sentences")
+                ).join(models.word_in_sentence).\
+                    group_by(models.Word).\
+                    order_by("sentences").\
+                    limit(PAGE_SIZE).\
+                    offset(offset).\
+                    filter(models.Word.word.like(word).\
+                    all()
 
                 for word in result:
                     answer.append({
@@ -64,10 +68,15 @@ class WordFrequencies(View):
                         "sentence_count": len(word.sentences),
                     })
         else:
-            result = db.session.query(models.Word.sentences,
-                func.count('*').label("sentence_count")).\
-                order_by(models.Word.sentences.desc()).subquery().\
-                limit(PAGE_SIZE).offset(offset).all()
+            result = db.session.query(models.Word,
+                func.count(models.word_in_sentence.c.word_id).\
+                    label("sentences")
+            ).join(models.word_in_sentence).\
+                group_by(models.Word).\
+                order_by("sentences").\
+                limit(PAGE_SIZE).\
+                offset(offset).\
+                all()
 
             for word in result:
                 answer.append({
