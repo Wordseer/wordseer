@@ -48,10 +48,9 @@ class GetDistribution(View):
         Returns:
             KeyedTuple: A KeyedTuple with the items ``length``, ``min``, and
                 ``max``, respectively containing the number of sentences, the
-                minimum present sentence ID, and the maximum present sentence ID.
+                minimum present sentence ID, and the maximum present sentence
+                ID.
         """
-
-        #result = Sentence.query.filter(Sentence.narrative_id == narrative_id
 
         result = db.session.query(func.min(Sentence.id).alias("min"),
             func.max(Sentence.id).alias("max"),
@@ -60,19 +59,44 @@ class GetDistribution(View):
 
         return result
 
-    def get_grammatical_ocurrences(narrative, dependency_id):
-        """
+    def get_grammatical_ocurrences(narrative_id, dependency_id):
+        """Return a list of Sentences from the given narrative in which
+        the given dependency ID occurs.
 
         Arguments:
-            narrative (int): The ID of the narrative to query.
-            dependency_id (int):
+            narrative_id (int): The ID of the narrative the Sentences should
+                have.
+            dependency_id (int): The ID of the dependency the Sentences should
+                have.
+
+        Returns:
+            list: A list of Sentence objects meeting the above criteria.
         """
 
-        ids = []
-        #FIXME
-        result = Sentence.query.filter(Sentence.narrative_id == narrative).\
-                filter(Sentence.dependency == dependency_id).\
-                order_by(Sentence.id)
+        result = db.session.query(Sentence).join(Unit, dependency).\
+            filter(Unit.id == narrative_id).\
+            filter(dependency.id == dependency_id).\
+            order_by(Sentence.id).all()
+
         return result
 
+    def get_text_occurrences(narrative_id, pattern):
+        """Return a list of Sentences from the given narrative in which the
+        given pattern occurs exactly.
+
+        Arguments:
+            narrative_id (int): The ID of the narrative the Sentences should
+                have.
+            pattern (str):
+
+        Returns:
+            list: A list of Sentence objects meeting the above criteria.
+        """
+
+        sentences = db.session.query(Sentence).join(Unit).\
+            filter(Unit.id == narrative_id).\
+            filter(Sentence.text.match(stripped_pattern)).\
+            order_by(Sentence.id).all()
+
+        return sentences
 

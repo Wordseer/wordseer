@@ -19,6 +19,11 @@ word_in_sequence = db.Table("word_in_sequence",
     db.Column("sequence_id", db.Integer, db.ForeignKey("sequence.id"))
 )
 
+depencency_in_sentence = db.Table("dependency_in_sentence",
+    db.Column("dependency_id", db.Integer, db.ForeignKey("dependency.id")),
+    db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id"))
+)
+
 # Models
 class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.
@@ -149,6 +154,10 @@ class Sentence(db.Model, Base):
         backref=db.backref('sentences', lazy="dynamic")
     )
     sequences = db.relationship("Sequence", backref="sentence")
+    dependencies = db.relationship("Dependency",
+            secondary=dependency_in_sentence,
+            backref="sentences"
+    )
 
     def __repr__(self):
         return "<Sentence: " + self.text + ">"
@@ -183,6 +192,18 @@ class Sequence(db.Model, Base):
     all_function_words = db.Column(db.Boolean)
     length = db.Column(db.Integer)
     words = db.relationship("Word", secondary=word_in_sequence)
+
+class Dependency(db.Model, Base):
+    """Just a placeholder.
+    """
+
+    relationship = db.Column(db.String)
+    governor = db.Column(db.String)
+    gov_index = db.Column(db.Integer)
+    gov_pos = db.Column(db.String)
+    dependent = db.Column(db.String)
+    dep_index = db.Column(db.Integer)
+    dep_pos = db.Column(db.String)
 
 class Property(db.Model, Base):
     """A model representing a property of a unit.
