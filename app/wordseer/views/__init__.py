@@ -1,2 +1,3 @@
-__all__ = ["associatedwords", "wordfrequencies"]
+__all__ = ["associatedwords", "wordfrequencies", "getpatterns",
+    "getdistribution"]
 

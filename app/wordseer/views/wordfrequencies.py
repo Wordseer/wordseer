@@ -2,8 +2,8 @@
 """
 
 from flask import request
-from flask.json import JSONDecoder
-from flask.json import JSONEncoder
+from flask import abort
+from flask.json import jsonify
 from flask.views import View
 from sqlalchemy.sql import func
 
@@ -11,22 +11,25 @@ from app import app
 from app import db
 from .. import wordseer
 from .. import utils
-from ..models import word_in_sentence
 from ...uploader.models import Word
+from ...uploader.models import word_in_sentence
 
 PAGE_SIZE = 100
 
 class WordFrequencies(View):
-    def dispatch(self):
+    def dispatch_request(self):
         """Dispatch the request to this page.
         """
 
-        words = request.args.get(words)
-        page = request.args.get(page)
+        words = request.args.get("words")
+        page = request.args.get("page")
 
         if page:
             results = self.get_word_frequencies(words.replace("*", "%"), page)
-            return JSONEncoder(results)
+            return jsonify(results)
+
+        else:
+            abort(400)
 
     def get_word_frequencies(self, words, page):
         """Get the frequencies of the given words, returning the given page
@@ -51,14 +54,13 @@ class WordFrequencies(View):
             wordlist = words.split(",")
             for word in wordlist:
                 result = db.session.query(Word,
-                    func.count(word_in_sentence.c.word_id).\
-                        label("sentences")
+                    func.count(word_in_sentence.c.word_id).label("sentences")
                 ).join(word_in_sentence).\
                     group_by(Word).\
                     order_by("sentences").\
                     limit(PAGE_SIZE).\
                     offset(offset).\
-                    filter(Word.word.like(word).\
+                    filter(Word.word.like(word)).\
                     all()
 
                 for word in result:
@@ -70,11 +72,9 @@ class WordFrequencies(View):
                     })
         else:
             result = db.session.query(Word,
-                func.count(word_in_sentence.c.word_id).\
-                    label("sentences")
+                func.count(word_in_sentence.c.word_id).label("sentences")
             ).join(word_in_sentence).\
                 group_by(Word).\
-
                 order_by("sentences").\
                 limit(PAGE_SIZE).\
                 offset(offset).\

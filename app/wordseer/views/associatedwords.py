@@ -1,9 +1,11 @@
 """Views for the WordSeer website.
 """
 
+import json
+
+from flask import abort
 from flask import request
-from flask.json import JSONDecoder
-from flask.json import JSONEncoder
+from flask.json import jsonify
 from flask.views import View
 
 from app import app
@@ -24,18 +26,22 @@ class GetAssociatedWords(View):
         self.govtype = request.args.get("deptype", "word")
         self.deptype = request.args.get("relation", "word")
         self.instance = request.args.get("instance")
-        self.searches = JSONDecoder(request.args.get("search"))
         self.collection = request.args.get("collection")
         self.statistics = request.args.get("statistics")
-        self.phrases = JSONDecoder(request.args.get("phrases"))
-        self.metadata = JSONDecoder(request.args.get("metadata"))
         self.timing = request.args.get("timing")
 
-    def dispatch():
+        try:
+            self.phrases = json.loads(str(request.args.get("phrases")))
+            self.metadata = json.loads(str(request.args.get("metadata")))
+            self.searches = json.loads(str(request.args.get("search")))
+        except ValueError:
+            abort(400)
+
+    def dispatch_request(self):
         """Create a JSON response to the request.
         """
         ids = []
-        word = request.args.get(word)
+        word = request.args.get("word")
         if request.args.get("id"):
             id_number = request.args.get("id")
             ids = id_number
@@ -49,7 +55,7 @@ class GetAssociatedWords(View):
                 ids = word.split()
 
         words = self.get_associated_words(ids, word)
-        return JSONEncoder(words)
+        return jsonify(words)
 
     def get_associated_words(self, ids, word):
         """Find the relevant adjectives, nouns, and verbs.
