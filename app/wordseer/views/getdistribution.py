@@ -10,7 +10,9 @@ from sqlalchemy.sql import func
 
 from app import app
 from app import db
+from ...uploader.models import Dependency
 from ...uploader.models import Sentence
+from ...uploader.models import Unit
 
 class GetDistribution(View):
     def dispatch(self):
@@ -73,9 +75,9 @@ class GetDistribution(View):
             list: A list of Sentence objects meeting the above criteria.
         """
 
-        result = db.session.query(Sentence).join(Unit, dependency).\
+        result = db.session.query(Sentence).join(Unit, Dependency).\
             filter(Unit.id == narrative_id).\
-            filter(dependency.id == dependency_id).\
+            filter(Dependency.id == dependency_id).\
             order_by(Sentence.id).all()
 
         return result

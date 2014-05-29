@@ -11,7 +11,8 @@ from app import app
 from app import db
 from .. import wordseer
 from .. import utils
-from .. import models
+from ..models import word_in_sentence
+from ...uploader.models import Word
 
 PAGE_SIZE = 100
 
@@ -49,15 +50,15 @@ class WordFrequencies(View):
         if words:
             wordlist = words.split(",")
             for word in wordlist:
-                result = db.session.query(models.Word,
-                    func.count(models.word_in_sentence.c.word_id).\
+                result = db.session.query(Word,
+                    func.count(word_in_sentence.c.word_id).\
                         label("sentences")
-                ).join(models.word_in_sentence).\
-                    group_by(models.Word).\
+                ).join(word_in_sentence).\
+                    group_by(Word).\
                     order_by("sentences").\
                     limit(PAGE_SIZE).\
                     offset(offset).\
-                    filter(models.Word.word.like(word).\
+                    filter(Word.word.like(word).\
                     all()
 
                 for word in result:
@@ -68,11 +69,12 @@ class WordFrequencies(View):
                         "sentence_count": len(word.sentences),
                     })
         else:
-            result = db.session.query(models.Word,
-                func.count(models.word_in_sentence.c.word_id).\
+            result = db.session.query(Word,
+                func.count(word_in_sentence.c.word_id).\
                     label("sentences")
-            ).join(models.word_in_sentence).\
-                group_by(models.Word).\
+            ).join(word_in_sentence).\
+                group_by(Word).\
+
                 order_by("sentences").\
                 limit(PAGE_SIZE).\
                 offset(offset).\
