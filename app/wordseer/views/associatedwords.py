@@ -16,6 +16,24 @@ from .. import models
 class GetAssociatedWords(View):
     """Return adjectives, nouns, and verbs with high TF-IDF scores that
     tend to occur within 10 sentences of the given word.
+
+    The expected url arguments are documented below.
+
+    Keyword Arguments:
+        phrases (str):
+        govtype (str):
+        dep (str):
+        deptype (str):
+        relation (str):
+
+    Arguments:
+        phrases (JSON):
+        metadata (JSON):
+        searches (JSON):
+        collection (str):
+        statistics (str):
+        timing (str):
+        instance (str):
     """
     def __init__(self):
         """Initialize variables necessary for the GetAssociatedUsers view.
@@ -25,15 +43,15 @@ class GetAssociatedWords(View):
         self.relation = request.args.get("dep", "")
         self.govtype = request.args.get("deptype", "word")
         self.deptype = request.args.get("relation", "word")
-        self.instance = request.args.get("instance")
-        self.collection = request.args.get("collection")
-        self.statistics = request.args.get("statistics")
-        self.timing = request.args.get("timing")
 
         try:
-            self.phrases = json.loads(str(request.args.get("phrases")))
-            self.metadata = json.loads(str(request.args.get("metadata")))
-            self.searches = json.loads(str(request.args.get("search")))
+            self.phrases = json.loads(str(request.args["phrases"]))
+            self.metadata = json.loads(str(request.args["metadata"]))
+            self.searches = json.loads(str(request.args["search"]))
+            self.collection = request.args["collection"]
+            self.statistics = request.args["statistics"]
+            self.timing = request.args["timing"]
+            self.instance = request.args["instance"]
         except ValueError:
             abort(400)
 
