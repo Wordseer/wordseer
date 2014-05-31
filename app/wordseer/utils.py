@@ -109,3 +109,7 @@ def get_lemma_variant_ids(word):
 
     return []
 
+def get_relation_description(relation):
+    #TODO: is this method even necessary?
+    raise NotImplementedError
+
