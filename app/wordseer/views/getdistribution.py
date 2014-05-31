@@ -16,6 +16,9 @@ from ...uploader.models import Sentence
 from ...uploader.models import Unit
 
 class GetDistribution(View):
+    """Find all the occurrences of a given grammatical pattern or textual
+    pattern in a given narrative.
+    """
     def dispatch_request(self):
         """Return the JSON response for this view.
         """
