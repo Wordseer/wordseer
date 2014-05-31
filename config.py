@@ -50,36 +50,6 @@ class BaseConfig(object):
     SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
     SECURITY_SEND_REGISTER_EMAIL = False
 
-    $javascript_files = "
-	<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' 
-type='text/css'>
- 	<link rel='stylesheet' type='text/css' href='../../extjs/resources/css/ext-all.css'>
-	<script>
-		// set wordseer collection
-		var path = window.location.pathname.split('/');
-		sessionStorage.setItem('INSTANCE', path[path.length -2])
-	</script>
-    <link rel='stylesheet' type='text/css' href='../../style/new-ui.css'>
-    <link rel='stylesheet' type='text/css' href='../../style/main.css'>
-	<link rel='stylesheet' type='text/css' href='../../style/d3.css'>
-	<script type='text/javascript' src='../../lib/closure/goog/base.js'></script>
-	<script type='text/javascript' src='../../lib/jquery/jquery.js'></script>
-	<script type='text/javascript' src='../../lib/jquery/jquery.scrollTo.js'></script>
-	<script type='text/javascript' 
-src='../../lib/jquery/jquery.resizableColumns.js'></script>
-	<script type='text/javascript' src='../../lib/raphael.js'></script>
-	<script type='text/javascript' src='../../lib/wordtree.js'></script>
-	<script type='text/javascript' src='../../lib/d3/d3.v3.min.js'></script>
-	<script type='text/javascript' src='../../lib/d3/crossfilter.v1.js'></script>
-	<script type='text/javascript' src='../../lib/canvg/canvg.js'></script>
-	<script type='text/javascript' src='../../lib/canvg/rgbcolor.js'></script>
-	<script type='text/javascript' src='../../lib/base64/base64.js'></script>
-	<script type='text/javascript' src='../../src/js/util.js'></script>
-	<script type='text/javascript' src='../../extjs/ext-all-debug.js'></script>
-	<script type='text/javascript' src='../../src/js/new-ui.js'></script>
-
-?>
-
     RELATIONS = {("none",): "search",
     ("",): "(any relation)",
     ("amod", "advmod",): "described as",
