@@ -66,7 +66,8 @@ class GetDistribution(View):
         """
 
         #FIXME: what is narrative?
-        result = db.session.query(func.min(Sentence.id).label("min"),
+        result = db.session.query(
+            func.min(Sentence.id).label("min"),
             func.max(Sentence.id).label("max"),
             func.count(Sentence.id).label("length")).\
                 join(Unit).\
@@ -87,6 +88,7 @@ class GetDistribution(View):
         Returns:
             list: A list of Sentence objects meeting the above criteria.
         """
+        #TODO: what is narrative?
 
         result = db.session.query(Sentence).join(Unit, Dependency).\
             filter(Unit.id == narrative_id).\
