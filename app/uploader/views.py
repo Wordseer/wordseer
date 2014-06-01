@@ -212,7 +212,6 @@ class ProjectCLPD(CLPDView):
     """CLPD view for listing files in a project.
     """
     def __init__(self):
-        print "Logged in: " + str(current_user.is_authenticated())
         super(ProjectCLPD, self).__init__("document_list.html",
             forms.DocumentUploadForm, forms.DocumentProcessForm,
             forms.ConfirmDeleteForm)
