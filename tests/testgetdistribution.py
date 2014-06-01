@@ -61,7 +61,7 @@ class TestGetDistribution(unittest.TestCase):
         assert result.max == sent4.id
         assert result.length == 2
 
-    def tst_get_grammatical_ocurrences(self):
+    def test_get_grammatical_ocurrences(self):
         """Test the get_grammatical_ocurrences method.
         """
         # Set up the trial units
@@ -76,11 +76,32 @@ class TestGetDistribution(unittest.TestCase):
 
         db.session.add_all([unit1, unit2, sent1, sent2, sent3, sent4, dep1,
             dep2])
-        db.session.save()
+        db.session.commit()
 
         # Run the SUT
         result = self.getdistribution.get_grammatical_ocurrences(unit1.id,
             dep1.id)
 
         assert result == [sent2, sent4]
+
+    @unittest.skip("Not functional.")
+    def test_get_text_ocurrences(self):
+        """Test the get_text_ocurrences method.
+        """
+
+        # Set up the trial units
+        unit1 = Unit()
+        unit2 = Unit()
+        sent1 = Sentence(unit = unit2, text="Find this text")
+        sent2 = Sentence(unit = unit1, text="Find this text")
+        sent3 = Sentence(unit = unit2, text="Don't find this text")
+        sent4 = Sentence(unit = unit1, text="Don't find this text")
+
+        db.session.add_all([unit1, unit2, sent1, sent2, sent3, sent4])
+        db.session.commit()
+
+        result = self.getdistribution.get_text_occurrences(unit1.id,
+            "Find this text")
+
+        assert result == [sent2]
 

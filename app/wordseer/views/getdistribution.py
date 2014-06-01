@@ -12,6 +12,7 @@ from app import app
 from app import db
 from .. import wordseer
 from ...uploader.models import Dependency
+from ...uploader.models import dependency_in_sentence
 from ...uploader.models import Sentence
 from ...uploader.models import Unit
 
@@ -90,14 +91,16 @@ class GetDistribution(View):
         """
         #TODO: what is narrative?
 
-        result = db.session.query(Sentence).join(Unit, Dependency).\
+        result = db.session.query(Sentence).\
+            join(dependency_in_sentence, Unit).\
             filter(Unit.id == narrative_id).\
             filter(Dependency.id == dependency_id).\
-            order_by(Sentence.id).all()
+            order_by(Sentence.id).\
+            all()
 
         return result
 
-    def get_text_occurrences(narrative_id, pattern):
+    def get_text_occurrences(self, narrative_id, pattern):
         """Return a list of Sentences from the given narrative in which the
         given pattern occurs exactly.
 
@@ -112,7 +115,7 @@ class GetDistribution(View):
 
         sentences = db.session.query(Sentence).join(Unit).\
             filter(Unit.id == narrative_id).\
-            filter(Sentence.text.match(stripped_pattern)).\
+            filter(Sentence.text.match(pattern)).\
             order_by(Sentence.id).all()
 
         return sentences

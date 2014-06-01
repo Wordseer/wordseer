@@ -161,7 +161,7 @@ class Sentence(db.Model, Base):
     )
 
     def __repr__(self):
-        return "<Sentence: " + self.text + ">"
+        return "<Sentence: " + str(self.text) + ">"
 
 class Word(db.Model, Base):
     """A model representing a word.
