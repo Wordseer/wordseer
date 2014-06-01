@@ -51,11 +51,12 @@ class TestGetDistribution(unittest.TestCase):
         sent4 = Sentence(unit = unit1)
 
         db.session.add_all([unit1, unit2, sent1, sent2, sent3, sent4])
+        db.session.commit()
 
         # Run the SUT
         result = self.getdistribution.get_dimensions(unit1.id)
 
-        assert result.min == sent2
-        assert result.max == sent4
+        assert result.min == sent2.id
+        assert result.max == sent4.id
         assert result.length == 2
 
