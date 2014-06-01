@@ -172,7 +172,7 @@ class ViewsTests(unittest.TestCase):
             "create-submitted": "true",
             "create-name": ""
             })
-        
+
         assert "no projects" in result.data
         assert "You must provide a name" in result.data
 
@@ -183,7 +183,7 @@ class ViewsTests(unittest.TestCase):
         The view should have the name and the path to the project.
         """
         mock_os.path.join.return_value = "test_path"
-        
+
         result = self.client.post("/projects/", data={
             "create-submitted": "true",
             "create-name": "test project"
@@ -300,7 +300,7 @@ class ViewsTests(unittest.TestCase):
         """
         project = Project(name="test", user=1)
         project.save()
-        
+
         upload_dir = tempfile.mkdtemp()
         application.config["UPLOAD_DIR"] = upload_dir
         os.makedirs(os.path.join(upload_dir, "1"))
@@ -363,7 +363,7 @@ class ViewsTests(unittest.TestCase):
         """Test file deletion.
         """
         mock_os.path.isdir.return_value = False
-        
+
         project = Project(name="test", user=1)
         project.save()
 
@@ -498,16 +498,17 @@ class AuthTests(unittest.TestCase):
             sess["user_id"] = User.query.filter(User.id == 1).one().get_id()
             sess["_fresh"] = True
 
-        project = Project(name="Bar's project", user=2)
-        project.save()
+        cls.project = Project(name="Bar's project", user=2)
+        cls.project.save()
 
         file_handle, file_path = tempfile.mkstemp()
         file_handle = os.fdopen(file_handle, "r+")
         file_handle.write("foobar")
 
         cls.file_path = os.path.join(file_path)
-        unit = Unit(project=project, path=cls.file_path)
-        unit.save()
+        cls.unit = Unit(project=cls.project, path=cls.file_path,
+            unit_type="foo")
+        cls.unit.save()
 
     def test_list_projects(self):
         """Test to make sure that bar's projects aren't listed for foo.
@@ -519,21 +520,22 @@ class AuthTests(unittest.TestCase):
     def test_view_project(self):
         """Test to make sure that foo can't see bar's project.
         """
-        result = self.client.get("/projects/1")
+        result = self.client.get("/projects/" + str(self.project.id))
 
         assert "Bar's project" not in result.data
 
     def test_view_document(self):
         """Test to make sure that foo can't see bar's file.
         """
-        result = self.client.get("/projects/1/documents/1")
+        result = self.client.get("/projects/" + str(self.project.id) +
+            "/documents/" + str(self.unit.id))
 
-        assert "/uploads/1" not in result.data
+        assert "/uploads/" + str(self.unit.id) not in result.data
 
     def test_get_document(self):
         """Test to make sure that foo can't get bar's file.
         """
-        result = self.client.get("/uploads/1")
+        result = self.client.get("/uploads/" + str(self.unit.id))
 
         with open(self.file_path) as test_file:
             assert result.data is not test_file.read()
@@ -556,7 +558,7 @@ class LoggedOutTests(unittest.TestCase):
         cls.file = os.fdopen(cls.file_handle, "r+")
         cls.file.write("foobar")
         cls.file_name = os.path.split(cls.file_path)[1]
-        
+
         unit = Unit(project=project, path=cls.file_path)
         unit.save()
 

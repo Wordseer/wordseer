@@ -8,6 +8,7 @@ built on SQLAlchemy.
 from app import db
 from app.models import Base
 
+
 # Association tables
 word_in_sentence = db.Table("word_in_sentence",
     db.Column('word_id', db.Integer, db.ForeignKey('word.id')),
@@ -125,7 +126,7 @@ class Unit(db.Model, Base):
         ordering number.
         """
 
-        return " ".join([self.unit_type, str(self.number)])
+        return str(self.unit_type) + " " + str(self.number)
 
 class Sentence(db.Model, Base):
     """A model representing a sentence.

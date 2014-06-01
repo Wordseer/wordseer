@@ -281,7 +281,7 @@ class ProjectCLPD(CLPDView):
             pass
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
-    view_func=ProjectCLPD.as_view("project_show"))        
+    view_func=ProjectCLPD.as_view("project_show"))
 
 @uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" +
     app.config["DOCUMENT_ROUTE"] + '<int:document_id>')
