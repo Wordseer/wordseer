@@ -16,11 +16,8 @@ from ...uploader.models import word_in_sentence
 
 PAGE_SIZE = 100
 
-wordseer.add_url_rule('/word-frequencies/get-frequent-words',
-    view_func=WordFrequencies.as_view("word_frequencies"))
-
 @wordseer.route("/word-frequencies/get-frequent-words")
-def get_frequent_words(self):
+def get_word_frequencies(self):
     """Use the functions in this file to return a JSON response.
 
     Arguments:
@@ -48,8 +45,9 @@ def get_frequent_words(self):
         error is returned.
     """
 
+    words = request.args.get("words")
+
     try:
-        words = request.args["words"]
         page = request.args["page"]
     except KeyError:
         abort(400)
@@ -58,13 +56,12 @@ def get_frequent_words(self):
     return jsonify(results)
 
 
-def get_word_frequencies(self, words, page):
+def get_word_frequency_page(self, words, page):
     """Get the frequencies of the given words, returning the given page
     of the pagination.
 
     Arguments:
-        words (string): A string of comma separated words (TODO: why not
-            make this a list?
+        words (string): A string of comma separated words.
         page (int): This function automatically paginates the result
             of the database query. Each page contains ``PAGE_SIZE`` number
             of entries, a config variable set at the top of this file.
@@ -76,19 +73,19 @@ def get_word_frequencies(self, words, page):
     """
     answer = []
     offset = page * PAGE_SIZE
+    query = db.session.query(Word,
+        func.count(word_in_sentence.c.word_id).label("sentences")
+    ).join(word_in_sentence).\
+        group_by(Word).\
+        order_by("sentences").\
+        limit(PAGE_SIZE).\
+        offset(offset)
 
     if words:
         wordlist = words.split(",")
+
         for word in wordlist:
-            result = db.session.query(Word,
-                func.count(word_in_sentence.c.word_id).label("sentences")
-            ).join(word_in_sentence).\
-                group_by(Word).\
-                order_by("sentences").\
-                limit(PAGE_SIZE).\
-                offset(offset).\
-                filter(Word.word.like(word)).\
-                all()
+            result = query.filter(Word.word.like(word)).all()
 
             for word in result:
                 answer.append({
@@ -98,15 +95,7 @@ def get_word_frequencies(self, words, page):
                     "sentence_count": len(word.sentences),
                 })
     else:
-        result = db.session.query(Word,
-            func.count(word_in_sentence.c.word_id).label("sentences")
-        ).join(word_in_sentence).\
-            group_by(Word).\
-            order_by("sentences").\
-            limit(PAGE_SIZE).\
-            offset(offset).\
-            all()
-
+        result = query.all()
         for word in result:
             answer.append({
                 "id": word.id,
