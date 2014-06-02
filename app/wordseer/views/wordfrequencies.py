@@ -14,15 +14,17 @@ from .. import utils
 from ...uploader.models import Word
 from ...uploader.models import word_in_sentence
 
+import pdb
+
 PAGE_SIZE = 100
 
 @wordseer.route("/word-frequencies/get-frequent-words")
-def get_word_frequencies(self):
+def get_word_frequencies():
     """Use the functions in this file to return a JSON response.
 
     Arguments:
         words (str): The words to retrieve frequencies for, separated by commas.
-        page (str): Which page of results to retrieve (see
+        page (int): Which page of results to retrieve (see
             ``get_word_frequencies`` documentation).
 
     Returns:
@@ -45,18 +47,17 @@ def get_word_frequencies(self):
         error is returned.
     """
 
-    words = request.args.get("words")
-
+    words = request.args.get("words", "")
+    pdb.set_trace()
     try:
-        page = request.args["page"]
-    except KeyError:
+        page = int(request.args["page"])
+    except (KeyError, ValueError):
         abort(400)
 
-    results = self.get_word_frequencies(words.replace("*", "%"), page)
+    results = get_word_frequency_page(words.replace("*", "%"), page)
     return jsonify(results)
 
-
-def get_word_frequency_page(self, words, page):
+def get_word_frequency_page(words, page):
     """Get the frequencies of the given words, returning the given page
     of the pagination.
 
