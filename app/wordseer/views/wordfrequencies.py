@@ -14,8 +14,6 @@ from .. import utils
 from ...uploader.models import Word
 from ...uploader.models import word_in_sentence
 
-import pdb
-
 @wordseer.route("/word-frequencies/get-frequent-words")
 def get_word_frequencies():
     """Use the functions in this file to return a JSON response.
@@ -29,14 +27,17 @@ def get_word_frequencies():
         If the request is successful, then it returns a JSON response as a
         string. This response has the following structure::
 
-            [
-                {
-                    "id": int,
-                    "word": str,
-                    "pos": int,
-                    "sentence_count": int
-                }
-            ]
+            {"result":
+                [
+                    {
+                        "id": int,
+                        "word": str,
+                        "pos": int,
+                        "sentence_count": int
+                    }
+                    ...and so on...
+                ]
+            }
 
         Further details on the return value can be found in the
         ``get_word_frequencies`` documentation.
@@ -52,7 +53,7 @@ def get_word_frequencies():
         abort(400)
 
     results = get_word_frequency_page(words, page)
-    return jsonify(results)
+    return jsonify(results=results)
 
 def get_word_frequency_page(words, page):
     """Get the frequencies of the given words, returning the given page
@@ -84,13 +85,12 @@ def get_word_frequency_page(words, page):
 
         for word in wordlist:
             result = query.from_self().filter(Word.word.like(word)).all()
-            pdb.set_trace()
             for word in result:
                 answer.append({
                     "id": word[0].id,
                     "word": word[0].word,
                     "pos": word[0].pos,
-                    "sentence_count": len(word.sentences),
+                    "sentence_count": word.sentences
                 })
     else:
         result = query.all()
@@ -99,7 +99,7 @@ def get_word_frequency_page(words, page):
                 "id": word[0].id,
                 "word": word[0].word,
                 "pos": word[0].pos,
-                "sentence_count": word.sentence_count,
+                "sentence_count": word.sentence_count
             })
 
     return answer

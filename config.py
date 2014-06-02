@@ -139,3 +139,4 @@ class Testing(BaseConfig):
     SQLALCHEMY_ECHO = False
 
     PAGE_SIZE = 10
+

@@ -177,6 +177,7 @@ class Word(db.Model, Base):
     """
 
     word = db.Column(db.String, index = True)
+    pos = db.Column(db.String)
 
     def __repr__(self):
         return "<Word: " + self.word + ">"

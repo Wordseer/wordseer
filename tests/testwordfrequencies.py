@@ -8,6 +8,7 @@ from app import app
 from app import db
 from app.uploader.models import Sentence
 from app.uploader.models import Word
+import pdb
 
 class TestGetWordFrequencies(unittest.TestCase):
     """Tests for the get_word_frequencies view.
@@ -46,17 +47,22 @@ class TestGetWordFrequencies(unittest.TestCase):
         s2 = Sentence(text="foor")
         s3 = Sentence(text="bar")
         for i in range(0, 25):
-            words.append(Word(word="foo", sentences=[s1]))
-            words.append(Word(word="foor", sentences=[s2]))
+            words.append(Word(word="foo", sentences=[s1], pos="foo"))
+            words.append(Word(word="foor", sentences=[s2], pos="foo"))
 
         words.append(Word(word="bar", sentences=[s3]))
 
         db.session.add_all(words)
         db.session.commit()
 
-        result = self.client.get(self.url + "?" + "words=foo&page=2")
+        result = self.client.get(self.url + "?" + "words=foo%&page=2")
+        pdb.set_trace()
+        result_dict = json.loads(result.data)["results"]
+        print result_dict
+        words_text = [word["word"] for word in result_dict]
 
-        words = json.loads(result.data)
-
-        print words
+        assert len(result_dict) == app.config["PAGE_SIZE"]
+        assert "foor" in words_text
+        assert "foo" in words_text
+        assert "bar" not in words_text
 
