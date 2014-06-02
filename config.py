@@ -83,6 +83,9 @@ class BaseConfig(object):
 
     PUNCTUATION = list(u"!@#$%^&*()_+-=~`,./;;\"'{}[]|’\\");
 
+    # Number of rows to return for paginated queries
+    PAGE_SIZE = 100
+
 class Production(BaseConfig):
     """Config for the production server.
     """
@@ -134,3 +137,5 @@ class Testing(BaseConfig):
     SQLALCHEMY_DATABASE_PATH = tempfile.mkstemp()[1]
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLALCHEMY_DATABASE_PATH
     SQLALCHEMY_ECHO = False
+
+    PAGE_SIZE = 10

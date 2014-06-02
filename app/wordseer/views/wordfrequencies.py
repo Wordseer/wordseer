@@ -16,8 +16,6 @@ from ...uploader.models import word_in_sentence
 
 import pdb
 
-PAGE_SIZE = 100
-
 @wordseer.route("/word-frequencies/get-frequent-words")
 def get_word_frequencies():
     """Use the functions in this file to return a JSON response.
@@ -48,13 +46,12 @@ def get_word_frequencies():
     """
 
     words = request.args.get("words", "")
-    pdb.set_trace()
     try:
         page = int(request.args["page"])
     except (KeyError, ValueError):
         abort(400)
 
-    results = get_word_frequency_page(words.replace("*", "%"), page)
+    results = get_word_frequency_page(words, page)
     return jsonify(results)
 
 def get_word_frequency_page(words, page):
@@ -65,7 +62,7 @@ def get_word_frequency_page(words, page):
         words (string): A string of comma separated words.
         page (int): This function automatically paginates the result
             of the database query. Each page contains ``PAGE_SIZE`` number
-            of entries, a config variable set at the top of this file.
+            of entries, a config variable set in ``config.py``.
 
     Retruns:
         list: A list in which every item is a dict which holds the id,
@@ -73,35 +70,35 @@ def get_word_frequency_page(words, page):
             word retrieved from the database.
     """
     answer = []
-    offset = page * PAGE_SIZE
+    offset = page * app.config["PAGE_SIZE"]
     query = db.session.query(Word,
         func.count(word_in_sentence.c.word_id).label("sentences")
     ).join(word_in_sentence).\
         group_by(Word).\
         order_by("sentences").\
-        limit(PAGE_SIZE).\
+        limit(app.config["PAGE_SIZE"]).\
         offset(offset)
 
     if words:
         wordlist = words.split(",")
 
         for word in wordlist:
-            result = query.filter(Word.word.like(word)).all()
-
+            result = query.from_self().filter(Word.word.like(word)).all()
+            pdb.set_trace()
             for word in result:
                 answer.append({
-                    "id": word.id,
-                    "word": word.word,
-                    "pos": word.pos,
+                    "id": word[0].id,
+                    "word": word[0].word,
+                    "pos": word[0].pos,
                     "sentence_count": len(word.sentences),
                 })
     else:
         result = query.all()
         for word in result:
             answer.append({
-                "id": word.id,
-                "word": word.word,
-                "pos": word.pos,
+                "id": word[0].id,
+                "word": word[0].word,
+                "pos": word[0].pos,
                 "sentence_count": word.sentence_count,
             })
 
