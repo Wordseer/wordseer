@@ -8,7 +8,7 @@ from app import db
 from app.uploader.models import Dependency
 from app.uploader.models import Sentence
 from app.uploader.models import Unit
-from app.wordseer.views.getdistribution import GetDistribution
+from app.wordseer.views import getdistribution
 
 class TestGetDistribution(unittest.TestCase):
     """Tests for the GetDistribution view.
@@ -24,7 +24,6 @@ class TestGetDistribution(unittest.TestCase):
         """
         cls.client = app.test_client()
         cls.url = "/getdistribution"
-        cls.getdistribution = GetDistribution()
 
     def test_arguments(self):
         """Test to make sure the correct arguments are required.
@@ -55,7 +54,7 @@ class TestGetDistribution(unittest.TestCase):
         db.session.commit()
 
         # Run the SUT
-        result = self.getdistribution.get_dimensions(unit1.id)
+        result = getdistribution.get_dimensions(unit1.id)
 
         assert result.min == sent2.id
         assert result.max == sent4.id
@@ -79,7 +78,7 @@ class TestGetDistribution(unittest.TestCase):
         db.session.commit()
 
         # Run the SUT
-        result = self.getdistribution.get_grammatical_ocurrences(unit1.id,
+        result = getdistribution.get_grammatical_ocurrences(unit1.id,
             dep1.id)
 
         assert result == [sent2, sent4]
@@ -100,7 +99,7 @@ class TestGetDistribution(unittest.TestCase):
         db.session.add_all([unit1, unit2, sent1, sent2, sent3, sent4])
         db.session.commit()
 
-        result = self.getdistribution.get_text_occurrences(unit1.id,
+        result = getdistribution.get_text_occurrences(unit1.id,
             "Find this text")
 
         assert result == [sent2]
