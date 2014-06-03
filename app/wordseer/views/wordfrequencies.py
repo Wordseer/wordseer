@@ -70,7 +70,8 @@ def get_word_frequency_page(words, page):
         words (string): A string of comma separated words.
         page (int): This function automatically paginates the result
             of the database query. Each page contains ``PAGE_SIZE`` number
-            of entries, a config variable set in ``config.py``.
+            of entries, a config variable set in ``config.py``. This is zero
+            indexed.
 
     Retruns:
         list: A list in which every item is a dict which holds the id,
