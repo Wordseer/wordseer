@@ -1,8 +1,8 @@
-"""This file contains utilities for finding grammatical patterns within
-two positions in a given sentence.
+"""Finding grammatical patterns within two positions in a given sentence.
 """
 
 from flask import request
+from flask import abort
 from flask.json import jsonify
 
 from app import db
@@ -12,9 +12,21 @@ from .. import wordseer
 
 @wordseer.route("/getpatterns")
 def get_patterns():
-    sentence = request.args.get("sentence")
-    start = request.args.get("start")
-    end = request.args.get("end")
+    """Get something.
+
+    Keyword Arguments:
+        sentence (str): Required.
+        start (int):
+        end (int):
+    """
+
+    try:
+        sentence = request.args["sentence"]
+    except ValueError:
+        abort(400)
+
+    start = int(request.args.get("start"))
+    end = int(request.args.get("end"))
     dependencies = []
 
     if sentence and start and end:

@@ -21,6 +21,20 @@ class TestGetWordFrequencies(unittest.TestCase):
         cls.client = app.test_client()
         cls.url = "/word-frequencies/get-frequent-words"
 
+        words = []
+
+        s1 = Sentence(text="foo")
+        s2 = Sentence(text="foor")
+        s3 = Sentence(text="bar")
+        for i in range(0, 25):
+            words.append(Word(word="foo", sentences=[s1], pos="foo"))
+            words.append(Word(word="foor", sentences=[s2], pos="foo"))
+
+        words.append(Word(word="bar", sentences=[s3]))
+
+        db.session.add_all(words)
+        db.session.commit()
+
     def test_arguments(self):
         """Make sure that arguments are handled properly.
         """
@@ -40,23 +54,8 @@ class TestGetWordFrequencies(unittest.TestCase):
         """Test the validity of the JSON result.
         """
 
-        words = []
-
-        s1 = Sentence(text="foo")
-        s2 = Sentence(text="foor")
-        s3 = Sentence(text="bar")
-        for i in range(0, 25):
-            words.append(Word(word="foo", sentences=[s1], pos="foo"))
-            words.append(Word(word="foor", sentences=[s2], pos="foo"))
-
-        words.append(Word(word="bar", sentences=[s3]))
-
-        db.session.add_all(words)
-        db.session.commit()
-
         result = self.client.get(self.url + "?" + "words=foo%&page=2")
         result_dict = json.loads(result.data)["results"]
-        print result_dict
         words_text = [word["word"] for word in result_dict]
 
         assert len(result_dict) == app.config["PAGE_SIZE"]
@@ -67,20 +66,6 @@ class TestGetWordFrequencies(unittest.TestCase):
     def test_get_word_frequency_double(self):
         """Test getting two words at once.
         """
-
-        words = []
-
-        s1 = Sentence(text="foo")
-        s2 = Sentence(text="foor")
-        s3 = Sentence(text="bar")
-        for i in range(0, 25):
-            words.append(Word(word="foo", sentences=[s1], pos="foo"))
-            words.append(Word(word="foor", sentences=[s2], pos="foo"))
-
-        words.append(Word(word="bar", sentences=[s3]))
-
-        db.session.add_all(words)
-        db.session.commit()
 
         result = self.client.get(self.url + "?" + "words=foor,bar&page=0")
         result_dict = json.loads(result.data)["results"]

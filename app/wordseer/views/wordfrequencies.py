@@ -118,7 +118,7 @@ def get_word_frequency_page(words, page):
                 "id": word[0].id,
                 "word": word[0].word,
                 "pos": word[0].pos,
-                "sentence_count": word.sentence_count
+                "sentence_count": word.sentences
             })
 
     return answer
