@@ -25,6 +25,7 @@ def log(item, value, replace_value):
 
     entry = Log(log_item=item, item_value=value)
     session = database.Database().session
+    session._model_changes = {}
 
     if REPLACE == replace_value:
         entry = session.merge(entry)
