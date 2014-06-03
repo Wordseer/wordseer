@@ -59,6 +59,13 @@ def get_word_frequency_page(words, page):
     """Get the frequencies of the given words, returning the given page
     of the pagination.
 
+    Note that the ``page`` argument signifies the "page" for every word
+    individually. That is, if you have three words (``foo``, ``bar``, ``baz``)
+    and a page size of 1, and you query with ``words=foo,bar,baz&page=1`` you
+    will get no results. This is because there is one page of results each for
+    ``foo``, ``bar``, and ``baz``. A query like ``words=foo,bar,baz&page=0``
+    will return data for both ``foo``, ``bar``, and ``baz``.
+
     Arguments:
         words (string): A string of comma separated words.
         page (int): This function automatically paginates the result
@@ -70,21 +77,24 @@ def get_word_frequency_page(words, page):
             word, pos, and length of the sentences attributes of every
             word retrieved from the database.
     """
+    #TODO: simplify the query, simplify the dict setting
     answer = []
     offset = page * app.config["PAGE_SIZE"]
-    query = db.session.query(Word,
-        func.count(word_in_sentence.c.word_id).label("sentences")
-    ).join(word_in_sentence).\
-        group_by(Word).\
-        order_by("sentences").\
-        limit(app.config["PAGE_SIZE"]).\
-        offset(offset)
 
     if words:
         wordlist = words.split(",")
 
         for word in wordlist:
-            result = query.from_self().filter(Word.word.like(word)).all()
+            result = db.session.query(Word,
+                func.count(word_in_sentence.c.word_id).label("sentences")
+            ).join(word_in_sentence).\
+                filter(Word.word.like(word)).\
+                group_by(Word).\
+                order_by("sentences").\
+                limit(app.config["PAGE_SIZE"]).\
+                offset(offset).\
+                all()
+
             for word in result:
                 answer.append({
                     "id": word[0].id,
@@ -93,7 +103,15 @@ def get_word_frequency_page(words, page):
                     "sentence_count": word.sentences
                 })
     else:
-        result = query.all()
+        result = db.session.query(Word,
+            func.count(word_in_sentence.c.word_id).label("sentences")
+        ).join(word_in_sentence).\
+            group_by(Word).\
+            order_by("sentences").\
+            limit(app.config["PAGE_SIZE"]).\
+            offset(offset).\
+            all()
+
         for word in result:
             answer.append({
                 "id": word[0].id,

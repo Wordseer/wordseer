@@ -8,7 +8,6 @@ from app import app
 from app import db
 from app.uploader.models import Sentence
 from app.uploader.models import Word
-import pdb
 
 class TestGetWordFrequencies(unittest.TestCase):
     """Tests for the get_word_frequencies view.
@@ -37,8 +36,8 @@ class TestGetWordFrequencies(unittest.TestCase):
         result = self.client.get(self.url + "?" + "page=2&word=foo")
         assert result.status_code != 400
 
-    def test_get_word_frequency_page(self):
-        """Test the get_word_frequency_page method.
+    def test_get_word_frequency_results(self):
+        """Test the validity of the JSON result.
         """
 
         words = []
@@ -56,7 +55,6 @@ class TestGetWordFrequencies(unittest.TestCase):
         db.session.commit()
 
         result = self.client.get(self.url + "?" + "words=foo%&page=2")
-        pdb.set_trace()
         result_dict = json.loads(result.data)["results"]
         print result_dict
         words_text = [word["word"] for word in result_dict]
@@ -65,4 +63,30 @@ class TestGetWordFrequencies(unittest.TestCase):
         assert "foor" in words_text
         assert "foo" in words_text
         assert "bar" not in words_text
+
+    def test_get_word_frequency_double(self):
+        """Test getting two words at once.
+        """
+
+        words = []
+
+        s1 = Sentence(text="foo")
+        s2 = Sentence(text="foor")
+        s3 = Sentence(text="bar")
+        for i in range(0, 25):
+            words.append(Word(word="foo", sentences=[s1], pos="foo"))
+            words.append(Word(word="foor", sentences=[s2], pos="foo"))
+
+        words.append(Word(word="bar", sentences=[s3]))
+
+        db.session.add_all(words)
+        db.session.commit()
+
+        result = self.client.get(self.url + "?" + "words=foor,bar&page=0")
+        result_dict = json.loads(result.data)["results"]
+        words_text = [word["word"] for word in result_dict]
+
+        assert "foor" in words_text
+        assert "bar" in words_text
+        assert "foo" not in words_text
 
