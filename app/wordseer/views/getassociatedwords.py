@@ -1,4 +1,4 @@
-"""Views for the WordSeer website.
+"""Get words associated with a given word.
 """
 
 import json
@@ -9,9 +9,11 @@ from flask.json import jsonify
 from flask.views import View
 
 from app import app
+from app import db
 from .. import wordseer
 from .. import utils
-from .. import models
+from ..models import CachedSentences
+from ...uploader.models import word_in_sentence
 
 class GetAssociatedWords(View):
     """Return adjectives, nouns, and verbs with high TF-IDF scores that
@@ -25,15 +27,13 @@ class GetAssociatedWords(View):
         dep (str):
         deptype (str):
         relation (str):
-
-    Arguments:
-        phrases (JSON):
-        metadata (JSON):
-        searches (JSON):
-        collection (str):
-        statistics (str):
-        timing (str):
-        instance (str):
+        phrases (JSON): Required.
+        metadata (JSON): Required.
+        searches (JSON): Required.
+        collection (str): Required.
+        statistics (str): Required.
+        timing (str): Required.
+        instance (str): Required.
     """
     def __init__(self):
         """Initialize variables necessary for the GetAssociatedUsers view.
@@ -93,12 +93,10 @@ class GetAssociatedWords(View):
         if request.args.get("query_id"):
             table = "filtered_sent_ids"
 
-            #TODO: missing global variables
             table = "cached_filtered_sent_ids"
             query_id_where = "don'tuse" #TODO
 
-        #TODO: sqlalchemy calls, unknown tables
-
+            words = db.session.query(CachedSentences).join(word_in_sentence)
         sentence_ids = []
         sentence_numbers = []
         document_ids = []

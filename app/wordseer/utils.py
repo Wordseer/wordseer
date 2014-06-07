@@ -25,21 +25,40 @@ def table_exists(table):
         return False
     return True
 
-def get_name_from_relation(relation):
-    """Given a relation, return a human-readable name. This method is configured
-    using a dict in config.py.
+def get_relation_description(relation):
+    """Do we really need this method? What exactly does it do?
 
-    Args:
-        relation (str): A relation to look up (as the key) in the RELATIONS dict
-            in config.py.
-
-    Returns:
-        string: The human-readable relation name, the value of the key that is
-            ``relation``.
+    Arguments:
+        relation (str):
     """
-    for relations, name in app.config["RELATIONS"].iteritems():
-        if relation in relations:
-            return name
+    #TODO: evaluate this method's usefulness
+    #TODO: unit testing
+    if "none" in relation:
+        return ""
+    if "" in relation:
+        return "(any relation)"
+    if "agent subj nsubj csubj nsubjpass csubjpass" in relation:
+        return "agent subj nsubj xsubj csubj nusbjpass csubjpass"
+    if "obj dobj iobj pobj" in relation:
+        return "dobj iobj pobj"
+    else:
+        return relation
+
+def remove_spaces_around_punctuation(sentence):
+    """Remove spaces before certain punctuation marks and after certain other
+    ones.
+
+    Arguments:
+        sentence (str): The sentence to remove spaces around punctuation in.
+    """
+
+    for mark in app.config["PUNCTUATION_NO_SPACE_BEFORE"]:
+        sentence = sentence.replace(" " + mark, mark)
+
+    for mark in app.config["PUNCTUATION_NO_SPACE_AFTER"]:
+        sentence = sentence.replace(mark + " ", mark)
+
+    return sentence
 
 def get_word_ids_from_phrase_set(phrase_set_id):
     """Returns a string containing all the words in the given
@@ -108,8 +127,4 @@ def get_lemma_variant_ids(word):
         return [word.id for word in result]
 
     return []
-
-def get_relation_description(relation):
-    #TODO: is this method even necessary?
-    raise NotImplementedError
 
