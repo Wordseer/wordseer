@@ -12,7 +12,10 @@ from app.models import Base
 # Association tables
 word_in_sentence = db.Table("word_in_sentence",
     db.Column('word_id', db.Integer, db.ForeignKey('word.id')),
-    db.Column('sentence_id', db.Integer, db.ForeignKey('sentence.id'))
+    db.Column('sentence_id', db.Integer, db.ForeignKey('sentence.id')),
+    db.Column("space_after", db.String),
+    db.Column("tag", db.String),
+    db.Column("position", db.Integer),
 )
 
 word_in_sequence = db.Table("word_in_sequence",
@@ -169,7 +172,8 @@ class Word(db.Model, Base):
     Words are the most basic building blocks of everything.
 
     Attributes:
-      word (str): the word
+      word (str): The word.
+      tag (str): The part of speech of the word.
 
     Relationships:
       has many: sentences
@@ -177,10 +181,9 @@ class Word(db.Model, Base):
     """
 
     word = db.Column(db.String, index = True)
-    pos = db.Column(db.String)
 
     def __repr__(self):
-        return "<Word: " + self.word + ">"
+        return "<Word: " + str(self.word) + ">"
 
 class Sequence(db.Model, Base):
     """A Sequence is a series of words.

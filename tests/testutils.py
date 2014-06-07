@@ -7,7 +7,6 @@ import unittest
 from app import db
 from app import app
 from app.wordseer import utils
-import pdb
 
 class TestUtils(unittest.TestCase):
     """Test the Utils module.
@@ -50,8 +49,6 @@ class TestUtils(unittest.TestCase):
             u" x" +
             u"x".join(both)
         )
-
-        pdb.set_trace()
 
         assert expected == utils.remove_spaces_around_punctuation(sentence)
 
