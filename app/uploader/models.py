@@ -5,18 +5,36 @@ This module contains the model-level logic specific to the uploader blueprint,
 built on SQLAlchemy.
 """
 
+from sqlalchemy.ext.associationproxy import association_proxy
+
 from app import db
 from app.models import Base
 
-
 # Association tables
-word_in_sentence = db.Table("word_in_sentence",
-    db.Column('word_id', db.Integer, db.ForeignKey('word.id')),
-    db.Column('sentence_id', db.Integer, db.ForeignKey('sentence.id')),
-    db.Column("space_after", db.String),
-    db.Column("tag", db.String),
-    db.Column("position", db.Integer),
-)
+class WordInSentence(db.Model, Base):
+    __tablename__ = "word_in_sentence"
+    word_id = db.Column(db.Integer, db.ForeignKey('word.id'),
+        primary_key=True)
+    sentence_id = db.Column(db.Integer, db.ForeignKey('sentence.id'),
+        primary_key=True)
+    space_after = db.Column(db.String)
+    tag = db.Column(db.String)
+    position = db.Column(db.Integer)
+
+    #word = db.relationship("Word",
+    #    backref=db.backref("sentences", lazy="dynamic"))
+    word = db.relationship("Word")
+    sentence = db.relationship("Sentence",
+        backref=db.backref("sentence_words", lazy="dynamic"))
+
+    def __init__(self, word=None, sentence=None, space_after=None, tag=None,
+        position=None):
+        #TODO: clean this up?
+        self.word = word
+        self.sentence = sentence
+        self.space_after = space_after
+        self.tag = tag
+        self.position = position
 
 word_in_sequence = db.Table("word_in_sequence",
     db.Column("word_id", db.Integer, db.ForeignKey("word.id")),
@@ -154,10 +172,11 @@ class Sentence(db.Model, Base):
     unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
     text = db.Column(db.Text, index = True)
 
-    words = db.relationship("Word", secondary="word_in_sentence",
-        backref=db.backref('sentences', lazy="dynamic")
-    )
-    sequences = db.relationship("Sequence", backref="sentence")
+    #words = db.relationship("Word", secondary="word_in_sentence",
+    #    backref=db.backref('sentences', lazy="dynamic")
+    #)
+    words = association_proxy("sentence_words", "word")
+    sequences = db.relationship("Sequence", backref="sentences")
     dependencies = db.relationship("Dependency",
             secondary=dependency_in_sentence,
             backref="sentences"
@@ -181,6 +200,7 @@ class Word(db.Model, Base):
     """
 
     word = db.Column(db.String, index = True)
+    #sentences = association_proxy("word_in_sentence", "sentences")
 
     def __repr__(self):
         return "<Word: " + str(self.word) + ">"
