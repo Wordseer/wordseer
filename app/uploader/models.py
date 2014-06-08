@@ -297,8 +297,3 @@ word_in_sequence = db.Table("word_in_sequence",
     db.Column("sequence_id", db.Integer, db.ForeignKey("sequence.id"))
 )
 
-#dependency_in_sentence = db.Table("dependency_in_sentence",
-#    db.Column("dependency_id", db.Integer, db.ForeignKey("dependency.id")),
-#    db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id"))
-#)
-
