@@ -44,7 +44,6 @@ class Unit(db.Model, Base):
     children = db.relationship("Unit")
     sentences = db.relationship("Sentence", backref='unit')
     properties = db.relationship("Property", backref='unit')
-    sequences = db.relationship("Sequence", backref="document")
 
     def __init__(self, document=None, **kwargs):
         """Initialize a top-level document unit from a document file.
@@ -141,14 +140,12 @@ class Sentence(db.Model, Base):
         creator=lambda word: WordInSentence(word=word))
 
     sentence_dependencies = db.relationship("DependencyInSentence")
-    dependencies = association_proxy("dependency_sentences", "dependency",
+    dependencies = association_proxy("sentence_dependencies", "dependency",
         creator=lambda dep: DependencyInSentence(dependency=dep))
 
-    sequences = db.relationship("Sequence", backref="sentences")
-    dependencies = db.relationship("Dependency",
-            secondary="dependency_in_sentence",
-            backref="sentences"
-    )
+    sentence_sequences = db.relationship("SequenceInSentence")
+    sequences = association_proxy("sentence_sequences", "sequence",
+        creator=lambda seq: SequenceInSentence(sequence=seq))
 
     def __repr__(self):
         return "<Sentence: " + str(self.text) + ">"
@@ -180,9 +177,10 @@ class Sequence(db.Model, Base):
     """A Sequence is a series of words.
     """
 
-    start_position = db.Column(db.Integer)
-    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
-    document_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
+    sequence_sentences = db.relationship("SequenceInSentence")
+    sentences = association_proxy("sequence_sentences", "sentence",
+        creator=lambda sent: SequenceInSentence(sentence=sent))
+
     sequence = db.Column(db.String)
     is_lemmatized = db.Column(db.Boolean)
     all_function_words = db.Column(db.Boolean)
@@ -200,7 +198,7 @@ class Dependency(db.Model, Base):
     dep_index = db.Column(db.Integer)
 
     dependency_sentences = db.relationship("DependencyInSentence")
-    sentences = association_proxy("sentence_dependencies", "dependency",
+    sentences = association_proxy("dependency_sentences", "sentence",
         creator=lambda sen: DependencyInSentence(sentence=sen))
 
 class Property(db.Model, Base):
@@ -287,10 +285,39 @@ class DependencyInSentence(db.Model):
     """
     dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id"),
         primary_key=True)
+
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"),
         primary_key=True)
+
+    sentence = db.relationship("Sentence")
+    dependency = db.relationship("Dependency")
+
     gov_index = db.Column(db.Integer)
     dep_index = db.Column(db.Integer)
+
+class SequenceInSentence(db.Model):
+    """Describes a relationship between a Sequence and a Sentence.
+
+    Attributes:
+        sequence_id (int): The ID of the Sequence in this relationship.
+        sentence_id (int): The ID of the Sentence in this relationship.
+        sequence_capitalization (str): A string with the exact capitalization
+            of this sequence in this sentence.
+        start_index (int): The position (0-indexed) of the first word of this
+            Sequence in this sentence.
+    """
+
+    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"),
+        primary_key=True)
+
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"),
+        primary_key=True)
+
+    sentence = db.relationship("Sentence")
+    sequence = db.relationship("Sequence")
+
+    sequence_capitalization = db.Column(db.String)
+    start_index = db.Column(db.Integer)
 
 word_in_sequence = db.Table("word_in_sequence",
     db.Column("word_id", db.Integer, db.ForeignKey("word.id")),

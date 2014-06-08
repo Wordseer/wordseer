@@ -49,6 +49,14 @@ class TestModels(unittest.TestCase):
         word_1.save()
         word_2.save()
 
+        sen1 = Sentence()
+        sen2 = Sentence()
+
+        word_2.sentences = [sen1, sen2]
+
+        db.session.add_all([sen1, sen2])
+        db.session.commit()
+
     def test_model_sentence(self):
         """Test to make sure that Sentence is working properly.
         """
@@ -68,6 +76,53 @@ class TestModels(unittest.TestCase):
         assert sentence.words == [word_1, word_2]
 
         sentence.save()
+
+        #Test with Dependencies
+        dependency1 = Dependency()
+        dependency2 = Dependency()
+
+        sentence.dependencies = [dependency1, dependency2]
+
+        db.session.add_all([dependency1, dependency2])
+        db.session.commit()
+
+        #Test with Sequences
+        sequence1 = Sequence()
+        sequence2 = Sequence()
+
+        sentence.sequences = [sequence1, sequence2]
+
+        db.session.add_all([sequence1, sequence2])
+        db.session.commit()
+
+    def test_model_dependency(self):
+        """Test to make sure that Dependency is working properly.
+        """
+
+        dependency = Dependency()
+        dependency.save()
+
+        # Test with sentences
+        sentence1 = Sentence()
+        sentence2 = Sentence()
+        dependency.sentences = [sentence1, sentence2]
+
+        db.session.add_all([sentence1, sentence2])
+        db.session.commit()
+
+    def test_model_sequence(self):
+        """Test to make sure that Sequence is working properly.
+        """
+
+        sequence = Sequence()
+        sequence.save()
+
+        # Test with Sentences
+        sentence1 = Sentence()
+        sentence2 = Sentence()
+        sequence.sentences = [sentence1, sentence2]
+
+        db.session.add_all([sentence1, sentence2])
 
     def test_model_unit(self):
         """Test to make sure that Unit is working properly.
@@ -638,3 +693,4 @@ class ImportTests(unittest.TestCase):
 
         print(doc_dict)
         return doc_dict
+
