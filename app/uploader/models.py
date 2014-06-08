@@ -10,42 +10,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from app import db
 from app.models import Base
 
-# Association tables
-class WordInSentence(db.Model, Base):
-    __tablename__ = "word_in_sentence"
-    word_id = db.Column(db.Integer, db.ForeignKey('word.id'),
-        primary_key=True)
-    sentence_id = db.Column(db.Integer, db.ForeignKey('sentence.id'),
-        primary_key=True)
-    space_after = db.Column(db.String)
-    tag = db.Column(db.String)
-    position = db.Column(db.Integer)
-
-    #word = db.relationship("Word",
-    #    backref=db.backref("sentences", lazy="dynamic"))
-    word = db.relationship("Word")
-    sentence = db.relationship("Sentence",
-        backref=db.backref("sentence_words", lazy="dynamic"))
-
-    def __init__(self, word=None, sentence=None, space_after=None, tag=None,
-        position=None):
-        #TODO: clean this up?
-        self.word = word
-        self.sentence = sentence
-        self.space_after = space_after
-        self.tag = tag
-        self.position = position
-
-word_in_sequence = db.Table("word_in_sequence",
-    db.Column("word_id", db.Integer, db.ForeignKey("word.id")),
-    db.Column("sequence_id", db.Integer, db.ForeignKey("sequence.id"))
-)
-
-dependency_in_sentence = db.Table("dependency_in_sentence",
-    db.Column("dependency_id", db.Integer, db.ForeignKey("dependency.id")),
-    db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id"))
-)
-
 # Models
 class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.
@@ -172,13 +136,13 @@ class Sentence(db.Model, Base):
     unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
     text = db.Column(db.Text, index = True)
 
-    #words = db.relationship("Word", secondary="word_in_sentence",
-    #    backref=db.backref('sentences', lazy="dynamic")
-    #)
-    words = association_proxy("sentence_words", "word")
+    sentence_words = db.relationship("WordInSentence")
+    words = association_proxy("sentence_words", "word",
+        creator=lambda word: WordInSentence(word=word))
+
     sequences = db.relationship("Sequence", backref="sentences")
     dependencies = db.relationship("Dependency",
-            secondary=dependency_in_sentence,
+            secondary="dependency_in_sentence",
             backref="sentences"
     )
 
@@ -200,7 +164,10 @@ class Word(db.Model, Base):
     """
 
     word = db.Column(db.String, index = True)
-    #sentences = association_proxy("word_in_sentence", "sentences")
+
+    word_sentences = db.relationship("WordInSentence")
+    sentences = association_proxy("word_sentences", "sentence",
+        creator=lambda sent: WordInSentence(sentence=sent))
 
     def __repr__(self):
         return "<Word: " + str(self.word) + ">"
@@ -216,7 +183,7 @@ class Sequence(db.Model, Base):
     is_lemmatized = db.Column(db.Boolean)
     all_function_words = db.Column(db.Boolean)
     length = db.Column(db.Integer)
-    words = db.relationship("Word", secondary=word_in_sequence)
+    words = db.relationship("Word", secondary="word_in_sequence")
 
 class Dependency(db.Model, Base):
     """Just a placeholder.
@@ -269,3 +236,28 @@ class Project(db.Model, Base):
 
     def __repr__(self):
         return "<Project (name=" + self.name + ")>"
+
+# Association tables
+class WordInSentence(db.Model):
+    __tablename__ = "word_in_sentence"
+    word_id = db.Column(db.Integer, db.ForeignKey('word.id'),
+        primary_key=True)
+    sentence_id = db.Column(db.Integer, db.ForeignKey('sentence.id'),
+        primary_key=True)
+    space_after = db.Column(db.String)
+    tag = db.Column(db.String)
+    position = db.Column(db.Integer)
+
+    word = db.relationship("Word")
+    sentence = db.relationship("Sentence")
+
+word_in_sequence = db.Table("word_in_sequence",
+    db.Column("word_id", db.Integer, db.ForeignKey("word.id")),
+    db.Column("sequence_id", db.Integer, db.ForeignKey("sequence.id"))
+)
+
+dependency_in_sentence = db.Table("dependency_in_sentence",
+    db.Column("dependency_id", db.Integer, db.ForeignKey("dependency.id")),
+    db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id"))
+)
+
