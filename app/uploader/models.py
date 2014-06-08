@@ -140,6 +140,10 @@ class Sentence(db.Model, Base):
     words = association_proxy("sentence_words", "word",
         creator=lambda word: WordInSentence(word=word))
 
+    sentence_dependencies = db.relationship("DependencyInSentence")
+    dependencies = association_proxy("dependency_sentences", "dependency",
+        creator=lambda dep: DependencyInSentence(dependency=dep))
+
     sequences = db.relationship("Sequence", backref="sentences")
     dependencies = db.relationship("Dependency",
             secondary="dependency_in_sentence",
@@ -192,10 +196,12 @@ class Dependency(db.Model, Base):
     relationship = db.Column(db.String)
     governor = db.Column(db.String)
     gov_index = db.Column(db.Integer)
-    gov_pos = db.Column(db.String)
     dependent = db.Column(db.String)
     dep_index = db.Column(db.Integer)
-    dep_pos = db.Column(db.String)
+
+    dependency_sentences = db.relationship("DependencyInSentence")
+    sentences = association_proxy("sentence_dependencies", "dependency",
+        creator=lambda sen: DependencyInSentence(sentence=sen))
 
 class Property(db.Model, Base):
     """A model representing a property of a unit.
@@ -239,7 +245,20 @@ class Project(db.Model, Base):
 
 # Association tables
 class WordInSentence(db.Model):
-    __tablename__ = "word_in_sentence"
+    """Describes a single Word in a single Sentence.
+
+    A Word in a Sentence has special attributes unique to one specific
+    ocurrence, described below.
+
+    Attributes:
+        word_id (int): The ID of the Word that this object describes.
+        sentence_id (int): The ID of the Sentence that this object describes.
+        space_after (str): If there is a space after this Word, then there
+            is a space character here. Otherwise, it is empty.
+        tag (str): The part of speech of this Word in this Sentence.
+        position (int): The position (0-indexed) of the Word in the Sentence.
+    """
+
     word_id = db.Column(db.Integer, db.ForeignKey('word.id'),
         primary_key=True)
     sentence_id = db.Column(db.Integer, db.ForeignKey('sentence.id'),
@@ -251,13 +270,35 @@ class WordInSentence(db.Model):
     word = db.relationship("Word")
     sentence = db.relationship("Sentence")
 
+class DependencyInSentence(db.Model):
+    """Describes a Dependency in a Sentence.
+
+    Since a Dependency always has the same two Words but may appear in
+    different Sentences, it is necessary to describe the positions of the
+    governor and the dependent on a case-by-case basis.
+
+    Attributes:
+        dependency_id (int): The ID of the Dependency in this relationship.
+        sentence_id (int): The ID of the Sentence in this relationship.
+        gov_id (int): The position (0-indexed) of the governor in this
+            relationship.
+        dep_id (int): The position (0-indexed) of the dependency in this
+            relationship.
+    """
+    dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id"),
+        primary_key=True)
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"),
+        primary_key=True)
+    gov_index = db.Column(db.Integer)
+    dep_index = db.Column(db.Integer)
+
 word_in_sequence = db.Table("word_in_sequence",
     db.Column("word_id", db.Integer, db.ForeignKey("word.id")),
     db.Column("sequence_id", db.Integer, db.ForeignKey("sequence.id"))
 )
 
-dependency_in_sentence = db.Table("dependency_in_sentence",
-    db.Column("dependency_id", db.Integer, db.ForeignKey("dependency.id")),
-    db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id"))
-)
+#dependency_in_sentence = db.Table("dependency_in_sentence",
+#    db.Column("dependency_id", db.Integer, db.ForeignKey("dependency.id")),
+#    db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id"))
+#)
 
