@@ -27,6 +27,12 @@ sentences_xref_queries = db.Table("sentences_xref_queries",
     db.Column("query_id", db.Integer, db.ForeignKey("cachedsentences.id"))
 )
 
+sequences_xref_sequencesets = db.Table("sequences_xref_sequencesets",
+    db.metadata,
+    db.Column("sequence_id", db.Integer, db.ForeignKey("sequence.id")),
+    db.Column("sequenceset_id", db.Integer, db.ForeignKey("sequenceset.id")),
+)
+
 class Set(object):
     """This is the basic Set class.
 
@@ -54,8 +60,9 @@ class SequenceSet(db.Model, Base, Set):
         sequences (list?): A list of Sequences (by ID) in this SequenceSet
     """
 
-    #sequences = db.relationship("Sequence") TODO: relationship
-    pass
+    sequences = db.relationship("Sequence",
+        secondary=sequences_xref_sequencesets,
+        backref="sets")
 
 class SentenceSet(db.Model, Base, Set):
     """A Set that can have a list of Sentences in it.
