@@ -4,9 +4,11 @@ Various utilities for use in the view methods.
 
 from flask import request
 
+from .models import SequenceSet
 from app import app
 from app import db
-from . import models
+from app.uploader.models import Sentence
+from app.uploader.models import Word
 
 def table_exists(table):
     """Check if the given table exists in the database.
@@ -98,6 +100,7 @@ def get_phrase_set_memberships():
 def get_relation_id(relation):
     pass
 
+#TODO: unit test
 def get_word_ids(word):
     """Return a list of ``Word`` IDs that correspond to the given surface word.
 
@@ -117,11 +120,10 @@ def get_word_ids(word):
 
     if not lemmatize:
         if not "*" in word:
-            words = db.session.query(Sentence).filter(Sentence.word == word).\
-                all()
+            words = Word.query.filter(Word.word == word.strip()).all()
         else:
-            words = db.session.query(Sentence).\
-                filter(Sentence.word.like(word.replace("*", "%")).all()
+            words = Word.query.\
+                filter(Word.word.like(query_word.replace("*", "%")).all()
 
         return [word.id for word in words]
 
@@ -129,8 +131,8 @@ def get_word_ids(word):
         return get_lemma_variant_ids(word)
 
 #TODO: What are these tables?
-def get_dependency_ids(gov, dep, relation, in_document=[], in_table=None,
-    in_sentence=[], start, limit):
+def get_dependency_ids(gov, dep, relation, start, limit, in_document=[],
+    in_table=None, in_sentence=[]):
     """Get dependencies that match the given criteria.
 
     Arguments:
@@ -152,6 +154,7 @@ def relationship_id_list(words):
     pass
 
 #TODO: can this accept and return a list instead?
+#TODO: depends on get_phrase_id_string
 def word_id_list(raw_words):
     """Convert a list of words to a list of ``Word`` IDs.
 
@@ -169,72 +172,92 @@ def word_id_list(raw_words):
         if "," in words:
             word_list = words.split(",")
 
+    pass
 
-def get_word_ids_from_phrase_set(phrase_set_id):
-    """Returns a string containing all the words in the given
-    phrase set ID.
-
-    Args:
-        phrase_set_id (int): The ID of the phrase set to retrieve word IDs from.
-
-    Returns:
-        list: A list of word IDs.
+#TODO: needs clarification
+def get_words_from_sequence_set(phrase_set_id):
+    """Return a string with all the words in the given word set ID.
     """
 
     lemmatize = request.args.get("all_word_forms") == "on"
 
-    #TODO: what are these strange new tables?
-    pass
+    words = db.session.query(Word).join(SequenceSet).distinct().\
+        filter(SequenceeSet.id == sequence_set_id)
 
-def get_word_ids(word):
-    """Returns a list of all the IDs that correspond to a
-	given surface word. A word can have multiple id's
-	if it has different parts of speech.
+#TODO: merge with above
+def get_word_ids_from_sequence_set(sequence_set_id):
+    """Returns a list containing all the ``Word` IDs in the given
+    ``SequenceSet``.
 
     Args:
-        word (str): The word to look up.
+        sequence_set_id (int): The ID of the ``SequenceSet`` to retrieve word
+            IDs from.
 
     Returns:
-        list: A list of all the given word's IDs.
+        list: A list of every ``Word`` ID present in the given ``SequenceSet``.
     """
 
-    if request.args.get("all_word_forms") == "on":
-        if not "*" in word:
-            result = models.Word.query.filter(Word.word == word.strip()).all()
+    lemmatize = request.args.get("all_word_forms") == "on"
+
+    sequences = db.session.query(Sequence).\
+        distinct().\
+        filter(SequenceSet.id == sequence_set_id).\
+        all()
+
+    ids = []
+
+    for sequence in sequences:
+        if lemmatize:
+            ids.append([get_lemma_variant_ids(word) for word in sequence.words])
         else:
-            query_word = word.replace("%", "*")
-            result = models.Word.query.filter(Word.word.like(query_word)).all()
+            ids.append([word.id for words in sequence.words])
 
-        if len(result):
-            ids = []
-            for row in result:
-                ids.append(row.id)
-            return ids
+    return ids
 
-        else:
-            return []
-
-    else:
-        return get_lemma_variant_ids(word)
-
-def get_lemma_variant_ids(word):
-    """Returns an array of word id's for all the words that have the same lemma
-    as this one.
+#TODO: unit test
+def get_lemma_variant_ids(surface_word):
+    """Get ``Word`` IDs for all words that have the same lemma as this one.
 
     Arguments:
-        word (str): A word to get lemmas for.
+        surface_word (str): The surface word to query.
 
     Returns:
-        list: A list of the IDs of all known words with the same lemma.
+        list: A list of IDs from ``Word`` objects with the same lemma as
+        the given word.
+    """
+    surface_word = surface_word.strip()
+    ids = []
+    lemmas = db.session.query(Word.lemma).\
+        filter(Word.word == surface_word).\
+        all()
+
+    words = db.session.query(Word.id).\
+        filter(Word.lemma in lemmas).\
+        all()
+
+    return words
+
+#TODO: unit test
+def get_lemma_variants(surface_word):
+    """Get the ``word`` attributes of ``Word``s that all have the same lemma
+    as the given word.
+
+    Arguments:
+        surface_word (str): The surface word to query.
+
+    Returns:
+        list: A list of ``word`` attributes from ``Word`` objects with the same
+        lemma as the given word.
     """
 
-    word = word.trim()
-    result = models.Word.query.filter(models.Word.word == word).all()
-    lemmas = [word.lemma for word in result]
+    lemmas = db.session.query(Word.lemma).\
+        filter(Word.word == surface_word).\
+        all()
 
-    if lemmas:
-        result = models.Word.query.filter(models.Word.lemma in lemmas)
-        return [word.id for word in result]
+    words = db.session.query(Word.word).\
+        distinct().\
+        filter(Word.lemma in lemmas).\
+        all()
 
-    return []
+    return words
 
