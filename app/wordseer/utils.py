@@ -123,7 +123,7 @@ def get_word_ids(word):
             words = Word.query.filter(Word.word == word.strip()).all()
         else:
             words = Word.query.\
-                filter(Word.word.like(query_word.replace("*", "%")).all()
+                filter(Word.word.like(query_word.replace("*", "%"))).all()
 
         return [word.id for word in words]
 
@@ -182,9 +182,11 @@ def get_words_from_sequence_set(phrase_set_id):
     lemmatize = request.args.get("all_word_forms") == "on"
 
     words = db.session.query(Word).join(SequenceSet).distinct().\
-        filter(SequenceeSet.id == sequence_set_id)
+        filter(SequenceSet.id == sequence_set_id)
 
-#TODO: merge with above
+#TODO: merge with above?
+#Because we're using this ORM, getting words or word ids or whatever else
+#from Word objects is trivial, and list comprehensions make lists easy to make.
 def get_word_ids_from_sequence_set(sequence_set_id):
     """Returns a list containing all the ``Word` IDs in the given
     ``SequenceSet``.
@@ -217,6 +219,9 @@ def get_word_ids_from_sequence_set(sequence_set_id):
 #TODO: unit test
 def get_lemma_variant_ids(surface_word):
     """Get ``Word`` IDs for all words that have the same lemma as this one.
+
+    That is, get the list of all lemmas whose surface word is ``surface_word``
+    and then return the IDs of all ``Word``s that have those lemmas.
 
     Arguments:
         surface_word (str): The surface word to query.
