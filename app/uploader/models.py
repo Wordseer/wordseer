@@ -251,7 +251,7 @@ class WordInSentence(db.Model):
     Attributes:
         word_id (int): The ID of the Word that this object describes.
         sentence_id (int): The ID of the Sentence that this object describes.
-        space_after (str): If there is a space after this Word, then there
+        space_before (str): If there is a space after this Word, then there
             is a space character here. Otherwise, it is empty.
         tag (str): The part of speech of this Word in this Sentence.
         position (int): The position (0-indexed) of the Word in the Sentence.
@@ -261,7 +261,7 @@ class WordInSentence(db.Model):
         primary_key=True)
     sentence_id = db.Column(db.Integer, db.ForeignKey('sentence.id'),
         primary_key=True)
-    space_after = db.Column(db.String)
+    space_before = db.Column(db.String)
     tag = db.Column(db.String)
     position = db.Column(db.Integer)
 
