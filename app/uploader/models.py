@@ -165,6 +165,7 @@ class Word(db.Model, Base):
     """
 
     word = db.Column(db.String, index = True)
+    lemma = db.Column(db.String)
 
     word_sentences = db.relationship("WordInSentence")
     sentences = association_proxy("word_sentences", "sentence",
