@@ -1,16 +1,21 @@
 """
-Unit tests for the Utils module.
+Unit tests for the utils module.
 """
 
 import unittest
 
-from app import db
 from app import app
+from app import db
+from app.uploader.models import Word
 from app.wordseer import utils
+import common
 
 class TestUtils(unittest.TestCase):
-    """Test the Utils module.
+    """Test the utils module.
     """
+    def setUp(self):
+        common.reset_db()
+
     def test_table_exists(self):
         """Test to make sure that table_exists recognizes every existing table
         and not tables that don't exist.
@@ -51,4 +56,20 @@ class TestUtils(unittest.TestCase):
         )
 
         assert expected == utils.remove_spaces_around_punctuation(sentence)
+
+    def test_get_lemma_variant_ids(self):
+        """Test get_lemma_variant_ids().
+        """
+
+        word1 = Word(word="foo", lemma="bar")
+        word2 = Word(word="foo", lemma="baz")
+        word3 = Word(word="bar", lemma="bar")
+        word4 = Word(word="baz", lemma="qux")
+
+        db.session.add_all([word1, word2, word3, word4])
+        db.session.commit()
+
+        variant_ids = utils.get_lemma_variant_ids("foo")
+
+        assert variant_ids.sort() == [word1.id, word2.id, word3.id].sort()
 
