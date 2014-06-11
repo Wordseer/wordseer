@@ -13,8 +13,16 @@ import common
 class TestUtils(unittest.TestCase):
     """Test the utils module.
     """
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         common.reset_db()
+        cls.word1 = Word(word="foo", lemma="bar")
+        cls.word2 = Word(word="foo", lemma="baz")
+        cls.word3 = Word(word="bar", lemma="bar")
+        cls.word4 = Word(word="baz", lemma="qux")
+
+        db.session.add_all([cls.word1, cls.word2, cls.word3, cls.word4])
+        db.session.commit()
 
     def test_table_exists(self):
         """Test to make sure that table_exists recognizes every existing table
@@ -61,15 +69,17 @@ class TestUtils(unittest.TestCase):
         """Test get_lemma_variant_ids().
         """
 
-        word1 = Word(word="foo", lemma="bar")
-        word2 = Word(word="foo", lemma="baz")
-        word3 = Word(word="bar", lemma="bar")
-        word4 = Word(word="baz", lemma="qux")
-
-        db.session.add_all([word1, word2, word3, word4])
-        db.session.commit()
-
         variant_ids = utils.get_lemma_variant_ids("foo")
 
-        assert variant_ids.sort() == [word1.id, word2.id, word3.id].sort()
+        assert variant_ids.sort() == [self.word1.id, self.word2.id,
+            self.word3.id].sort()
+
+    def test_get_lemma_variants(self):
+        """Test get_lemma_variants()
+        """
+
+        variants = utils.get_lemma_variants("foo")
+
+        assert variants.sort() == [self.word1.word, self.word2.word,
+            self.word3.word].sort()
 
