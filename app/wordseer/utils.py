@@ -1,13 +1,16 @@
 """
 Various utilities for use in the view methods.
 """
+import pdb
 
 from flask import request
 
 from .models import SequenceSet
+from .models import sequences_in_sequencesets
 from app import app
 from app import db
 from app.uploader.models import Sentence
+from app.uploader.models import Sequence
 from app.uploader.models import Word
 
 def table_exists(table):
@@ -174,6 +177,11 @@ def word_id_list(raw_words):
 
     pass
 
+def sequence_id_list(words):
+    """Convert a list of words or phrases to a list of sequence IDs.
+    """
+    pass
+
 #TODO: needs clarification
 def get_words_from_sequence_set(phrase_set_id):
     """Return a string with all the words in the given word set ID.
@@ -200,23 +208,25 @@ def get_word_ids_from_sequence_set(sequence_set_id):
     """
 
     lemmatize = request.args.get("all_word_forms") == "on"
-
     sequences = db.session.query(Sequence).\
+        join(sequences_in_sequencesets).\
         distinct().\
-        filter(SequenceSet.id == sequence_set_id).\
+        filter(sequences_in_sequencesets.c.sequenceset_id == sequence_set_id).\
         all()
 
     ids = []
 
     for sequence in sequences:
         if lemmatize:
-            ids.append([get_lemma_variant_ids(word) for word in sequence.words])
+            for word in sequence.words:
+                #ids.extend(get_lemma_variant_ids(word.word))
+                pass
         else:
-            ids.append([word.id for words in sequence.words])
-
+            for word in sequence.words:
+                #ids.append(word.id)
+                pass
     return ids
 
-#TODO: unit test
 def get_lemma_variant_ids(surface_word):
     """Get ``Word`` IDs for all words that have the same lemma as this one.
 
@@ -231,7 +241,6 @@ def get_lemma_variant_ids(surface_word):
         the given word.
     """
     surface_word = surface_word.strip()
-    ids = []
     lemmas = db.session.query(Word.lemma).\
         filter(Word.word == surface_word).\
         all()
@@ -242,7 +251,7 @@ def get_lemma_variant_ids(surface_word):
 
     return words
 
-#TODO: unit test
+#TODO: merge with above?
 def get_lemma_variants(surface_word):
     """Get the ``word`` attributes of ``Word``s that all have the same lemma
     as the given word.
@@ -265,4 +274,19 @@ def get_lemma_variants(surface_word):
         all()
 
     return words
+
+#TODO: need clarification
+def make_query_string(gov, govtype, dep, deptype, relation, collection,
+    metadata, phrases):
+    """Return a string representing the query in a human-friendly way.
+    """
+    pass
+
+#TODO: cached_filtered_sent_ids vs filtered_sent_ids
+def get_number_of_sentences_in_slice():
+    pass
+
+#TODO: filtered_sent_ids vs cached_filtered_sent_ids
+def get_number_of_documents_in_slice():
+    pass
 

@@ -8,26 +8,26 @@ from app.models import Base
 from app.models import User
 
 # Association tables
-sentences_xref_sentencesets = db.Table("sentences_xref_sentencesets",
+sentences_in_sentencesets = db.Table("sentences_in_sentencesets",
     db.metadata,
     db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id")),
     db.Column("sentenceset_id", db.Integer, db.ForeignKey("sentenceset.id"))
 )
 
 #TODO: are we going to have a Document object?
-documents_xref_documentsets = db.Table("documents_xref_documentsets",
+documents_in_documentsets = db.Table("documents_in_documentsets",
     db.metadata,
     db.Column("document_id", db.Integer, db.ForeignKey("unit.id")),
     db.Column("documentset_id", db.Integer, db.ForeignKey("documentset.id"))
 )
 
-sentences_xref_queries = db.Table("sentences_xref_queries",
+sentences_in_queries = db.Table("sentences_in_queries",
     db.metadata,
     db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id")),
     db.Column("query_id", db.Integer, db.ForeignKey("cachedsentences.id"))
 )
 
-sequences_xref_sequencesets = db.Table("sequences_xref_sequencesets",
+sequences_in_sequencesets = db.Table("sequences_in_sequencesets",
     db.metadata,
     db.Column("sequence_id", db.Integer, db.ForeignKey("sequence.id")),
     db.Column("sequenceset_id", db.Integer, db.ForeignKey("sequenceset.id")),
@@ -61,7 +61,7 @@ class SequenceSet(db.Model, Base, Set):
     """
 
     sequences = db.relationship("Sequence",
-        secondary=sequences_xref_sequencesets,
+        secondary=sequences_in_sequencesets,
         backref="sets")
 
 class SentenceSet(db.Model, Base, Set):
@@ -72,7 +72,7 @@ class SentenceSet(db.Model, Base, Set):
     """
 
     sentences = db.relationship("Sentence",
-        secondary=sentences_xref_sentencesets,
+        secondary=sentences_in_sentencesets,
         backref="sets")
 
 class DocumentSet(db.Model, Base, Set):
@@ -83,7 +83,7 @@ class DocumentSet(db.Model, Base, Set):
     """
 
     documents = db.relationship("Unit",
-        secondary=documents_xref_documentsets,
+        secondary=documents_in_documentsets,
         backref="sets")
 
 class CachedSentences(db.Model, Base):
@@ -101,5 +101,5 @@ class CachedSentences(db.Model, Base):
     """
 
     sentences = db.relationship("Sentence",
-        secondary=sentences_xref_queries)
+        secondary=sentences_in_queries)
 

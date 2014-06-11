@@ -3,11 +3,16 @@ Unit tests for the utils module.
 """
 
 import unittest
+import pdb
+
+import mock
 
 from app import app
 from app import db
+from app.uploader.models import Sequence
 from app.uploader.models import Word
 from app.wordseer import utils
+from app.wordseer.models import SequenceSet
 import common
 
 class TestUtils(unittest.TestCase):
@@ -21,7 +26,14 @@ class TestUtils(unittest.TestCase):
         cls.word3 = Word(word="bar", lemma="bar")
         cls.word4 = Word(word="baz", lemma="qux")
 
-        db.session.add_all([cls.word1, cls.word2, cls.word3, cls.word4])
+        sequence1 = Sequence(words=[cls.word1, cls.word2])
+        sequence2 = Sequence(words=[cls.word4])
+        sequence3 = Sequence(words=[cls.word3])
+        cls.sequenceset1 = SequenceSet(sequences=[sequence1, sequence2])
+        cls.sequenceset2 = SequenceSet(sequences=[sequence3])
+
+        db.session.add_all([sequence1, sequence2, sequence3, cls.sequenceset1,
+            cls.sequenceset2, cls.word1, cls.word2, cls.word3, cls.word4])
         db.session.commit()
 
     def test_table_exists(self):
@@ -82,4 +94,33 @@ class TestUtils(unittest.TestCase):
 
         assert variants.sort() == [self.word1.word, self.word2.word,
             self.word3.word].sort()
+
+    @mock.patch("app.wordseer.utils.request", autospec=True)
+    def test_get_word_ids_from_sequence_set(self, mock_request):
+        """Test the get_word_ids_from_sequence_set method with
+        all_word_forms on.
+        """
+
+        mock_request.args = {"all_word_forms": "off"}
+
+        with app.test_request_context():
+            word_ids = utils.get_word_ids_from_sequence_set(self.sequenceset1.id)
+
+        assert word_ids.sort() == [self.word1.id, self.word2.id,
+            self.word4.id].sort()
+
+
+    @mock.patch("app.wordseer.utils.request", autospec=True)
+    def test_lemmatize_get_word_ids_from_sequence_set(self, mock_request):
+        """Test the get_word_ids_from_sequence_set method with
+        all_word_forms off.
+        """
+
+        mock_request.args = {"all_word_forms": "on"}
+
+        with app.test_request_context():
+            word_ids = utils.get_word_ids_from_sequence_set(self.sequenceset1.id)
+
+        assert word_ids.sort() == [self.word1.id, self.word2.id, self.word3.id,
+            self.word4.id].sort()
 
