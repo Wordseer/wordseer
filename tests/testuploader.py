@@ -16,18 +16,11 @@ from app import db
 from app import user_datastore
 from app.uploader.models import *
 from app.models import *
-
-def reset_db():
-    open(application.config["SQLALCHEMY_DATABASE_PATH"], 'w').close()
-    engine = create_engine(application.config["SQLALCHEMY_DATABASE_URI"])
-    db.Model.metadata.create_all(engine)
-
-def tearDownModule():
-    os.remove(application.config["SQLALCHEMY_DATABASE_PATH"])
+import common
 
 class TestModels(unittest.TestCase):
     def setUp(self):
-        reset_db()
+        common.reset_db()
 
     def test_model_word(self):
         """Test to make sure that the atttributes of the Word model can be
@@ -186,7 +179,7 @@ class ViewsTests(unittest.TestCase):
         """Clear the database for the next unit test.
         """
         self.client = application.test_client()
-        reset_db()
+        common.reset_db()
         user_datastore.create_user(email="foo@foo.com", password="password")
         db.session.commit()
         with self.client.session_transaction() as sess:
@@ -544,7 +537,7 @@ class AuthTests(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        reset_db()
+        common.reset_db()
         cls.client = application.test_client()
         user_datastore.create_user(email="foo@foo.com", password="password")
         user_datastore.create_user(email="bar@bar.com", password="password")
@@ -603,7 +596,7 @@ class LoggedOutTests(unittest.TestCase):
     def setUpClass(cls):
         """Reset the DB and create a dummy project and document.
         """
-        reset_db()
+        common.reset_db()
         cls.client = application.test_client()
 
         project = Project(name="Bar's project", user=2)
