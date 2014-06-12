@@ -82,9 +82,10 @@ class TestUtils(unittest.TestCase):
         """
 
         variant_ids = utils.get_lemma_variant_ids("foo")
+        pdb.set_trace()
 
-        assert variant_ids.sort() == [self.word1.id, self.word2.id,
-            self.word3.id].sort()
+        assert sorted(variant_ids) == sorted([self.word1.id, self.word2.id,
+            self.word3.id])
 
     def test_get_lemma_variants(self):
         """Test get_lemma_variants()
@@ -92,8 +93,8 @@ class TestUtils(unittest.TestCase):
 
         variants = utils.get_lemma_variants("foo")
 
-        assert variants.sort() == [self.word1.word, self.word2.word,
-            self.word3.word].sort()
+        assert sorted(variants) == sorted([self.word1.word, self.word2.word,
+            self.word3.word])
 
     @mock.patch("app.wordseer.utils.request", autospec=True)
     def test_get_word_ids_from_sequence_set(self, mock_request):
@@ -104,10 +105,12 @@ class TestUtils(unittest.TestCase):
         mock_request.args = {"all_word_forms": "off"}
 
         with app.test_request_context():
-            word_ids = utils.get_word_ids_from_sequence_set(self.sequenceset1.id)
+            word_ids = utils.get_word_ids_from_sequence_set(
+                self.sequenceset1.id)
 
-        assert word_ids.sort() == [self.word1.id, self.word2.id,
-            self.word4.id].sort()
+        pdb.set_trace()
+        assert sorted(word_ids) == sorted([self.word1.id, self.word2.id,
+            self.word4.id])
 
 
     @mock.patch("app.wordseer.utils.request", autospec=True)
@@ -119,8 +122,19 @@ class TestUtils(unittest.TestCase):
         mock_request.args = {"all_word_forms": "on"}
 
         with app.test_request_context():
-            word_ids = utils.get_word_ids_from_sequence_set(self.sequenceset1.id)
+            word_ids = utils.get_word_ids_from_sequence_set(
+                self.sequenceset1.id)
 
-        assert word_ids.sort() == [self.word1.id, self.word2.id, self.word3.id,
-            self.word4.id].sort()
+        assert sorted(word_ids) == sorted([self.word1.id, self.word2.id,
+            self.word3.id, self.word4.id])
+
+    @mock.patch("app.wordseer.utils.request", autospec=True)
+    def test_get_word_ids_from_surface_word(self, mock_request):
+        """Test the get_word_ids_from_surface_word method
+        """
+
+        mock_request.args = {"all_word_forms": "on"}
+
+        with app.test_request_context():
+            word_ids = utils.get_word_ids_from_surface_word("foo")
 

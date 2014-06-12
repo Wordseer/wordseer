@@ -104,7 +104,7 @@ def get_relation_id(relation):
     pass
 
 #TODO: unit test
-def get_word_ids(word):
+def get_word_ids_from_surface_word(word):
     """Return a list of ``Word`` IDs that correspond to the given surface word.
 
     A surface word could have multiple IDs if it has different possible
@@ -213,19 +213,17 @@ def get_word_ids_from_sequence_set(sequence_set_id):
         distinct().\
         filter(sequences_in_sequencesets.c.sequenceset_id == sequence_set_id).\
         all()
+    pdb.set_trace()
 
     ids = []
 
     for sequence in sequences:
-        if lemmatize:
-            for word in sequence.words:
-                #ids.extend(get_lemma_variant_ids(word.word))
-                pass
-        else:
-            for word in sequence.words:
-                #ids.append(word.id)
-                pass
-    return ids
+        for word in sequence.words:
+            if lemmatize:
+                ids.extend(get_lemma_variant_ids(word.word))
+            else:
+                ids.append(word.id)
+    return list(set(ids))
 
 def get_lemma_variant_ids(surface_word):
     """Get ``Word`` IDs for all words that have the same lemma as this one.
@@ -241,15 +239,17 @@ def get_lemma_variant_ids(surface_word):
         the given word.
     """
     surface_word = surface_word.strip()
-    lemmas = db.session.query(Word.lemma).\
+    lemmas = db.session.query(Word).\
         filter(Word.word == surface_word).\
         all()
 
+    lemma_list = [word.lemma for word in lemmas]
+
     words = db.session.query(Word.id).\
-        filter(Word.lemma in lemmas).\
+        filter(Word.lemma.in_(lemma_list)).\
         all()
 
-    return words
+    return [word.id for word in words]
 
 #TODO: merge with above?
 def get_lemma_variants(surface_word):
@@ -264,16 +264,18 @@ def get_lemma_variants(surface_word):
         lemma as the given word.
     """
 
-    lemmas = db.session.query(Word.lemma).\
+    lemmas = db.session.query(Word).\
         filter(Word.word == surface_word).\
         all()
 
-    words = db.session.query(Word.word).\
+    lemma_list = [word.lemma for word in lemmas]
+
+    words = db.session.query(Word).\
         distinct().\
-        filter(Word.lemma in lemmas).\
+        filter(Word.lemma.in_(lemma_list)).\
         all()
 
-    return words
+    return [word.word for word in words]
 
 #TODO: need clarification
 def make_query_string(gov, govtype, dep, deptype, relation, collection,
