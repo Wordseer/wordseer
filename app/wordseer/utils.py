@@ -30,14 +30,14 @@ def table_exists(table):
         return False
     return True
 
+#TODO: evaluate this method's usefulness
+#TODO: unit testing
 def get_relation_description(relation):
     """Do we really need this method? What exactly does it do?
 
     Arguments:
         relation (str):
     """
-    #TODO: evaluate this method's usefulness
-    #TODO: unit testing
     if "none" in relation:
         return ""
     if "" in relation:
@@ -93,24 +93,26 @@ def get_words_in_sentence(sentence_id):
     Arguments:
         sentence_id (int): The ID of the sentence to query.
     """
+    words = db.session.query(SentenceInWord).\
+        filter(SentenceInWord.c.sentence_id == sentence_id).\
+        order_by(SentenceInWord.c.position).\
+        all()
+
     pass
 
 #TODO: needs clarification
-def get_phrase_set_memberships():
+def get_sequence_set_memberships():
     pass
 
 #TODO: needs clarification
 def get_relation_id(relation):
     pass
 
-#TODO: unit test
 def get_word_ids_from_surface_word(word):
     """Return a list of ``Word`` IDs that correspond to the given surface word.
 
     A surface word could have multiple IDs if it has different possible
-    lemmas depending on context.
-
-    TODO: what does lemmatize do?
+    lemmas depending on context. ``*`` may be used as a one-character wildcard.
 
     Arguments:
         word (str): The word to query for.
@@ -121,12 +123,14 @@ def get_word_ids_from_surface_word(word):
     lemmatize = request.args.get("all_word_forms") == "on"
     word = word.strip()
 
+    pdb.set_trace()
+
     if not lemmatize:
         if not "*" in word:
-            words = Word.query.filter(Word.word == word.strip()).all()
+            words = Word.query.filter(Word.word == word).all()
         else:
             words = Word.query.\
-                filter(Word.word.like(query_word.replace("*", "%"))).all()
+                filter(Word.word.like(word.replace("*", "%"))).all()
 
         return [word.id for word in words]
 
@@ -157,30 +161,61 @@ def relationship_id_list(words):
     pass
 
 #TODO: can this accept and return a list instead?
-#TODO: depends on get_phrase_id_string
+#TODO: unit testing
 def word_id_list(raw_words):
     """Convert a list of words to a list of ``Word`` IDs.
 
     Arguments:
-        raw_words (str): A list of words to look up.
+        raw_words (str): A list of words to look up. This list can be comma
+            separated or space separated.
 
     Returns:
         str: A comma separated list of IDs for all the words given.
     """
 
-    #raw_words = [raw_word.replace("+", "").strip() for raw_word in raw_words]
     words = words.replace("+", "").strip()
+    all_ids = []
     if words:
         word_list = words.split(" ")
         if "," in words:
             word_list = words.split(",")
+        #TODO: why?
+        all_ids = [-2]
+        for word in word_list:
+            all_ids.extend(get_word_ids_from_surface_word(word))
 
-    pass
+    return all_ids
 
-def sequence_id_list(words):
-    """Convert a list of words or phrases to a list of sequence IDs.
+#TODO: is this words? sequences? both?
+#TODO: why not return objects
+#TODO: plus separation does not work
+def sequence_id_list(sequences):
+    """Convert a list of phrases to a list of sequence IDs.
+
+    Arguments:
+        words (str): A list of sequences to convert. This may be comma separated
+            or space separated, with plusses translating to ???
+
+    Returns:
+        list: A list of ``Sequence`` IDs.
     """
-    pass
+
+    words = words.strip()
+    all_ids = [-2] #TODO: why?
+    if "," in sequences:
+        sequence_list = sequences.split(",")
+    elif "+" in sequences:
+        sequence_list = sequences.replace("+", "").split(" ")
+    else:
+        sequence_list = [sequences]
+
+    for sequence in sequence_list:
+        sequence_ids = db.session.query(Sequence).\
+            filter(Sequence.sequence == sequence).\
+            all()
+        all_ids.extend(sequence_ids)
+
+    return all_ids
 
 #TODO: needs clarification
 def get_words_from_sequence_set(phrase_set_id):
@@ -213,7 +248,6 @@ def get_word_ids_from_sequence_set(sequence_set_id):
         distinct().\
         filter(sequences_in_sequencesets.c.sequenceset_id == sequence_set_id).\
         all()
-    pdb.set_trace()
 
     ids = []
 

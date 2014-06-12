@@ -82,7 +82,6 @@ class TestUtils(unittest.TestCase):
         """
 
         variant_ids = utils.get_lemma_variant_ids("foo")
-        pdb.set_trace()
 
         assert sorted(variant_ids) == sorted([self.word1.id, self.word2.id,
             self.word3.id])
@@ -108,7 +107,6 @@ class TestUtils(unittest.TestCase):
             word_ids = utils.get_word_ids_from_sequence_set(
                 self.sequenceset1.id)
 
-        pdb.set_trace()
         assert sorted(word_ids) == sorted([self.word1.id, self.word2.id,
             self.word4.id])
 
@@ -130,11 +128,30 @@ class TestUtils(unittest.TestCase):
 
     @mock.patch("app.wordseer.utils.request", autospec=True)
     def test_get_word_ids_from_surface_word(self, mock_request):
-        """Test the get_word_ids_from_surface_word method
+        """Test the get_word_ids_from_surface_word method with all_word_forms
+        off.
+        """
+
+        mock_request.args = {"all_word_forms": "off"}
+
+        with app.test_request_context():
+            word_ids = utils.get_word_ids_from_surface_word("fo*")
+
+        assert sorted(word_ids) == sorted([self.word1.id, self.word2.id])
+
+    @unittest.skip("Waiting for clarification")
+    @mock.patch("app.wordseer.utils.request", autospec=True)
+    def test_get_word_ids_from_surface_word(self, mock_request):
+        """Test the get_word_ids_from_surface_word method with all_word_forms
+        on.
         """
 
         mock_request.args = {"all_word_forms": "on"}
 
         with app.test_request_context():
-            word_ids = utils.get_word_ids_from_surface_word("foo")
+            word_ids = utils.get_word_ids_from_surface_word("fo*")
+
+        pdb.set_trace()
+
+        assert sorted(word_ids) == sorted([self.word1.id, self.word2.id])
 
