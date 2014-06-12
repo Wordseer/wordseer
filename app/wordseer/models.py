@@ -40,7 +40,7 @@ class Set(object):
     A Set model has an association with a User and has some properties like a
     name and a creation date.
 
-    Keyword Args:
+    Attributes:
         user_id (int): The ID of the user that owns this Set
         name (str): The name of this Set
         creation_date (str): A date.DateTime object of when this Set was created
@@ -56,7 +56,7 @@ class Set(object):
 class SequenceSet(db.Model, Base, Set):
     """SequenceSet is a Set that can have a list of Sequences in it.
 
-    Keyword Args:
+    Attributes:
         sequences (list?): A list of Sequences (by ID) in this SequenceSet
     """
 
@@ -67,7 +67,7 @@ class SequenceSet(db.Model, Base, Set):
 class SentenceSet(db.Model, Base, Set):
     """A Set that can have a list of Sentences in it.
 
-    Keyword Args:
+    Attributes:
         sentences (list?): A list of Sentences (by ID) in this SentenceSet
     """
 
@@ -78,7 +78,7 @@ class SentenceSet(db.Model, Base, Set):
 class DocumentSet(db.Model, Base, Set):
     """A Set that can have a list of Documents in it.
 
-    Keyword Args:
+    Attributes:
         document (list?): A list of Documents (by ID) in this DocumentSet
     """
 
@@ -96,10 +96,34 @@ class CachedSentences(db.Model, Base):
     This model stores the relevant query ID and a list of Sentences. The
     query ID of a given entry is its ID.
 
-    Keyword Args:
+    Attributes:
         sentences (list?): A list of Sentences connected with this query.
     """
 
     sentences = db.relationship("Sentence",
         secondary=sentences_in_queries)
+
+class PropertyMetadata(db.Model, Base):
+    """Describes ``Property`` objects of the same type: metametadata, if you
+    will.
+
+    ``Property``s must have additional data attached to it to describe to
+    wordseer what should be done with it.
+
+    Attributes:
+        type (str): The type of these ``Property``s (string, int, date, etc.)
+        filterable (boolean): If True, then this ``Property`` object should be
+            filterable in the wordseer interface.
+        property_name (str): The name of the property that this object is
+            describing; this is the same as the ``name`` of the
+            ``Property`` object described.
+        display (boolean): If True, then the ``Property`` objects described
+            by this object should have their names and values described in
+            the reading view on the frontend.
+    """
+
+    type = db.Column(db.String)
+    filterable = db.Column(db.Boolean)
+    property_name = db.Column(db.String)
+    display = db.Column(db.String)
 
