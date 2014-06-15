@@ -114,7 +114,7 @@ class PropertyMetadata(db.Model, Base):
         type (str): The type of these ``Property``s (string, int, date, etc.)
         filterable (boolean): If True, then this ``Property`` object should be
             filterable in the wordseer interface.
-        property_name (str): The name of the property that this object is
+        display_name (str): The name of the property that this object is
             describing; this is the same as the ``name`` of the
             ``Property`` object described.
         display (boolean): If True, then the ``Property`` objects described
@@ -123,7 +123,17 @@ class PropertyMetadata(db.Model, Base):
     """
 
     type = db.Column(db.String)
-    filterable = db.Column(db.Boolean)
-    property_name = db.Column(db.String)
-    display = db.Column(db.String)
+    is_category = db.Column(db.Boolean)
+    display_name = db.Column(db.String)
+    display = db.Column(db.Boolean)
+
+class WorkingSet(db.Model, Base):
+    """Every *Set has a corresponding WorkingSet entry (one-to-one). If
+    possible, it would be nice if this was done better.
+    """
+
+    set_id = db.Column(db.Integer)
+    set_type = db.Column(db.String)
+    username = db.Column(db.String)
+    #date =
 
