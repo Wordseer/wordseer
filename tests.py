@@ -2,10 +2,11 @@ import os
 import unittest
 
 from app.models import *
+from database import prep_test
 
 class TestCase(unittest.TestCase):
     def setUp(self):
-        pass
+        prep_test()
 
     def tearDown(self):
         pass
@@ -47,6 +48,7 @@ class TestCase(unittest.TestCase):
         u1.properties.append(p1)
 
         print("sentence.words", s1.words)
+        print("word.sentences", w1.sentences)
         print("unit.sentences", u1.sentences)
         print("unit.properties", u1.properties)
 
@@ -79,50 +81,26 @@ class TestCase(unittest.TestCase):
         print("Children of u1", u1.children)
         print("u3's parent", u3.parent)
 
-    def test_sample_document(self):
-        """Test turning a document file into the corresponding models.
+        # Make a document
+        d1 = Document("test", "path/to/d1")
+        d1.save()
 
-        Once a document has been imported as an object, it should use the
-        Unit constructor to initialize and save all models for the document.
-        """
+        print("New document", str(d1))
+        print("Document unit", str(d1.unit))
 
-        # Import the document.
-        document = self.import_document("sample_document.txt")
-        doc_unit = Unit(document)
+        # Add units to the document
+        d1.children.append(u1)
+        d1.save()
 
-        # Look at document contents
-        print(doc_unit.sentences)
+        print("Children of d1", str(d1.children))
+        print("Parent of u1", str(u1.parent.document))
+
 
     """
     #######
     Helpers
     #######
     """
-
-    def import_document(self, filename):
-        """Simulate a document import without using a processor.
-        """
-
-        doc_dict = dict()
-        doc_dict["subunits"] = dict()
-        doc_dict["properties"] = dict()
-        doc_dict["sentences"] = list()
-
-        with open(filename) as document:
-            for line in document:
-                words = line.split()
-
-                if words:
-                    if words[0][-1] == ":":
-                        doc_dict["properties"][words[0][:-1]] = " ".join(words[1:])
-                    else:
-                        doc_dict["sentences"].append((line, words))
-                else:
-                    # Empty line
-                    doc_dict["sentences"].append(("", ["\n"]))
-
-        print(doc_dict)
-        return doc_dict
 
 if __name__ == '__main__':
     unittest.main()
