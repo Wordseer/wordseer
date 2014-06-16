@@ -1,16 +1,17 @@
 # Modified from:
 # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
-from app import app, db
 import os
-import shutil
-import imp
+from sys import argv
+
+from app import app, db
 
 from migrate.versioning import api
-from sys import argv
+import imp
+import shutil
 from sqlalchemy import create_engine
 
-
 SQLALCHEMY_DATABASE_URI = app.config["SQLALCHEMY_DATABASE_URI"]
+print SQLALCHEMY_DATABASE_URI
 SQLALCHEMY_MIGRATE_REPO = app.config["SQLALCHEMY_MIGRATE_REPO"]
 
 def create():
@@ -19,27 +20,36 @@ def create():
         api.create(SQLALCHEMY_MIGRATE_REPO, 'database repository')
         api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
     else:
-        api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO, api.version(SQLALCHEMY_MIGRATE_REPO))
+        api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO,
+            api.version(SQLALCHEMY_MIGRATE_REPO))
 
 def migrate():
-    migration = SQLALCHEMY_MIGRATE_REPO + '/versions/%03d_migration.py' % (api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO) + 1)
+    migration = (SQLALCHEMY_MIGRATE_REPO +
+        '/versions/%03d_migration.py' % (api.db_version(SQLALCHEMY_DATABASE_URI,
+        SQLALCHEMY_MIGRATE_REPO) + 1))
     tmp_module = imp.new_module('old_model')
-    old_model = api.create_model(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
+    old_model = api.create_model(SQLALCHEMY_DATABASE_URI,
+        SQLALCHEMY_MIGRATE_REPO)
+    #FIXME
     exec old_model in tmp_module.__dict__
-    script = api.make_update_script_for_model(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO, tmp_module.meta, db.metadata)
+    script = api.make_update_script_for_model(SQLALCHEMY_DATABASE_URI,
+        SQLALCHEMY_MIGRATE_REPO, tmp_module.meta, db.metadata)
     open(migration, "wt").write(script)
     api.upgrade(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
     print('New migration saved as ' + migration)
-    print('Current database version: ' + str(api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)))
+    print('Current database version: ' +
+        str(api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)))
 
 def upgrade():
     api.upgrade(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
-    print 'Current database version: ' + str(api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO))
+    print('Current database version: ' +
+        str(api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)))
 
 def downgrade():
     v = api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
     api.downgrade(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO, v - 1)
-    print 'Current database version: ' + str(api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO))
+    print('Current database version: ' +
+        str(api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)))
 
 def drop():
     os.remove(SQLALCHEMY_DATABASE_URI.split('///')[-1])
@@ -82,7 +92,7 @@ if __name__ == "__main__":
     elif argv[1] == "drop":
         drop()
     elif argv[1] == "reset":
-        prep_test()
+        reset()
     elif argv[1] == "prep_test":
         prep_test()
     else:

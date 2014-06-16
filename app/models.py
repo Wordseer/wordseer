@@ -1,17 +1,16 @@
 """
+Models for the wordseer frontend as a whole.
 
-===========
-Data Models
-===========
-
-This module contains the model-level logic, built on SQLAlchemy.
-
+These models set up user authentication, which is used by all blueprints in
+the application.
 """
 
-from app import db
+from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
 import re
+
+from app import db
 
 class Base(object):
     """This is a mixin to add to Flask-SQLAlchemy"s db.Model class.
@@ -19,13 +18,6 @@ class Base(object):
 
     # Define the primary key
     id = db.Column(db.Integer, primary_key=True)
-
-    @declared_attr
-    def __tablename__(cls):
-        """Convert camel case class name to snake for the tables.
-        """
-        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', cls.__name__)
-        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
     def save(self):
         """Commits this model instance to the database
@@ -76,6 +68,32 @@ class Base(object):
 Models
 ######
 """
+
+roles_users = db.Table('roles_users',
+        db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+        db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+
+class Role(db.Model, RoleMixin):
+    """Represents a flask-security user role.
+    """
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
+class User(db.Model, UserMixin):
+    """Represents a flask-security user.
+    """
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), unique=True)
+    password = db.Column(db.String(255))
+    active = db.Column(db.Boolean())
+    confirmed_at = db.Column(db.DateTime())
+    roles = db.relationship('Role', secondary=roles_users,
+        backref=db.backref('users', lazy='dynamic'))
+
+    sets = db.relationship("Set", backref="user")
+
 
 class Collection(db.Model, Base):
     """A collection of documents.
@@ -327,7 +345,6 @@ class Word(db.Model, Base):
 
     Relationships:
       has many: sentences
-
     """
 
     # Attributes

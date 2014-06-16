@@ -1,0 +1,42 @@
+{% import "macros.html" as macros %}
+{% extends "item_list.html" %}
+{% block title %}Projects{% endblock %}
+{% block page_header %}
+    {{ macros.breadcrumbs([("", "Projects")]) }}
+{% endblock %}
+{% block creation_header %}Create new project{% endblock %}
+{% block creation_form %}
+    <form method="POST" enctype="multipart/form-data" class="form-inline"
+        role="form">
+        {{ macros.render_errors(create_form.name.errors) }}
+        {{ create_form.hidden_tag() }}
+        {{ macros.render_field(create_form.name, label_class="sr-only",
+            show_errors=False) }}
+        {{ create_form.create_button(class="btn btn-primary",
+            icon="glyphicon-ok") }}
+    </form>
+{% endblock %}
+{% block list_header %}Existing projects{% endblock %}
+{% block list_form %}
+    {% if process_form.selection.choices %}
+        <form method="POST" role="form">
+            {{ process_form.hidden_tag() }}
+            {{ macros.selection_table(process_form.selection,
+                "project",
+                "table table-striped table-hover click-anywhere",
+                "Project Name", "uploader.project_show") }}
+            <h3>Selected file actions:</h3>
+            {{ process_form.process_button(class="btn btn-primary",
+                icon="glyphicon-tasks") }}
+            {{ process_form.delete_button(class="btn btn-danger",
+                icon="glyphicon-remove") }}
+            {{ macros.render_errors(process_form.selection.errors) }}
+        </form>
+    {% else %}
+        <p>You own no projects.</p>
+    {% endif %}
+{% endblock %}
+{% block toplevel %}
+    {{ macros.modal_confirmation() }}
+{% endblock %}
+

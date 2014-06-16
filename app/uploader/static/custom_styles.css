@@ -1,0 +1,55 @@
+.select {
+    width: 50px;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 999px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    background: red;
+    cursor: inherit;
+    display: block;
+}
+input[readonly] {
+    background-color: white !important;
+    cursor: text !important;
+}
+
+.align-top {
+    display: inline-block !important;
+    vertical-align: top;
+}
+
+.left-margin {
+    margin-left: 5px;
+}
+
+nav {
+    margin-top: 10px;
+}
+
+.alert h2:first-child {
+    margin-top: 0;
+}
+
+form + div.alert, input+div.alert, div.form-group+div.alert {
+    margin-top: 15px;
+}
+
+.navbar-nav>li>span {
+    color: #777;
+    line-height: 20px;
+    position: relative;
+    display: block;
+    padding: 15px 15px;
+}

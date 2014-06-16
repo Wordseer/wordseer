@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %} Home {% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Welcome to WordSeer!</h1>
+        <p>This is an online interface to the WordSeer NLP tool.</p>
+        <p>
+            {% if current_user.is_authenticated() %}
+                <a class="btn btn-primary btn-lg"
+                    href="{{ url_for('uploader.projects') }}" role="button">
+                    Projects
+                </a>
+            {% else %}
+                <a class="btn btn-primary btn-lg"
+                    href="{{ url_for_security('login') }}" role="button">
+                    Log in
+                </a>
+            {% endif %}
+        </p>
+    </div>
+{% endblock %}

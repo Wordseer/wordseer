@@ -1,0 +1,7 @@
+# This directory needs to exist for uploads to work, but git does not support
+# empty directories.
+
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore

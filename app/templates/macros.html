@@ -1,0 +1,169 @@
+{% macro modal_confirmation() -%}
+{# Print a confirmation dialog for deletions. This is currently
+non-functional. #}
+<div class="modal fade" id="confirmDelete" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Delete Parmanently</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure about this ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirm">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro render_field(field, label_class="", field_class="",
+    show_errors=True, button=None, help="") -%}
+    {# Render a form field with associated bootstrap code. All extra kwargs
+    will be passed on to the field function.
+
+    Args:
+        field: The field to render.
+
+    Params:
+        label_class: A string of the class to add to the label, default none.
+        field_class: A string of the class to add to the field, default none.
+        show_errors: If True (default), print the errors for this field as the
+            last thing.
+        button: If set to a field, render this field within the form-group.
+            Useful for rendering buttons within a form-group.
+        help: If set to a string, render this string in a <p class="help-block">
+            before the errors but after the form-group.
+    #}
+
+    {% set placeholder = field.label.text %}
+    <div class="form-group{% if field.errors %} has-error
+        has-feedback{% endif %}">
+    {% if field.type == "FileField" %}
+        <div class="input-group col-xs-6 col-md-4 pull-left">
+            <span class="input-group-btn">
+                <span class="btn btn-primary btn-file">
+                    {{ field.label(class="sr-only") }}
+                    {{ field.label.text }}
+                    {{ field(**kwargs)|safe }}
+                </span>
+            </span>
+            <input type="text" class="form-control" readonly>
+        </div>
+    {% elif field.type == "BooleanField" %}
+        <div class="checkbox">
+            <label {% if label_class %}class="{{ label_class }}"{% endif %}>
+                {{ field(**kwargs) }}{{ field.label.text }}
+            </label>
+        </div>
+    {% else %}
+        {{ field.label(class=label_class) }}
+        {{ field(placeholder=field.label.text, class="form-control " +
+            field_class, **kwargs)|safe }}
+    {% endif %}
+    {% if button %}
+        {{ button }}
+    {% endif %}
+    </div>
+    {% if help %}
+        <p class="help-block">
+            {{ help }}
+        </p>
+    {% endif %}
+    {% if show_errors %}
+        {{ render_errors(field.errors) }}
+    {% endif %}
+{%- endmacro %}
+
+{% macro render_errors(errors) %}
+    {# Given a list of errors, render them in a bootstrap alert-danger div.
+
+    Args:
+        errors: A list of errors.
+    #}
+    {% if errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro breadcrumbs(links) -%}
+    {# Given a list of breadcrumbs, print them in order.
+
+    Args:
+        links: A list of tuples in the format (url, text). The first tuple
+        will be the leftmost item in the breadcrumb chain.
+    #}
+
+    {% for url, text in links %}
+        {% set suffix = " » " %}
+        {% if loop.last %}
+            {% set suffix = "" %}
+        {% endif %}
+        {% if url %}
+            <a href="{{ url }}">{{ text }}</a>{{ suffix }}
+        {% else %}
+            {{ text }}
+        {% endif %}
+    {% endfor %}
+{%- endmacro %}
+
+{% macro selection_table(choices, type, table_class, heading, link_dest) %}
+    {# Print a list of documents or projects, with the ability to select
+    and links to the page of each element.
+
+    This is a two-column table, with the first column being checkboxes and
+    headed by a link to select every checkbox.
+
+    Args:
+        choices: The list of choices, as from a MultiCheckboxField.
+        type: Either "document" or "project", which changes how the link is
+            created.
+        table_class: The class to use for the table.
+        heading: The heading for the second column.
+        link_dest: The first argument to pass to url_for.
+    #}
+
+    <table class="{{ table_class }}">
+        <thead>
+            <tr>
+                <th class="select">
+                    Select (<a href="#" id="check-all">All</a>)
+                </th>
+                <th>
+                    {{ heading }}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for choice in choices %}
+                <tr>
+                    <td>
+                        {{ choice }}
+                    </td>
+                    <td>
+                        <label for="{{ choice.id }}">
+                            {% if "project" in type %}
+                                <a href="{{ url_for(link_dest,
+                                    project_id=choice.data, **kwargs) }}">
+                            {% elif "document" in type %}
+                                <a href="{{ url_for(link_dest,
+                                    document_id=choice.data, **kwargs) }}">
+                            {% endif %}
+                                {{ choice.label.text }}
+                            </a>
+                        </label>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
