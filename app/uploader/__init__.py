@@ -17,20 +17,4 @@ from .views import *
 
 from . import errors
 
-def generate_form_token():
-    """Sets a token to prevent double posts."""
-    if '_form_token' not in session:
-        form_token = ''.join(
-            [random.choice(ascii_letters+digits) for i in range(32)])
-        session['_form_token'] = form_token
-    return session['_form_token']
-
-@uploader.before_request
-def check_form_token():
-    """Checks for a valid form token in POST requests."""
-    if request.method == 'POST':
-        token = session.pop('_form_token', None)
-        if not token or token != request.form.get('_form_token'):
-            redirect(request.url)
-
-uploader.app_template_global(generate_form_token)
+uploader.app_template_global(views.generate_form_token)
