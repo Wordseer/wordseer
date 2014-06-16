@@ -1,7 +1,7 @@
 """Error handlers for the wordseer blueprint.
 """
 
-from . import exceptiomns
+from . import exceptions
 from . import uploader
 from . import helpers
 

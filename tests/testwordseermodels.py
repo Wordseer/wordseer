@@ -4,10 +4,10 @@
 import unittest
 
 from app import db
-from app.wordseer.models import Set
-from app.wordseer.models import SequenceSet
-from app.wordseer.models import SentenceSet
-from app.wordseer.models import DocumentSet
+from app.models import Set
+from app.models import SequenceSet
+from app.models import SentenceSet
+from app.models import DocumentSet
 from common import reset_db
 
 class TestSets(unittest.TestCase):
