@@ -11,7 +11,7 @@ from flask.views import View
 from app import app
 from app import db
 from .. import wordseer
-from .. import utils
+from .. import helpers
 from ..models import CachedSentences
 from ...uploader.models import WordInSentence
 

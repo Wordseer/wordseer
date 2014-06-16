@@ -20,7 +20,7 @@ from app.models import User
 from . import exceptions
 from . import forms
 from .models import Unit, Project
-from . import shortcuts
+from . import helpers
 from . import uploader
 
 def generate_form_token():
@@ -43,19 +43,19 @@ def check_form_token():
 def project_not_found(error):
     """This handles the user trying to view a project that does not exist.
     """
-    return shortcuts.not_found("project")
+    return helpers.not_found("project")
 
 @uploader.errorhandler(exceptions.DocumentNotFoundException)
 def document_not_found(error):
     """This handles the user trying to view a document that does not exist.
     """
-    return shortcuts.not_found("document")
+    return helpers.not_found("document")
 
 @uploader.errorhandler(404)
 def page_not_found(error):
     """This handles the user trying to view a general page that does not exist.
     """
-    return shortcuts.not_found("page")
+    return helpers.not_found("page")
 
 class CLPDView(View):
     """This is a pluggable view to handle CLPD (Create, List, Process, Delete)
@@ -142,10 +142,10 @@ class CLPDView(View):
 
         self.set_choices(**kwargs)
 
-        if shortcuts.really_submitted(self.create_form):
+        if helpers.really_submitted(self.create_form):
             self.handle_create(**kwargs)
 
-        elif shortcuts.really_submitted(self.process_form):
+        elif helpers.really_submitted(self.process_form):
             self.handle_process(**kwargs)
 
         self.reset_fields()
@@ -222,7 +222,7 @@ class ProjectCLPD(CLPDView):
         """Make sure this project exists and make sure that this user can see
         the project.
         """
-        self.project = shortcuts.get_object_or_exception(Project,
+        self.project = helpers.get_object_or_exception(Project,
             Project.id == kwargs["project_id"],
             exceptions.ProjectNotFoundException)
 
@@ -292,7 +292,7 @@ def document_show(project_id, document_id):
     :param int doc_id: The document to retrieve details for.
     """
 
-    document = shortcuts.get_object_or_exception(Unit,
+    document = helpers.get_object_or_exception(Unit,
         Unit.id == document_id, exceptions.DocumentNotFoundException)
 
     # Test if this user can see it
