@@ -17,11 +17,11 @@ from werkzeug import secure_filename
 from app import app
 from app import db
 from app.models import User
-from . import exceptions
-from . import forms
-from .models import Unit, Project
-from . import helpers
-from . import uploader
+from .. import exceptions
+from .. import forms
+from ...models import Unit, Project
+from .. import helpers
+from .. import uploader
 
 class CLPDView(View):
     """This is a pluggable view to handle CLPD (Create, List, Process, Delete)
