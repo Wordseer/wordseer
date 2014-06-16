@@ -12,5 +12,3 @@ wordseer = Blueprint('wordseer', __name__,
     static_url_path=os.path.dirname(__file__))
 
 from .views import *
-from . import models
-

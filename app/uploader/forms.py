@@ -11,7 +11,7 @@ from wtforms.validators import Required, ValidationError
 
 from app import app
 from .fields import ButtonField, MultiCheckboxField
-from .models import Unit, Project
+from ..models import Unit, Project
 
 class HiddenSubmitted(object):
     """A mixin to provide a hidden field called "submitted" which has a default

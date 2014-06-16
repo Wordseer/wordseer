@@ -14,7 +14,7 @@ uploader = Blueprint('uploader', __name__,
     static_url_path=os.path.dirname(__file__))
 
 from .views import *
-from . import models
+
 from . import errors
 
 def generate_form_token():

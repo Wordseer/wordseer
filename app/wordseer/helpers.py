@@ -5,13 +5,9 @@ import pdb
 
 from flask import request
 
-from .models import SequenceSet
-from .models import sequences_in_sequencesets
+from ..models import *
 from app import app
 from app import db
-from app.uploader.models import Sentence
-from app.uploader.models import Sequence
-from app.uploader.models import Word
 
 def table_exists(table):
     """Check if the given table exists in the database.

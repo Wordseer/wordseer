@@ -11,11 +11,7 @@ from sqlalchemy.sql.expression import asc
 from sqlalchemy.sql.expression import literal_column
 
 from .. import wordseer
-from ..models import PropertyMetadata
-from ..models import WorkingSet
-from ...uploader.models import Property
-from ...uploader.models import Sequence
-from ...uploader.models import SequenceInSentence
+from ...models import PropertyMetadata, WorkingSet, Property, Sequence, SequenceInSentence
 from app import db
 
 class AutoSuggest(View):
