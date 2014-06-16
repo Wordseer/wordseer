@@ -13,6 +13,6 @@ uploader = Blueprint('uploader', __name__,
     static_folder="static",
     static_url_path=os.path.dirname(__file__))
 
-from . import views
+from .views import *
 
 uploader.app_template_global(views.generate_form_token)

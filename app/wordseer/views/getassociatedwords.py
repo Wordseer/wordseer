@@ -12,8 +12,7 @@ from app import app
 from app import db
 from .. import wordseer
 from .. import utils
-from ..models import CachedSentences
-from ...uploader.models import WordInSentence
+from ...models import CachedSentences, WordInSentence
 
 class GetAssociatedWords(View):
     """Return adjectives, nouns, and verbs with high TF-IDF scores that

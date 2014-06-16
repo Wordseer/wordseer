@@ -805,7 +805,7 @@ documents_in_documentsets = db.Table("documents_in_documentsets",
 sentences_in_queries = db.Table("sentences_in_queries",
     db.metadata,
     db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id")),
-    db.Column("query_id", db.Integer, db.ForeignKey("cachedsentences.id"))
+    db.Column("query_id", db.Integer, db.ForeignKey("cached_sentences.id"))
 )
 
 sequences_in_sequencesets = db.Table("sequences_in_sequencesets",

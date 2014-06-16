@@ -29,7 +29,7 @@ class BaseConfig(object):
     SQLALCHEMY_MIGRATE_REPO = os.path.join(ROOT, 'db')
 
     # Upload config
-    UPLOAD_DIR = os.path.join(ROOT, 'app/uploads')
+    UPLOAD_DIR = os.path.join(ROOT, 'uploads')
     ALLOWED_EXTENSIONS = ["xml", "json"]
     STRUCTURE_EXTENSION = "json"
 
@@ -112,9 +112,12 @@ class Testing(BaseConfig):
     WTF_CSRF_ENABLED = False
 
     # Set database configurations
-    SQLALCHEMY_DATABASE_PATH = tempfile.mkstemp()[1]
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLALCHEMY_DATABASE_PATH
+    # SQLALCHEMY_DATABASE_PATH = tempfile.mkstemp()[1]
+    # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLALCHEMY_DATABASE_PATH
+
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BaseConfig.ROOT,
+        BaseConfig.APP_NAME + ".db")
+
     SQLALCHEMY_ECHO = False
 
     PAGE_SIZE = 10
-
