@@ -34,22 +34,24 @@ sequences_in_sequencesets = db.Table("sequences_in_sequencesets",
 )
 
 class Set(db.Model, Base):
-    """This is the basic Set class.
+    """This is the basic ``Set`` class.
 
-    Sets are made of either Sequences (a.k.a Phrases), Sentences and Documents.
-    A Set model has an association with a User and has some properties like a
-    name and a creation date.
+    ``Set``s are made of either ``Sequence``s, ``Sentence``s and ``Document``s.
+    A ``Set`` model has an association with a ``User`` and has some properties
+    like a name and a creation date.
+
+    The more specialized type of ``Set``s (like ``SequenceSet``s, etc) inherit
+    from this table.
 
     Attributes:
-        user_id (int): The ID of the user that owns this Set
-        name (str): The name of this Set
-        creation_date (str): A date.DateTime object of when this Set was created
+        user (User): The ``User`` that owns this ``Set``
+        name (str): The name of this ``Set``
+        creation_date (str): A ``date.DateTime`` object of when this ``Set`` was
+            created.
+        type (str): The type of ``Set`` that this is.
     """
 
-    @declared_attr
-    def user_id(cls):
-        return db.Column(db.Integer, db.ForeignKey("user.id"))
-
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     name = db.Column(db.String)
     creation_date = db.Column(db.Date)
     type = db.Column(db.String)
@@ -60,10 +62,12 @@ class Set(db.Model, Base):
     }
 
 class SequenceSet(Set, db.Model):
-    """SequenceSet is a Set that can have a list of Sequences in it.
+    """A ``Set`` that can have a list of ``Sequences`` in it.
+
+    The ``type`` attribute a ``SequenceSet`` is set to ``sequenceset``.
 
     Attributes:
-        sequences (list?): A list of Sequences (by ID) in this SequenceSet
+        sequences (list): A list of ``Sequence``s in this ``SequenceSet``.
     """
 
     #__tablename__ = "sequenceset"
@@ -78,10 +82,12 @@ class SequenceSet(Set, db.Model):
     }
 
 class SentenceSet(Set, db.Model):
-    """A Set that can have a list of Sentences in it.
+    """A ``Set`` that can have a list of ``Sentences`` in it.
+
+    The ``type`` attribute of a ``SentenceSet`` is set to ``sentenceset``.
 
     Attributes:
-        sentences (list?): A list of Sentences (by ID) in this SentenceSet
+        sentences (list): A list of ``Sentence``s in this ``SentenceSet``.
     """
 
     #__tablename__ = "sentenceset"
@@ -96,10 +102,12 @@ class SentenceSet(Set, db.Model):
     }
 
 class DocumentSet(Set, db.Model):
-    """A Set that can have a list of Documents in it.
+    """A Set that can have a list of ``Document``s in it.
+
+    The ``type`` attribute of a ``DocumentSet`` is set to ``sentenceset``.
 
     Attributes:
-        document (list?): A list of Documents (by ID) in this DocumentSet
+        documents (list): A list of ``Document``s in this ``DocumentSet``.
     """
 
     #__tablename__ = "documentset"
@@ -114,17 +122,17 @@ class DocumentSet(Set, db.Model):
     }
 
 class CachedSentences(db.Model, Base):
-    """Cached list of sentences for a query.
+    """Cached list of ``Sentences`` for a query.
 
-    When a User does a query we pre-compute the set of sentences that matches
-    this query so that the 5 default views (of the JavaScript frontend) don't
-    all have to compute it separately.
+    When a ``User`` does a query we pre-compute the set of sentences that
+    matches this query so that the 5 default views (of the JavaScript frontend)
+    don't all have to compute it separately.
 
-    This model stores the relevant query ID and a list of Sentences. The
-    query ID of a given entry is its ID.
+    This model stores the relevant query ID and a list of Sentences.
+    The query ID of a given entry is its ID.
 
     Attributes:
-        sentences (list?): A list of Sentences connected with this query.
+        sentences (list): A list of ``Sentence``s connected with this query.
     """
 
     sentences = db.relationship("Sentence",
@@ -153,14 +161,4 @@ class PropertyMetadata(db.Model, Base):
     is_category = db.Column(db.Boolean)
     display_name = db.Column(db.String)
     display = db.Column(db.Boolean)
-
-#class WorkingSet(db.Model, Base):
-#    """Every *Set has a corresponding WorkingSet entry (one-to-one). If
-#    possible, it would be nice if this was done better.
-#    """
-#
-#    set_id = db.Column(db.Integer)
-#    set_type = db.Column(db.String)
-#    username = db.Column(db.String)
-#    #date =
 
