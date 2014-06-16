@@ -11,14 +11,14 @@ from app.models import User
 sentences_in_sentencesets = db.Table("sentences_in_sentencesets",
     db.metadata,
     db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id")),
-    db.Column("sentenceset_id", db.Integer, db.ForeignKey("sentenceset.id"))
+    db.Column("sentenceset_id", db.Integer, db.ForeignKey("sentence_set.id"))
 )
 
 #TODO: are we going to have a Document object?
 documents_in_documentsets = db.Table("documents_in_documentsets",
     db.metadata,
     db.Column("document_id", db.Integer, db.ForeignKey("unit.id")),
-    db.Column("documentset_id", db.Integer, db.ForeignKey("documentset.id"))
+    db.Column("documentset_id", db.Integer, db.ForeignKey("document_set.id"))
 )
 
 sentences_in_queries = db.Table("sentences_in_queries",
@@ -30,7 +30,7 @@ sentences_in_queries = db.Table("sentences_in_queries",
 sequences_in_sequencesets = db.Table("sequences_in_sequencesets",
     db.metadata,
     db.Column("sequence_id", db.Integer, db.ForeignKey("sequence.id")),
-    db.Column("sequenceset_id", db.Integer, db.ForeignKey("sequenceset.id")),
+    db.Column("sequenceset_id", db.Integer, db.ForeignKey("sequence_set.id")),
 )
 
 class Set(db.Model, Base):
@@ -59,14 +59,14 @@ class Set(db.Model, Base):
         "polymorphic_on": type,
     }
 
-class SequenceSet(Set):
+class SequenceSet(Set, db.Model):
     """SequenceSet is a Set that can have a list of Sequences in it.
 
     Attributes:
         sequences (list?): A list of Sequences (by ID) in this SequenceSet
     """
 
-    __tablename__ = "sequenceset"
+    #__tablename__ = "sequenceset"
 
     id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
     sequences = db.relationship("Sequence",
@@ -77,14 +77,14 @@ class SequenceSet(Set):
         "polymorphic_identity": "sequenceset",
     }
 
-class SentenceSet(Set):
+class SentenceSet(Set, db.Model):
     """A Set that can have a list of Sentences in it.
 
     Attributes:
         sentences (list?): A list of Sentences (by ID) in this SentenceSet
     """
 
-    __tablename__ = "sentenceset"
+    #__tablename__ = "sentenceset"
 
     id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
     sentences = db.relationship("Sentence",
@@ -95,14 +95,14 @@ class SentenceSet(Set):
         "polymorphic_identity": "sequenceset",
     }
 
-class DocumentSet(Set):
+class DocumentSet(Set, db.Model):
     """A Set that can have a list of Documents in it.
 
     Attributes:
         document (list?): A list of Documents (by ID) in this DocumentSet
     """
 
-    __tablename__ = "documentset"
+    #__tablename__ = "documentset"
 
     id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
     documents = db.relationship("Unit",
