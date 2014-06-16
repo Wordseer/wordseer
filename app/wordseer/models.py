@@ -33,7 +33,7 @@ sequences_in_sequencesets = db.Table("sequences_in_sequencesets",
     db.Column("sequenceset_id", db.Integer, db.ForeignKey("sequenceset.id")),
 )
 
-class Set(object):
+class Set(db.Model, Base):
     """This is the basic Set class.
 
     Sets are made of either Sequences (a.k.a Phrases), Sentences and Documents.
@@ -52,39 +52,66 @@ class Set(object):
 
     name = db.Column(db.String)
     creation_date = db.Column(db.Date)
+    type = db.Column(db.String)
 
-class SequenceSet(db.Model, Base, Set):
+    __mapper_args__ = {
+        "polymorphic_identity": "set",
+        "polymorphic_on": type,
+    }
+
+class SequenceSet(Set):
     """SequenceSet is a Set that can have a list of Sequences in it.
 
     Attributes:
         sequences (list?): A list of Sequences (by ID) in this SequenceSet
     """
 
+    __tablename__ = "sequenceset"
+
+    id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
     sequences = db.relationship("Sequence",
         secondary=sequences_in_sequencesets,
         backref="sets")
 
-class SentenceSet(db.Model, Base, Set):
+    __mapper_args__ = {
+        "polymorphic_identity": "sequenceset",
+    }
+
+class SentenceSet(Set):
     """A Set that can have a list of Sentences in it.
 
     Attributes:
         sentences (list?): A list of Sentences (by ID) in this SentenceSet
     """
 
+    __tablename__ = "sentenceset"
+
+    id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
     sentences = db.relationship("Sentence",
         secondary=sentences_in_sentencesets,
         backref="sets")
 
-class DocumentSet(db.Model, Base, Set):
+    __mapper_args__ = {
+        "polymorphic_identity": "sequenceset",
+    }
+
+class DocumentSet(Set):
     """A Set that can have a list of Documents in it.
 
     Attributes:
         document (list?): A list of Documents (by ID) in this DocumentSet
     """
 
+    __tablename__ = "documentset"
+
+    id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
     documents = db.relationship("Unit",
         secondary=documents_in_documentsets,
         backref="sets")
+
+    __mapper_args__ = {
+        "polymorphic_identity": "sequenceset",
+    }
 
 class CachedSentences(db.Model, Base):
     """Cached list of sentences for a query.
@@ -127,13 +154,13 @@ class PropertyMetadata(db.Model, Base):
     display_name = db.Column(db.String)
     display = db.Column(db.Boolean)
 
-class WorkingSet(db.Model, Base):
-    """Every *Set has a corresponding WorkingSet entry (one-to-one). If
-    possible, it would be nice if this was done better.
-    """
-
-    set_id = db.Column(db.Integer)
-    set_type = db.Column(db.String)
-    username = db.Column(db.String)
-    #date =
+#class WorkingSet(db.Model, Base):
+#    """Every *Set has a corresponding WorkingSet entry (one-to-one). If
+#    possible, it would be nice if this was done better.
+#    """
+#
+#    set_id = db.Column(db.Integer)
+#    set_type = db.Column(db.String)
+#    username = db.Column(db.String)
+#    #date =
 
