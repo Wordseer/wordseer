@@ -29,7 +29,7 @@ class BaseConfig(object):
     SQLALCHEMY_MIGRATE_REPO = os.path.join(ROOT, 'db')
 
     # Upload config
-    UPLOAD_DIR = os.path.join(ROOT, 'app/uploads')
+    UPLOAD_DIR = os.path.join(ROOT, 'uploads')
     ALLOWED_EXTENSIONS = ["xml", "json"]
     STRUCTURE_EXTENSION = "json"
 
