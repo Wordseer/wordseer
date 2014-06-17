@@ -345,6 +345,7 @@ class Word(db.Model, Base):
     # Relationships
 
     sentences = association_proxy("word_in_sentence", "sentence")
+    word = association_proxy("word_in_sequence", "sequence")
 
     def __repr__(self):
         """Representation string for words, showing the word.
@@ -412,6 +413,7 @@ class Sequence(db.Model, Base):
     # Relationships
 
     sentences = association_proxy("sequence_in_sentence", "sentence")
+    words = association_proxy("word_in_sequence", "word")
 
 class GrammaticalRelationship(db.Model, Base):
     """A grammatical relationship between two words.
