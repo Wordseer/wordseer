@@ -12,7 +12,7 @@ written in Python using the Flask framework and several web framework libraries.
 1.  Create a virtualenv
 2.  Run:
 
-        bash flask_packages
+        pip -r requirements.txt
 
     to install the necessary packages.
 3.  Run:
@@ -29,3 +29,4 @@ written in Python using the Flask framework and several web framework libraries.
 1. Simply run `runtests.py`:
 
         python runtests.py
+
