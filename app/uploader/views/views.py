@@ -155,7 +155,7 @@ class ProjectsCLPD(CLPDView):
         """Every choice is in the form of (project.id, project.name).
         """
         self.process_form.selection.choices = []
-        for project in Project.query.filter(Project.user ==
+        for project in Project.query.filter(User.id ==
             current_user.id).all():
             self.process_form.selection.add_choice(project.id, project.name)
 
@@ -165,7 +165,7 @@ class ProjectsCLPD(CLPDView):
         """
         project = Project(
             name=self.create_form.name.data,
-            user=current_user.id)
+            user=current_user)
         db.session.add(project)
         db.session.flush()
         project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
@@ -216,7 +216,7 @@ class ProjectCLPD(CLPDView):
     def set_choices(self, **kwargs):
         """The template needs the choices in the form of (id, filename).
         """
-        file_objects = Unit.query.filter(Unit.project_id == self.project.id).\
+        file_objects = Unit.query.filter(Project.id == self.project.id).\
             filter(Unit.path != None).all()
         self.process_form.selection.choices = []
         for file_object in file_objects:
@@ -303,3 +303,4 @@ def get_file(file_id):
     directory, filename = os.path.split(unit.path)
 
     return send_from_directory(directory, filename)
+

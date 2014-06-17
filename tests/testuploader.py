@@ -8,6 +8,7 @@ import shutil
 import tempfile
 import unittest
 
+from flask_security.utils import login_user
 import mock
 from sqlalchemy import create_engine
 
@@ -16,6 +17,8 @@ from app import db
 from app import user_datastore
 from app.models import *
 import common
+
+import pdb
 
 class TestModels(unittest.TestCase):
     def setUp(self):
@@ -192,18 +195,21 @@ class TestModels(unittest.TestCase):
 
         assert d1.children == [u1]
 
-        assert u1.parent.document == d1
+        assert u1.document == d1
 
 class ViewsTests(unittest.TestCase):
     def setUp(self):
         """Clear the database for the next unit test.
         """
+        #pdb.set_trace()
         self.client = application.test_client()
         common.reset_db()
-        user_datastore.create_user(email="foo@foo.com", password="password")
+        self.user = user_datastore.create_user(email="foo@foo.com",
+            password="password")
         db.session.commit()
+        #login_user(self.user)
         with self.client.session_transaction() as sess:
-            sess["user_id"] = User.query.filter(User.id == 1).one().get_id()
+            sess["user_id"] = self.user.id
             sess["_fresh"] = True
 
     def test_no_projects(self):
@@ -215,7 +221,7 @@ class ViewsTests(unittest.TestCase):
     def test_projects(self):
         """Test the projects view with a project present.
         """
-        new_project = Project(name="test", user=1)
+        new_project = Project(name="test", user=self.user)
         new_project.save()
         result = self.client.get("/projects/")
         assert "/projects/1" in result.data
@@ -223,7 +229,7 @@ class ViewsTests(unittest.TestCase):
     def test_projects_bad_create(self):
         """Test creating an existing project.
         """
-        project = Project(name="test", user=1)
+        project = Project(name="test", user=self.user)
         project.save()
 
         result = self.client.post("/projects/", data={
@@ -268,9 +274,9 @@ class ViewsTests(unittest.TestCase):
         mock_os.path.isdir.return_value = True
 
         project1 = Project(name="test1", path=application.config["UPLOAD_DIR"],
-            user=1)
+            user=self.user)
         project2 = Project(name="test2", path=application.config["UPLOAD_DIR"],
-            user=1)
+            user=self.user)
         project1.save()
         project2.save()
 
@@ -289,8 +295,8 @@ class ViewsTests(unittest.TestCase):
         """Test deleting without a selection.
         """
 
-        project1 = Project(name="test1", user=1)
-        project2 = Project(name="test2", user=1)
+        project1 = Project(name="test1", user=self.user)
+        project2 = Project(name="test2", user=self.user)
         project1.save()
         project2.save()
 
@@ -307,7 +313,7 @@ class ViewsTests(unittest.TestCase):
         """Test processing an unprocessable project.
         """
 
-        project1 = Project(name="test1", user=1)
+        project1 = Project(name="test1", user=self.user)
         project1.save()
 
         result = self.client.post("/projects/", data={
@@ -321,7 +327,7 @@ class ViewsTests(unittest.TestCase):
     def test_projects_process(self):
         """Test processing a processable project.
         """
-        project = Project(name="test", user=1)
+        project = Project(name="test", user=self.user)
         project.save()
 
         unit1 = Unit(project=project, path="/test-path/1.xml")
@@ -340,7 +346,7 @@ class ViewsTests(unittest.TestCase):
     def test_no_project_show(self):
         """Make sure project_show says that there are no files.
         """
-        project = Project(name="test", user=1)
+        project = Project(name="test", user=self.user)
         project.save()
         result = self.client.get("/projects/1")
 
@@ -350,7 +356,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show(self):
         """Make sure project_show shows files.
         """
-        project = Project(name="test", user=1)
+        project = Project(name="test", user=self.user)
         project.save()
         document1 = Unit(path="/test/doc1.xml", project=project)
         document2 = Unit(path="/test/doc2.xml", project=project)
@@ -366,7 +372,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_upload(self):
         """Try uploading a file to the project_show view.
         """
-        project = Project(name="test", user=1)
+        project = Project(name="test", user=self.user)
         project.save()
 
         upload_dir = tempfile.mkdtemp()
@@ -389,7 +395,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_double_upload(self):
         """Try uploading two files with the same name to the project_show view.
         """
-        project = Project(name="test", user=1)
+        project = Project(name="test", user=self.user)
         project.save()
 
         upload_dir = tempfile.mkdtemp()
@@ -411,7 +417,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_no_post(self):
         """Try sending an empty post to project_show.
         """
-        project = Project(name="test", user=1)
+        project = Project(name="test", user=self.user)
         project.save()
 
         result = self.client.post("/projects/1", data={
@@ -432,7 +438,7 @@ class ViewsTests(unittest.TestCase):
         """
         mock_os.path.isdir.return_value = False
 
-        project = Project(name="test", user=1)
+        project = Project(name="test", user=self.user)
         project.save()
 
         unit1 = Unit(project=project, path="/test-path/1.xml")
@@ -454,7 +460,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_bad_delete(self):
         """Test a bad file delete request.
         """
-        project = Project(name="test", user=1)
+        project = Project(name="test", user=self.user)
         project.save()
 
         unit1 = Unit(project=project, path="/test-path/1.xml")
@@ -474,7 +480,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_process(self):
         """Test processing a processable group of files.
         """
-        project = Project(name="test", user=1)
+        project = Project(name="test", user=self.user)
         project.save()
 
         unit1 = Unit(project=project, path="/test-path/1.xml")
@@ -493,7 +499,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_bad_process(self):
         """Test processing an unprocessable group of files.
         """
-        project = Project(name="test", user=1)
+        project = Project(name="test", user=self.user)
         project.save()
 
         unit1 = Unit(project=project, path="/test-path/1.xml")
@@ -523,7 +529,8 @@ class ViewsTests(unittest.TestCase):
     def test_document_show(self):
         """Test the detail document view.
         """
-        project = Project(name="test project", path="/test-path/", user=1)
+        project = Project(name="test project", path="/test-path/",
+            user=self.user)
         project.save()
 
         document = Unit(path="/test-path/test-file.xml", project=project)
@@ -541,13 +548,13 @@ class ViewsTests(unittest.TestCase):
         file_handle = os.fdopen(file_handle, "r+")
         file_handle.write("foobar")
 
-        project = Project(user=1)
+        project = Project(user=self.user)
 
         document = Unit(path=file_path, project=project)
         document.save()
 
         result = self.client.get("/uploads/1")
-
+        pdb.set_trace()
         with open(file_path) as test_file:
             assert result.data == file_handle.read()
 
@@ -559,14 +566,16 @@ class AuthTests(unittest.TestCase):
     def setUpClass(cls):
         common.reset_db()
         cls.client = application.test_client()
-        user_datastore.create_user(email="foo@foo.com", password="password")
-        user_datastore.create_user(email="bar@bar.com", password="password")
+        cls.user1 = user_datastore.create_user(email="foo@foo.com",
+            password="password")
+        cls.user2 = user_datastore.create_user(email="bar@bar.com",
+            password="password")
         db.session.commit()
         with cls.client.session_transaction() as sess:
-            sess["user_id"] = User.query.filter(User.id == 1).one().get_id()
+            sess["user_id"] = cls.user1.get_id()
             sess["_fresh"] = True
 
-        cls.project = Project(name="Bar's project", user=2)
+        cls.project = Project(name="Bar's project", user=cls.user2)
         cls.project.save()
 
         file_handle, file_path = tempfile.mkstemp()
@@ -581,7 +590,7 @@ class AuthTests(unittest.TestCase):
     def test_list_projects(self):
         """Test to make sure that bar's projects aren't listed for foo.
         """
-        result = self.client.get("/projects")
+        result = self.client.get("/projects/")
 
         assert "Bar's project" not in result.data
 
@@ -618,8 +627,10 @@ class LoggedOutTests(unittest.TestCase):
         """
         common.reset_db()
         cls.client = application.test_client()
-
-        project = Project(name="Bar's project", user=2)
+        user = User()
+        db.session.add(user)
+        db.session.commit()
+        project = Project(name="Bar's project", user=user)
         project.save()
 
         cls.file_handle, cls.file_path = tempfile.mkstemp()

@@ -117,7 +117,7 @@ class Project(db.Model, Base):
     # Relationships
 
     documents = db.relationship("Document", backref="project")
-
+    files = db.relationship("Unit", backref="project") #FIXME: temporary
 
 class Document(db.Model, Base):
     """A model for a single document file.
@@ -201,12 +201,15 @@ class Unit(db.Model, Base):
     unit_type = db.Column(db.String(64), index = True)
     number = db.Column(db.Integer, index = True)
     parent_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
-
+    path = db.Column(db.String) #FIXME this is just for testing purposes
     # Relationships
 
     children = db.relationship("Unit")
     sentences = db.relationship("Sentence", backref="unit")
     properties = db.relationship("Property", backref="unit")
+
+    #FIXME: temporary
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     @property
     def parent(self):
@@ -345,7 +348,7 @@ class Word(db.Model, Base):
     # Relationships
 
     sentences = association_proxy("word_in_sentence", "sentence")
-    word = association_proxy("word_in_sequence", "sequence")
+    sequences = association_proxy("word_in_sequence", "sequence")
 
     def __repr__(self):
         """Representation string for words, showing the word.
@@ -764,3 +767,4 @@ sequences_in_sequencesets = db.Table("sequences_in_sequencesets",
     db.Column("sequence_id", db.Integer, db.ForeignKey("sequence.id")),
     db.Column("sequenceset_id", db.Integer, db.ForeignKey("sequence_set.id")),
 )
+
