@@ -14,7 +14,6 @@ from sqlalchemy import create_engine
 from app import app as application
 from app import db
 from app import user_datastore
-from app.uploader.models import *
 from app.models import *
 import common
 

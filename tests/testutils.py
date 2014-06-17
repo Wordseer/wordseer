@@ -9,10 +9,8 @@ import mock
 
 from app import app
 from app import db
-from app.uploader.models import Sequence
-from app.uploader.models import Word
+from app.models import Sequence, Word, SequenceSet
 from app.wordseer import utils
-from app.wordseer.models import SequenceSet
 import common
 
 class TestUtils(unittest.TestCase):

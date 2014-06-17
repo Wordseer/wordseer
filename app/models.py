@@ -119,12 +119,6 @@ class Project(db.Model, Base):
     documents = db.relationship("Document", backref="project")
 
 
-    def __init__(self, name="", path=""):
-        """Initialize the collection with a name.
-        """
-
-        self.name = name
-
 class Document(db.Model, Base):
     """A model for a single document file.
 
@@ -214,14 +208,6 @@ class Unit(db.Model, Base):
     sentences = db.relationship("Sentence", backref="unit")
     properties = db.relationship("Property", backref="unit")
 
-    def __init__(self, unit_type="", number=0):
-        """Default constructor for units, setting its type and number.
-        """
-
-        self.unit_type = unit_type
-        self.number = number
-
-
     @property
     def parent(self):
         """Method for getting a unit's parent.
@@ -277,12 +263,6 @@ class Sentence(db.Model, Base):
     words = association_proxy("word_in_sentence", "word")
     sequences = association_proxy("sequence_in_sentence", "sequence")
     dependencies = association_proxy("dependency_in_sentence", "dependency")
-
-    def __init__(self, text=""):
-        """Initialize the sentence with the text of the sentence.
-        """
-
-        self.text = text
 
     def __repr__(self):
         """Representation of the sentence, showing its text.
@@ -365,14 +345,7 @@ class Word(db.Model, Base):
     # Relationships
 
     sentences = association_proxy("word_in_sentence", "sentence")
-
-    def __init(self, word = "", lemma = "", tag = ""):
-        """Initialize a word with its word, lemma, and tag.
-        """
-
-        self.word = word
-        self.lemma = lemma
-        self.tag = tag
+    word = association_proxy("word_in_sequence", "sequence")
 
     def __repr__(self):
         """Representation string for words, showing the word.
@@ -401,13 +374,6 @@ class Property(db.Model, Base):
     unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
     name = db.Column(db.String, index = True)
     value = db.Column(db.String, index = True)
-
-    def __init__(self, name="", value=""):
-        """Initialize the property with a name and value
-        """
-
-        self.name = name
-        self.value = value
 
     def __repr__(self):
         """Representation string for properties, showing the property name
@@ -447,17 +413,7 @@ class Sequence(db.Model, Base):
     # Relationships
 
     sentences = association_proxy("sequence_in_sentence", "sentence")
-
-    def __init__(self, sequence=None, lemmatized=False, has_function_words=False,
-        all_function_words=False, length=None):
-        """Initialize a sequence with all necessary fields
-        """
-
-        self.sequence = sequence
-        self.lemmatized = lemmatized
-        self.has_function_words = has_function_words
-        self.all_function_words = all_function_words
-        self.length = length
+    words = association_proxy("word_in_sequence", "word")
 
 class GrammaticalRelationship(db.Model, Base):
     """A grammatical relationship between two words.
@@ -475,11 +431,6 @@ class GrammaticalRelationship(db.Model, Base):
     # Attributes
 
     name = db.Column(db.String, index = True)
-
-    def __init__(self, name):
-        """Initialize with the name of the relationship
-        """
-        self.name = name
 
 class Dependency(db.Model, Base):
     """A representation of the grammatical dependency between two words.
@@ -523,7 +474,7 @@ class Dependency(db.Model, Base):
 
     sentences = association_proxy("dependency_in_sentence", "sentence")
 
-    def __init__(self, relationship, governor, dependent):
+    def __init__(self, relationship=None, governor=None, dependent=None):
         """Create a dependency between the governor and dependent with the given
         grammatical relationship
         """
