@@ -50,6 +50,8 @@ class TestModels(unittest.TestCase):
         db.session.add_all([sen1, sen2])
         db.session.commit()
 
+        assert word_2.sentences == [sen1, sen2]
+
     def test_model_sentence(self):
         """Test to make sure that Sentence is working properly.
         """
@@ -173,6 +175,25 @@ class TestModels(unittest.TestCase):
 
         assert retrieved_prop.name == prop.name
         assert retrieved_prop.value == prop.value
+
+    def test_model_document(self):
+        """Test to make sure that Document is working properly.
+        """
+
+        d1 = Document("test", "/path/to/d1")
+        d1.save()
+
+        assert d1.unit.unit_type == "document"
+
+        u1 = Unit()
+        u1.save()
+
+        d1.children.append(u1)
+        d1.save()
+
+        assert d1.children == [u1]
+
+        assert u1.parent.document == d1
 
 class ViewsTests(unittest.TestCase):
     def setUp(self):
@@ -638,52 +659,4 @@ class LoggedOutTests(unittest.TestCase):
 
         with open(self.file_path) as test_file:
             assert result.data is not test_file.read()
-
-@unittest.skip("Should be rewritten to use David's code.")
-class ImportTests(unittest.TestCase):
-    def test_sample_document(self):
-        """Test turning a document file into the corresponding models.
-
-        Once a document has been imported as an object, it should use the
-        Unit constructor to initialize and save all models for the document.
-        """
-        #TODO: this doesn't test anything
-        # Import the document.
-        document = self.import_document("sample_document.txt")
-        doc_unit = Unit(document)
-
-        # Look at document contents
-        print(doc_unit.sentences)
-
-    """
-    #######
-    Helpers
-    #######
-    """
-
-    def import_document(self, filename):
-        """Simulate a document import without using a processor.
-        """
-
-        doc_dict = dict()
-        doc_dict["subunits"] = dict()
-        doc_dict["properties"] = dict()
-        doc_dict["sentences"] = list()
-
-        with open(filename) as document:
-            for line in document:
-                words = line.split()
-
-                if words:
-                    if words[0][-1] == ":":
-                        doc_dict["properties"][words[0][:-1]] = " ".join(
-                            words[1:])
-                    else:
-                        doc_dict["sentences"].append((line, words))
-                else:
-                    # Empty line
-                    doc_dict["sentences"].append(("", ["\n"]))
-
-        print(doc_dict)
-        return doc_dict
 

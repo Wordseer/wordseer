@@ -64,21 +64,6 @@ def reset():
 
     db.create_all()
 
-def prep_test():
-    try:
-        if os.environ['FLASK_ENV'].lower() == 'testing':
-            try:
-                # Remove old database if it's there
-                os.remove(SQLALCHEMY_DATABASE_URI.split('///')[-1])
-            except OSError:
-                pass
-
-            db.create_all()
-        else:
-            print("Your envinronment configurations are not set to testing.")
-    except KeyError:
-        print("Your Flask environment is not set.")
-
 if __name__ == "__main__":
 
     if argv[1] == "create":
@@ -97,3 +82,4 @@ if __name__ == "__main__":
         prep_test()
     else:
         print(str(argv[1]) + " is not a valid database operation.")
+
