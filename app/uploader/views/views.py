@@ -273,12 +273,11 @@ def document_show(project_id, document_id):
 
     :param int doc_id: The document to retrieve details for.
     """
-
     document = helpers.get_object_or_exception(Unit,
         Unit.id == document_id, exceptions.DocumentNotFoundException)
 
     # Test if this user can see it
-    if document.project.user != current_user.id:
+    if document.project.user != current_user:
         return app.login_manager.unauthorized()
 
     filename = os.path.split(document.path)[1]
@@ -293,11 +292,10 @@ def document_show(project_id, document_id):
 def get_file(file_id):
     """If the user has permission to view this file, then return it.
     """
-
     unit = Unit.query.filter(Unit.id == file_id).one()
 
     # Test if this user can see it
-    if unit.project.user != current_user.id or not unit.path:
+    if unit.project.user != current_user or not unit.path:
         return app.login_manager.unauthorized()
 
     directory, filename = os.path.split(unit.path)

@@ -18,8 +18,6 @@ from app import user_datastore
 from app.models import *
 import common
 
-import pdb
-
 class TestModels(unittest.TestCase):
     def setUp(self):
         common.reset_db()
@@ -194,14 +192,12 @@ class TestModels(unittest.TestCase):
         d1.save()
 
         assert d1.children == [u1]
-
-        assert u1.document == d1
+        assert u1.parent.document[0] == d1
 
 class ViewsTests(unittest.TestCase):
     def setUp(self):
         """Clear the database for the next unit test.
         """
-        #pdb.set_trace()
         self.client = application.test_client()
         common.reset_db()
         self.user = user_datastore.create_user(email="foo@foo.com",
@@ -523,7 +519,6 @@ class ViewsTests(unittest.TestCase):
             "action": "0",
             "process-selection": ["1"]
             })
-
         assert "At least one document must be selected" in result.data
 
     def test_document_show(self):
@@ -537,7 +532,6 @@ class ViewsTests(unittest.TestCase):
         document.save()
 
         result = self.client.get("/projects/1/documents/1")
-
         assert "/uploads/" + str(document.id) in result.data
         assert "test-file.xml" in result.data
 
@@ -554,7 +548,6 @@ class ViewsTests(unittest.TestCase):
         document.save()
 
         result = self.client.get("/uploads/1")
-        pdb.set_trace()
         with open(file_path) as test_file:
             assert result.data == file_handle.read()
 
