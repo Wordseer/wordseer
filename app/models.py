@@ -103,6 +103,15 @@ class User(db.Model, UserMixin):
     sets = db.relationship("Set", backref="user")
     projects = db.relationship("Project", backref="user")
 
+    def has_document(document):
+        """Checks if the user owns this document.
+        """
+
+        return document.project in self.projects
+
+        # for many-to-many document and projects, use this:
+        # return any([project in self.projects for project in document.projects])
+
 
 class Project(db.Model, Base):
     """A WordSeer project for a collection of documents.
@@ -177,6 +186,14 @@ class Document(db.Model, Base):
 
     def __repr__(self):
         return "<Document: " + self.title + ">"
+
+    def belongs_to(user):
+        """Checks if this project belongs to the user
+        """
+        return self.project in user.projects
+
+        # for many-to-many document and projects, use this:
+        # return any([project in user.projects for project in self.projects])
 
 class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.
@@ -717,24 +734,6 @@ class WordInSequence(db.Model, Base):
         backref=db.backref(
             "word_in_sequence", cascade="all, delete-orphan"
         )
-    )
-
-    sequence = db.relationship("Sequence",
-        backref=db.backref(
-            "word_in_sequence", cascade="all, delete-orphan"
-        )
-    )
-
-    def __init__(self, word=None, sequence=None):
-        self.word = word
-        self.sequence = sequence
-
-
-class DependencyInSentence(db.Model, Base):
-    """Association object for dependencies in sentences
-    """
-
-    dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id"))
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     governor_index = db.Column(db.Integer)
     dependent_index = db.Column(db.Integer)
