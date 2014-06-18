@@ -22,6 +22,7 @@ def really_submitted(form):
         return form.validate_on_submit()
     return False
 
+#TODO: add more conditions
 def get_object_or_exception(model, condition, exception=None):
     """Either get the requested object or raise an exception.
 
@@ -45,3 +46,4 @@ def not_found(item):
     :arg str item: The name of the item not found.
     """
     return render_template("item_not_found.html", item=item), 404
+
