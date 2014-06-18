@@ -6,22 +6,31 @@ import os
 import shutil
 import random
 from string import ascii_letters, digits
+import pdb
 
-from flask import (redirect, render_template, request, send_from_directory,
-    session, config)
+from flask import config
+from flask import redirect
+from flask import render_template
+from flask import request
+from flask import send_from_directory
+from flask import session
 from flask_security.core import current_user
 from flask_security.decorators import login_required
 from flask.views import View
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug import secure_filename
 
+from .. import exceptions
+from .. import forms
+from .. import helpers
+from .. import uploader
+from ...models import Document
+from ...models import Project
+from ...models import Unit
+from ...models import User
 from app import app
 from app import db
 from app.models import User
-from .. import exceptions
-from .. import forms
-from ...models import Unit, Project
-from .. import helpers
-from .. import uploader
 
 def generate_form_token():
     """Sets a token to prevent double posts."""
@@ -237,9 +246,9 @@ class ProjectCLPD(CLPDView):
             # inside the form?
             if not os.path.isfile(dest_path):
                 uploaded_file.save(dest_path)
-                unit = Unit(path=dest_path, project=self.project)
-                unit.save()
-                self.process_form.selection.add_choice(unit.id,
+                document = Document(path=dest_path, projects=[self.project])
+                document.save()
+                self.process_form.selection.add_choice(document.id,
                     os.path.split(dest_path)[1])
             else:
                 self.create_form.uploaded_file.errors.\
@@ -273,8 +282,16 @@ def document_show(project_id, document_id):
 
     :param int doc_id: The document to retrieve details for.
     """
-    document = helpers.get_object_or_exception(Unit,
-        Unit.id == document_id, exceptions.DocumentNotFoundException)
+    #TODO: good spot for a helper
+    #document = helpers.get_object_or_exception(Unit,
+    #   Unit.id == document_id, exceptions.DocumentNotFoundException)
+    try:
+        document = Document.query.\
+            filter(Document.id == document_id).\
+            filter(User == current_user).\
+            one()
+    except NoResultFound:
+        raise exceptions.DocumentNotFoundException
 
     # Test if this user can see it
     if document.project.user != current_user:
@@ -292,10 +309,14 @@ def document_show(project_id, document_id):
 def get_file(file_id):
     """If the user has permission to view this file, then return it.
     """
-    unit = Unit.query.filter(Unit.id == file_id).one()
+    #pdb.set_trace()
+    #FIXME: this query is broken
+    document = Document.query.\
+        filter(Document.id == file_id).\
+        filter(User == current_user).all()
 
     # Test if this user can see it
-    if unit.project.user != current_user or not unit.path:
+    if not document or not unit.path:
         return app.login_manager.unauthorized()
 
     directory, filename = os.path.split(unit.path)

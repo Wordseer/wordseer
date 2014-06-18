@@ -7,6 +7,7 @@ import os
 import shutil
 import tempfile
 import unittest
+import pdb
 
 from flask_security.utils import login_user
 import mock
@@ -180,10 +181,10 @@ class TestModels(unittest.TestCase):
         """Test to make sure that Document is working properly.
         """
 
-        d1 = Document("test", "/path/to/d1")
+        d1 = Document(title="test", path="/path/to/d1")
         d1.save()
 
-        assert d1.unit.unit_type == "document"
+        assert d1.unit_type == "document"
 
         u1 = Unit()
         u1.save()
@@ -192,7 +193,7 @@ class TestModels(unittest.TestCase):
         d1.save()
 
         assert d1.children == [u1]
-        assert u1.parent.document[0] == d1
+        assert u1.parent == d1
 
 class ViewsTests(unittest.TestCase):
     def setUp(self):
@@ -203,7 +204,7 @@ class ViewsTests(unittest.TestCase):
         self.user = user_datastore.create_user(email="foo@foo.com",
             password="password")
         db.session.commit()
-        #login_user(self.user)
+
         with self.client.session_transaction() as sess:
             sess["user_id"] = self.user.id
             sess["_fresh"] = True
@@ -326,10 +327,10 @@ class ViewsTests(unittest.TestCase):
         project = Project(name="test", user=self.user)
         project.save()
 
-        unit1 = Unit(project=project, path="/test-path/1.xml")
-        unit2 = Unit(project=project, path="/test-path/2.json")
-        unit1.save()
-        unit2.save()
+        document1 = Document(projects=[project], path="/test-path/1.xml")
+        document2 = Document(projects=[project], path="/test-path/2.json")
+        document1.save()
+        document2.save()
 
         result = self.client.post("/projects/", data={
             "process-submitted": "true",
@@ -354,8 +355,8 @@ class ViewsTests(unittest.TestCase):
         """
         project = Project(name="test", user=self.user)
         project.save()
-        document1 = Unit(path="/test/doc1.xml", project=project)
-        document2 = Unit(path="/test/doc2.xml", project=project)
+        document1 = Document(path="/test/doc1.xml", projects=[project])
+        document2 = Document(path="/test/doc2.xml", projects=[project])
         document1.save()
         document2.save()
         result = self.client.get("/projects/1")
@@ -437,10 +438,10 @@ class ViewsTests(unittest.TestCase):
         project = Project(name="test", user=self.user)
         project.save()
 
-        unit1 = Unit(project=project, path="/test-path/1.xml")
-        unit2 = Unit(project=project, path="/test-path/2.xml")
-        unit1.save()
-        unit2.save()
+        document1 = Document(projects=[project], path="/test-path/1.xml")
+        document2 = Document(projects=[project], path="/test-path/2.xml")
+        document1.save()
+        document2.save()
 
         result = self.client.post("/projects/1", data={
             "process-submitted": "true",
@@ -449,8 +450,8 @@ class ViewsTests(unittest.TestCase):
             })
 
         assert "no files in this project" in result.data
-        mock_os.remove.assert_any_call(unit1.path)
-        mock_os.remove.assert_any_call(unit2.path)
+        mock_os.remove.assert_any_call(document1.path)
+        mock_os.remove.assert_any_call(document2.path)
         assert mock_os.remove.call_count == 2
 
     def test_project_show_bad_delete(self):
@@ -459,8 +460,8 @@ class ViewsTests(unittest.TestCase):
         project = Project(name="test", user=self.user)
         project.save()
 
-        unit1 = Unit(project=project, path="/test-path/1.xml")
-        unit2 = Unit(project=project, path="/test-path/2.xml")
+        unit1 = Document(projects=[project], path="/test-path/1.xml")
+        unit2 = Document(projects=[project], path="/test-path/2.xml")
         unit1.save()
         unit2.save()
 
@@ -479,8 +480,8 @@ class ViewsTests(unittest.TestCase):
         project = Project(name="test", user=self.user)
         project.save()
 
-        unit1 = Unit(project=project, path="/test-path/1.xml")
-        unit2 = Unit(project=project, path="/test-path/2.json")
+        unit1 = Document(projects=[project], path="/test-path/1.xml")
+        unit2 = Document(projects=[project], path="/test-path/2.json")
         unit1.save()
         unit2.save()
 
@@ -498,8 +499,8 @@ class ViewsTests(unittest.TestCase):
         project = Project(name="test", user=self.user)
         project.save()
 
-        unit1 = Unit(project=project, path="/test-path/1.xml")
-        unit2 = Unit(project=project, path="/test-path/2.xml")
+        unit1 = Document(projects=[project], path="/test-path/1.xml")
+        unit2 = Document(projects=[project], path="/test-path/2.xml")
         unit1.save()
         unit2.save()
 
@@ -524,11 +525,12 @@ class ViewsTests(unittest.TestCase):
     def test_document_show(self):
         """Test the detail document view.
         """
+        pdb.set_trace()
         project = Project(name="test project", path="/test-path/",
             user=self.user)
-        project.save()
+        document = Document(path="/test-path/test-file.xml", projects=[project])
 
-        document = Unit(path="/test-path/test-file.xml", project=project)
+        project.save()
         document.save()
 
         result = self.client.get("/projects/1/documents/1")
@@ -544,7 +546,7 @@ class ViewsTests(unittest.TestCase):
 
         project = Project(user=self.user)
 
-        document = Unit(path=file_path, project=project)
+        document = Document(path=file_path, projects=[project])
         document.save()
 
         result = self.client.get("/uploads/1")
@@ -555,30 +557,29 @@ class AuthTests(unittest.TestCase):
     """Make sure that users can only see the pages and such that they
     should be seeing.
     """
-    @classmethod
-    def setUpClass(cls):
+    #TODO: can we make this a classmethod without SQLAlchemy complaining?
+    def setUp(self):
         database.restore_cache()
-        cls.client = application.test_client()
-        cls.user1 = user_datastore.create_user(email="foo@foo.com",
+        self.client = application.test_client()
+        self.user1 = user_datastore.create_user(email="foo@foo.com",
             password="password")
-        cls.user2 = user_datastore.create_user(email="bar@bar.com",
+        self.user2 = user_datastore.create_user(email="bar@bar.com",
             password="password")
         db.session.commit()
-        with cls.client.session_transaction() as sess:
-            sess["user_id"] = cls.user1.get_id()
+        with self.client.session_transaction() as sess:
+            sess["user_id"] = self.user1.get_id()
             sess["_fresh"] = True
 
-        cls.project = Project(name="Bar's project", user=cls.user2)
-        cls.project.save()
+        self.project = Project(name="Bar's project", user=self.user2)
+        self.project.save()
 
         file_handle, file_path = tempfile.mkstemp()
         file_handle = os.fdopen(file_handle, "r+")
         file_handle.write("foobar")
 
-        cls.file_path = os.path.join(file_path)
-        cls.unit = Unit(project=cls.project, path=cls.file_path,
-            unit_type="foo")
-        cls.unit.save()
+        self.file_path = os.path.join(file_path)
+        self.document = Document(projects=[self.project], path=self.file_path)
+        self.document.save()
 
     def test_list_projects(self):
         """Test to make sure that bar's projects aren't listed for foo.
@@ -598,14 +599,14 @@ class AuthTests(unittest.TestCase):
         """Test to make sure that foo can't see bar's file.
         """
         result = self.client.get("/projects/" + str(self.project.id) +
-            "/documents/" + str(self.unit.id))
+            "/documents/" + str(self.document.id))
 
-        assert "/uploads/" + str(self.unit.id) not in result.data
+        assert "/uploads/" + str(self.document.id) not in result.data
 
     def test_get_document(self):
         """Test to make sure that foo can't get bar's file.
         """
-        result = self.client.get("/uploads/" + str(self.unit.id))
+        result = self.client.get("/uploads/" + str(self.document.id))
 
         with open(self.file_path) as test_file:
             assert result.data is not test_file.read()
@@ -614,25 +615,25 @@ class LoggedOutTests(unittest.TestCase):
     """Make sure that logged out users can't see much of anything.
     """
 
-    @classmethod
-    def setUpClass(cls):
+    #TODO: can we make this a classmethod without sqlalchemy complaining?
+    def setUp(self):
         """Reset the DB and create a dummy project and document.
         """
         database.restore_cache()
-        cls.client = application.test_client()
+        self.client = application.test_client()
         user = User()
         db.session.add(user)
         db.session.commit()
         project = Project(name="Bar's project", user=user)
         project.save()
 
-        cls.file_handle, cls.file_path = tempfile.mkstemp()
-        cls.file = os.fdopen(cls.file_handle, "r+")
-        cls.file.write("foobar")
-        cls.file_name = os.path.split(cls.file_path)[1]
+        self.file_handle, self.file_path = tempfile.mkstemp()
+        self.file = os.fdopen(self.file_handle, "r+")
+        self.file.write("foobar")
+        self.file_name = os.path.split(self.file_path)[1]
 
-        unit = Unit(project=project, path=cls.file_path)
-        unit.save()
+        document = Document(projects=[project], path=self.file_path)
+        document.save()
 
     def test_list_projects(self):
         """Test to make sure that unauthed users can't see project lists.

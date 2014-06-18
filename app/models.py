@@ -103,80 +103,18 @@ class User(db.Model, UserMixin):
     sets = db.relationship("Set", backref="user")
     projects = db.relationship("Project", backref="user")
 
-
 class Project(db.Model, Base):
     """A WordSeer project for a collection of documents.
     """
 
     # Attributes
-
     name = db.Column(db.String)
     path = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     # Relationships
-
-    documents = db.relationship("Document", backref="project")
-    files = db.relationship("Unit", backref="project") #FIXME: temporary
-
-class Document(db.Model, Base):
-    """A model for a single document file.
-
-    Documents are top-level Units. See the description in the Unit model for
-    further details.
-
-    Attributes:
-      title (str): the title of the document
-      path (str): the location of the file on the system
-      unit_id (int): a link to its corresponding unit
-      collection_id (int): a link to its collection
-
-    Relationships:
-      has one: unit
-      has many: sentences
-      belongs to: collection
-    """
-
-    # Attributes
-
-    title = db.Column(db.String, index = True)
-    path = db.Column(db.String)
-    unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
-    sentence_count = db.Column(db.Integer)
-
-    # Relationships
-
-    sentences = db.relationship("Sentence", backref="document")
-    unit = db.relationship("Unit", backref="document")
-
-    def __init__(self, title = "", path = ""):
-        """Initialize a document, which also creates the corresponding unit.
-        """
-
-        self.title = title
-        self.path = path
-
-        unit = Unit()
-        unit.unit_type = "document"
-        self.unit = unit
-
-    @property
-    def properties(self):
-        """Convenience access to this document's properties
-        """
-
-        return self.unit.properties
-
-    @property
-    def children(self):
-        """Convenience access for its immediate children
-        """
-
-        return self.unit.children
-
-    def __repr__(self):
-        return "<Document: " + self.title + ">"
+    files = db.relationship("Document", secondary="documents_in_projects",
+        backref="projects") #FIXME: these are docs
 
 class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.
@@ -197,46 +135,72 @@ class Unit(db.Model, Base):
     """
 
     # Attributes
-
+    id = db.Column(db.Integer, primary_key=True)
     unit_type = db.Column(db.String(64), index = True)
     number = db.Column(db.Integer, index = True)
     parent_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
     path = db.Column(db.String) #FIXME this is just for testing purposes
-    # Relationships
 
-    children = db.relationship("Unit")
+    # Relationships
+    children = db.relationship("Unit", backref=db.backref("parent",
+        remote_side=[id]))
     sentences = db.relationship("Sentence", backref="unit")
     properties = db.relationship("Property", backref="unit")
 
-    #FIXME: temporary
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
-
-    @property
-    def parent(self):
-        """Method for getting a unit's parent.
-
-        This method exists because in the current set up, it has been tricky to
-        define the parent as a db.relationship.
-        """
-
-        return Unit.query.get(self.parent_id)
-
-    @classmethod
-    def documents(cls):
-        """Returns units of the document type.
-
-        Note that this should eventually take a collection as a parameter, or
-        be replaced by a method from the Collection model
-        """
-
-        return Unit.query.filter_by(unit_type="document").all()
+    __mapper_args__ = {
+        "polymorphic_identity": "unit",
+        "polymorphic_on": unit_type
+    }
 
     def __repr__(self):
         """Return a representation of a unit, which is its type followed by its
         ordering number
         """
 
-        return "<Unit: " + " ".join([str(self.unit_type), str(self.number)]) + ">"
+        return "<Unit: " + " ".join([str(self.unit_type),
+            str(self.number)]) + ">"
+
+class Document(Unit, db.Model):
+    """A model for a single document file.
+
+    Documents are top-level Units. See the description in the Unit model for
+    further details.
+
+    Attributes:
+      title (str): the title of the document
+      path (str): the location of the file on the system
+      unit_id (int): a link to its corresponding unit
+      collection_id (int): a link to its collection
+
+    Relationships:
+      has one: unit
+      has many: sentences
+      belongs to: collection
+    """
+
+    # Attributes
+    id = db.Column(db.Integer, db.ForeignKey("unit.id"), primary_key=True)
+    title = db.Column(db.String, index = True)
+    path = db.Column(db.String)
+    sentence_count = db.Column(db.Integer)
+
+    # Relationships
+    parent_id = None
+    #children = db.relationship("Unit", backref="parent") FIXME: No parents
+
+    __mapper_args__ = {
+        "polymorphic_identity": "document",
+    }
+
+    @property
+    def properties(self):
+        """Convenience access to this document's properties
+        """
+
+        return self.unit.properties
+
+    def __repr__(self):
+        return "<Document: " + str(self.title) + ">"
 
 class Sentence(db.Model, Base):
     """A model representing a sentence.
@@ -576,7 +540,7 @@ class DocumentSet(Set, db.Model):
     #__tablename__ = "documentset"
 
     id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
-    documents = db.relationship("Unit",
+    documents = db.relationship("Document",
         secondary="documents_in_documentsets",
         backref="sets")
 
@@ -752,7 +716,7 @@ sentences_in_sentencesets = db.Table("sentences_in_sentencesets",
 #TODO: are we going to have a Document object?
 documents_in_documentsets = db.Table("documents_in_documentsets",
     db.metadata,
-    db.Column("document_id", db.Integer, db.ForeignKey("unit.id")),
+    db.Column("document_id", db.Integer, db.ForeignKey("document.id")),
     db.Column("documentset_id", db.Integer, db.ForeignKey("document_set.id"))
 )
 
@@ -766,5 +730,11 @@ sequences_in_sequencesets = db.Table("sequences_in_sequencesets",
     db.metadata,
     db.Column("sequence_id", db.Integer, db.ForeignKey("sequence.id")),
     db.Column("sequenceset_id", db.Integer, db.ForeignKey("sequence_set.id")),
+)
+
+documents_in_projects = db.Table("documents_in_projects",
+    db.metadata,
+    db.Column("document_id", db.Integer, db.ForeignKey("document.id")),
+    db.Column("project_id", db.Integer, db.ForeignKey("project.id"))
 )
 
