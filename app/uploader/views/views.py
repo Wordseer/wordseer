@@ -286,6 +286,7 @@ def document_show(project_id, document_id):
     #document = helpers.get_object_or_exception(Unit,
     #   Unit.id == document_id, exceptions.DocumentNotFoundException)
     try:
+        #TODO: broken query
         document = Document.query.\
             filter(Document.id == document_id).\
             filter(User == current_user).\
