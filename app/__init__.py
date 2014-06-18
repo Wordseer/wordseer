@@ -39,3 +39,4 @@ from app.wordseer import wordseer as wordseer_bp
 
 app.register_blueprint(uploader_bp)
 app.register_blueprint(wordseer_bp)
+

@@ -1,20 +1,20 @@
 # Modified from:
 # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
 import os
-from sys import argv
-
-from app import app, db
-
-from migrate.versioning import api
-import imp
 import shutil
 from sqlalchemy import create_engine
+from sys import argv
+
+from app import app
+from app import db
+from migrate.versioning import api
+import imp
 
 SQLALCHEMY_DATABASE_URI = app.config["SQLALCHEMY_DATABASE_URI"]
-print SQLALCHEMY_DATABASE_URI
 SQLALCHEMY_MIGRATE_REPO = app.config["SQLALCHEMY_MIGRATE_REPO"]
 
 def create():
+    #FIXME: does not seem to work
     create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
     if not os.path.exists(SQLALCHEMY_MIGRATE_REPO):
         api.create(SQLALCHEMY_MIGRATE_REPO, 'database repository')
@@ -63,6 +63,18 @@ def reset():
         pass
 
     db.create_all()
+
+def cache():
+    """Copy the current database file to ``SQLALCHEMY_DATABASE_CACHE_PATH``.
+    """
+    shutil.copyfile(app.config["SQLALCHEMY_DATABASE_PATH"],
+        app.config["SQLALCHEMY_DATABASE_CACHE_PATH"])
+
+def restore_cache():
+    """Copy the cached file to where the database file should be.
+    """
+    shutil.copyfile(app.config["SQLALCHEMY_DATABASE_CACHE_PATH"],
+        app.config["SQLALCHEMY_DATABASE_PATH"])
 
 if __name__ == "__main__":
 
