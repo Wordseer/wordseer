@@ -8,7 +8,7 @@ from app.models import Set
 from app.models import SequenceSet
 from app.models import SentenceSet
 from app.models import DocumentSet
-from common import reset_db
+import database
 
 class TestSets(unittest.TestCase):
     """Test all the different ``Set`` models.
@@ -16,7 +16,7 @@ class TestSets(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        reset_db()
+        database.restore_cache()
 
         cls.set = Set()
         cls.sequenceset = SequenceSet()

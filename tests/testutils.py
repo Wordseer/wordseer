@@ -11,14 +11,14 @@ from app import app
 from app import db
 from app.models import Sequence, Word, SequenceSet
 from app.wordseer import helpers
-import common
+import database
 
 class TestUtils(unittest.TestCase):
     """Test the helpers module.
     """
     @classmethod
     def setUpClass(cls):
-        common.reset_db()
+        database.restore_cache()
         cls.word1 = Word(word="foo", lemma="bar")
         cls.word2 = Word(word="foo", lemma="baz")
         cls.word3 = Word(word="bar", lemma="bar")

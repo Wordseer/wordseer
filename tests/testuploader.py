@@ -16,11 +16,11 @@ from app import app as application
 from app import db
 from app import user_datastore
 from app.models import *
-import common
+import database
 
 class TestModels(unittest.TestCase):
     def setUp(self):
-        common.reset_db()
+        database.restore_cache()
 
     def test_model_word(self):
         """Test to make sure that the atttributes of the Word model can be
@@ -199,7 +199,7 @@ class ViewsTests(unittest.TestCase):
         """Clear the database for the next unit test.
         """
         self.client = application.test_client()
-        common.reset_db()
+        database.restore_cache()
         self.user = user_datastore.create_user(email="foo@foo.com",
             password="password")
         db.session.commit()
@@ -557,7 +557,7 @@ class AuthTests(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        common.reset_db()
+        database.restore_cache()
         cls.client = application.test_client()
         cls.user1 = user_datastore.create_user(email="foo@foo.com",
             password="password")
@@ -618,7 +618,7 @@ class LoggedOutTests(unittest.TestCase):
     def setUpClass(cls):
         """Reset the DB and create a dummy project and document.
         """
-        common.reset_db()
+        database.restore_cache()
         cls.client = application.test_client()
         user = User()
         db.session.add(user)
