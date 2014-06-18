@@ -263,9 +263,16 @@ class Sentence(db.Model, Base):
 
     # Relationships
 
-    words = association_proxy("word_in_sentence", "word")
-    sequences = association_proxy("sequence_in_sentence", "sequence")
-    dependencies = association_proxy("dependency_in_sentence", "dependency")
+    words = association_proxy("word_in_sentence", "word",
+        creator=lambda word: WordInSentence(word=word)
+    )
+
+    sequences = association_proxy("sequence_in_sentence", "sequence",
+        creator=lambda sequence: SequenceInSentence(sequence=sequence)
+    )
+    dependencies = association_proxy("dependency_in_sentence", "dependency",
+        creator=lambda dependency: DependencyInSentence(dependency=dependency)
+    )
 
     def __repr__(self):
         """Representation of the sentence, showing its text.
@@ -347,8 +354,13 @@ class Word(db.Model, Base):
 
     # Relationships
 
-    sentences = association_proxy("word_in_sentence", "sentence")
-    sequences = association_proxy("word_in_sequence", "sequence")
+    sentences = association_proxy("word_in_sentence", "sentence",
+        creator = lambda sentence: WordInSentence(sentence=sentence)
+    )
+
+    sequences = association_proxy("word_in_sequence", "sequence",
+        creator = lambda sequence: WordInSequence(sequence=sequence)
+    )
 
     def __repr__(self):
         """Representation string for words, showing the word.
@@ -415,8 +427,12 @@ class Sequence(db.Model, Base):
 
     # Relationships
 
-    sentences = association_proxy("sequence_in_sentence", "sentence")
-    words = association_proxy("word_in_sequence", "word")
+    sentences = association_proxy("sequence_in_sentence", "sentence",
+        creator = lambda sentence: SequenceInSentence(sentence=sentence)
+    )
+    words = association_proxy("word_in_sequence", "word",
+        creator = lambda word: WordInSequence(word=word)
+    )
 
 class GrammaticalRelationship(db.Model, Base):
     """A grammatical relationship between two words.
@@ -475,7 +491,9 @@ class Dependency(db.Model, Base):
         "Word", foreign_keys = [dependent_id], backref = "dependent_dependencies"
     )
 
-    sentences = association_proxy("dependency_in_sentence", "sentence")
+    sentences = association_proxy("dependency_in_sentence", "sentence",
+        creator = lambda sentence: DependencyInSentence(sentence=sentence)
+    )
 
     def __init__(self, relationship=None, governor=None, dependent=None):
         """Create a dependency between the governor and dependent with the given
