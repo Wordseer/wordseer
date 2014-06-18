@@ -14,7 +14,6 @@ SQLALCHEMY_DATABASE_URI = app.config["SQLALCHEMY_DATABASE_URI"]
 SQLALCHEMY_MIGRATE_REPO = app.config["SQLALCHEMY_MIGRATE_REPO"]
 
 def create():
-    #FIXME: does not seem to work
     create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
     if not os.path.exists(SQLALCHEMY_MIGRATE_REPO):
         api.create(SQLALCHEMY_MIGRATE_REPO, 'database repository')
