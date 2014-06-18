@@ -122,6 +122,14 @@ class Project(db.Model, Base):
     files = db.relationship("Document", secondary="documents_in_projects",
         backref="projects") #FIXME: these are docs
 
+    def belongs_to(user):
+        """Checks if this project belongs to the user
+        """
+        return self.project in user.projects
+
+        # for many-to-many document and projects, use this:
+        # return any([project in user.projects for project in self.projects])
+
 class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.
 
@@ -701,13 +709,8 @@ class WordInSequence(db.Model, Base):
         )
     )
 
-    def __init__(self, word=None, sequence=None):
-        self.word = word
-        self.sequence = sequence
-
-
 class DependencyInSentence(db.Model, Base):
-    """Association object for dependencies in sentences
+    """Association object for dependencies in sentences.
     """
 
     dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id"))
