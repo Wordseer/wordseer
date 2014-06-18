@@ -125,10 +125,8 @@ class Project(db.Model, Base):
     def belongs_to(user):
         """Checks if this project belongs to the user
         """
-        return self.project in user.projects
 
-        # for many-to-many document and projects, use this:
-        # return any([project in user.projects for project in self.projects])
+        return any([project in user.projects for project in self.projects])
 
 class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.
