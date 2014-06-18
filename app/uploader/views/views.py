@@ -6,7 +6,6 @@ import os
 import shutil
 import random
 from string import ascii_letters, digits
-import pdb
 
 from flask import config
 from flask import redirect
@@ -286,23 +285,24 @@ def document_show(project_id, document_id):
     #document = helpers.get_object_or_exception(Unit,
     #   Unit.id == document_id, exceptions.DocumentNotFoundException)
     try:
-        #TODO: broken query
-        document = Document.query.\
-            filter(Document.id == document_id).\
-            filter(User == current_user).\
-            one()
-    except NoResultFound:
-        raise exceptions.DocumentNotFoundException
+        document = Document.query.get(document_id)
+    except TypeError:
+        return app.login_manager.unauthorized()
+
+    access_granted = current_user.has_document(Document.query.get(document_id))
 
     # Test if this user can see it
-    if document.project.user != current_user:
+    if not access_granted:
         return app.login_manager.unauthorized()
 
     filename = os.path.split(document.path)[1]
+    #TODO: move to objects
+    project = Project.query.join(User).filter(User.id == current_user.id).\
+        filter(Document.id == document_id).one()
 
     return render_template("document_show.html",
         document=document,
-        project=document.project,
+        project=project,
         filename=filename)
 
 @uploader.route(app.config["UPLOAD_ROUTE"] + "<int:file_id>")
@@ -310,16 +310,20 @@ def document_show(project_id, document_id):
 def get_file(file_id):
     """If the user has permission to view this file, then return it.
     """
-    #pdb.set_trace()
-    #FIXME: this query is broken
-    document = Document.query.\
-        filter(Document.id == file_id).\
-        filter(User == current_user).all()
-
     # Test if this user can see it
-    if not document or not unit.path:
+#    if not document or not unit.path:
+
+#return app.login_manager.unauthorized()
+
+    try:
+        access_granted = current_user.has_document(
+            Document.query.get(file_id))
+    except TypeError:
         return app.login_manager.unauthorized()
 
+    # Test if this user can see it
+    if not access_granted:
+        return app.login_manager.unauthorized()
     directory, filename = os.path.split(unit.path)
 
     return send_from_directory(directory, filename)

@@ -543,7 +543,6 @@ class ViewsTests(unittest.TestCase):
     def test_document_show(self):
         """Test the detail document view.
         """
-        pdb.set_trace()
         projxyz = Project(name="test project", path="/test-path/",
             user=self.user)
         docxyz = Document(path="/test-path/test-file.xml", projects=[projxyz])

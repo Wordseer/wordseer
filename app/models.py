@@ -103,6 +103,12 @@ class User(db.Model, UserMixin):
     sets = db.relationship("Set", backref="user")
     projects = db.relationship("Project", backref="user")
 
+    def has_document(self, document):
+        """Check if this user owns this document.
+        """
+
+        return any([project in self.projects for project in document.projects])
+
 class Project(db.Model, Base):
     """A WordSeer project for a collection of documents.
     """
@@ -198,6 +204,12 @@ class Document(Unit, db.Model):
         """
 
         return self.unit.properties
+
+    def belongs_to(self, user):
+        """Check if this Document belongs to this user.
+        """
+
+        return any([project in user.projects for project in self.projects])
 
     def __repr__(self):
         return "<Document: " + str(self.title) + ">"
