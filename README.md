@@ -51,9 +51,15 @@ Then, from the root directory of `corenlp`, execute the following:
 
     python setup.py install
 
-This should install `corenlp` to your system. In order to complete the setup,
-version *3.2.0* of Stanford's CoreNLP library must simply be in a directory
-accessible to the backend.
+This should install `corenlp` to your system.
+
+In order to complete the setup, version *3.2.0* of Stanford's CoreNLP
+library must simply be in a directory accessible to the backend. From the
+root directory of `wordseerbackend`:
+
+    wget http://nlp.stanford.edu/software/stanford-corenlp-full-2013-06-20.zip
+    unzip stanford-corenlp-full-2013-06-20.zip
+    mv stanford-corenlp-full-2013-06-20 stanford-corenlp
 
 You must also run the `createdb.py` script before running for the first time:
 
@@ -85,3 +91,4 @@ If you want to build the documentation, you will need to install `sphinx`:
     pip install sphinx
 
 Then run `make html` in the `docs` directory.
+
