@@ -26,6 +26,10 @@ class Base(object):
     @declared_attr
     def __tablename__(cls):
         """Convert camel case class name to snake for the tables.
+
+        Although db.Model should include a __tablename__ by default, the mixin
+        does not seem to be working as expected; hence, we have left this
+        method here that works the same as flask_sqlalchemy's.
         """
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', cls.__name__)
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
@@ -67,6 +71,9 @@ class Base(object):
 
     def __repr__(self):
         """Default representation string for models.
+
+        Output format is as follows:
+        <ClassName: | att1: val1 | att2: val2 | .... |>
         """
 
         repr_str = "<" + self.__class__.__name__ + ":"

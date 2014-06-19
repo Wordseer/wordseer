@@ -9,6 +9,6 @@ from flask import Blueprint
 wordseer = Blueprint('wordseer', __name__,
     template_folder='templates',
     static_folder="static",
-    static_url_path=os.path.dirname(__file__))
+    static_url_path="/" + os.path.dirname(__file__))
 
 from .views import *
