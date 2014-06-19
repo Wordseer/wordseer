@@ -84,10 +84,6 @@ Models
 ######
 """
 
-roles_users = db.Table('roles_users',
-        db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-        db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
-
 class Role(db.Model, RoleMixin):
     """Represents a flask-security user role.
     """
@@ -104,7 +100,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
-    roles = db.relationship('Role', secondary=roles_users,
+    roles = db.relationship('Role', secondary="roles_users",
         backref=db.backref('users', lazy='dynamic'))
 
     sets = db.relationship("Set", backref="user")
@@ -770,5 +766,10 @@ documents_in_projects = db.Table("documents_in_projects",
     db.metadata,
     db.Column("document_id", db.Integer, db.ForeignKey("document.id")),
     db.Column("project_id", db.Integer, db.ForeignKey("project.id"))
+)
+
+roles_users = db.Table('roles_users',
+        db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+        db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 )
 
