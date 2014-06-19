@@ -11,9 +11,12 @@ written in Python using the Flask framework and several web framework libraries.
 ## Running the application
 1.  Create a virtualenv
 2.  Run:
+        (UNIX)
 
         pip -r requirements.txt
 
+        (Win)
+        pip -r install requirements_win.txt
     to install the necessary packages.
 3.  Run:
 
