@@ -265,6 +265,8 @@ class Sentence(db.Model, Base):
         creator=lambda dependency: DependencyInSentence(dependency=dependency)
     )
 
+    document = db.relationship("Document", foreign_keys = [document_id], backref="all_sentences")
+
     def __repr__(self):
         """Representation of the sentence, showing its text.
 
