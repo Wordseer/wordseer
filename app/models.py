@@ -129,8 +129,8 @@ class Project(db.Model, Base):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     # Relationships
-    files = db.relationship("Document", secondary="documents_in_projects",
-        backref="projects") #FIXME: these are docs
+    documents = db.relationship("Document", secondary="documents_in_projects",
+        backref="projects")
 
     def belongs_to(user):
         """Checks if this project belongs to the user

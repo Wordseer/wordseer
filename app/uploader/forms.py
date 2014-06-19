@@ -122,7 +122,7 @@ class ProjectProcessForm(ProcessForm):
         if form.process_button.data == form.PROCESS:
             for project_id in form.selection.data:
                 project = Project.query.filter(Project.id == project_id).one()
-                is_processable(units=project.files)
+                is_processable(units=project.documents)
 
 class ConfirmDeleteForm(Form, HiddenSubmitted):
     """A form that will ask users to confirm their deletions.
@@ -134,3 +134,4 @@ class ConfirmDeleteForm(Form, HiddenSubmitted):
         value=DELETE)
     cancel_button = ButtonField(text="No, do not delete", name="action",
         value=CANCEL)
+
