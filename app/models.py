@@ -376,7 +376,7 @@ class Property(db.Model, Base):
         """Representation string for properties, showing the property name
         """
 
-        return "<Property: " + self.name + ">"
+        return "<Property: " + str(self.name) + ">"
 
 class Sequence(db.Model, Base):
     """A sequence of at most 4 consecutive words in a sentence.
