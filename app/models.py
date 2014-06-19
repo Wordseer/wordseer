@@ -4,11 +4,15 @@ Models for the wordseer frontend as a whole.
 These models set up user authentication, which is used by all blueprints in
 the application.
 """
+import re
 
-from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
+from flask.ext.security import RoleMixin
+from flask.ext.security import SQLAlchemyUserDatastore
+from flask.ext.security import UserMixin
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
-import re
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound
 
 from app import db
 
@@ -26,7 +30,6 @@ class Base(object):
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', cls.__name__)
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
-
     def save(self):
         """Commits this model instance to the database
 
@@ -42,21 +45,25 @@ class Base(object):
         """Retrieves a record that matches the query, or create a new record
         with the parameters of the query.
 
-        Returns False if more than one record is retrieved.
+        Arguments:
+            kwargs: Conditions that the record should match.
+
+        Returns:
+            ``False`` if more than one record is retrieved, a new instance
+            of the model if none are found, and the existing instance if one
+            is found.
         """
 
-        match = cls.query.filter_by(**kwargs)
-
-        if match.count() == 0:
+        try:
+            match = cls.query.filter_by(**kwargs).one()
+        except NoResultFound:
             new_record = cls(**kwargs)
             new_record.save()
             return new_record
-
-        elif match.count() == 1:
-            return match.first()
-
-        else:
+        except MultipleResultsFound:
             return False
+
+        return match
 
     def __repr__(self):
         """Default representation string for models.
@@ -139,10 +146,13 @@ class Unit(db.Model, Base):
     Attributes:
       unit_type (str): the unit type (document, section, etc.).
       number (int): a sequencing number (e.g. 2 for chapter 2).
-      parent_id (int): a link to the parent unit.
+      parent (Unit): The ``Unit`` that owns this ``Unit``.
+      children (list of Units): ``Unit``s that this ``Unit`` owns.
+      sentences (list of Sentences): ``Sentences`` found in this ``Unit``.
+      properties (list of Properties): Metadata for this unit.
 
     Relationships:
-      has one: document
+      has one: parent
       has many: children (Unit), sentences, properties
     """
 
@@ -165,7 +175,7 @@ class Unit(db.Model, Base):
 
     def __repr__(self):
         """Return a representation of a unit, which is its type followed by its
-        ordering number
+        ordering number.
         """
 
         return "<Unit: " + " ".join([str(self.unit_type),
@@ -178,10 +188,8 @@ class Document(Unit, db.Model):
     further details.
 
     Attributes:
-      title (str): the title of the document
-      path (str): the location of the file on the system
-      unit_id (int): a link to its corresponding unit
-      collection_id (int): a link to its collection
+        title (str): the title of the document
+        path (str): the location of the file on the system
 
     Relationships:
       has one: unit
@@ -197,6 +205,7 @@ class Document(Unit, db.Model):
 
     # Relationships
     parent_id = None
+    parent = None
     #children = db.relationship("Unit", backref="parent") FIXME: No parents
 
     __mapper_args__ = {
@@ -739,7 +748,6 @@ sentences_in_sentencesets = db.Table("sentences_in_sentencesets",
     db.Column("sentenceset_id", db.Integer, db.ForeignKey("sentence_set.id"))
 )
 
-#TODO: are we going to have a Document object?
 documents_in_documentsets = db.Table("documents_in_documentsets",
     db.metadata,
     db.Column("document_id", db.Integer, db.ForeignKey("document.id")),
