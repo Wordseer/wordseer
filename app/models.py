@@ -160,6 +160,7 @@ class Unit(db.Model, Base):
     """
 
     # Attributes
+    # We need to redefine ID here for the children relationship
     id = db.Column(db.Integer, primary_key=True)
     unit_type = db.Column(db.String(64), index = True)
     number = db.Column(db.Integer, index = True)
@@ -201,6 +202,7 @@ class Document(Unit, db.Model):
     """
 
     # Attributes
+    # We need to redefine ID here for polymorphic inheritance
     id = db.Column(db.Integer, db.ForeignKey("unit.id"), primary_key=True)
     title = db.Column(db.String, index = True)
     path = db.Column(db.String)
