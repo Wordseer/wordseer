@@ -151,7 +151,6 @@ class Unit(db.Model, Base):
     unit_type = db.Column(db.String(64), index = True)
     number = db.Column(db.Integer, index = True)
     parent_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
-    path = db.Column(db.String) #FIXME this is just for testing purposes
 
     # Relationships
     children = db.relationship("Unit", backref=db.backref("parent",
@@ -204,15 +203,11 @@ class Document(Unit, db.Model):
         "polymorphic_identity": "document",
     }
 
-    @property
-    def properties(self):
-        """Convenience access to this document's properties
-        """
-
-        return self.unit.properties
-
     def belongs_to(self, user):
-        """Check if this Document belongs to this user.
+        """Check if this ``Document`` belongs to this ``User``.
+
+        Arguments:
+            user (User): A ``User`` to check ownership to.
         """
 
         return any([project in user.projects for project in self.projects])
