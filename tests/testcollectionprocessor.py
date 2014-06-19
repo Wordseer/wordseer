@@ -149,7 +149,7 @@ class TestCollectionProcessor(unittest.TestCase):
         mock_writer.get_max_sentence_id.return_value = max_id
 
         attrs = {"words": range(10)}
-        sentences = [mock.MagicMock(**attrs) for x in range(0, max_id)]
+        sentences = [mock.MagicMock(words=range(10), id=x) for x in range(0, max_id)]
         def get_sentence(arg):
             return sentences[arg]
 

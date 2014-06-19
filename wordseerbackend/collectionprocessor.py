@@ -5,6 +5,7 @@ between the input and the pipeline.
 
 from datetime import datetime
 import os
+import pdb
 
 from . import config
 from .database.database import Database
@@ -41,7 +42,7 @@ class CollectionProcessor(object):
         :param boolean start_from_scratch: If true, then the tables in the
             database will be recreated.
         """
-        # Set up database if necessary
+	# Set up database if necessary
         if start_from_scratch is True:
             with Database() as database:
                 database.reset()
@@ -205,6 +206,7 @@ class CollectionProcessor(object):
         on it.
         """
 
+        pdb.set_trace()
         latest_sentence = logger.get("latest_sequence_sentence")
 
         if len(latest_sentence) == 0:
