@@ -89,8 +89,8 @@ class CLPDView(View):
 
         if os.path.isdir(obj.path):
             shutil.rmtree(obj.path)
-            for unit in obj.files:
-                db.session.delete(unit)
+            for document in obj.documents:
+                db.session.delete(document)
             db.session.commit()
         else:
             os.remove(obj.path)

@@ -129,8 +129,8 @@ class Project(db.Model, Base):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     # Relationships
-    files = db.relationship("Document", secondary="documents_in_projects",
-        backref="projects") #FIXME: these are docs
+    documents = db.relationship("Document", secondary="documents_in_projects",
+        backref="projects")
 
     def belongs_to(user):
         """Checks if this project belongs to the user
@@ -160,6 +160,7 @@ class Unit(db.Model, Base):
     """
 
     # Attributes
+    # We need to redefine ID here for the children relationship
     id = db.Column(db.Integer, primary_key=True)
     unit_type = db.Column(db.String(64), index = True)
     number = db.Column(db.Integer, index = True)
@@ -201,6 +202,7 @@ class Document(Unit, db.Model):
     """
 
     # Attributes
+    # We need to redefine ID here for polymorphic inheritance
     id = db.Column(db.Integer, db.ForeignKey("unit.id"), primary_key=True)
     title = db.Column(db.String, index = True)
     path = db.Column(db.String)
@@ -383,7 +385,7 @@ class Property(db.Model, Base):
         """Representation string for properties, showing the property name
         """
 
-        return "<Property: " + self.name + ">"
+        return "<Property: " + str(self.name) + ">"
 
 class Sequence(db.Model, Base):
     """A sequence of at most 4 consecutive words in a sentence.
