@@ -12,7 +12,7 @@ written in Python using the Flask framework and several web framework libraries.
 1.  Create a virtualenv
 2.  Run:
 
-        pip -r requirements.txt
+        pip install -r requirements.txt
 
     to install the necessary packages.
 3.  Run:
