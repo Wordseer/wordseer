@@ -5,7 +5,6 @@ between the input and the pipeline.
 
 from datetime import datetime
 import os
-import pdb
 
 from . import config
 from .database.database import Database
@@ -206,7 +205,6 @@ class CollectionProcessor(object):
         on it.
         """
 
-        pdb.set_trace()
         latest_sentence = logger.get("latest_sequence_sentence")
 
         if len(latest_sentence) == 0:
@@ -236,3 +234,4 @@ class CollectionProcessor(object):
                         str(max_sentence_id))
 
             sentences_processed += 1
+

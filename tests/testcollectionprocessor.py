@@ -148,8 +148,9 @@ class TestCollectionProcessor(unittest.TestCase):
         max_id = 20
         mock_writer.get_max_sentence_id.return_value = max_id
 
-        attrs = {"words": range(10)}
-        sentences = [mock.MagicMock(words=range(10), id=x) for x in range(0, max_id)]
+        sentences = [mock.MagicMock(words=range(10), id=x)
+            for x in range(0, max_id)]
+
         def get_sentence(arg):
             return sentences[arg]
 
@@ -316,3 +317,4 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.calculate_index_sequences.called == False
         assert colproc.parse_documents.called == False
         assert colproc.extract_record_metadata.called == False
+
