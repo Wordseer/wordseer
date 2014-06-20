@@ -45,9 +45,9 @@ class DocumentParser(object):
             current_max = 0
             logger.log(LATEST_SENT_ID, str(current_max), logger.REPLACE)
 
-        for sentence in document.sentences:
+        for sentence in document.all_sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
-                parse_products = self.parser.parse(sentence.sentence)
+                parse_products = self.parser.parse(sentence.text)
                 parsed.add_sentence(sentence, parse_products)
                 count += 1
                 current_max = sentence.id
