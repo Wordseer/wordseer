@@ -1,3 +1,6 @@
+from app import db
+from base import Base
+
 class Project(db.Model, Base):
     """A WordSeer project for a collection of documents.
     """
