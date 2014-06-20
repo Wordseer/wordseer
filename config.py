@@ -113,7 +113,7 @@ class Testing(BaseConfig):
 
     # Set database configurations
     SQLALCHEMY_DATABASE_PATH = tempfile.mkstemp()[1]
-    # SQLALCHEMY_DATABASE_PATH = os.path.join(BaseConfig.ROOT, BaseConfig.APP_NAME + "_dev.db")
+    # SQLALCHEMY_DATABASE_PATH = os.path.join(BaseConfig.ROOT, BaseConfig.APP_NAME + "_test.db")
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLALCHEMY_DATABASE_PATH
 
     SQLALCHEMY_DATABASE_CACHE_PATH = tempfile.mkstemp()[1]

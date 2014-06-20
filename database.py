@@ -59,8 +59,7 @@ def reset():
     try:
         os.remove(SQLALCHEMY_DATABASE_URI.split('///')[-1])
     except OSError:
-        print("Database not found; exiting.")
-        pass
+        print("Database not found; creating new database.")
 
     db.create_all()
 
