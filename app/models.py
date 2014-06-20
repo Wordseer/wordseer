@@ -482,20 +482,11 @@ class Dependency(db.Model, Base):
         creator = lambda sentence: DependencyInSentence(sentence=sentence)
     )
 
-    def __init__(self, relationship=None, governor=None, dependent=None):
-        """Create a dependency between the governor and dependent with the given
-        grammatical relationship
-        """
-
-        self.grammatical_relationship = relationship
-        self.governor = governor
-        self.dependent = dependent
-
     def __repr__(self):
         """Representation string for the dependency
         """
 
-        rel = self.grammatical_relationship.relationship
+        rel = self.grammatical_relationship.name
         gov = self.governor.word
         dep = self.dependent.word
 
