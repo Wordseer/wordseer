@@ -131,21 +131,6 @@ class Project(db.Model, Base):
     documents = db.relationship("Document", secondary="documents_in_projects",
             backref="projects")
 
-    def belongs_to(self, user):
-        """Checks if this ``Project`` belongs to the given ``User``.
-
-        Arguments:
-            user (User): The ``User`` object to check ownership for.
-
-        Returns:
-            boolean: ``True`` if ``user`` owns this ``Project``, ``False``
-            otherwise.
-        """
-        #FIXME: broken
-        pass
-
-        return any([project in user.projects for project in self.projects])
-
 class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.
 
