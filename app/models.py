@@ -7,7 +7,6 @@ the application.
 import re
 
 from flask.ext.security import RoleMixin
-from flask.ext.security import SQLAlchemyUserDatastore
 from flask.ext.security import UserMixin
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -130,7 +129,22 @@ class Project(db.Model, Base):
 
     # Relationships
     documents = db.relationship("Document", secondary="documents_in_projects",
-        backref="projects")
+            backref="projects")
+
+    def belongs_to(self, user):
+        """Checks if this ``Project`` belongs to the given ``User``.
+
+        Arguments:
+            user (User): The ``User`` object to check ownership for.
+
+        Returns:
+            boolean: ``True`` if ``user`` owns this ``Project``, ``False``
+            otherwise.
+        """
+        #FIXME: broken
+        pass
+
+        return any([project in user.projects for project in self.projects])
 
 class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.
@@ -156,8 +170,8 @@ class Unit(db.Model, Base):
     # Attributes
     # We need to redefine ID here for the children relationship
     id = db.Column(db.Integer, primary_key=True)
-    unit_type = db.Column(db.String(64), index = True)
-    number = db.Column(db.Integer, index = True)
+    unit_type = db.Column(db.String(64), index=True)
+    number = db.Column(db.Integer, index=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
 
     # Relationships
@@ -198,7 +212,7 @@ class Document(Unit, db.Model):
     # Attributes
     # We need to redefine ID here for polymorphic inheritance
     id = db.Column(db.Integer, db.ForeignKey("unit.id"), primary_key=True)
-    title = db.Column(db.String, index = True)
+    title = db.Column(db.String, index=True)
     path = db.Column(db.String)
     sentence_count = db.Column(db.Integer)
 
@@ -232,7 +246,8 @@ class Sentence(db.Model, Base):
 
     Attributes:
       unit_id: a link to the unit containing the sentence.
-      document_id: the document (top-level unit) to which this sentence belongs to.
+      document_id: the document (top-level unit) to which this sentence belongs
+        to.
       text: the raw text of the sentence.
 
     Relationships:
@@ -244,7 +259,7 @@ class Sentence(db.Model, Base):
 
     unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
     document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
-    text = db.Column(db.Text, index = True)
+    text = db.Column(db.Text, index=True)
 
     # Relationships
 
@@ -259,7 +274,8 @@ class Sentence(db.Model, Base):
         creator=lambda dependency: DependencyInSentence(dependency=dependency)
     )
 
-    document = db.relationship("Document", foreign_keys = [document_id], backref="all_sentences")
+    document = db.relationship("Document", foreign_keys=[document_id],
+        backref="all_sentences")
 
     def __repr__(self):
         """Representation of the sentence, showing its text.
@@ -283,11 +299,11 @@ class Sentence(db.Model, Base):
         """
 
         word_in_sentence = WordInSentence(
-            word = word,
-            sentence = self,
-            position = position,
-            space_before = space_before,
-            tag = tag
+            word=word,
+            sentence=self,
+            position=position,
+            space_before=space_before,
+            tag=tag
         )
         word_in_sentence.save()
 
@@ -300,10 +316,10 @@ class Sentence(db.Model, Base):
         """
 
         dependency_in_sentence = DependencyInSentence(
-            dependency = dependency,
-            sentence = self,
-            governor_index = governor_index,
-            dependent_index = dependent_index
+            dependency=dependency,
+            sentence=self,
+            governor_index=governor_index,
+            dependent_index=dependent_index
         )
 
         dependency_in_sentence.save()
@@ -311,15 +327,29 @@ class Sentence(db.Model, Base):
         return dependency_in_sentence
 
     def add_sequence(self, sequence, position=None):
-        """Add a sequence to the sentence by explicitly creating the
+        """Add a ``Sequence`` to the ``Sentence`` by explicitly creating the
         association object.
+
+        Arguments:
+            sequence (Sequence): The ``Sequence`` to associate with this
+                ``Sentence``.
+            position (int): The position (0-indexed) of this ``Sequence`` in
+                this ``Sentence``.
+
+        Returns:
+            SequenceInSentence: The association object that associates this
+            ``Sentence`` and ``sequence``.
         """
 
         sequence_in_sentence = SequenceInSentence(
-            sequence = sequence,
-            sentence = self,
-            position = position
+            sequence=sequence,
+            sentence=self,
+            position=position
         )
+
+        sequence_in_sentence.save()
+
+        return sequence_in_sentence
 
 class Word(db.Model, Base):
     """A model representing a word.
@@ -335,18 +365,18 @@ class Word(db.Model, Base):
 
     # Attributes
 
-    word = db.Column(db.String, index = True)
-    lemma = db.Column(db.String, index = True)
-    tag = db.Column(db.String, index = True)
+    word = db.Column(db.String, index=True)
+    lemma = db.Column(db.String, index=True)
+    tag = db.Column(db.String, index=True)
 
     # Relationships
 
     sentences = association_proxy("word_in_sentence", "sentence",
-        creator = lambda sentence: WordInSentence(sentence=sentence)
+        creator=lambda sentence: WordInSentence(sentence=sentence)
     )
 
     sequences = association_proxy("word_in_sequence", "sequence",
-        creator = lambda sequence: WordInSequence(sequence=sequence)
+        creator=lambda sequence: WordInSequence(sequence=sequence)
     )
 
     def __repr__(self):
@@ -374,8 +404,8 @@ class Property(db.Model, Base):
 
     # Attributes
     unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
-    name = db.Column(db.String, index = True)
-    value = db.Column(db.String, index = True)
+    name = db.Column(db.String, index=True)
+    value = db.Column(db.String, index=True)
 
     def __repr__(self):
         """Representation string for properties, showing the property name
@@ -404,21 +434,21 @@ class Sequence(db.Model, Base):
 
     # Attributes
 
-    sequence = db.Column(db.String, index = True)
+    sequence = db.Column(db.String, index=True)
     lemmatized = db.Column(db.Boolean)
     has_function_words = db.Column(db.Boolean)
     all_function_words = db.Column(db.Boolean)
-    length = db.Column(db.Integer, index = True)
-    sentence_count = db.Column(db.Integer, index = True)
-    document_count = db.Column(db.Integer, index = True)
+    length = db.Column(db.Integer, index=True)
+    sentence_count = db.Column(db.Integer, index=True)
+    document_count = db.Column(db.Integer, index=True)
 
     # Relationships
 
     sentences = association_proxy("sequence_in_sentence", "sentence",
-        creator = lambda sentence: SequenceInSentence(sentence=sentence)
+        creator=lambda sentence: SequenceInSentence(sentence=sentence)
     )
     words = association_proxy("word_in_sequence", "word",
-        creator = lambda word: WordInSequence(word=word)
+        creator=lambda word: WordInSequence(word=word)
     )
 
 class GrammaticalRelationship(db.Model, Base):
@@ -436,7 +466,7 @@ class GrammaticalRelationship(db.Model, Base):
 
     # Attributes
 
-    name = db.Column(db.String, index = True)
+    name = db.Column(db.String, index=True)
 
 class Dependency(db.Model, Base):
     """A representation of the grammatical dependency between two words.
@@ -463,8 +493,8 @@ class Dependency(db.Model, Base):
     )
     governor_id = db.Column(db.Integer, db.ForeignKey("word.id"))
     dependent_id = db.Column(db.Integer, db.ForeignKey("word.id"))
-    sentence_count = db.Column(db.Integer, index = True)
-    document_count = db.Column(db.Integer, index = True)
+    sentence_count = db.Column(db.Integer, index=True)
+    document_count = db.Column(db.Integer, index=True)
 
     # Relationships
 
@@ -472,14 +502,14 @@ class Dependency(db.Model, Base):
         "GrammaticalRelationship", backref="dependency"
     )
     governor = db.relationship(
-        "Word", foreign_keys = [governor_id], backref = "governor_dependencies"
+        "Word", foreign_keys=[governor_id], backref="governor_dependencies"
     )
     dependent = db.relationship(
-        "Word", foreign_keys = [dependent_id], backref = "dependent_dependencies"
+        "Word", foreign_keys=[dependent_id], backref="dependent_dependencies"
     )
 
     sentences = association_proxy("dependency_in_sentence", "sentence",
-        creator = lambda sentence: DependencyInSentence(sentence=sentence)
+        creator=lambda sentence: DependencyInSentence(sentence=sentence)
     )
 
     def __repr__(self):
