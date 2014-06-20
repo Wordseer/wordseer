@@ -132,12 +132,6 @@ class Project(db.Model, Base):
     documents = db.relationship("Document", secondary="documents_in_projects",
         backref="projects")
 
-    def belongs_to(user):
-        """Checks if this project belongs to the user
-        """
-
-        return any([project in user.projects for project in self.projects])
-
 class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.
 
