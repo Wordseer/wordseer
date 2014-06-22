@@ -1,8 +1,12 @@
+"""The ``Base`` class that provides some helpful methods to other models.
+"""
 import re
-from app import db
+
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
+
+from app import db
 
 class Base(object):
     """This is a mixin to add to Flask-SQLAlchemy"s db.Model class.
@@ -72,3 +76,4 @@ class Base(object):
         repr_str += " |>"
 
         return repr_str
+

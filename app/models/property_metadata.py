@@ -1,3 +1,6 @@
+"""Models for property metadata.
+"""
+
 from app import db
 from base import Base
 
@@ -24,3 +27,4 @@ class PropertyMetadata(db.Model, Base):
     is_category = db.Column(db.Boolean)
     display_name = db.Column(db.String)
     display = db.Column(db.Boolean)
+

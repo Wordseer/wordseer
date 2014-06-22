@@ -1,5 +1,8 @@
+"""Set models.
+"""
+
 from app import db
-from base import Base
+from .base import Base
 
 class Set(db.Model, Base):
     """This is the basic ``Set`` class.
@@ -29,7 +32,7 @@ class Set(db.Model, Base):
         "polymorphic_on": type,
     }
 
-class SequenceSet(Set, db.Model):
+class SequenceSet(Set):
     """A ``Set`` that can have a list of ``Sequences`` in it.
 
     The ``type`` attribute a ``SequenceSet`` is set to ``sequenceset``.
@@ -37,8 +40,6 @@ class SequenceSet(Set, db.Model):
     Attributes:
         sequences (list): A list of ``Sequence``s in this ``SequenceSet``.
     """
-
-    #__tablename__ = "sequenceset"
 
     id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
     sequences = db.relationship("Sequence",
@@ -49,7 +50,7 @@ class SequenceSet(Set, db.Model):
         "polymorphic_identity": "sequenceset",
     }
 
-class SentenceSet(Set, db.Model):
+class SentenceSet(Set):
     """A ``Set`` that can have a list of ``Sentences`` in it.
 
     The ``type`` attribute of a ``SentenceSet`` is set to ``sentenceset``.
@@ -57,8 +58,6 @@ class SentenceSet(Set, db.Model):
     Attributes:
         sentences (list): A list of ``Sentence``s in this ``SentenceSet``.
     """
-
-    #__tablename__ = "sentenceset"
 
     id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
     sentences = db.relationship("Sentence",
@@ -69,7 +68,7 @@ class SentenceSet(Set, db.Model):
         "polymorphic_identity": "sequenceset",
     }
 
-class DocumentSet(Set, db.Model):
+class DocumentSet(Set):
     """A Set that can have a list of ``Document``s in it.
 
     The ``type`` attribute of a ``DocumentSet`` is set to ``sentenceset``.
@@ -77,8 +76,6 @@ class DocumentSet(Set, db.Model):
     Attributes:
         documents (list): A list of ``Document``s in this ``DocumentSet``.
     """
-
-    #__tablename__ = "documentset"
 
     id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
     documents = db.relationship("Document",
@@ -88,3 +85,4 @@ class DocumentSet(Set, db.Model):
     __mapper_args__ = {
         "polymorphic_identity": "sequenceset",
     }
+

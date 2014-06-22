@@ -1,3 +1,6 @@
+"""Models to describe grammatical relationships.
+"""
+
 from app import db
 from base import Base
 
@@ -17,3 +20,4 @@ class GrammaticalRelationship(db.Model, Base):
     # Attributes
 
     name = db.Column(db.String, index=True)
+

@@ -1,8 +1,19 @@
+"""Association objects for many-to-many relationships that require further
+detail than simply two foreign key columns.
+"""
+
 from app import db
 from base import Base
 
 class WordInSentence(db.Model, Base):
-    """Association object for words in sentences
+    """Association object for ``Word``s in ``Sentence``s.
+
+    Attributes:
+        word (Word): The ``Word`` in this relationship.
+        sentence (Sentence): The ``Sentence`` in this relationship.
+        position (int): The position of ``word`` in ``sentence``.
+        space_before (str): The space before ``word`` (if any).
+        tag (str): The part of speech of ``word``.
     """
 
     word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
@@ -33,7 +44,13 @@ class WordInSentence(db.Model, Base):
         self.tag = tag
 
 class SequenceInSentence(db.Model, Base):
-    """Association object for sequences in sentences
+    """Association object for sequences in sentences.
+
+    Attributes:
+        sequence (Sequence): The ``Sequence`` in this relationship.
+        sentence (Sentence): The ``Sentence`` in this relationship.
+        position (int): The starting index (0-indexed) of ``sequence`` in
+            ``sentence``.
     """
 
     sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
@@ -58,7 +75,11 @@ class SequenceInSentence(db.Model, Base):
         self.position = position
 
 class WordInSequence(db.Model, Base):
-    """Association object for words in sequences
+    """Association object for words in sequences.
+
+    Attributes:
+        word (Word): The ``Word`` in this relationship.
+        sequence (Sequence): The ``Sequence`` in this relationship.
     """
 
     word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
@@ -78,6 +99,14 @@ class WordInSequence(db.Model, Base):
 
 class DependencyInSentence(db.Model, Base):
     """Association object for dependencies in sentences.
+
+    Attributes:
+        dependency (Dependency): The ``Dependency`` in this relationship.
+        sentence (Sentence): The ``Sentence`` in this relationship.
+        governor_index (int): The position (0-indexed) of the governor of
+            ``dependency`` in ``sentence``.
+        dependent_index (int): The position (0-indexed) of the dependent of
+            ``dependency`` in ``sentence``.
     """
 
     dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id"))
@@ -104,3 +133,4 @@ class DependencyInSentence(db.Model, Base):
         self.sentence = sentence
         self.governor_index = governor_index
         self.dependent_index = dependent_index
+

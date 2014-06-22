@@ -1,16 +1,12 @@
-
+"""The Document model.
 """
-Models for the wordseer frontend as a whole.
-
-These models set up user authentication, which is used by all blueprints in
-the application.
-"""
-from app import db
-from base import Base
-from unit import Unit
 from sqlalchemy.ext.associationproxy import association_proxy
 
-class Document(Unit, db.Model):
+from app import db
+from .base import Base
+from .unit import Unit
+
+class Document(Unit):
     """A model for a single document file.
 
     Documents are top-level Units. See the description in the Unit model for
@@ -21,9 +17,9 @@ class Document(Unit, db.Model):
         path (str): the location of the file on the system
 
     Relationships:
-      has one: unit
-      has many: sentences
-      belongs to: collection
+        has one: unit
+        has many: sentences
+        belongs to: collection
     """
 
     # Attributes
@@ -47,9 +43,14 @@ class Document(Unit, db.Model):
 
         Arguments:
             user (User): A ``User`` to check ownership to.
+
+        Returns:
+            ``True`` if this ``Document`` is in any of the ``Project``s owned
+            by ``user``, ``False`` otherwise.
         """
 
         return any([project in user.projects for project in self.projects])
 
     def __repr__(self):
         return "<Document: " + str(self.title) + ">"
+

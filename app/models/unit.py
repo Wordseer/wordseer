@@ -41,9 +41,10 @@ class Unit(db.Model, Base):
     }
 
     def __repr__(self):
-        """Return a representation of a unit, which is its type followed by its
-        ordering number.
+        """Return a string representation of a unit, which is its type followed
+        by its ordering number.
         """
 
         return "<Unit: " + " ".join([str(self.unit_type),
             str(self.number)]) + ">"
+

@@ -1,7 +1,12 @@
-from app import db
-from base import Base
-from association_objects import WordInSentence, DependencyInSentence, SequenceInSentence
+"""Sentence models.
+"""
 from sqlalchemy.ext.associationproxy import association_proxy
+
+from app import db
+from .base import Base
+from .association_objects import DependencyInSentence
+from .association_objects import SequenceInSentence
+from .association_objects import WordInSentence
 
 class Sentence(db.Model, Base):
     """A model representing a sentence.
@@ -11,14 +16,19 @@ class Sentence(db.Model, Base):
     (the model), and also stores its own raw text, for use in search results.
 
     Attributes:
-      unit_id: a link to the unit containing the sentence.
-      document_id: the document (top-level unit) to which this sentence belongs
-        to.
-      text: the raw text of the sentence.
+        unit (Unit): The ``Unit`` containing this sentence.
+        document (Document): the ``Document`` (top-level unit) to which this
+            sentence belongs to.
+        text (str): The raw text of the sentence.
+        sequences (list of Sequences): ``Sequence``s present in this sentence.
+            This relationship is described with ``SequenceInSentence``.
+        dependencies (list of Dependencies): ``Dependency``s present in this
+            sentence. This relationship is described with
+            ``DependencyInSentence``.
 
     Relationships:
-      belongs to: unit, document
-      has many: words, sequences, dependencies
+        belongs to: unit, document
+        has many: words, sequences, dependencies
     """
 
     # Attributes
@@ -62,6 +72,18 @@ class Sentence(db.Model, Base):
         """Add a word to the sentence by explicitly creating the association
         object.
 
+        Arguments:
+            word (Word): The ``Word`` that should be added to this ``Sentence``.
+
+        Keyword Arguments:
+            position (int): The position (0-indexed) of ``word`` in this
+                ``Sentence``.
+            space_before (str): The space before ``word``, if any.
+            tage (str): The part of speech of ``word``.
+
+        Returns:
+            WordInSentence: The association object that associates this
+                ``Sentence`` and ``word``.
         """
 
         word_in_sentence = WordInSentence(
@@ -79,6 +101,19 @@ class Sentence(db.Model, Base):
         dependent_index=None):
         """Add a dependency to the sentence by explicitly creating the
         association object.
+
+        Arguments:
+            dependency (Dependency): The ``Dependency`` in this relationship.
+
+        Keyword Arguments:
+            governor_index (int): Position (0-indexed) of the governor in this
+                ``Sentence``. Default is ``None``.
+            dependent_index (int): Position (0-indexed) of the dependent in this
+                ``Sentence``. Default is ``None``.
+
+        Returns:
+            DependencyInSentence: The association object that associates this
+                ``Sentence`` and ``dependency``.
         """
 
         dependency_in_sentence = DependencyInSentence(
@@ -99,8 +134,10 @@ class Sentence(db.Model, Base):
         Arguments:
             sequence (Sequence): The ``Sequence`` to associate with this
                 ``Sentence``.
+
+        Keyword Arguments:
             position (int): The position (0-indexed) of this ``Sequence`` in
-                this ``Sentence``.
+                this ``Sentence``. Default is ``None``.
 
         Returns:
             SequenceInSentence: The association object that associates this
@@ -116,5 +153,4 @@ class Sentence(db.Model, Base):
         sequence_in_sentence.save()
 
         return sequence_in_sentence
-
 

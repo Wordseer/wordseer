@@ -1,3 +1,5 @@
+"""Simple many-to-many associations that don't require additional data.
+"""
 from app import db
 
 sentences_in_sentencesets = db.Table("sentences_in_sentencesets",
