@@ -29,6 +29,13 @@ class Set(db.Model, Base):
         "polymorphic_on": type,
     }
 
+    def get_items(self):
+        """Subclasses of ``Set`` should override this method to return a list
+        of whatever they are ``Set``s of.
+        """
+
+        raise NotImplementedError()
+
 class SequenceSet(Set, db.Model):
     """A ``Set`` that can have a list of ``Sequences`` in it.
 
@@ -48,6 +55,15 @@ class SequenceSet(Set, db.Model):
     __mapper_args__ = {
         "polymorphic_identity": "sequenceeset",
     }
+
+    def get_items(self):
+        """Return the ``Sequence``s associated with this ``SequenceSet``.
+
+        Returns:
+            list of Sequences
+        """
+
+        return sequences
 
 class SentenceSet(Set, db.Model):
     """A ``Set`` that can have a list of ``Sentences`` in it.
@@ -69,6 +85,15 @@ class SentenceSet(Set, db.Model):
         "polymorphic_identity": "sentenceset",
     }
 
+    def get_items(self):
+        """Return the ``Sentence``s associated with this ``SentenceSet``.
+
+        Returns:
+            list of Sentences
+        """
+
+        return sequences
+
 class DocumentSet(Set, db.Model):
     """A Set that can have a list of ``Document``s in it.
 
@@ -88,4 +113,13 @@ class DocumentSet(Set, db.Model):
     __mapper_args__ = {
         "polymorphic_identity": "documentset",
     }
+
+    def get_items(self):
+        """Return the ``Document``s associated with this ``DocumentSet``.
+
+        Returns:
+            list of Documents
+        """
+
+        return sequences
 
