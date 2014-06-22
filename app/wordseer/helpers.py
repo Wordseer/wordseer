@@ -322,3 +322,22 @@ def get_number_of_sentences_in_slice():
 def get_number_of_documents_in_slice():
     pass
 
+def get_model_from_tablename(tablename):
+    """Given a tablename, retrieve the model that is associated with it.
+
+    Arguments:
+        tablename (str): The table whose model should be retrieved.
+
+    Returns:
+        The model that is associated with ``tablename``, ``None`` otherwise.
+    """
+
+    for model in db.Model._decl_class_registry_.values():
+        try:
+            if model.__tablename__ == tablename:
+                return model
+        except AttributeError:
+            pass
+
+    return None
+
