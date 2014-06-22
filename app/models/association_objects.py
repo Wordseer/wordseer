@@ -10,6 +10,7 @@ class WordInSentence(db.Model, Base):
     position = db.Column(db.Integer)
     space_before = db.Column(db.String)
     tag = db.Column(db.String)
+    surface = db.Column(db.String)
 
     sentence = db.relationship("Sentence",
         backref=db.backref(
@@ -104,3 +105,4 @@ class DependencyInSentence(db.Model, Base):
         self.sentence = sentence
         self.governor_index = governor_index
         self.dependent_index = dependent_index
+
