@@ -44,3 +44,16 @@ def list_subset_contents(set_id):
 
     return jsonify(contents)
 
+def get_highlight_text(start, start_index, end, end_index):
+    """???
+
+    Arguments:
+        start
+        start_index
+        end
+        end_index
+    """
+    #TODO: this has nothing to do with highlights, whatever those are
+
+    pass
+

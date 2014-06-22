@@ -6,6 +6,7 @@ from datetime import date
 from flask import abort
 from flask import jsonify
 
+from ...models import Set
 from ...models import User
 from ..helpers import get_model_from_tablename
 
