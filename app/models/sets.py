@@ -46,7 +46,7 @@ class SequenceSet(Set, db.Model):
         backref="sets")
 
     __mapper_args__ = {
-        "polymorphic_identity": "sequenceset",
+        "polymorphic_identity": "sequenceeset",
     }
 
 class SentenceSet(Set, db.Model):
@@ -66,7 +66,7 @@ class SentenceSet(Set, db.Model):
         backref="sets")
 
     __mapper_args__ = {
-        "polymorphic_identity": "sequenceset",
+        "polymorphic_identity": "sentenceset",
     }
 
 class DocumentSet(Set, db.Model):
@@ -86,5 +86,6 @@ class DocumentSet(Set, db.Model):
         backref="sets")
 
     __mapper_args__ = {
-        "polymorphic_identity": "sequenceset",
+        "polymorphic_identity": "documentset",
     }
+
