@@ -5,13 +5,13 @@ from flask import abort
 from flask import request
 from flask.json import jsonify
 from flask.views import View
-from sqlalchemy import _not
+from sqlalchemy import not_
 from sqlalchemy import func
 from sqlalchemy.sql.expression import asc
 from sqlalchemy.sql.expression import literal_column
 
 from .. import wordseer
-from ...models import PropertyMetadata, WorkingSet, Property, Sequence, SequenceInSentence
+from ...models import PropertyMetadata, Property, Sequence, SequenceInSentence
 from app import db
 
 class AutoSuggest(View):
@@ -116,7 +116,7 @@ class AutoSuggest(View):
         #TODO: document_count
         sets = db.session.query(WorkingSet.id,
             Property.name.label("text"),
-            literal_column("'phrase-set'").label("class")
+            literal_column("'phrase-set'").label("class"),
             func.count(Property.unit_id.distinct()).label("unit_count")).\
                 filter(Property.unit_name == "sentence").\
                 filter(Property.value == WorkingSet.id).\
