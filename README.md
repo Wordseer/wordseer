@@ -30,3 +30,15 @@ written in Python using the Flask framework and several web framework libraries.
 
         python runtests.py
 
+## Documentation
+
+Documentation is
+[available on readthedocs](http://wordseer-flask.readthedocs.org). You can also
+build it yourself:
+
+	cd docs/
+	make html
+
+Or, on windows, simply run `make.bat`.
+
+
