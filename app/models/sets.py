@@ -22,10 +22,18 @@ class Set(db.Model, Base):
         type (str): The type of ``Set`` that this is.
     """
 
+    # Attributes
+    # We need to redefine ID to nest sets
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     name = db.Column(db.String)
     creation_date = db.Column(db.Date)
     type = db.Column(db.String)
+    parent_id = db.Column(db.Integer, db.ForeignKey("set.id"))
+
+    # Relationships
+    children = db.relationship("Set", backref=db.backref("parent",
+        remote_side=[id]))
 
     __mapper_args__ = {
         "polymorphic_identity": "set",
@@ -119,3 +127,4 @@ class DocumentSet(Set):
         """
 
         return documents
+

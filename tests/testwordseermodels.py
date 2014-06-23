@@ -33,6 +33,13 @@ class TestSets(unittest.TestCase):
 
         sets = db.session.query(Set).all()
 
+        set2 = Set()
+        self.set.children = [set2]
+        set2.save()
+
+        assert set2.parent == self.set
+        assert self.set.children == [set2]
+
         assert len(sets) == 4
         assert self.set in sets
 
