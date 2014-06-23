@@ -32,9 +32,6 @@ class Set(db.Model, Base):
         "polymorphic_on": type,
     }
 
-<<<<<<< HEAD
-class SequenceSet(Set):
-=======
     def get_items(self):
         """Subclasses of ``Set`` should override this method to return a list
         of whatever they are ``Set``s of.
@@ -42,8 +39,7 @@ class SequenceSet(Set):
 
         raise NotImplementedError()
 
-class SequenceSet(Set, db.Model):
->>>>>>> master
+class SequenceSet(Set):
     """A ``Set`` that can have a list of ``Sequences`` in it.
 
     The ``type`` attribute a ``SequenceSet`` is set to ``sequenceset``.
@@ -61,9 +57,6 @@ class SequenceSet(Set, db.Model):
         "polymorphic_identity": "sequenceeset",
     }
 
-<<<<<<< HEAD
-class SentenceSet(Set):
-=======
     def get_items(self):
         """Return the ``Sequence``s associated with this ``SequenceSet``.
 
@@ -73,8 +66,7 @@ class SentenceSet(Set):
 
         return sequences
 
-class SentenceSet(Set, db.Model):
->>>>>>> master
+class SentenceSet(Set):
     """A ``Set`` that can have a list of ``Sentences`` in it.
 
     The ``type`` attribute of a ``SentenceSet`` is set to ``sentenceset``.
@@ -92,9 +84,6 @@ class SentenceSet(Set, db.Model):
         "polymorphic_identity": "sentenceset",
     }
 
-<<<<<<< HEAD
-class DocumentSet(Set):
-=======
     def get_items(self):
         """Return the ``Sentence``s associated with this ``SentenceSet``.
 
@@ -104,8 +93,7 @@ class DocumentSet(Set):
 
         return sequences
 
-class DocumentSet(Set, db.Model):
->>>>>>> master
+class DocumentSet(Set):
     """A Set that can have a list of ``Document``s in it.
 
     The ``type`` attribute of a ``DocumentSet`` is set to ``sentenceset``.
@@ -123,8 +111,6 @@ class DocumentSet(Set, db.Model):
         "polymorphic_identity": "documentset",
     }
 
-<<<<<<< HEAD
-=======
     def get_items(self):
         """Return the ``Document``s associated with this ``DocumentSet``.
 
@@ -133,5 +119,3 @@ class DocumentSet(Set, db.Model):
         """
 
         return sequences
-
->>>>>>> master
