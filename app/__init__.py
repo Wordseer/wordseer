@@ -25,13 +25,14 @@ Database Set Up
 
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
-from app.models.flask_security import User, Role
+from app.models import *
 
 """
 Authentication setup
 """
 
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+user_datastore = SQLAlchemyUserDatastore(db, flask_security.User,
+    flask_security.Role)
 security = Security(app, user_datastore)
 
 from app.uploader import uploader as uploader_bp

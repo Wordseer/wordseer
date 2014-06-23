@@ -32,7 +32,18 @@ class Set(db.Model, Base):
         "polymorphic_on": type,
     }
 
+<<<<<<< HEAD
 class SequenceSet(Set):
+=======
+    def get_items(self):
+        """Subclasses of ``Set`` should override this method to return a list
+        of whatever they are ``Set``s of.
+        """
+
+        raise NotImplementedError()
+
+class SequenceSet(Set, db.Model):
+>>>>>>> master
     """A ``Set`` that can have a list of ``Sequences`` in it.
 
     The ``type`` attribute a ``SequenceSet`` is set to ``sequenceset``.
@@ -47,10 +58,23 @@ class SequenceSet(Set):
         backref="sets")
 
     __mapper_args__ = {
-        "polymorphic_identity": "sequenceset",
+        "polymorphic_identity": "sequenceeset",
     }
 
+<<<<<<< HEAD
 class SentenceSet(Set):
+=======
+    def get_items(self):
+        """Return the ``Sequence``s associated with this ``SequenceSet``.
+
+        Returns:
+            list of Sequences
+        """
+
+        return sequences
+
+class SentenceSet(Set, db.Model):
+>>>>>>> master
     """A ``Set`` that can have a list of ``Sentences`` in it.
 
     The ``type`` attribute of a ``SentenceSet`` is set to ``sentenceset``.
@@ -65,10 +89,23 @@ class SentenceSet(Set):
         backref="sets")
 
     __mapper_args__ = {
-        "polymorphic_identity": "sequenceset",
+        "polymorphic_identity": "sentenceset",
     }
 
+<<<<<<< HEAD
 class DocumentSet(Set):
+=======
+    def get_items(self):
+        """Return the ``Sentence``s associated with this ``SentenceSet``.
+
+        Returns:
+            list of Sentences
+        """
+
+        return sequences
+
+class DocumentSet(Set, db.Model):
+>>>>>>> master
     """A Set that can have a list of ``Document``s in it.
 
     The ``type`` attribute of a ``DocumentSet`` is set to ``sentenceset``.
@@ -83,6 +120,18 @@ class DocumentSet(Set):
         backref="sets")
 
     __mapper_args__ = {
-        "polymorphic_identity": "sequenceset",
+        "polymorphic_identity": "documentset",
     }
 
+<<<<<<< HEAD
+=======
+    def get_items(self):
+        """Return the ``Document``s associated with this ``DocumentSet``.
+
+        Returns:
+            list of Documents
+        """
+
+        return sequences
+
+>>>>>>> master

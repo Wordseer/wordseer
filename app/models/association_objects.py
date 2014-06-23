@@ -21,6 +21,7 @@ class WordInSentence(db.Model, Base):
     position = db.Column(db.Integer)
     space_before = db.Column(db.String)
     tag = db.Column(db.String)
+    surface = db.Column(db.String)
 
     sentence = db.relationship("Sentence",
         backref=db.backref(

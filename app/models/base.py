@@ -36,6 +36,12 @@ class Base(object):
         db.session.add(self)
         db.session.commit()
 
+    def delete(self):
+        """Deletes this model instance and commits.
+        """
+        db.session.delete(self)
+        db.session.commit()
+
     @classmethod
     def find_or_create(cls, **kwargs):
         """Retrieves a record that matches the query, or create a new record

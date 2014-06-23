@@ -5,7 +5,9 @@ import pdb
 
 from flask import request
 
-from ..models import *
+from ..models.association_tables import sequences_in_sequencesets
+from ..models.sequence import Sequence
+from ..models.word import Word
 from app import app
 from app import db
 
@@ -321,4 +323,23 @@ def get_number_of_sentences_in_slice():
 #TODO: filtered_sent_ids vs cached_filtered_sent_ids
 def get_number_of_documents_in_slice():
     pass
+
+def get_model_from_tablename(tablename):
+    """Given a tablename, retrieve the model that is associated with it.
+
+    Arguments:
+        tablename (str): The table whose model should be retrieved.
+
+    Returns:
+        The model that is associated with ``tablename``, ``None`` otherwise.
+    """
+
+    for model in db.Model._decl_class_registry_.values():
+        try:
+            if model.__tablename__ == tablename:
+                return model
+        except AttributeError:
+            pass
+
+    return None
 

@@ -16,7 +16,15 @@ from sqlalchemy import create_engine
 from app import app as application
 from app import db
 from app import user_datastore
-from app.models import *
+from app.models.document import Document
+from app.models.dependency import Dependency
+from app.models.flask_security import User
+from app.models.property import Property
+from app.models.project import Project
+from app.models.sentence import Sentence
+from app.models.sequence import Sequence
+from app.models.unit import Unit
+from app.models.word import Word
 import database
 
 class TestModels(unittest.TestCase):
