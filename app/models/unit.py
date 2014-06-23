@@ -10,7 +10,7 @@ class Unit(db.Model, Base):
     Units are hierarchical; one unit can contain many children units.
 
     Attributes:
-      unit_type (str): the unit type (document, section, etc.).
+      type (str): the unit type (document, section, etc.).
       number (int): a sequencing number (e.g. 2 for chapter 2).
       parent (Unit): The ``Unit`` that owns this ``Unit``.
       children (list of Units): ``Unit``s that this ``Unit`` owns.
@@ -25,7 +25,7 @@ class Unit(db.Model, Base):
     # Attributes
     # We need to redefine ID here for the children relationship
     id = db.Column(db.Integer, primary_key=True)
-    unit_type = db.Column(db.String(64), index=True)
+    type = db.Column(db.String(64))
     number = db.Column(db.Integer, index=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
 
@@ -37,7 +37,7 @@ class Unit(db.Model, Base):
 
     __mapper_args__ = {
         "polymorphic_identity": "unit",
-        "polymorphic_on": unit_type
+        "polymorphic_on": type
     }
 
     def __repr__(self):
