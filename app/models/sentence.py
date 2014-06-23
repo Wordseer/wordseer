@@ -20,9 +20,9 @@ class Sentence(db.Model, Base):
         document (Document): the ``Document`` (top-level unit) to which this
             sentence belongs to.
         text (str): The raw text of the sentence.
-        sequences (list of Sequences): ``Sequence``s present in this sentence.
+        sequences (list of Sequences): ``Sequence``\s present in this sentence.
             This relationship is described with ``SequenceInSentence``.
-        dependencies (list of Dependencies): ``Dependency``s present in this
+        dependencies (list of Dependencies): ``Dependency``\s present in this
             sentence. This relationship is described with
             ``DependencyInSentence``.
 
