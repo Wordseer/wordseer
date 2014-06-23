@@ -29,8 +29,7 @@ class ButtonField(Field):
         return str(self.text)
 
 class MultiCheckboxField(SelectMultipleField):
-    """
-    A multiple-select, except displays a list of checkboxes.
+    """A multiple-select, except displays a list of checkboxes.
 
     Iterating the field will produce subfields, allowing custom rendering of
     the enclosed checkbox fields.
@@ -42,12 +41,13 @@ class MultiCheckboxField(SelectMultipleField):
         """Add a tuple to the choices property of the selection field. A bit
         shorter than typing out the full command.
 
-        :param choice_id: The first item in the tuple. From a template, this
-        value is reachable as the .id attribute of every item in the selection
-        field.
-        :param choice_data: The second item in the tuple. From a template, this
-        value is reachable as the .data attribute of every item in the selection
-        field.
+        Arguments:
+            choice_id (int): The first item in the tuple. From a template, this
+                value is reachable as the .id attribute of every item in the
+                selectionfield.
+            choice_data: The second item in the tuple. From a template,
+                this value is reachable as the .data attribute of every item in
+                the selection field.
         """
 
         self.choices.append((choice_id, choice_data))
@@ -56,12 +56,14 @@ class MultiCheckboxField(SelectMultipleField):
         """The reverse of add_choice: remove a choice from the choices property
         of the selection field.
 
-        :param choice_id: The first item in the tuple. From a template, this
-        value is reachable as the .id attribute of every item in the selection
-        field.
-        :param choice_data: The second item in the tuple. From a template, this
-        value is reachable as the .data attribute of every item in the selection
-        field.
+        Arguments:
+            choice_id (int): The first item in the tuple. From a template, this
+                value is reachable as the .id attribute of every item in the
+                selection field.
+            choice_data: The second item in the tuple. From a template, this
+                value is reachable as the .data attribute of every item in the
+                selection field.
         """
 
         self.choices.remove((choice_id, choice_data))
+

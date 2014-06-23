@@ -70,8 +70,9 @@ class Base(object):
     def __repr__(self):
         """Default representation string for models.
 
-        Output format is as follows:
-        <ClassName: | att1: val1 | att2: val2 | .... |>
+        Output format is as follows::
+
+            <ClassName: | att1: val1 | att2: val2 | .... |>
         """
 
         repr_str = "<" + self.__class__.__name__ + ":"

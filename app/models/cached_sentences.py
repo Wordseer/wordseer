@@ -12,7 +12,7 @@ class CachedSentences(db.Model, Base):
     The query ID of a given entry is its ID.
 
     Attributes:
-        sentences (list): A list of ``Sentence``s connected with this query.
+        sentences (list): A list of ``Sentence``\s connected with this query.
     """
 
     sentences = db.relationship("Sentence",

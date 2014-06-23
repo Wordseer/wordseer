@@ -72,7 +72,7 @@ def remove_spaces_around_punctuation(sentence):
 
 #TODO: needs clarification
 def get_words_in_sentence(sentence_id):
-    """Given a ``Sentence`` ID, return information about all ``Word``s in that
+    """Given a ``Sentence`` ID, return information about all ``Word``\s in that
     sentence in the form of a list.
 
     The structure of the list is like this::
@@ -261,7 +261,7 @@ def get_lemma_variant_ids(surface_word):
     """Get ``Word`` IDs for all words that have the same lemma as this one.
 
     That is, get the list of all lemmas whose surface word is ``surface_word``
-    and then return the IDs of all ``Word``s that have those lemmas.
+    and then return the IDs of all ``Word``\s that have those lemmas.
 
     Arguments:
         surface_word (str): The surface word to query.
@@ -285,7 +285,7 @@ def get_lemma_variant_ids(surface_word):
 
 #TODO: merge with above?
 def get_lemma_variants(surface_word):
-    """Get the ``word`` attributes of ``Word``s that all have the same lemma
+    """Get the ``word`` attributes of ``Word``\s that all have the same lemma
     as the given word.
 
     Arguments:

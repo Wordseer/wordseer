@@ -8,11 +8,11 @@ class PropertyMetadata(db.Model, Base):
     """Describes ``Property`` objects of the same type: metametadata, if you
     will.
 
-    ``Property``s must have additional data attached to it to describe to
+    ``Property``\s must have additional data attached to it to describe to
     wordseer what should be done with it.
 
     Attributes:
-        type (str): The type of these ``Property``s (string, int, date, etc.)
+        type (str): The type of these ``Property``\s (string, int, date, etc.)
         filterable (boolean): If True, then this ``Property`` object should be
             filterable in the wordseer interface.
         display_name (str): The name of the property that this object is

@@ -6,7 +6,7 @@ from app import db
 from base import Base
 
 class WordInSentence(db.Model, Base):
-    """Association object for ``Word``s in ``Sentence``s.
+    """Association object for ``Word``\s in ``Sentence``\s.
 
     Attributes:
         word (Word): The ``Word`` in this relationship.
