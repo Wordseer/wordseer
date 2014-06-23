@@ -91,7 +91,7 @@ class SentenceSet(Set):
             list of Sentences
         """
 
-        return sequences
+        return sentences
 
 class DocumentSet(Set):
     """A Set that can have a list of ``Document``s in it.
@@ -118,4 +118,4 @@ class DocumentSet(Set):
             list of Documents
         """
 
-        return sequences
+        return documents
