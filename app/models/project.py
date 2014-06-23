@@ -10,7 +10,7 @@ class Project(db.Model, Base):
         name (str): A human-readable name for this project.
         path (str): The location of the directory of the files of this project.
         user (User): The owner of this project.
-        documents (list of Documents): ``Document``s present in this project.
+        documents (list of Documents): ``Document``\s present in this project.
     """
 
     # Attributes

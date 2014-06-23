@@ -7,12 +7,15 @@ from .base import Base
 class Set(db.Model, Base):
     """This is the basic ``Set`` class.
 
-    ``Set``s are made of either ``Sequence``s, ``Sentence``s and ``Document``s.
+    ``Set``\s contain other objects; by default, there are ``DocumentSet``\s,
+    ``SentenceSet``\s, and ``SequenceSet``\s, containing ``Document``\s,
+    ``Sentence``\s, and ``Sequence``\s respectively.
+
     A ``Set`` model has an association with a ``User`` and has some properties
     like a name and a creation date.
 
-    The more specialized type of ``Set``s (like ``SequenceSet``s, etc) inherit
-    from this table.
+    The more specialized type of ``Set``\s (like ``SequenceSet``\s, etc) inherit
+    from this class.
 
     Attributes:
         user (User): The ``User`` that owns this ``Set``
@@ -42,7 +45,7 @@ class Set(db.Model, Base):
 
     def get_items(self):
         """Subclasses of ``Set`` should override this method to return a list
-        of whatever they are ``Set``s of.
+        of whatever they are ``Set``\s of.
         """
 
         raise NotImplementedError()
@@ -66,7 +69,7 @@ class SequenceSet(Set):
     }
 
     def get_items(self):
-        """Return the ``Sequence``s associated with this ``SequenceSet``.
+        """Return the ``Sequence``\s associated with this ``SequenceSet``.
 
         Returns:
             list of Sequences
@@ -80,7 +83,7 @@ class SentenceSet(Set):
     The ``type`` attribute of a ``SentenceSet`` is set to ``sentenceset``.
 
     Attributes:
-        sentences (list): A list of ``Sentence``s in this ``SentenceSet``.
+        sentences (list): A list of ``Sentence``\s in this ``SentenceSet``.
     """
 
     id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
@@ -93,7 +96,7 @@ class SentenceSet(Set):
     }
 
     def get_items(self):
-        """Return the ``Sentence``s associated with this ``SentenceSet``.
+        """Return the ``Sentence``\s associated with this ``SentenceSet``.
 
         Returns:
             list of Sentences
@@ -102,12 +105,12 @@ class SentenceSet(Set):
         return sentences
 
 class DocumentSet(Set):
-    """A Set that can have a list of ``Document``s in it.
+    """A Set that can have a list of ``Document``\s in it.
 
     The ``type`` attribute of a ``DocumentSet`` is set to ``sentenceset``.
 
     Attributes:
-        documents (list): A list of ``Document``s in this ``DocumentSet``.
+        documents (list): A list of ``Document``\s in this ``DocumentSet``.
     """
 
     id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
