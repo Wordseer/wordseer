@@ -132,15 +132,14 @@ class TestModels(unittest.TestCase):
         """Test to make sure that Unit is working properly.
         """
 
-        unit_type = "section"
+        unit_type = Property(name="unit_type", value="section")
         number = 1
 
         unit = Unit()
 
-        unit.unit_type = unit_type
+        unit.properties = [unit_type]
         unit.number = number
 
-        assert unit.unit_type == unit_type
         assert unit.number == number
 
         sentence = Sentence()
@@ -151,7 +150,7 @@ class TestModels(unittest.TestCase):
         unit.properties.append(prop)
 
         assert unit.sentences == [sentence]
-        assert unit.properties == [prop]
+        assert unit.properties == [unit_type, prop]
 
         unit.save()
         prop.save()
@@ -159,7 +158,7 @@ class TestModels(unittest.TestCase):
         retrieved_prop = Property.query.filter(Property.name=="title").\
             filter(Property.value == "Hello World").first()
 
-        assert retrieved_prop.unit.unit_type == unit.unit_type
+        assert retrieved_prop.unit.type == "unit"
         assert retrieved_prop.unit.number == unit.number
 
     def test_model_property(self):
@@ -192,7 +191,7 @@ class TestModels(unittest.TestCase):
         d1 = Document(title="test", path="/path/to/d1")
         d1.save()
 
-        assert d1.unit_type == "document"
+        assert d1.type == "document"
 
         u1 = Unit()
         u1.save()
