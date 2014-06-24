@@ -36,15 +36,6 @@ class WordInSentence(db.Model, Base):
         )
     )
 
-    def __init__(self, word=None, sentence=None, position=None, space_before="",
-        tag=""):
-
-        self.word = word
-        self.sentence = sentence
-        self.position = position
-        self.space_before = space_before
-        self.tag = tag
-
 class SequenceInSentence(db.Model, Base):
     """Association object for sequences in sentences.
 
@@ -70,11 +61,6 @@ class SequenceInSentence(db.Model, Base):
             "sequence_in_sentence", cascade="all, delete-orphan"
         )
     )
-
-    def __init__(self, sequence=None, sentence=None, position=None):
-        self.sequence = sequence
-        self.sentence = sentence
-        self.position = position
 
 class WordInSequence(db.Model, Base):
     """Association object for words in sequences.
@@ -127,12 +113,3 @@ class DependencyInSentence(db.Model, Base):
             "dependency_in_sentence", cascade="all, delete-orphan"
         )
     )
-
-    def __init__(self, dependency=None, sentence=None, governor_index=None,
-        dependent_index=None):
-
-        self.dependency = dependency
-        self.sentence = sentence
-        self.governor_index = governor_index
-        self.dependent_index = dependent_index
-
