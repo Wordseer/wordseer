@@ -10,15 +10,17 @@ class Dependency(db.Model, Base):
     relationship.
 
     Attributes:
-      grammatical_relationship_id (int): link to the grammatical relationship
-      governor_id (int): link to the governor word
-      dependent_id (int): link to the dependent word
-      sentence_count (int): the number of sentences this appears in
-      document_count (int): the number of documents this appears in
+        grammatical_relationship (GrammaticalRelationship): The
+            ``GrammaticalRelationship`` which describes the relationship between
+            the governor and the dependent.
+        governor_id (int): link to the governor word
+        dependent_id (int): link to the dependent word
+        sentence_count (int): the number of sentences this appears in
+        document_count (int): the number of documents this appears in
 
     Relationships:
-      has one: dependent (Word), governor (Word), grammatical relationship
-      has many: sentences
+        Has one: dependent (Word), governor (Word), grammatical relationship
+        Has many: sentences
     """
 
     # Attributes

@@ -14,6 +14,7 @@ class WordInSentence(db.Model, Base):
         position (int): The position of ``word`` in ``sentence``.
         space_before (str): The space before ``word`` (if any).
         tag (str): The part of speech of ``word``.
+        surface (str): The ``Word`` with exact capitalization.
     """
 
     word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
