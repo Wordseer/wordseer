@@ -1,4 +1,4 @@
-"""Get words associated with a given word.
+"""Endpoints for fetching co-occurring and similar words
 """
 
 import json
@@ -84,6 +84,7 @@ class GetAssociatedWords(View):
 
         Returns:
             list of
+
         """
         ids = ", ".join(ids)
         context_conditions = ""
@@ -103,6 +104,14 @@ class GetAssociatedWords(View):
 
         #TODO: process sqlalchemy results
 
+class GetFrequentWords(View):
+    """Do the same thing as GetAssociatedWords, but return more results
+    in a different format and only one part of speech at a time.
+
+    TODO: why? """
+    pass
+
 wordseer.add_url_rule("/word-frequencies/word-frequencies",
     view_func=GetAssociatedWords.as_view("word-frequencies"))
 
+# TODO: URL rule for GetFrequentWords
