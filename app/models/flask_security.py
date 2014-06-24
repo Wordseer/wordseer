@@ -9,7 +9,6 @@ from .base import Base
 class Role(db.Model, Base, RoleMixin):
     """Represents a flask-security user role.
     """
-    id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
@@ -17,7 +16,6 @@ class User(db.Model, Base, UserMixin):
     """Represents a flask-security user.
     """
 
-    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
