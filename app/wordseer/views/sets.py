@@ -13,4 +13,5 @@ from .. import helpers
 
 class CRUD(View):
     """CRUD subsets"""
-    pass
+    def __init__(self):
+        """initialize variables needed for Set operations"""
