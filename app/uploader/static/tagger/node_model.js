@@ -3,15 +3,16 @@
  * wordseer compatible structure JSON file
  * @Author = Hassan Jannah
  */
-var DOCUMENT_TAG = 'document', SUBUNIT_TAG = 'subunit', METADATA_TAG = 'metadata', SENTANCE_TAG = 'sentance';
+var DOCUMENT_TAG = 'document', SUBUNIT_TAG = 'subunit', METADATA_TAG = 'metadata', SENTANCE_TAG = 'sentance', NODE_ID_PREFIX='tagger-id-';
 var NodeModel = function() {
-    var self = {};
-    var primaryKeys = ['id' , 'tag', 'type', 'xpaths', 'name', 'active'],
+    var self = {}, xml, url, filename;
+    var primaryKeys = ['id', 'tag', 'type', 'xpaths', 'name', 'active'],
+            document_keys = ['filename', 'url', 'xml'],
             subunit_keys = ['structureName'],
             metadata_keys = ['attr', 'propertyName', 'displayName', 'dataType', 'nameIsDisplayed', 'valueIsDisplayed', 'isCategory'];
-    self.attributes = {id:'', tag: '', type: '', xpaths: [], name: '',
+    self.attributes = {filename: '', url: '', xml: {}, id: '', tag: '', type: '', xpaths: [], name: '',
         units: [], metadata: [], children: [], sub_xpaths: [], attrs: {}, attr: '',
-        sbelongsTo: '',
+        sbelongsTo: '', isAttribute:false,
         isCategory: false, nameIsDisplayed: false, valueIsDisplayed: false, dataType: '',
         structureName: '', 'propertyName': '', displayName: '', root: false, sentance: false};
     self.init = function() {
@@ -21,6 +22,8 @@ var NodeModel = function() {
     {
         var jqxhr = $.ajax({url: xml_filepath, async: false});
         xml = $.parseXML(jqxhr.responseText);
+        url = xml_filepath;
+        filename = xml_filepath.replace(/^.*[\\\/]/, '');
         self.createFromXML($(xml).children()[0]);
 //        console.log(attributes);
 
@@ -28,13 +31,13 @@ var NodeModel = function() {
     self.createFromXML = function(inXML, path, id) {
         xml = inXML;
         path = (path) ? path : '/';
-        id = (id)? id: 'node-id-';
+        id = (id) ? id : NODE_ID_PREFIX;
         self.attributes.root = (path === '/') ? true : false;
 //        console.log(path);
 //        console.log(xml);
         var children = $(xml).children(), attrs = xml.attributes;
         self.attributes.tag = $(xml).prop('tagName');
-        self.attributes.id = id+self.attributes.tag;
+        self.attributes.id = id + self.attributes.tag;
         self.attributes.xpaths.push(path + self.attributes.tag + "/");
         self.attributes.structureName = self.attributes.tag;
         self.attributes.displayName = self.attributes.structureName;
@@ -50,7 +53,12 @@ var NodeModel = function() {
             }
         });
         if (self.attributes.root)
+        {
             self.attributes.type = DOCUMENT_TAG;
+            self.attributes.filename = filename;
+            self.attributes.url = url;
+            self.attributes.xml = xml;
+        }
         if (children.length > 0)
         {
             if (!self.attributes.root)
@@ -75,13 +83,14 @@ var NodeModel = function() {
     };
     self.createAsAttribute = function(id, name, value, xpaths)
     {
-        self.attributes.id=id+'attr'+name;
+        self.attributes.id = id + 'attr' + name;
         self.attributes.tag = name;
         self.attributes.type = METADATA_TAG;
         self.attributes.dataType = "string";
         self.attributes.attr = name;
         self.attributes.xpaths.push(xpaths + '@' + name);
         self.attributes.displayName = name;
+        self.attributes.isAttribute = true;
     };
     self.loadFromJSON = function(json) {
 

@@ -7,13 +7,16 @@
  
     <%} else {%> <span class="glyphicon glyphicon-minus-sign" style="color:white;"></span><%}%>
        </span>
-    <button type='button' class=' btn btn-sm tagger-tooltip <% if(type==="subunit") 
+    <button type='button' class='btn btn-sm tagger-tooltip <% if(type==="subunit") 
             {%> btn-primary <%} 
             else if(type==="metadata") 
             {%> btn-info <% }
             else
-            { %> btn-success <%}%>node-tag node-tag-<%=type%>' 
-            data-id='<%= id %>' data-xpaths='<%= xpaths[0] %>' title="Click to preview"><%=tag%></button>
+            { %> btn-success <%}%> node-tag node-tag-<%=type%>' 
+            data-id='<%= id %>' data-xpaths='<%= xpaths[0] %>' 
+            data-type='<%=type%>'
+            data-isattribute='<%if(isAttribute){%>1<% }else{ %>0<%}%>'
+            title="Click to preview"><%=tag%></button>
 
     <span class='node-tag-action node-tag-action-text' data-id='<%= id %>' data-xpaths='<%= xpaths[0] %>' title='Use as Text'> <span class='glyphicon glyphicon-ok'></span>&nbsp;Text</span>
     <span class='node-tag-action node-tag-action-dimension' data-id='<%= id %>' data-xpaths='<%= xpaths[0] %>' title='Use as Dimension'> <span class='glyphicon glyphicon-ok'></span>&nbsp;Dimension</span>

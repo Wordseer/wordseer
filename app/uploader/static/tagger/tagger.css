@@ -111,5 +111,26 @@ and open the template in the editor.
     opacity: 1;
 }
 .highlighted-nodes{
-    background-color: rgba(255, 210, 99, .2);
+    background-color: rgba(255, 210, 99, .4);
+}
+
+/**************
+* XML Preview *
+**************/
+
+.xml-preview-node{
+    
+}
+.xml-preview-children{
+    padding-left:10px;
+}
+.xml-preview-tag{
+    color: #222;
+    font-weight: bold;
+}
+.xml-preview-attribute{
+    color: rgb(120,0,0);
+}
+.xml-preview-content{
+    
 }

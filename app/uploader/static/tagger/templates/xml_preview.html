@@ -1,0 +1,16 @@
+<div class="xml-preview-node <%=nodeId%>">
+    &lt;<span class="xml-preview-tag"><%= tagName %></span>
+    <% _.each(attributes, function(val, key) { %>
+    <span class="xml-preview-attribute <%=nodeId%>attr<%=val.name%>"><%= val.name %>="<%= val.value %>"</span>
+    <% });%>
+    &gt;
+    <%if (children.length > 0) {%>
+    <div class="xml-preview-children">
+    </div>
+    <% } else { %><br>
+    <span class="xml-preview-content">
+    <%= textContent %>
+    <br>
+    </span>
+    <% } %>&lt;<span class="xml-preview-tag">/<%= tagName %></span>&gt;
+</div>

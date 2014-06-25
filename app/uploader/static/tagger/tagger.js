@@ -10,7 +10,8 @@ var project_id, document_id, document_url, filename, kwargs, templates_url;
 var TEMPLATES = {
     CONTAINER: {filename: 'container.html'},
     BUCKET: {filename: 'bucket.html'},
-    TREE_NODE: {filename: 'tree_node.html'}
+    TREE_NODE: {filename: 'tree_node.html'},
+    XML_PREVIEW: {filename: 'xml_preview.html'}
 };
 var buckets = {
     sentences: {id: 'sentance-bucket',
@@ -39,8 +40,12 @@ function test() {
 }
 function render() {
     renderContainers();
-    loadBuckets();
+    renderBuckets();
     renderNodes(nodes, '#tagger-node-preview .tagger-container-body');
+    console.log(nodes.attributes.xml);
+    renderXMLPreview(nodes.attributes.xml, '#tagger-xml-preview .tagger-container-body');
+
+
 }
 function loadRequestParams() {
     project_id = $('#project-id').val();
@@ -70,7 +75,20 @@ function loadTemplate(filename)
     return jqxhr.responseText;
 }
 
+function loadTooltips()
+{
+    try {
+        $('.tagger-tooltip').tooltipster({contentAsHTML: true});
+    }
+    catch (err)
+    {
 
+    }
+}
+function renderTemplate(target, template, args)
+{
+    $(target).append(template.render(args));
+}
 function renderContainers()
 {
     renderTemplate('#tagger-buckets', TEMPLATES.CONTAINER,
@@ -83,22 +101,13 @@ function renderContainers()
             {id: 'tagger-xml-preview-container', header: 'XML Preview',
                 help: 'a preview of the source XML document'});
 }
-function renderTemplate(target, template, args)
-{
-    $(target).append(template.render(args));
-}
 
 
-function loadBuckets() {
+function renderBuckets() {
     for (var bucket in buckets)
     {
-        renderBucket('#tagger-buckets-container .tagger-container-body', buckets[bucket]);
+        renderTemplate('#tagger-buckets-container .tagger-container-body', TEMPLATES.BUCKET, buckets[bucket]);
     }
-}
-
-function renderBucket(target, bucket)
-{
-    renderTemplate(target, TEMPLATES.BUCKET, bucket);
 }
 
 function renderNodes(node, target)
@@ -120,18 +129,27 @@ function renderNodes(node, target)
 //    }
 }
 
-
-function loadTooltips()
+function renderXMLPreview(xml, target, parent_id)
 {
-    try {
-        $('.tagger-tooltip').tooltipster({contentAsHTML: true});
-    }
-    catch (err)
+    parent_id = (parent_id) ? parent_id : NODE_ID_PREFIX;
+    var node_id = parent_id + xml.tagName;
+    xml['nodeId'] = node_id;
+//    console.log(xml);
+    renderTemplate(target, TEMPLATES.XML_PREVIEW, xml);
+    var children = $(xml).children();
+    if (children.length > 0)
     {
-
+        _.each(children, function(child)
+        {
+            renderXMLPreview(child, '.'+node_id+':last .xml-preview-children:first', node_id);
+        });
     }
 }
 
+
+/********************
+ *      EVENTS      *
+ ********************/
 function loadNodeTreeEvents()
 {
     $('.tagger-node .collapse-node').on('click', function() {
@@ -139,11 +157,11 @@ function loadNodeTreeEvents()
         self.parents('.tagger-node:first').children('.tagger-node-children:first').slideUp();
         self.hide();
         self.siblings('.expand-node').show();
-    }).on('mouseover', function(){
-         var self = $(this);
+    }).on('mouseover', function() {
+        var self = $(this);
         self.parents('.tagger-node:first').children('.tagger-node-children:first').addClass('highlighted-nodes');
-    }).on('mouseout', function(){
-         var self = $(this);
+    }).on('mouseout', function() {
+        var self = $(this);
         self.parents('.tagger-node:first').children('.tagger-node-children:first').removeClass('highlighted-nodes');
     });
     $('.tagger-node .expand-node').on('click', function() {
@@ -151,5 +169,15 @@ function loadNodeTreeEvents()
         self.parents('.tagger-node:first').children('.tagger-node-children:first').slideDown();
         self.hide();
         self.siblings('.collapse-node').show();
+    });
+    
+    $('.node-tag').on('click', function(){
+        var self = $(this), id = self.attr('data-id'), isAttribute = parseInt(self.attr('data-isattribute'));
+        $('.xml-preview-node .highlighted-nodes').removeClass('highlighted-nodes');
+        $('.xml-preview-node .'+id).addClass('highlighted-nodes');
+//        console.log(id);
+        var top = $('#tagger-xml-preview-container .'+id+":first").offset().top - $('#tagger-xml-preview-container .tagger-container-body').position().top-25;
+        console.log(top);
+        $('#tagger-xml-preview-container .tagger-container-body').scrollTop(top);
     });
 }
