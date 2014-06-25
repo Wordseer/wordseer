@@ -49,21 +49,21 @@ class CRUD(View):
         except ValueError:
             abort(400)
         # optional args depending on the operation requested
-        self.id = request.args.get("id", None)
-        self.collectiontype = request.args.get("collectiontype", None)
-        self.user = request.args.get("user", None)
-        self.name = request.args.get("name", None)
-        self.parent = request.args.get("parent", None)
-        self.update = request.args.get("update", None)
-        self.item = request.args.get("item", None)
-        self.annotation = request.args.get("annotation", None)
-        self.annotation_id
-        self.itemtype = request.args.get("itemType", None)
-        self.note_id = request.args.get("noteID", None)
-        self.text = request.args.get("text", None)
-        self.new_name = request.args.get("newName", None)
-        self.new_parent = request.args.get("newParent", None)
-        self.merge_into = request.args.get("mergeInto", None)
+        self.set_id = request.args.get("id", type=int)
+        self.collectiontype = request.args.get("collectiontype")
+        self.user = request.args.get("user")
+        self.name = request.args.get("name")
+        self.parent = request.args.get("parent")
+        self.update = request.args.get("update")
+        self.item_id = request.args.get("item", type=int)
+        self.annotation = request.args.get("annotation")
+        self.annotation_id = request.args.get("annotation", type=int)
+        self.itemtype = request.args.get("itemType")
+        self.note_id = request.args.get("noteID", type=int)
+        self.text = request.args.get("text")
+        self.new_name = request.args.get("newName")
+        self.new_parent = request.args.get("newParent")
+        self.merge_into = request.args.get("mergeInto")
 
     def read(self):
         """Returns the contents of the Set with the given ID
