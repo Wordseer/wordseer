@@ -124,12 +124,12 @@ class CRUD(View):
         # php equivalent: subsets/read.php:listCollections()
         # check for required args
         if self.collection_type and self.user_id:
+
+            # get sentence and document counts
+            # retrieve top-level Set records
+            # merge counts and records
+            # recurse through any nested Sets
             sets = {}
-            sets["text"] = ""
-            sets["id"] = 0
-            sets["children"] = Set.query.get(type=self.collection_type,
-                user_id=self.user_id)
-            sets["root" = True]
 
             return jsonify(sets)
         else:
