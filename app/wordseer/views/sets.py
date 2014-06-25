@@ -66,27 +66,30 @@ class CRUD(View):
         self.merge_into = request.args.get("mergeInto")
 
     def read(self):
-        """Returns the contents of the Set with the given ID
+        """Returns the contents of the ``Set`` with the given ID
 
-            Arguments:
-                subset_id (int): ID of the ``Set`` to list.
+        Requires:
+            set_id (int): ID of the ``Set`` to list.
 
-            Returns:
-                list: Contents of the requested ``Set``, a dict with the following
-                fields:
+        Returns:
+            Contents of the requested ``Set``, a dict with the following
+            fields:
 
-                - date: Creation date of the ``Set``
-                - text: Name of the ``Set``
-                - type: Type of the ``Set``
-                - id: ID of the ``Set``
-                - phrases: If this is a ``SequenceSet``, a list
-                    of phrases in this ``Set``.
-                - ids: If it's not a ``SequenceSet``, then a list of the item IDs in
-                    the ``Set``.
-            """
-            #TODO: why don't we just return a list of IDs in both cases?
-            #TODO: why do we need to return the ID?
+            - date: Creation date of the ``Set``
+            - text: Name of the ``Set``
+            - type: Type of the ``Set``
+            - id: ID of the ``Set``
+            - phrases: If this is a ``SequenceSet``, a list
+                of phrases in this ``Set``.
+            - ids: If it's not a ``SequenceSet``, then a list of the item IDs in
+                the ``Set``.
+        """
+        # php equivalent: subsets/read.php:listSubsetContents()
+        #TODO: why don't we just return a list of IDs in both cases?
+        #TODO: why do we need to return the ID?
 
+        # check for required args
+        if self.set_id:
             contents = {}
             requested_set = Set.query.get(set_id)
 
@@ -104,18 +107,14 @@ class CRUD(View):
 
             return jsonify(contents)
 
-        # check for required args
-        # if self.id:
-        #     # MODEL METHOD: retrieve a set by ID
-        #     # php equivalent: subsets/read.php:listSubsetContents()
-        # else:
-        #     abort(400)
+        else:
+            abort(400)
 
 
 
     # possible type values to dispatch
-    types = dict()
-    types["read"] = read
+    operations = dict()
+    operations["read"] = read
 
     def dispatch_request(self):
         """create a JSON response to the request"""
