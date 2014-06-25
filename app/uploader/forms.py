@@ -5,6 +5,7 @@ This file stores all the relevant forms for the web application.
 import os
 
 from flask_wtf import Form
+from flask import redirect
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms.fields import StringField, HiddenField
 from wtforms.validators import Required, ValidationError
@@ -19,7 +20,34 @@ class HiddenSubmitted(object):
     """
 
     submitted = HiddenField(default="true")
+#TODO: Check if needed
+def is_mappable(ids=None, units=None):
+    """
+    validate that only one xml document is chosen to create a structure file.
+    
+    """
+    doc_count = 0
+    if ids:
+        # Turn ids into units
+        units = []
+        for file_id in ids:
+            units.append(Unit.query.filter(Unit.id == file_id).one())
+    for unit in units:
+        ext = os.path.splitext(unit.path)[1][1:]
+        if ext in app.config["ALLOWED_EXTENSIONS"]:
+            doc_count += 1
+    
+    file_path = units[0].path
+    if doc_count is not 1:
+        raise ValidationError("Selection must include exactly one " +
+            " or ".join(app.config["ALLOWED_EXTENSIONS"]) + " file")
+    return True
 
+    #TODO: load tagger here
+    
+    
+    
+    
 def is_processable(ids=None, units=None):
     """Given a list of file IDs or Unit objects, determine if this collection of
     files can be processed (no more than one struc file, at least one xml file).
@@ -40,7 +68,7 @@ def is_processable(ids=None, units=None):
         units = []
         for file_id in ids:
             units.append(Unit.query.filter(Unit.id == file_id).one())
-
+    
     for unit in units:
         # Then process the units
         ext = os.path.splitext(unit.path)[1][1:]
@@ -63,6 +91,7 @@ class ProcessForm(Form, HiddenSubmitted):
 
     PROCESS = "0"
     DELETE = "-1"
+    STRUCTURE = "1"
 
     selection = MultiCheckboxField("Select",
         coerce=int,
@@ -72,6 +101,7 @@ class ProcessForm(Form, HiddenSubmitted):
         choices=[])
     process_button = ButtonField("Process", name="action", value=PROCESS)
     delete_button = ButtonField("Delete", name="action", value=DELETE)
+    structure_button = ButtonField("Map Structure", name="action", value=STRUCTURE)
 
 class DocumentUploadForm(Form, HiddenSubmitted):
     """This is a form to upload files to the server. It handles both XML
@@ -91,9 +121,16 @@ class DocumentProcessForm(ProcessForm):
     def validate_selection(form, field):
         """If the selection is for processing, then run is_processable on the
         selected files.
-        """
+        If the selection is for structure mapping, then run reirect_to_tagger
+        """    
+
         if form.process_button.data == form.PROCESS:
             is_processable(ids=form.selection.data)
+        
+        
+        if form.structure_button.data == form.STRUCTURE:
+            is_mappable(ids=form.selection.data)
+
 
 class ProjectCreateForm(Form, HiddenSubmitted):
     """Create new projects. This is simply a one-field form, requiring the

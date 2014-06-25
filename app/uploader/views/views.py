@@ -8,7 +8,7 @@ import random
 from string import ascii_letters, digits
 
 from flask import config
-from flask import redirect
+from flask import redirect, url_for
 from flask import render_template
 from flask import request
 from flask import send_from_directory
@@ -56,7 +56,7 @@ class CLPDView(View):
     we can reduce the redundancy.
     """
 
-    #TODO: facilitate delete
+    #TODO : facilitate delete
 
     decorators = [login_required]
     methods = ["GET", "POST"]
@@ -127,23 +127,28 @@ class CLPDView(View):
     def dispatch_request(self, **kwargs):
         """Render the template with the required data. kwargs are data
         passed to the URL.
+        if the map request button is clickec and valid, redirect to the mapping page
         """
+        to_redirect = 0
         self.pre_tests(**kwargs)
 
         self.set_choices(**kwargs)
-
+        
         if helpers.really_submitted(self.create_form):
             self.handle_create(**kwargs)
 
         elif helpers.really_submitted(self.process_form):
-            self.handle_process(**kwargs)
+            to_redirect =   self.handle_process(**kwargs)
+        #TODO: maybe not the cleanest way to do it!!
+        if to_redirect == 0:
+            self.reset_fields()
 
-        self.reset_fields()
-
-        return render_template(self.template,
-            create_form=self.create_form,
-            process_form=self.process_form,
-            **self.template_kwargs)
+            return render_template(self.template,
+                create_form=self.create_form,
+                process_form=self.process_form,
+                **self.template_kwargs)
+        else:
+            return redirect(to_redirect)
 
 @uploader.route("/")
 def home():
@@ -191,7 +196,7 @@ class ProjectsCLPD(CLPDView):
                 project = Project.query.filter(Project.id == project_id).one()
                 self.delete_object(project, project.name)
         if request.form["action"] == self.process_form.PROCESS:
-            #TODO: process the projects
+            #TODO : process the projects
             pass
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"],
@@ -266,6 +271,16 @@ class ProjectCLPD(CLPDView):
                 file_model = Unit.query.filter(Unit.id == file_id).one()
                 file_name = os.path.split(file_model.path)[1]
                 self.delete_object(file_model, file_name)
+        elif request.form["action"] == self.process_form.STRUCTURE:
+            """ return the URL for structure mapping 
+            """
+            file_id = files[0]
+            file_model = Unit.query.filter(Unit.id == file_id).one()
+            file_name = os.path.split(file_model.path)[1]
+            url = url_for('uploader.document_map', document_id=int(float(file_id)), **kwargs)
+            return url
+
+            
         elif request.form["action"] == self.process_form.PROCESS:
             pass
 
@@ -297,6 +312,7 @@ def document_show(project_id, document_id):
 
     filename = os.path.split(document.path)[1]
     #TODO: move to objects
+    
     project = Project.query.join(User).filter(User.id == current_user.id).\
         filter(Document.id == document_id).one()
 
@@ -304,7 +320,38 @@ def document_show(project_id, document_id):
         document=document,
         project=project,
         filename=filename)
+        
+@uploader.route(app.config["PROJECT_ROUTE"]+"<int:project_id>"+
+    app.config["MAP_ROUTE"] + '<int:document_id>')
+@login_required
+def document_map(project_id, document_id):
+    """
+    The map xml action, which is used create a sturctuve file map for document.
 
+    :param int doc_id: The document to retrieve details for.
+    """
+    print "DOC MAP"
+    try:
+        document = Document.query.get(document_id)
+    except TypeError:
+        return app.login_manager.unauthorized()
+
+    access_granted = current_user.has_document(Document.query.get(document_id))
+
+    # Test if this user can see it
+    if not access_granted:
+        return app.login_manager.unauthorized()
+
+    filename = os.path.split(document.path)[1]
+    project = Project.query.join(User).filter(User.id == current_user.id).\
+        filter(Document.id == document_id).one()
+    print document
+    return render_template("document_map.html",
+        document=document,
+        project=project,
+        filename=filename, 
+        document_url="%s%s"%(app.config["UPLOAD_ROUTE"],document.id))
+        
 @uploader.route(app.config["UPLOAD_ROUTE"] + "<int:file_id>")
 @login_required
 def get_file(file_id):
@@ -324,6 +371,8 @@ def get_file(file_id):
     # Test if this user can see it
     if not access_granted:
         return app.login_manager.unauthorized()
+    
+    unit = Unit.query.filter(Unit.id == file_id).one()
     directory, filename = os.path.split(unit.path)
 
     return send_from_directory(directory, filename)

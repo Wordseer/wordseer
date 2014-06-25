@@ -1,0 +1,115 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Jun 23, 2014, 1:44:09 PM
+    Author     : Hassan Jannah
+*/
+
+#tagger-node-preview , #tagger-xml-preview{
+    width:calc(50% - 10px);
+    margin:5px; 
+    display:inline-block;
+    float:left;
+    /*max-height: 400px;*/
+/*    overflow: auto;*/
+
+}
+#tagger-node-preview .tagger-container-body, #tagger-xml-preview .tagger-container-body{
+    overflow:auto;
+    max-height: 300px;
+}
+#tagger-previews{
+    width:100%;
+    display:inline-block;
+}
+
+.tagger-bucket{
+    width:calc(50% - 10px);
+    margin:5px; 
+    display:inline-block;
+    float:left;
+}
+.tagger-box{
+    /*border: 1px solid #CCC;*/
+}
+.bucket-header{
+    background-color: navy;
+    color:white;
+    border-radius: 5px 5px 0 0;
+    border: 1px solid #CCC;
+    padding: 5px;
+}
+.bucket-body{
+    border: 1px solid #CCC;
+    padding: 5px;
+}
+.bucket-helper{
+    float:right;
+}
+
+
+
+/****************
+*   NODE TAGS   *
+*****************/
+.tagger-node{
+    padding:2px;
+}
+.tagger-node-children{
+    padding-left:10px;
+}
+
+.node-tag{
+    background-color: yellow;
+}
+
+.node-tag-metadata{
+
+}
+
+.node-tag-units{
+
+}
+.node-tag-action{
+
+    /*width:20px;*/
+    height:20px;
+    border-radius: 10px;
+    padding:3px;
+    opacity:.1;
+    color:#222;
+    cursor:pointer;
+}
+.node-tag-action:hover{
+    opacity:.8;
+}
+.node-tag-action-dimension
+{
+    background-color:rgb(241, 249, 0);
+    /*color:red;*/
+}
+.node-tag-action-text
+{
+    background-color:rgb(0, 249, 241);
+    /*color:green;*/
+}
+
+.expand-node , .collapse-node{
+    opacity: .2;
+    cursor: pointer;
+}
+.expand-node{
+    color: green;
+}
+.collapse-node{
+    color:coral;
+}
+.expand-node:hover , .collapse-node:hover{
+    opacity: 1;
+}
+.highlighted-nodes{
+    background-color: rgba(255, 210, 99, .2);
+}
