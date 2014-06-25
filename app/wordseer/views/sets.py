@@ -13,13 +13,13 @@ class CRUD(View):
         """initialize variables needed for ``Set`` operations
 
         request params:
-        instance (str): ?
+        instance (str): Required
         type (str): Required
         id (int): Required if ``type`` in ["read", "delete"]
             or if ``type`` in ["update"] and ``update`` in ["add", "delete", "rename",
             "move","merge"]
         collectiontype (str): Required if ``type`` in ["list", "listflat", "create"]
-        user (str): Required if ``type`` in ["list", "listflat", "create"]
+        user (int): Required if ``type`` in ["list", "listflat", "create"]
             or ``type`` in ["update"] and ``update`` in ["addNote", "addTag"]
         name (str): Required if ``type`` in ["create"]
         parent (?): Required if ``type`` in ["create"]
@@ -38,19 +38,21 @@ class CRUD(View):
         newParent (?): Required if ``type`` in ["update"] and ``update`` in ["move"]
         mergeInto (?): Required if ``type`` in ["update"] and ``update`` in ["merge"]
         """
+        # TODO: does frontend send username or user ID? we need the ID
+
         # required args
         try:
-            self.type = request.args["type"]
+            self.operation = request.args["type"]
             self.instance = request.args["instance"]
         except ValueError:
             abort(400)
         # optional args depending on the operation requested
         self.set_id = request.args.get("id", type=int)
-        self.collectiontype = request.args.get("collectiontype")
-        self.user = request.args.get("user")
-        self.name = request.args.get("name")
+        self.collection_type = request.args.get("collectiontype")
+        self.user_id = request.args.get("user", type=int)
+        self.set_name = request.args.get("name")
         self.parent = request.args.get("parent")
-        self.update = request.args.get("update")
+        self.update_type = request.args.get("update")
         self.item_id = request.args.get("item", type=int)
         self.annotation = request.args.get("annotation")
         self.annotation_id = request.args.get("annotation", type=int)
