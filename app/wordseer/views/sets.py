@@ -103,7 +103,7 @@ class CRUD(View):
             else:
                 contents["ids"] = [item.id for item in requested_set.get_items()]
 
-            return jsonify(contents)
+            return contents
 
         else:
             abort(400)
@@ -131,7 +131,7 @@ class CRUD(View):
             # recurse through any nested Sets
             sets = {}
 
-            return jsonify(sets)
+            return sets
         else:
             abort(400)
 
@@ -141,5 +141,7 @@ class CRUD(View):
     operations["list"] = list
 
     def dispatch_request(self):
-        """choose function from dispatch table with key == ``request.type``"""
+        """choose function from dispatch table with key == ``request.type``
+        and jsonify it
+        """
         pass
