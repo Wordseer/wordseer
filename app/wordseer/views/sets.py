@@ -5,14 +5,10 @@ from flask import request
 from flask.json import jsonify
 from flask.views import View
 
-from app import app
-from app import db
-from .. import wordseer
-from .. import helpers
-
+from app.models.sets import Set
 
 class CRUD(View):
-    """CRUD Sets"""
+    """CRUD ``Set``s"""
     def __init__(self):
         """initialize variables needed for ``Set`` operations
 
