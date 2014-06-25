@@ -108,12 +108,38 @@ class CRUD(View):
         else:
             abort(400)
 
+    def list(self):
+        """Returns a list of extant ``Set``s of a given type
 
+        Requires:
+            collection_type (str): the type of ``Set`` desired
+            user_id (int): ``User`` to whom the ```Set```s belong
+
+        Returns:
+            - text: an empty string
+            - id: 0
+            - children: the list of ``Set``s
+            - root: True
+        """
+        # php equivalent: subsets/read.php:listCollections()
+        # check for required args
+        if self.collection_type and self.user_id:
+            sets = {}
+            sets["text"] = ""
+            sets["id"] = 0
+            sets["children"] = Set.query.get(type=self.collection_type,
+                user_id=self.user_id)
+            sets["root" = True]
+
+            return jsonify(sets)
+        else:
+            abort(400)
 
     # possible type values to dispatch
     operations = dict()
     operations["read"] = read
+    operations["list"] = list
 
     def dispatch_request(self):
-        """create a JSON response to the request"""
+        """choose function from dispatch table with key == ``request.type``"""
         pass
