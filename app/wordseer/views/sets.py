@@ -5,6 +5,8 @@ from flask import request
 from flask.json import jsonify
 from flask.views import View
 
+from app import db
+from app.models.property import Property
 from app.models.sets import Set
 
 class CRUD(View):
@@ -63,7 +65,7 @@ class CRUD(View):
         self.new_parent = request.args.get("newParent")
         self.merge_into = request.args.get("mergeInto")
 
-    def read(self):
+    def read(self, set_id=self.set_id):
         """Returns the contents of the ``Set`` with the given ID
 
         Requires:
@@ -108,30 +110,41 @@ class CRUD(View):
         else:
             abort(400)
 
-    def list(self):
-        """Returns a list of extant ``Set``s of a given type
+    def sent_and_doc_counts(self):
+        """count sentences and documents associated with the units in each set"""
+        # TODO: php got both document and sentence counts from metadata table;
+        # can we do that here?
+        pass
+
+    def list(self, parent_id=0):
+        """Returns a recursive list of extant ``Set``\s of a given type
 
         Requires:
             collection_type (str): the type of ``Set`` desired
-            user_id (int): ``User`` to whom the ```Set```s belong
+            user_id (int): ``User`` to whom the ``Set``\s belong
 
         Returns:
-            - text: an empty string
-            - id: 0
-            - children: the list of ``Set``s
-            - root: True
+            - text: name of set
+            - id: id of set (0 indicates root)
+            - children: children of ``Set`` (recursive)
+            - root: bool
         """
         # php equivalent: subsets/read.php:listCollections()
         # check for required args
         if self.collection_type and self.user_id:
+            setlist = {}
+            # retrieve n-level Set records
+            sets = Set.query.filter_by(parent_id=parent_id,
+                user_id=self.user_id, type=self.collection_type).all()
 
+            setlist["id"] = parent_id
+            setlist["children"] = [self.read(set.id) for set in sets]
             # get sentence and document counts
-            # retrieve top-level Set records
             # merge counts and records
             # recurse through any nested Sets
-            sets = {}
 
-            return sets
+
+            return setlist
         else:
             abort(400)
 
