@@ -70,7 +70,8 @@ class CRUD(View):
         """Returns the contents of the ``Set`` with the given ID
 
         Requires:
-            set_id (int): ID of the ``Set`` to list.
+            set_id (int): ID of the ``Set`` to list. falls back to query param
+            as default
 
         Returns:
             Contents of the requested ``Set``, a dict with the following
@@ -90,26 +91,28 @@ class CRUD(View):
         #TODO: why do we need to return the ID?
 
         # check for required args
-        if self.set_id:
-            contents = {}
-            requested_set = Set.query.get(self.set_id)
-
-            contents["text"] = requested_set.name
-            contents["id"] = requested_set.id
-            contents["date"] = requested_set.creation_date
-            contents["type"] = requested_set.type
-
-            if requested_set.type == "sequenceset":
-                contents["phrases"] = [sequence.sequence for sequence in
-                    requested_set.sequences]
-
+        if not set_id:
+            if self.set_id:
+                set_id = self.set_id
             else:
-                contents["ids"] = [item.id for item in requested_set.get_items()]
+                abort(400)
 
-            return contents
+        contents = {}
+        requested_set = Set.query.get(set_id)
+
+        contents["text"] = requested_set.name
+        contents["id"] = requested_set.id
+        contents["date"] = requested_set.creation_date
+        contents["type"] = requested_set.type
+
+        if requested_set.type == "sequenceset":
+            contents["phrases"] = [sequence.sequence for sequence in
+                requested_set.sequences]
 
         else:
-            abort(400)
+            contents["ids"] = [item.id for item in requested_set.get_items()]
+
+        return contents
 
     def sent_and_doc_counts(self):
         """count sentences and documents associated with the units in each set"""
