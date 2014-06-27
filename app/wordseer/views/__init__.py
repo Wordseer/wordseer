@@ -1,3 +1,1 @@
-__all__ = ["getassociatedwords",
-]
-
+__all__ = ["associatedwords", "sets"]

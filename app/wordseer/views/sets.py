@@ -8,6 +8,7 @@ from flask.views import View
 from app import db
 from app.models.property import Property
 from app.models.sets import Set
+from .. import wordseer
 
 class CRUD(View):
     """CRUD ``Set``s"""
@@ -65,7 +66,7 @@ class CRUD(View):
         self.new_parent = request.args.get("newParent")
         self.merge_into = request.args.get("mergeInto")
 
-    def read(self, set_id=self.set_id):
+    def read(self, set_id=None):
         """Returns the contents of the ``Set`` with the given ID
 
         Requires:
@@ -91,11 +92,11 @@ class CRUD(View):
         # check for required args
         if self.set_id:
             contents = {}
-            requested_set = Set.query.get(set_id)
+            requested_set = Set.query.get(self.set_id)
 
             contents["text"] = requested_set.name
             contents["id"] = requested_set.id
-            contents["date"] = requested_set.date
+            contents["date"] = requested_set.creation_date
             contents["type"] = requested_set.type
 
             if requested_set.type == "sequenceset":
@@ -157,4 +158,8 @@ class CRUD(View):
         """choose function from dispatch table with key == ``request.type``
         and jsonify it
         """
-        pass
+        result = self.operations[self.operation](self)
+        return jsonify(result)
+
+# routing instructions
+wordseer.add_url_rule('/api/sets/', view_func=CRUD.as_view("sets"))
