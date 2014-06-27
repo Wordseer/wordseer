@@ -65,7 +65,7 @@ class SequenceSet(Set):
         backref="sets")
 
     __mapper_args__ = {
-        "polymorphic_identity": "sequenceeset",
+        "polymorphic_identity": "sequenceset",
     }
 
     def get_items(self):
