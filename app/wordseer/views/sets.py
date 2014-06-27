@@ -6,7 +6,6 @@ from flask.json import jsonify
 from flask.views import View
 
 from app import db
-from app.models.property import Property
 from app.models.sets import Set
 from .. import wordseer
 
@@ -115,7 +114,7 @@ class CRUD(View):
         return contents
 
     def sent_and_doc_counts(self):
-        """count sentences and documents associated with the units in each set"""
+        """count sentences and documents associated with the units in each ``Set``"""
         # TODO: php got both document and sentence counts from metadata table;
         # can we do that here?
         pass
@@ -136,19 +135,31 @@ class CRUD(View):
         # php equivalent: subsets/read.php:listCollections()
         # check for required args
         if self.collection_type and self.user_id:
-            setlist = {}
-            # retrieve n-level Set records
+            setlist = []
+            # retrieve Set records from this level
             sets = Set.query.filter_by(parent_id=parent_id,
                 user_id=self.user_id, type=self.collection_type).all()
+            for set in sets:
+                setinfo = self.read(self, set.id)
 
-            setlist["id"] = parent_id
-            setlist["children"] = [self.read(set.id) for set in sets]
-            # get sentence and document counts
-            # merge counts and records
-            # recurse through any nested Sets
+                # TODO: get sentence and document counts
 
+                # recurse through any nested Sets
+                setinfo["children"] = [self.list(self, set.id)]
 
-            return setlist
+                setlist.append(setinfo)
+
+            if parent_id == 0:
+                # wrap setlist in the special root-level row
+                all_sets = {
+                    "text": '',
+                    "id": 0,
+                    "children": setlist,
+                    "root": True
+                    }
+                return all_sets
+            else:
+                return setlist
         else:
             abort(400)
 
