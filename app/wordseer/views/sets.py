@@ -119,7 +119,7 @@ class CRUD(View):
         # can we do that here?
         pass
 
-    def list(self, parent_id=0):
+    def list(self, parent_id=None):
         """Returns a recursive list of extant ``Set``\s of a given type
 
         Requires:
@@ -135,21 +135,23 @@ class CRUD(View):
         # php equivalent: subsets/read.php:listCollections()
         # check for required args
         if self.collection_type and self.user_id:
-            setlist = []
+
             # retrieve Set records from this level
+            setlist = []
+
             sets = Set.query.filter_by(parent_id=parent_id,
                 user_id=self.user_id, type=self.collection_type).all()
+
             for set in sets:
-                setinfo = self.read(self, set.id)
+                setinfo = self.read(set.id)
 
                 # TODO: get sentence and document counts
 
                 # recurse through any nested Sets
-                setinfo["children"] = [self.list(self, set.id)]
-
+                setinfo["children"] = [self.list(set.id)]
                 setlist.append(setinfo)
 
-            if parent_id == 0:
+            if parent_id == None:
                 # wrap setlist in the special root-level row
                 all_sets = {
                     "text": '',
