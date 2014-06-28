@@ -5,35 +5,55 @@ import unittest
 from app import models, db
 from flask import json
 
+import database
 import wordseer
 
 
 class TestSetViews(unittest.TestCase):
     """test all the different ``Set`` views"""
 
-    def setUp(self):
-        self.app = wordseer.app
+    @classmethod
+    def setUpClass(cls):
+        """doc"""
+        cls.longMessage = True
 
-        # create some Sets to query
-        user = models.flask_security.User()
-        db.session.add(user)
-        set1 = models.sets.SentenceSet(name="test1", user_id=user.id)
-        db.session.add(set1)
-        set2 = models.sets.SequenceSet(name="test2", parent_id=set1.id,
-            user_id=user.id)
-        db.session.add(set2)
-        set3 = models.sets.SentenceSet(name="test3", parent_id=set1.id,
-            user_id=user.id)
+        cls.client = wordseer.app.test_client()
+
+        database.restore_cache()
+
+        cls.user = models.flask_security.User()
+
+        db.session.add(cls.user)
+
+        cls.set1 = models.sets.SentenceSet(name="test1", user=cls.user)
+        cls.set2 = models.sets.SequenceSet(name="test2", parent=cls.set1,
+            user=cls.user)
+        cls.set3 = models.sets.SentenceSet(name="test3", parent=cls.set1,
+            user=cls.user)
+
+        db.session.add_all([cls.set1, cls.set2, cls.set3])
+
         db.session.commit()
 
-        self.user = user
-        self.set1 = set1
-        self.set2 = set2
-        self.set3 = set3
+        db.session.refresh(cls.user)
+        db.session.refresh(cls.set1)
+        db.session.refresh(cls.set3)
+
+        # am I adding users correctly?
+        assert cls.set1.user_id == cls.user.id, \
+            "set: %s, user: %s" % (cls.set1.user_id, cls.user.id)
+
+        # am I adding parents correctly?
+        assert cls.set3.parent_id == cls.set1.id, \
+            "%s, %s" % (cls.set3.parent_id, cls.set1.id)
+
+    @classmethod
+    def tearDownClass(cls):
+        db.session.close()
 
     def test_crud_init(self):
         """test the ``sets.CRUD`` class __init__"""
-        with self.app.test_client() as c:
+        with self.client as c:
             response = c.get("/api/sets/")
             self.assertEqual(response.status_code, 400, msg=response.status_code)
 
@@ -43,12 +63,13 @@ class TestSetViews(unittest.TestCase):
     def test_read(self):
         """test the ``sets.CRUD.read`` view"""
 
-        with self.app.test_client() as c:
+        with self.client as c:
             # missing required variables
             response = c.get("/api/sets/?instance=foo&type=read")
             self.assertEqual(response.status_code, 400, msg=response.status_code)
 
             # should work
+            # db.session.refresh(self.set1)
             response = c.get("/api/sets/?instance=foo&type=read&id=" +
                 str(self.set1.id))
             self.assertEqual(response.status_code, 200, msg=response.status_code)
@@ -63,12 +84,11 @@ class TestSetViews(unittest.TestCase):
             self.assertEqual(data["date"], self.set1.creation_date)
 
             # TODO: 'ids' and 'phrases'
-            # self.assertEqual(data["ids"], self.set1.name)
 
     def test_list(self):
         """test the ``sets.CRUD.list`` view"""
 
-        with self.app.test_client() as c:
+        with self.client as c:
             # required variables
             response = c.get("/api/sets/?instance=foo&type=list")
             self.assertEqual(response.status_code, 400)
@@ -80,3 +100,8 @@ class TestSetViews(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
 
             # TODO: test responses
+            self.assertEqual(response.mimetype, "application/json",
+                msg=response.mimetype)
+            data = json.loads(response.data)
+            self.assertEqual(data["root"], True)
+            self.assertEqual(len(data["children"]), 1, msg=data)
