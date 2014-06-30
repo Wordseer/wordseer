@@ -130,6 +130,14 @@ class CRUD(View):
             - text: name of ``Set``
             - id: id of set (0 indicates root)
             - children: children of ``Set`` (recursive)
+                - text
+                - id
+                - type
+                - date
+                - [ids or phrases]?
+                - children
+                - sentence_count
+                - document_count
             - root: bool
         """
         # php equivalent: subsets/read.php:listCollections()
