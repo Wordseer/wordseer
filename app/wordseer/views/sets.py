@@ -127,7 +127,7 @@ class CRUD(View):
             user_id (int): ``User`` to whom the ``Set``\s belong
 
         Returns:
-            - text: name of set
+            - text: name of ``Set``
             - id: id of set (0 indicates root)
             - children: children of ``Set`` (recursive)
             - root: bool
@@ -148,7 +148,7 @@ class CRUD(View):
                 # TODO: get sentence and document counts
 
                 # recurse through any nested Sets
-                setinfo["children"] = [self.list(set.id)]
+                setinfo["children"] = self.list(set.id)
                 setlist.append(setinfo)
 
             if parent_id == None:

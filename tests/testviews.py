@@ -30,14 +30,17 @@ class TestSetViews(unittest.TestCase):
             user=cls.user)
         cls.set3 = models.sets.SentenceSet(name="test3", parent=cls.set1,
             user=cls.user)
+        cls.set4 = models.sets.SentenceSet(name="test4", parent=cls.set1,
+            user=cls.user)
 
-        db.session.add_all([cls.set1, cls.set2, cls.set3])
+        db.session.add_all([cls.set1, cls.set2, cls.set3, cls.set4])
 
         db.session.commit()
 
         db.session.refresh(cls.user)
         db.session.refresh(cls.set1)
         db.session.refresh(cls.set3)
+        db.session.refresh(cls.set4)
 
         # am I adding users correctly?
         assert cls.set1.user_id == cls.user.id, \
@@ -105,3 +108,11 @@ class TestSetViews(unittest.TestCase):
             data = json.loads(response.data)
             self.assertEqual(data["root"], True)
             self.assertEqual(len(data["children"]), 1, msg=data)
+            # first level nesting
+            self.assertEqual(data["children"][0]["text"], "test1")
+
+            # second level nesting
+            self.assertEqual(data["children"][0]["children"][0]["text"],
+                "test3", msg=data)
+            self.assertEqual(data["children"][0]["children"][1]["text"],
+                "test4", msg=data)
