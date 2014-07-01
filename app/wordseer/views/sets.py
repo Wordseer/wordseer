@@ -1,4 +1,4 @@
-import json
+import datetime
 
 from flask import abort
 from flask import request
@@ -6,6 +6,7 @@ from flask.json import jsonify
 from flask.views import View
 
 from app import db
+from app.models.flask_security import User
 from app.models.sets import Set
 from .. import wordseer
 
@@ -53,7 +54,7 @@ class CRUD(View):
         self.collection_type = request.args.get("collectiontype")
         self.user_id = request.args.get("user", type=int)
         self.set_name = request.args.get("name")
-        self.parent = request.args.get("parent")
+        self.parent_id = request.args.get("parent")
         self.update_type = request.args.get("update")
         self.item_id = request.args.get("item", type=int)
         self.annotation = request.args.get("annotation")
@@ -223,44 +224,40 @@ class CRUD(View):
         """Create a new subset with the given information.
 
         Arguments:
-            user (str): The username of the ``User`` that should own this ``Set``
-            set_name (str): The ``name`` for the set to be created.
-            set_parent: TODO: what is this and what does it do?
-            set_type (str): The tablename of set that should be created.
+            user_id (str): The ``User`` that should own this ``Set``
+            set_name (str): The name of the ``Set`` to be created.
+            parent_id (int): The id of the ``Set`` to nest it under
+            collection_type (str): the type of ``Set``
 
         Returns:
-            On success, a JSON response like so::
-
-                {
-                    "status": "ok",
-                    "id": int, ID of the newly created Set
-                    "date": str, date of creation of this Set
-                }
-
-            On failure, a 400 error will be returned.
+            - "status": "ok" [TODO: eliminate this]
+            - "id": int, ID of the newly created ``Set``
+            - "date": str, date of creation of this ``Set``
         """
+        # php equivalent: subsets/create.php:create()
 
-        user = User.query.filter(User.name == username).one()
+        if self.user_id and self.set_name and self.parent_id \
+            and self.collection_type:
 
-        try:
-            set_model = get_model_from_tablename(set_type)(user=user,
-                name=set_name,
-                date=date.today()
-            )
-        except TypeError:
-            return abort(400)
+            user = User.query.get(self.user_id)
 
-        set_model.save()
+            # TODO: set current creation date by default in model
+            new_set = Set(name=self.set_name, parent_id=self.parent_id,
+                type=self.collection_type, user=user)
 
-        #TODO: updateMainMetadataCounts? what does that even do?
-        return jsonify(
-            {
-                "status": "ok", #TODO: let's get rid of this, 200 code is ok
-                "id": set_model.id,
-                "date": str(set_model.date)
-            }
-        )
+            # TODO: should this be a model method?
+            db.session.add(new_set)
+            db.session.commit()
 
+            #TODO: updateMainMetadataCounts? what does that even do?
+
+            return {
+                    "status": "ok", #TODO: let's get rid of this, 200 code is ok
+                    "id": new_set.id,
+                    "date": new_set.creation_date
+                }
+        else:
+            abort(400)
 
     # possible type values to dispatch
     operations = {

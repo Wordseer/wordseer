@@ -86,6 +86,7 @@ class TestSetViews(unittest.TestCase):
             self.assertEqual(data["text"], self.set1.name)
             self.assertEqual(data["type"], self.set1.type)
             self.assertEqual(data["id"], self.set1.id)
+            # TODO: creation dates should be defaulting to current in model
             self.assertEqual(data["date"], self.set1.creation_date)
 
             # TODO: 'ids' and 'phrases'
@@ -124,7 +125,7 @@ class TestSetViews(unittest.TestCase):
 
         with self.client as c:
             # required variables
-            response = c.get("/api/sets/?instance=foo&type=list")
+            response = c.get("/api/sets/?instance=foo&type=listflat")
             self.assertEqual(response.status_code, 400)
 
             # should work
@@ -147,3 +148,30 @@ class TestSetViews(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             data = json.loads(response.data)
             self.assertEqual(data["sets"][0]["text"], "all", msg=data)
+
+    def test_create(self):
+        """test the ``sets.CRUD.create`` method"""
+
+        with self.client as c:
+            # required variables
+            response = c.get("/api/sets/?instance=foo&type=create")
+            self.assertEqual(response.status_code, 400)
+
+            # should work
+            query = "?instance=foo&type=create&collectiontype=sentenceset" \
+                + "&user=" + str(self.user.id) + "&name=test_create&parent=0"
+            response = c.get("/api/sets/" + query)
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+
+            # TODO: dates not being set
+            self.assertEqual(data["date"], None, msg=data)
+
+            # may need to change if more rows are added to setup method
+            new_id = 6
+            self.assertEqual(data["id"], new_id, msg=data)
+
+            # make sure it went into db correctly by reading it
+            new_set = c.get("/api/sets/?instance=foo&type=read&id=" + str(new_id))
+            data = json.loads(new_set.data)
+            self.assertEqual(data["text"], "test_create", msg=data)
