@@ -194,3 +194,6 @@ class TestSetViews(unittest.TestCase):
             query = "?instance=foo&type=read&id=" + str(self.set1.id)
             response = c.get("/api/sets/" + query)
             self.assertEqual(response.status_code, 400, msg=response.data)
+
+        # put the deleted stuff back
+        self.setUpClass()

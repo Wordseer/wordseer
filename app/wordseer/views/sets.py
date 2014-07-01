@@ -100,6 +100,9 @@ class CRUD(View):
         contents = {}
         requested_set = Set.query.get(set_id)
 
+        if not requested_set:
+            abort(400)
+
         contents["text"] = requested_set.name
         contents["id"] = requested_set.id
         contents["date"] = requested_set.creation_date
