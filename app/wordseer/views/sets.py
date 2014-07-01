@@ -173,10 +173,47 @@ class CRUD(View):
         else:
             abort(400)
 
+    def list_flat(self):
+        """Performs ``read`` method on all ``Set``\s belonging to current
+        ``User``\; returns them in a non-recursive list.
+
+        Requires:
+            collection_type (str): the type of ``Set`` desired
+            user_id (int): ``User`` to whom the ``Set``\s belong
+
+        Returns:
+            [{
+            - date: Creation date of the ``Set``
+            - text: Name of the ``Set``
+            - type: Type of the ``Set``
+            - id: ID of the ``Set``
+            - phrases: If this is a ``SequenceSet``, a list
+                of phrases in this ``Set``.
+            - ids: If it's not a ``SequenceSet``, then a list of the item IDs in
+                the ``Set``.
+            }, {...}, ...]
+        """
+        # php equivalent: subsets/read.php:listCollectionsFlat()
+        # check for required args
+        if self.collection_type and self.user_id:
+            sets = Set.query.filter_by(user_id=self.user_id,
+                type=self.collection_type).order_by(Set.name).all()
+            result = [self.read(set.id) for set in sets]
+
+            # prepend special "all" set for document sets
+            if self.collection_type == "document":
+                alldocs = {
+                    "text": "all",
+                    "date": "",
+                    "id": 0
+                }
+                result.insert(0, alldocs)
+
     # possible type values to dispatch
-    operations = dict()
+    operations = {}
     operations["read"] = read
     operations["list"] = list
+    operations["listflat"] = list_flat
 
     def dispatch_request(self):
         """choose function from dispatch table with key == ``request.type``
