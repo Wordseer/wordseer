@@ -259,12 +259,44 @@ class CRUD(View):
         else:
             abort(400)
 
+    def delete(self):
+        """Delete the specified ``Set``
+
+        Requires:
+            -set_id
+
+        Returns:
+            status: ok
+        """
+        # php equivalent: subsets/create.php:delete()
+
+        # required variables
+        if self.set_id:
+
+            # delete the set
+            set = Set.query.get(self.set_id)
+            db.session.delete(set)
+
+            # delete its entire subtree
+            # TODO: this should be done at the model or DB level with cascades;
+            # http://docs.sqlalchemy.org/en/rel_0_9/orm/session.html#delete
+
+            # delete any metadata that associates it with text units
+
+            db.session.commit()
+
+            return {"status": "ok"}
+
+        else:
+            abort(400)
+
     # possible type values to dispatch
     operations = {
         "read": read,
         "list": list,
         "listflat": list_flat,
         "create": create,
+        "delete": delete
     }
 
     def dispatch_request(self):

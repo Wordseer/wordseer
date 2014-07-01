@@ -175,3 +175,22 @@ class TestSetViews(unittest.TestCase):
             new_set = c.get("/api/sets/?instance=foo&type=read&id=" + str(new_id))
             data = json.loads(new_set.data)
             self.assertEqual(data["text"], "test_create", msg=data)
+
+    def test_delete(self):
+        "test the ``sets.CRUD.delete`` method"
+
+        with self.client as c:
+            # required variables
+            # required variables
+            response = c.get("/api/sets/?instance=foo&type=delete")
+            self.assertEqual(response.status_code, 400)
+
+            # delete a root note, see what happens
+            query = "?instance=foo&type=delete&id=" + str(self.set1.id)
+            response = c.get("/api/sets/" + query)
+            self.assertEqual(response.status_code, 200)
+
+            # is it gone?
+            query = "?instance=foo&type=read&id=" + str(self.set1.id)
+            response = c.get("/api/sets/" + query)
+            self.assertEqual(response.status_code, 400, msg=response.data)
