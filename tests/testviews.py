@@ -32,6 +32,8 @@ class TestSetViews(unittest.TestCase):
             user=cls.user)
         cls.set4 = models.sets.SentenceSet(name="test4", parent=cls.set1,
             user=cls.user)
+        cls.set5 = models.sets.DocumentSet(name="test5", user=cls.user)
+
 
         db.session.add_all([cls.set1, cls.set2, cls.set3, cls.set4])
 
@@ -102,7 +104,7 @@ class TestSetViews(unittest.TestCase):
             response = c.get("/api/sets/" + query)
             self.assertEqual(response.status_code, 200)
 
-            # TODO: test responses
+            # test responses
             self.assertEqual(response.mimetype, "application/json",
                 msg=response.mimetype)
             data = json.loads(response.data)
@@ -116,3 +118,32 @@ class TestSetViews(unittest.TestCase):
                 "test3", msg=data)
             self.assertEqual(data["children"][0]["children"][1]["text"],
                 "test4", msg=data)
+
+    def test_list_flat(self):
+        """test the ``sets.CRUD.list_flat`` method"""
+
+        with self.client as c:
+            # required variables
+            response = c.get("/api/sets/?instance=foo&type=list")
+            self.assertEqual(response.status_code, 400)
+
+            # should work
+            query = "?instance=foo&type=listflat&collectiontype=sentenceset&user="\
+                + str(self.user.id)
+            response = c.get("/api/sets/" + query)
+            self.assertEqual(response.status_code, 200)
+
+            # test responses
+            self.assertEqual(response.mimetype, "application/json",
+                msg=response.mimetype)
+            data = json.loads(response.data)
+            self.assertEqual(data["sets"][0]["text"], "test1")
+            self.assertEqual(data["sets"][2]["text"], "test4")
+
+            # is document "all" set prepended?
+            query = "?instance=foo&type=listflat&collectiontype=documentset&user="\
+                + str(self.user.id)
+            response = c.get("/api/sets/" + query)
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertEqual(data["sets"][0]["text"], "all", msg=data)

@@ -175,7 +175,7 @@ class CRUD(View):
 
     def list_flat(self):
         """Performs ``read`` method on all ``Set``\s belonging to current
-        ``User``\; returns them in a non-recursive list.
+        ``User`` of given type; returns them in a non-recursive list.
 
         Requires:
             collection_type (str): the type of ``Set`` desired
@@ -196,18 +196,28 @@ class CRUD(View):
         # php equivalent: subsets/read.php:listCollectionsFlat()
         # check for required args
         if self.collection_type and self.user_id:
+
             sets = Set.query.filter_by(user_id=self.user_id,
                 type=self.collection_type).order_by(Set.name).all()
+
             result = [self.read(set.id) for set in sets]
 
             # prepend special "all" set for document sets
-            if self.collection_type == "document":
+            # TODO: frontend may send type as "document", need to change
+            if self.collection_type == "documentset":
                 alldocs = {
                     "text": "all",
                     "date": "",
                     "id": 0
                 }
                 result.insert(0, alldocs)
+
+            # TODO: jsonify does not allow top-level lists for security reasons;
+            # http://flask.pocoo.org/docs/security/#json-security
+            # need to update the frontend accordingly
+            return {"sets": result}
+        else:
+            abort(400)
 
     # possible type values to dispatch
     operations = {}
