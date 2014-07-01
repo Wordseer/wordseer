@@ -3,7 +3,7 @@ from lib.wordseerbackend.reader_writer import ReaderWriter
 
 import os
 
-collection_dir = os.path.join("lib", "wordseerbackend", "tests", "data", "shakespeare_mini")
+collection_dir = os.path.join("lib", "wordseerbackend", "tests", "data", "articles")
 extension = ".xml"
 structure_file = os.path.join(collection_dir, "structure.json")
 
