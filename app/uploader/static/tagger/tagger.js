@@ -7,18 +7,21 @@ $(document).ready(function() {
     init_tagger();
 });
 var project_id, document_id, document_url, filename, kwargs, templates_url;
+var BODY_CHANGE_EVENT = 'bodyChange';
 var TEMPLATES = {
     CONTAINER: {filename: 'container.html'},
     BUCKET: {filename: 'bucket.html'},
+    BUCKET_NODE: {filename: 'bucket_node.html'},
     TREE_NODE: {filename: 'tree_node.html'},
-    XML_PREVIEW: {filename: 'xml_preview.html'}
+    XML_PREVIEW: {filename: 'xml_preview.html'},
+    OUTPUT_PREVIEW: {filename: 'output_preview.html'}
 };
 var buckets = {
-    sentences: {id: 'sentance-bucket',
-        header: 'Select text nodes to analyze',
+    sentences: {id: 'sentence-bucket',
+        header: 'Selected text nodes to analyze',
         help: 'Text nodes are nodes that contain the target text content of the analysis.'},
     dimensions: {id: 'dimension-bucket',
-        header: 'Select addtional dimensions',
+        header: 'Selected analysis dimensions',
         help: 'Dimensions are additional information that help perform multi-dimensional analysis on the text.'}};
 
 var nodes;
@@ -26,26 +29,31 @@ function init_tagger() {
     loadRequestParams();
     nodes = new NodeModel();
     nodes.loadFromXMLURL(document_url);
+    console.log(nodes);
     loadTemplates();
     render();
     loadNodeTreeEvents();
-
     loadTooltips();
+    loadOutputPreview();
 
-    test();
+//    test();
 //    console.log(JSON.stringify(nodes.toJSON()));
 }
-function test() {
-
+function test()
+{
+    var counter = 0;
+    _.each(nodes.map, function(item)
+    {
+        item.attributes.dataType = 'text ' + counter++;
+    });
+    console.log(nodes);
 }
 function render() {
     renderContainers();
     renderBuckets();
     renderNodes(nodes, '#tagger-node-preview .tagger-container-body');
-    console.log(nodes.attributes.xml);
+//    console.log(nodes.attributes.xml);
     renderXMLPreview(nodes.attributes.xml, '#tagger-xml-preview .tagger-container-body');
-
-
 }
 function loadRequestParams() {
     project_id = $('#project-id').val();
@@ -66,6 +74,7 @@ function loadTemplates()
     {
         TEMPLATES[template]['url'] = templates_url + '/' + TEMPLATES[template].filename;
         TEMPLATES[template]['html'] = loadTemplate(TEMPLATES[template].url);
+//        console.log(TEMPLATES[template]);
         TEMPLATES[template]['render'] = _.template(TEMPLATES[template]['html']);
     }
 }
@@ -88,6 +97,13 @@ function loadTooltips()
 function renderTemplate(target, template, args)
 {
     $(target).append(template.render(args));
+    $(target).trigger(BODY_CHANGE_EVENT);
+}
+function removeNode(target) {
+
+    var parent = $(target).parent();
+    $(target).remove();
+    parent.trigger(BODY_CHANGE_EVENT);
 }
 function renderContainers()
 {
@@ -141,7 +157,7 @@ function renderXMLPreview(xml, target, parent_id)
     {
         _.each(children, function(child)
         {
-            renderXMLPreview(child, '.'+node_id+':last .xml-preview-children:first', node_id);
+            renderXMLPreview(child, '.' + node_id + ':last .xml-preview-children:first', node_id);
         });
     }
 }
@@ -170,14 +186,125 @@ function loadNodeTreeEvents()
         self.hide();
         self.siblings('.collapse-node').show();
     });
-    
-    $('.node-tag').on('click', function(){
+    $('.node-tag').on('click', function() {
         var self = $(this), id = self.attr('data-id'), isAttribute = parseInt(self.attr('data-isattribute'));
         $('.xml-preview-node .highlighted-nodes').removeClass('highlighted-nodes');
-        $('.xml-preview-node .'+id).addClass('highlighted-nodes');
+        $('.xml-preview-node .' + id).addClass('highlighted-nodes');
 //        console.log(id);
-        var top = $('#tagger-xml-preview-container .'+id+":first").offset().top - $('#tagger-xml-preview-container .tagger-container-body').position().top-25;
-        console.log(top);
+        var top = $('#tagger-xml-preview-container .' + id + ":first").offset().top - $('#tagger-xml-preview-container .tagger-container-body').position().top - 25;
+//        console.log(top);
         $('#tagger-xml-preview-container .tagger-container-body').scrollTop(top);
     });
+    $('.node-tag-action-text').on('click', function()
+    {
+        var self = $(this);
+        var id = self.attr('data-id');
+        if (self.hasClass('added-node'))
+        {
+            //elemeent already added, remove it
+            self.removeClass('added-node');
+            removeTextElement(id);
+        }
+        else
+        {
+            self.addClass('added-node');
+            self.siblings('.added-node').removeClass('added-node');
+            removeDimensionElement(id);
+            addTextElement(id);
+            addBucketTagHighlightEvent(id);
+        }
+
+//        $('.bucket-body').trigger('change');
+    });
+    $('.node-tag-action-dimension').on('click', function()
+    {
+        var self = $(this);
+        var id = self.attr('data-id');
+        if (self.hasClass('added-node'))
+        {
+            //elemeent already added, remove it
+            self.removeClass('added-node');
+            removeDimensionElement(id);
+        }
+        else
+        {
+            self.addClass('added-node');
+            self.siblings('.added-node').removeClass('added-node');
+            removeTextElement(id);
+            addDimensionElement(id);
+            addBucketTagHighlightEvent(id);
+        }
+//        $('.bucket-body').trigger('change');
+
+    });
+}
+
+
+
+function addTextElement(id)
+{
+    var node = nodes.map[id];
+//    console.log(node);
+    if (!node.attributes.isActive)
+    {
+
+        node.activate();
+        node.setAsSentence(true);
+        renderTemplate('#sentence-bucket .bucket-body', TEMPLATES.BUCKET_NODE, node.attributes);
+//        console.log(nodes);
+    } else {
+        alert('node already added');
+    }
+//    node.rename(SENTENCE_TAG);
+
+}
+function addDimensionElement(id)
+{
+    var node = nodes.map[id];
+    if (!node.attributes.isActive)
+    {
+        node.activate();
+        node.setAsDimension(true);
+        renderTemplate('#dimension-bucket .bucket-body', TEMPLATES.BUCKET_NODE, node.attributes);
+//        console.log(nodes);
+    } else {
+        alert('node already added');
+    }
+}
+function removeTextElement(id)
+{
+    var node = nodes.map[id];
+    node.deactivate();
+    node.setAsSentence(false);
+    removeNode('#sentence-bucket > .bucket-body .' + id);
+}
+function removeDimensionElement(id)
+{
+    var node = nodes.map[id];
+//    console.log(id);
+    node.deactivate();
+    removeNode('#dimension-bucket > .bucket-body .' + id);
+}
+
+function addBucketTagHighlightEvent(id) {
+    $('.bucket-body .' + id).on('mouseover', function() {
+        $('#' + id + ' > .node-tag').addClass('highlighted-tag');
+    })
+            .on('mouseout', function() {
+                $('#' + id + ' > .node-tag').removeClass('highlighted-tag');
+            });
+}
+
+function loadOutputPreview()
+{
+    //"DOMSubtreeModified"
+    $('.bucket-body').on(BODY_CHANGE_EVENT, function() {
+//        console.log('body changed');
+        var data = nodes.getSample();
+        $('#tagger-output-preview').empty();
+        renderTemplate('#tagger-output-preview', TEMPLATES.OUTPUT_PREVIEW, {data:data});
+
+
+    });
+
 }

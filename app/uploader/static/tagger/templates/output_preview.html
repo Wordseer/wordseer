@@ -1,0 +1,16 @@
+<table id='output-preview-table'>
+    <% if(data.length>0) {%>
+    <tr>
+        <% _.each(data[0], function(value, key){%>
+        <td title='<%=value.help%>'><%=value.name%> (<%=value.tag%>)</td>
+        <%});%>
+    </tr>
+    <% _.each(data, function(row){%>
+    <tr>
+        <% _.each(row, function(value, key){%>
+        <td title='<%=value.help%>'><%=value.value%></td>
+        <%});%>
+    </tr>
+    <%});%>
+    <%}%>
+</table>

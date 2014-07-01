@@ -17,9 +17,9 @@
             data-type='<%=type%>'
             data-isattribute='<%if(isAttribute){%>1<% }else{ %>0<%}%>'
             title="Click to preview"><%=tag%></button>
-
+<% if(type!=="document") {%>
     <span class='node-tag-action node-tag-action-text' data-id='<%= id %>' data-xpaths='<%= xpaths[0] %>' title='Use as Text'> <span class='glyphicon glyphicon-ok'></span>&nbsp;Text</span>
     <span class='node-tag-action node-tag-action-dimension' data-id='<%= id %>' data-xpaths='<%= xpaths[0] %>' title='Use as Dimension'> <span class='glyphicon glyphicon-ok'></span>&nbsp;Dimension</span>
-
+<%}%>
     <div class='tagger-node-children'></div>
 </div>

@@ -1,0 +1,15 @@
+
+
+<button type='button' class="btn btn-sm bucket-tag bucket-tag-<%=type%> tagger-tooltip <%=id%> <% if(type==='subunit') 
+        {%> btn-primary <%} 
+        else if(type==='metadata') 
+        {%> btn-info <% }
+        else
+        { %> btn-success <%}%> 
+        <% if (isDimension){%> bucket-tag-dimension<%}%>" 
+        data-id='<%= id %>' data-xpaths='<%= xpaths[0] %>' 
+        data-type='<%=type%>'
+        data-isattribute='<%if(isAttribute){%>1<% }else{ %>0<%}%>'
+        title="belongs to <%=belongsTo%><%if(isDimension){%>. Click to rename<%}%>">
+    <%=tag%>    <% if(isDimension){%><span class='glyphicon glyphicon-edit'></span><%}%>
+</button>
