@@ -2,10 +2,13 @@ from lib.wordseerbackend.wordseerbackend.collectionprocessor import CollectionPr
 from lib.wordseerbackend.reader_writer import ReaderWriter
 
 import os
+import database
 
 collection_dir = os.path.join("lib", "wordseerbackend", "tests", "data", "articles")
 extension = ".xml"
 structure_file = os.path.join(collection_dir, "structure.json")
+
+database.reset()
 
 reader_writer = ReaderWriter()
 collection_processor = CollectionProcessor(reader_writer)
