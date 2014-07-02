@@ -154,13 +154,13 @@ class CRUD(View):
             sets = Set.query.filter_by(parent_id=parent_id,
                 user_id=self.user_id, type=self.collection_type).all()
 
-            for set in sets:
-                setinfo = self.read(set.id)
+            for s in sets:
+                setinfo = self.read(s.id)
 
                 # TODO: get sentence and document counts
 
                 # recurse through any nested Sets
-                setinfo["children"] = self.list(set.id)
+                setinfo["children"] = self.list(s.id)
                 setlist.append(setinfo)
 
             if parent_id == None:
@@ -204,7 +204,7 @@ class CRUD(View):
             sets = Set.query.filter_by(user_id=self.user_id,
                 type=self.collection_type).order_by(Set.name).all()
 
-            result = [self.read(set.id) for set in sets]
+            result = [self.read(s.id) for s in sets]
 
             # prepend special "all" set for document sets
             # TODO: frontend may send type as "document", need to change
@@ -277,12 +277,12 @@ class CRUD(View):
         if self.set_id:
 
             # get the set or abort if it doesn't exist
-            set = Set.query.get(self.set_id)
-            if not set:
+            target_set = Set.query.get(self.set_id)
+            if not target_set:
                 abort(400)
 
             # delete the set
-            db.session.delete(set)
+            db.session.delete(target_set)
 
             # delete its entire subtree
             # TODO: this should be done at the model or DB level with cascades;
@@ -290,7 +290,8 @@ class CRUD(View):
             # currently it is just moving children up a level in the tree
 
             # TODO: delete any metadata that associates it with text units
-            # this probably needs to be handled by the model also
+            # this probably needs to be handled by the model also?
+#           are we actually using any properties or metadata for this? 
 
             db.session.commit()
 
@@ -299,32 +300,57 @@ class CRUD(View):
         else:
             abort(400)
 
-    def update():
+    def update(self):
         """Methods for adding, modifying, and deleting items within ``Set``\s;
         Has its own dispatch dict for various update types
         """
-        utypes = {
-            "add": None,
-            "delete": None,
-            "addNote": None,
-            "addTag": None,
-            "editNote": None,
-            "deleteNote": None,
-            "deleteTag": None,
-            "rename": None,
-            "move": None,
-            "merge": None
-        }
+        if self.update_type:
+            
+            # TODO: all of these update methods are going to require a more
+            # generic way to access items in different set types
+            utypes = {
+                "add": update_add_to_set,
+                "delete": None,
+                "addNote": None,
+                "addTag": None,
+                "editNote": None,
+                "deleteNote": None,
+                "deleteTag": None,
+                "rename": None,
+                "move": None,
+                "merge": None
+            }
 
-        # TODO: return utypes and dispatch the methods, when they exist
+            # TODO: return utypes and dispatch the methods, when they exist
+            return utypes[self.update_type](self)
+        
+        else:
+            abort(400)
 
     def update_add_to_set(self):
-        """Adds the given id's to the set with the given ID."""
+        """Adds the given id's to the set with the given ID.
+        
+        Requires:
+            - set_id: the ID of the ``Set`` to add the new item to
+            - new_item: a ___-delimited string of various item attributes
+        Returns: 
+        """
         # php equivalent: subsets/update.php:addItemToSubset()
 
         if self.set_id and self.new_item:
             # do something
+            target_set = Set.query.get(self.set_id)
+            items = split("___", trim(self.new_item))
             
+            # TODO: model method needed: a generic "add item to set" method
+            # that is overloaded by subclasses; otherwise I have to check the
+            # set type and hard-code every possible option to a different 
+            # operation (target_set.sequences.append, 
+            # target_set.sentences.append, etc)
+            
+            #for now            
+            abort(400)
+        
         else:
             abort(400)
 

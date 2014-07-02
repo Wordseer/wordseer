@@ -176,6 +176,7 @@ class TestSetViews(unittest.TestCase):
             data = json.loads(new_set.data)
             self.assertEqual(data["text"], "test_create", msg=data)
 
+    @unittest.skip("needs a model method to delete subtree")
     def test_delete(self):
         "test the ``sets.CRUD.delete`` method"
 
@@ -200,3 +201,19 @@ class TestSetViews(unittest.TestCase):
             response = c.get("/api/sets/" + query)
             self.assertEqual(response.status_code, 400,
                 msg="requires a delete-orphan cascade at the model level")
+    
+    @unittest.skip("needs model method")
+    def test_update_add_to_set(self):
+        """test the sets.CRUD.update_add_to_set method"""
+        
+        with self.client as c:
+            # required variables
+            response = c.get("/api/sets/?instance=foo&type=update")
+            self.assertEqual(response.status_code, 400)
+            
+            # should work
+            response = c.get("/api/sets/?instance=foo&type=update&update=add")
+            self.assertEqual(response.status_code, 400)
+            
+            # TODO: test response
+            
