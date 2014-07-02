@@ -3,6 +3,7 @@ from lib.wordseerbackend.reader_writer import ReaderWriter
 
 import os
 import database
+import pdb
 
 collection_dir = os.path.join("lib", "wordseerbackend", "tests", "data", "articles")
 extension = ".xml"
@@ -13,4 +14,5 @@ database.reset()
 reader_writer = ReaderWriter()
 collection_processor = CollectionProcessor(reader_writer)
 
+# pdb.set_trace()
 collection_processor.process(collection_dir, structure_file, extension, False)

@@ -51,3 +51,5 @@ keien.py
 # Documentation
 docs/build
 
+# line_profiler
+*.*prof

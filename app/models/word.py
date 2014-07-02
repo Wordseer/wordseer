@@ -45,5 +45,4 @@ class Word(db.Model, Base):
         """Representation string for words, showing the word.
         """
 
-        return "<Word: " + self.word + ">"
-
+        return "<Word: " + str(self.word) + ">"
