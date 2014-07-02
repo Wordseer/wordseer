@@ -56,7 +56,7 @@ class CRUD(View):
         self.set_name = request.args.get("name")
         self.parent_id = request.args.get("parent")
         self.update_type = request.args.get("update")
-        self.item_id = request.args.get("item", type=int)
+        self.new_item = request.args.get("item")
         self.annotation = request.args.get("annotation")
         self.annotation_id = request.args.get("annotation", type=int)
         self.itemtype = request.args.get("itemType")
@@ -299,13 +299,43 @@ class CRUD(View):
         else:
             abort(400)
 
+    def update():
+        """Methods for adding, modifying, and deleting items within ``Set``\s;
+        Has its own dispatch dict for various update types
+        """
+        utypes = {
+            "add": None,
+            "delete": None,
+            "addNote": None,
+            "addTag": None,
+            "editNote": None,
+            "deleteNote": None,
+            "deleteTag": None,
+            "rename": None,
+            "move": None,
+            "merge": None
+        }
+
+        # TODO: return utypes and dispatch the methods, when they exist
+
+    def update_add_to_set(self):
+        """Adds the given id's to the set with the given ID."""
+        # php equivalent: subsets/update.php:addItemToSubset()
+
+        if self.set_id and self.new_item:
+            # do something
+            
+        else:
+            abort(400)
+
     # possible type values to dispatch
     operations = {
         "read": read,
         "list": list,
         "listflat": list_flat,
         "create": create,
-        "delete": delete
+        "delete": delete,
+        "update": update,
     }
 
     def dispatch_request(self):
