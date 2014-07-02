@@ -52,8 +52,7 @@ class TestSetViews(unittest.TestCase):
         assert self.set3.parent_id == self.set1.id, \
             "%s, %s" % (self.set3.parent_id, self.set1.id)
 
-    @classmethod
-    def tearDownClass(self):
+    def tearDown(self):
         db.session.close()
 
     def test_crud_init(self):
