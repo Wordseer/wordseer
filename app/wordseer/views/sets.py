@@ -276,15 +276,21 @@ class CRUD(View):
         # required variables
         if self.set_id:
 
-            # delete the set
+            # get the set or abort if it doesn't exist
             set = Set.query.get(self.set_id)
+            if not set:
+                abort(400)
+
+            # delete the set
             db.session.delete(set)
 
             # delete its entire subtree
             # TODO: this should be done at the model or DB level with cascades;
             # http://docs.sqlalchemy.org/en/rel_0_9/orm/session.html#delete
+            # currently it is just moving children up a level in the tree
 
-            # delete any metadata that associates it with text units
+            # TODO: delete any metadata that associates it with text units
+            # this probably needs to be handled by the model also
 
             db.session.commit()
 
