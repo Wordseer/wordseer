@@ -12,48 +12,48 @@ import wordseer
 class TestSetViews(unittest.TestCase):
     """test all the different ``Set`` views"""
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """doc"""
-        cls.longMessage = True
+        self.longMessage = True
 
-        cls.client = wordseer.app.test_client()
+        self.client = wordseer.app.test_client()
 
         database.restore_cache()
 
-        cls.user = models.flask_security.User()
+        self.user = models.flask_security.User()
 
-        db.session.add(cls.user)
+        db.session.add(self.user)
 
-        cls.set1 = models.sets.SentenceSet(name="test1", user=cls.user)
-        cls.set2 = models.sets.SequenceSet(name="test2", parent=cls.set1,
-            user=cls.user)
-        cls.set3 = models.sets.SentenceSet(name="test3", parent=cls.set1,
-            user=cls.user)
-        cls.set4 = models.sets.SentenceSet(name="test4", parent=cls.set1,
-            user=cls.user)
-        cls.set5 = models.sets.DocumentSet(name="test5", user=cls.user)
+        self.set1 = models.sets.SentenceSet(name="test1", user=self.user)
+        self.set2 = models.sets.SequenceSet(name="test2", parent=self.set1,
+            user=self.user)
+        self.set3 = models.sets.SentenceSet(name="test3", parent=self.set1,
+            user=self.user)
+        self.set4 = models.sets.SentenceSet(name="test4", parent=self.set1,
+            user=self.user)
+        self.set5 = models.sets.DocumentSet(name="test5", user=self.user)
 
 
-        db.session.add_all([cls.set1, cls.set2, cls.set3, cls.set4])
+        db.session.add_all([self.set1, self.set2, self.set3, self.set4,
+            self.set5])
 
         db.session.commit()
 
-        db.session.refresh(cls.user)
-        db.session.refresh(cls.set1)
-        db.session.refresh(cls.set3)
-        db.session.refresh(cls.set4)
+        db.session.refresh(self.user)
+        db.session.refresh(self.set1)
+        db.session.refresh(self.set3)
+        db.session.refresh(self.set4)
 
         # am I adding users correctly?
-        assert cls.set1.user_id == cls.user.id, \
-            "set: %s, user: %s" % (cls.set1.user_id, cls.user.id)
+        assert self.set1.user_id == self.user.id, \
+            "set: %s, user: %s" % (self.set1.user_id, self.user.id)
 
         # am I adding parents correctly?
-        assert cls.set3.parent_id == cls.set1.id, \
-            "%s, %s" % (cls.set3.parent_id, cls.set1.id)
+        assert self.set3.parent_id == self.set1.id, \
+            "%s, %s" % (self.set3.parent_id, self.set1.id)
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(self):
         db.session.close()
 
     def test_crud_init(self):
@@ -111,6 +111,7 @@ class TestSetViews(unittest.TestCase):
             data = json.loads(response.data)
             self.assertEqual(data["root"], True)
             self.assertEqual(len(data["children"]), 1, msg=data)
+
             # first level nesting
             self.assertEqual(data["children"][0]["text"], "test1")
 
@@ -195,5 +196,8 @@ class TestSetViews(unittest.TestCase):
             response = c.get("/api/sets/" + query)
             self.assertEqual(response.status_code, 400, msg=response.data)
 
-        # put the deleted stuff back
-        self.setUpClass()
+            # what about children?
+            query = "?instance=foo&type=read&id=" + str(self.set3.id)
+            response = c.get("/api/sets/" + query)
+            self.assertEqual(response.status_code, 400,
+                msg="requires a delete-orphan cascade at the model level")
