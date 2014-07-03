@@ -217,3 +217,54 @@ class TestSetViews(unittest.TestCase):
             
             # TODO: test response
             
+class TestDocumentViews(unittest.TestCase):
+    """test doc views"""
+    
+    def setUp(self):
+        """dfadsfd"""
+        # set up test client
+        self.client = wordseer.app.test_client
+        self.longMessage = True
+        
+        # make a project
+        self.proj = models.project.Project(name="testp")
+        db.session.add(self.proj)
+        # make a document
+        self.doc1 = models.document.Document(title="testd1")
+        db.session.add(self.doc1)
+        # associate document with project
+        self.proj.documents.append(self.doc1)  
+        db.session.commit()
+        
+        # create metadata and associate it with the document
+        self.prop1 = models.property.Property(name="testprop", value="blerg")
+        self.prop1meta = models.property_metadata.PropertyMetadata(
+            display_name="testprop", display=True, is_category=False, 
+            type="string")
+            
+        self.prop2 = models.property.Property(name="testprop2", value="blerg2")
+        self.prop2meta = models.property_metadata.PropertyMetadata(
+            display_name="testprop2", display=False, is_category=True, 
+            type="string")
+        db.session.add_all([self.prop1, self.prop2, 
+            self.prop1meta, self.prop2meta])
+            
+        self.doc1.properties.append(self.prop1)
+        self.doc1.properties.append(self.prop2)
+            
+        db.session.commit()
+        
+    def test_get_document(self):
+        """test the document.GetDocument class"""
+        with self.client() as c:
+            response = c.get("/api/documents/single/?instance=testp&id="+\
+                str(self.doc1.id))
+            self.assertEqual(response.status_code, 200, msg=self.doc1.id)
+            
+            # inspect the response
+            data = json.loads(response.data)
+            self.assertEqual(data["metadata"][0]["name"], self.prop1.name)
+            self.assertEqual(data["metadata"][1]["name_is_displayed"],
+                self.prop2meta.display)
+            
+            

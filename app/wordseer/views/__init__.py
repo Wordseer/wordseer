@@ -1,1 +1,1 @@
-__all__ = ["associatedwords", "sets"]
+__all__ = ["associatedwords", "sets", "document"]
