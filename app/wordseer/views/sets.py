@@ -8,7 +8,7 @@ from flask.views import View
 from app import db
 from app.models.flask_security import User
 from app.models.sets import Set
-from .. import wordseer
+from app.wordseer import wordseer
 
 class CRUD(View):
     """CRUD ``Set``s"""
@@ -46,7 +46,7 @@ class CRUD(View):
         # required args
         try:
             self.operation = request.args["type"]
-            self.instance = request.args["instance"]
+            self.project = request.args["instance"]
         except ValueError:
             abort(400)
         # optional args depending on the operation requested
