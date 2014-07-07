@@ -216,21 +216,33 @@ var NodeModel = function() {
                 json[key] = self.attributes[key];
             });
         //create subnit child objects
-        if (self.attributes.units.length > 0)
-        {
-            json['units'] = [];
-            _.each(self.attributes.units, function(unit) {
-                json.units.push(unit.toJSON());
-            });
-        }
-        //create metadata child objects
         if (self.attributes.metadata.length > 0)
         {
             json['metadata'] = [];
             _.each(self.attributes.metadata, function(unit) {
-                json.metadata.push(unit.toJSON());
+                json.metadata.push(unit.toJSON(activeOnly));
             });
         }
+        if (self.attributes.units.length > 0)
+        {
+            json['units'] = [];
+            _.each(self.attributes.units, function(unit) {
+//                var children = unit
+//                if (self.attributes.isActive || !activeOnly)//if activeOnly, only process active nodes
+                    json.units.push(unit.toJSON(activeOnly));
+              /*  else
+                {
+                    _.each(unit.attributes.units, function(sub_unit){
+                        
+                    })
+
+                }*/
+            });
+        }
+        //create metadata child objects
+
+        if (self.attributes.isRoot)
+            json['WORDSEER_CONFIG'] = self;
         return json;
     };
 

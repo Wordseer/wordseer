@@ -73,6 +73,8 @@ function loadRequestParams()
 function saveStructureFile()
 {
     alert('Saving structure file');
+    var data = nodes.toJSON();
+    console.log(data);
 
 }
 
