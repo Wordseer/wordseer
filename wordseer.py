@@ -9,7 +9,7 @@ portnum = 80
 if len(sys.argv)>1:
     hostname = sys.argv[1]
 if len(sys.argv)>2:
-    portnum = sys.argv[2]
+    portnum = int(float(sys.argv[2]))
 from app import app
 
 
