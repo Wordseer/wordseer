@@ -1,7 +1,9 @@
-<div id ='<%= id %>' class='tagger-bucket'>
-    <div class='bucket-header tagger-tooltip ' title='<%=help%>'><span><%=header%></span>
-        <span class='glyphicon glyphicon-question-sign bucket-helper' ></span>
-    </div>
-    <div id='<% id +"-body" %>' class='bucket-body'></div>
-
-</div>
+<tr id ='<%= id %>' class='tagger-bucket'>
+    <td class='tagger-bucket-header-cell'><div class='panel-heading tagger-tooltip ' title='<%=help%>'><span class='panel-title'><%=header%></span>
+            <span class='glyphicon glyphicon-question-sign bucket-helper' ></span>
+        </div>
+    </td>
+    <td class='tagger-bucket-content-cell'>
+        <div id='<% id +"-body" %>' class='bucket-body'></div>
+    <td>
+</tr>

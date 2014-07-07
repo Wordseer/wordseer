@@ -7,14 +7,14 @@
 <link rel="stylesheet" href="{{ url_for('uploader.static',filename='tagger/tagger.css') }}" type="text/css" />
 
 
-<script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/jquery-1.11.1.min.js') }}"></script>
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/lib/jquery-1.11.1.min.js') }}"></script>
 
-<script type = 'text/javascript' src = "{{ url_for('uploader.static',filename='tagger/jquery.tooltipster.min.js') }}">
-        < link rel = "stylesheet" href = "{{ url_for('uploader.static',filename='tagger/tooltipster.css') }}" type = "text/css" / >    </script>
-<script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/bootstrap.min.js') }}"></script>
-<script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/jquery.xpath.js') }}"></script>
-<script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/underscore.js') }}"></script>
-<script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/string.js') }}"></script>
+<script type = 'text/javascript' src = "{{ url_for('uploader.static',filename='tagger/lib/jquery.tooltipster.min.js') }}">
+        < link rel = "stylesheet" href = "{{ url_for('uploader.static',filename='tagger/lib/tooltipster.css') }}" type = "text/css" / ></script>
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/lib/bootstrap.min.js') }}"></script>
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/lib/jquery.xpath.js') }}"></script>
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/lib/underscore.js') }}"></script>
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/lib/string.js') }}"></script>
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/node_model.js') }}"></script>
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/tagger.js') }}"></script>
 
@@ -37,16 +37,20 @@
 <div id='tagger'>
     <!--<h2> Create structure file</h2>-->
     <p>Description here</p>
+
     <input type="hidden" id="project-id" value="{{project.id}}"/>
     <input type="hidden" id="document-id" value="{{document.id}}"/>
     <input type="hidden" id="document-url" value="{{document_url}}"/>
     <input type="hidden" id="filename" value="{{filename}}"/>
     <input type="hidden" id="templates-url" value="{{url_for('uploader.static', filename='tagger/templates')}}"/>
-    <div id='tagger-previews'><div id="tagger-node-preview" class="tagger-box"></div>
-        <div id="tagger-xml-preview" class="tagger-box"></div>
+    <button id="save-structure-button" class="btn btn-md btn-success" onclick="saveStructureFile()">Save and Return</button>
+    <div id='tagger-previews'>
+        <div id="tagger-node-preview" class="panel panel-default tagger-box"></div>
+        <div id="tagger-xml-preview" class="panel panel-default tagger-box"></div>
     </div>
-    <div id="tagger-buckets" class="tagger-box"></div>
-    <div id="tagger-output-preview" class="tagger-box"></div>
+    <div id="tagger-buckets" class="panel panel-default tagger-box"></div>
+    <div id="tagger-output-preview" class="panel panel-default tagger-box"></div>
+    <div id="tagger-rename-dialogue" style="display:none"></div>
 </div>
 {% endblock %}
 

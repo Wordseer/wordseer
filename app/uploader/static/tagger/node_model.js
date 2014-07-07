@@ -11,17 +11,18 @@ var DOCUMENT_TAG = 'document',
         TITLE_NODE_TAG = 'title'
         ;
 var NodeModel = function() {
-    var self = {}, xml, url, filename, xml_raw;
+    var self = {}, xml, xmlns, url, filename, xml_raw;
     var primaryKeys = ['id', 'tag', 'type', 'xpaths', 'name', 'active'],
             document_keys = ['filename', 'url', 'xml'],
             subunit_keys = ['titleXPaths', 'structureName'],
             metadata_keys = ['attr', 'propertyName', 'displayName', 'dataType', 'nameIsDisplayed', 'valueIsDisplayed', 'isCategory'];
     self.attributes = {filename: '', url: '', xml: {}, id: '', tag: '', type: '',
-        xpaths: [], name: '', titleXpaths: [],
+        xpaths: [], name: '', titleXpaths: [], titleId: '',
         units: [], metadata: [], children: [], sub_xpaths: [], attrs: {}, attr: '',
         belongsTo: '', isAttribute: false, isActive: false,
         isCategory: false, nameIsDisplayed: false, valueIsDisplayed: false, dataType: '',
-        structureName: '', 'propertyName': '', displayName: '', root: false, isSentence: false, isDimension: false};
+        structureName: '', 'propertyName': '', displayName: '',
+        isRoot: false, isSentence: false, isProperty: false, isTitle: false};
     self.map = {};
     self.init = function() {
 
@@ -34,26 +35,33 @@ var NodeModel = function() {
         url = xml_filepath;
         filename = xml_filepath.replace(/^.*[\\\/]/, '');
         self.createFromXML($(xml).children()[0]);
+        //TODO: Fix slave narratives
     };
     self.createFromXML = function(inXML, path, id) {
         xml = inXML;
         path = (path) ? path : '/';
         id = (id) ? id : NODE_ID_PREFIX;
-        self.attributes.root = (path === '/') ? true : false;
+        self.attributes.isRoot = (path === '/') ? true : false;
         var children = $(xml).children(), attrs = xml.attributes;
         self.attributes.tag = $(xml).prop('tagName');
         self.attributes.name = $(xml).prop('tagName');
-        self.attributes.id = id + self.attributes.tag;
+        self.attributes.id = id + S(self.attributes.tag).replace('.', '_').s;
         self.attributes.xpaths.push(path + self.attributes.tag + "/");
         self.attributes.structureName = self.attributes.tag;
         self.attributes.displayName = self.attributes.structureName;
         var paths = path.split('/');
-//        console.log(paths);
+//console.log(paths);
         if (paths.length > 1)
             self.attributes.belongsTo = paths[paths.length - 2];
         _.each(attrs, function(attr)
         {
             self.attributes.attrs[attr.nodeName] = attr.nodeValue;
+            if (attr.nodeName === 'xmlns')
+            {
+//console.log('xmlns namespace detected ' + attr.nodeValue);
+//console.log(attr.nodeValue);
+                xmlns = attr.nodeValue;
+            }
             var node = new NodeModel();
             node.createAsAttribute(self.attributes.id, attr.nodeName, attr.nodeValue, self.attributes.xpaths);
             if (!_.contains(self.attributes.sub_xpaths, node.attributes.xpaths[0]))
@@ -66,18 +74,18 @@ var NodeModel = function() {
 
         if (children.length > 0)
         {
-            if (!self.attributes.root)
+            if (!self.attributes.isRoot)
                 self.attributes.type = SUBUNIT_TAG;
             _.each(children, function(child)
             {
                 var node = new NodeModel();
                 node.createFromXML(child, self.attributes.xpaths[0], self.attributes.id);
-//                console.log(self.attributes.sub_xpaths);
+//console.log(self.attributes.sub_xpaths);
                 if (!self.map[node.attributes.id])
                 {
                     self.attributes.sub_xpaths.push(node.attributes.xpaths[0]);
                     self.attributes.children.push(node);
-//                    console.log(node.attributes.id);
+//console.log(node.attributes.id);
                     if (node.attributes.type === METADATA_TAG)
                         self.attributes.metadata.push(node);
                     else
@@ -95,7 +103,7 @@ var NodeModel = function() {
             self.attributes.type = METADATA_TAG;
             self.attributes.xpaths[0] += 'text()';
         }
-        if (self.attributes.root)
+        if (self.attributes.isRoot)
         {
             self.attributes.type = DOCUMENT_TAG;
             self.attributes.filename = filename;
@@ -125,10 +133,13 @@ var NodeModel = function() {
     self.deactivate = function() {
         self.attributes.isActive = self.attributes.valueIsDisplayed
                 = self.attributes.nameIsDisplayed = self.attributes.isSentence
-                = self.attributes.isDimension = false;
+                = self.attributes.isProperty = false;
     };
     self.rename = function(newName) {
+        var oldName = self.attributes.name + '';
         self.attributes.displayName = self.attributes.name = self.attributes.propertyName = newName;
+//console.log('renaming '+oldName +' to ' +self.attributes.name);
+
     };
     self.setDisplayName = function(name)
     {
@@ -140,6 +151,11 @@ var NodeModel = function() {
     self.setTitleAsXPath = function(titleXPath) {
         self.attributes.titleXpaths = [titleXPath];
     };
+    self.setTitleNode = function(id) {
+        self.map[id].rename(TITLE_NODE_TAG);
+        self.map[id].attributes.isTitle = true;
+        self.attributes.titleId = id;
+    };
     self.hasChildren = function() {
         return self.attributes.children.length > 0;
     };
@@ -148,13 +164,13 @@ var NodeModel = function() {
         {
             self.rename(SENTENCE_TAG);
             self.attributes.isSentence = true;
-            self.attributes.isDimension = false;
+            self.attributes.isProperty = false;
             self.attributes.type = SUBUNIT_TAG;
             self.attributes.isCategory = false;
-            console.log(self.attributes.xpaths[0]);
+//console.log(self.attributes.xpaths[0]);
             if (!S(self.attributes.xpaths[0]).endsWith('text()') && !self.attributes.isAttribute)
                 self.attributes.xpaths[0] += 'text()';
-            console.log(self.attributes.xpaths[0]);
+//console.log(self.attributes.xpaths[0]);
         }
         else
         {
@@ -162,19 +178,19 @@ var NodeModel = function() {
             self.attributes.isSentence = false;
         }
     };
-    self.setAsDimension = function(flag)
+    self.setAsProperty = function(flag)
     {
         if (flag)
         {
             self.rename(self.attributes.tag);
             self.attributes.isSentence = false;
-            self.attributes.isDimension = true;
-//            self.attributes.type = METADATA_TAG;
+            self.attributes.isProperty = true;
+//self.attributes.type = METADATA_TAG;
             self.attributes.isCategory = true;
 
             if (S(self.attributes.xpaths[0]).endsWith('text()'))
                 self.attributes.xpaths[0] = S(self.attributes.xpaths[0]).chompRight('text()').s;
-//            console.log(self.attributes.xpaths[0]);
+//console.log(self.attributes.xpaths[0]);
         }
         else
         {
@@ -230,68 +246,62 @@ var NodeModel = function() {
         var sentences = _.filter(map, function(item) {
             return item.attributes.isSentence;
         });
-        var dimensions = _.filter(map, function(item) {
-            return item.attributes.isDimension;
+        var properties = _.filter(map, function(item) {
+            return item.attributes.isProperty;
         });
-//        console.log(map);
-//        console.log(self);
+//console.log(map);
+//console.log(self);
         var sampleColumn = function() {
-            return {help: '', name: '', value: '', xpath: ''};
+            return {id: '', help: '', name: '', value: '', xpath: ''};
         };
-//        console.log(xml_raw);
-        for (var i = 1; i <= size; i++)
+//console.log(xml_raw);
+
+        _.each(sentences, function(node, key)
         {
-            var outputItem = [];
-            _.each(sentences, function(node, key)
+            var outputItems = [];
+            for (var i = 1; i <= size; i++)
             {
 
+                var outputItem = [];
                 var xpath = node.attributes.xpaths[0],
                         sentence = new sampleColumn();
                 sentence.help = 'sentence';
                 sentence.tag = node.attributes.tag;
                 sentence.name = node.attributes.name;
-                sentence.value = getXPathNode(xml_raw, xpath, i, null, node.attributes.isAttribute);
+                sentence.value = getXPathNode(xml_raw, xmlns, xpath, i, null, node.attributes.isAttribute);
                 sentence.xpath = xpath;
+                sentence.id = node.attributes.id;
                 outputItem.push(sentence);
-                _.each(dimensions, function(dimension, dim_key) {
-                    var dim_col = new sampleColumn(), xpath2 = dimension.attributes.xpaths[0];
-                    dim_col.help = 'dimension';
-                    dim_col.tag = dimension.attributes.tag;
-                    dim_col.name = dimension.attributes.name;
-
-                    dim_col.value = getXPathNode(xml_raw, xpath, i, xpath2, dimension.attributes.isAttribute);
+                _.each(properties, function(property)
+                {
+                    var dim_col = new sampleColumn(), xpath2 = property.attributes.xpaths[0], xpath2Title;
+                    dim_col.help = 'property';
+                    dim_col.tag = property.attributes.tag;
+                    dim_col.name = property.attributes.name;
+                    if (property.attributes.titleId === '')
+                        xpath2Title = xpath2;
+                    else
+                        xpath2Title = self.map[property.attributes.titleId].attributes.xpaths[0];
+                    dim_col.value = getXPathNode(xml_raw, xmlns, xpath, i, xpath2Title, property.attributes.isAttribute);
+                    //console.log(typeof (dim_col.value));
                     dim_col.xpath = xpath2;
-                    outputItem.push(dim_col);
+                    dim_col.id = property.attributes.id;
+                    if (!property.attributes.isTitle)
+                        outputItem.push(dim_col);
                 });
+                outputItems.push(outputItem);
+            }
+            sample.push(outputItems);
+//console.log(node);
+        });
 
-//                console.log(node);
-            });
-            sample.push(outputItem);
-        }
-        console.log(sample);
+
+//console.log(sample);
         return sample;
     };
     return self;
 };
 
-/*
- function getNode(nodes, xpath)
- {
- var node;
- for (var key in nodes)
- {
- var n = nodes[key];
- var sub_xpaths = n.attributs.sub_xpaths;
- if (_.contains(sub_xpaths, xpath))
- {
- node = getNode(n.attributes.units, xpath);
- if (!node)
- node = getNode(n.attributes.metadata, xpath);
- }
- }
- return node;
- }
- */
 /**
  * 
  * @param {type} xml XML DOM
@@ -300,13 +310,13 @@ var NodeModel = function() {
  * @param {type} ancestorXPath retrieve the andestors of the specific primary node
  * @returns {unresolved} results
  */
-function getXPathNode(xml, nodeXPath, index, ancestorXPath, isAttribute)
+function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, isAttribute)
 {
-//    console.log(xml);
-//    var xml2 = $.parseXML(xml);
-//    xml = $(xml);
-//    xml.setProperty("SelectionLanguage", "XPath")
-    var result, evaluator = new XPathEvaluator(),
+//console.log(xml);
+//var xml2 = $.parseXML(xml);
+//xml = $(xml);
+//xml.setProperty("SelectionLanguage", "XPath")
+    var result,
             xpathExpression = '(' + nodeXPath + ')',
             isChild = false, secondaryXPath = '';
     xpathExpression = (index) ? xpathExpression + '[' + index + ']' : xpathExpression;
@@ -318,7 +328,7 @@ function getXPathNode(xml, nodeXPath, index, ancestorXPath, isAttribute)
         if (S(ancestorXPath).contains(nodeXPath))
         {
             //child nodes
-//            console.log('child found');
+//console.log('child found');
             isChild = true;
             xpathExpression += ancestorXPath.replace(nodeXPath);
         }
@@ -328,66 +338,67 @@ function getXPathNode(xml, nodeXPath, index, ancestorXPath, isAttribute)
             {
                 if (ancestorList[i] === nodeList[i])//Trees are diverging
                 {
-//                    console.log('chomping '+ ancestorList[i]);
+//console.log('chomping '+ ancestorList[i]);
                     ancestorXPathShort = S(ancestorXPathShort).chompLeft(ancestorList[i - 1] + '/').s;
                 }
             }
-//            secondaryXPath = ancestorXPathShort;
+//secondaryXPath = ancestorXPathShort;
             xpathExpression += (ancestorXPathShort.length > 0) ? '/ancestor::' + S(ancestorXPathShort).chompRight('/').s : '';
         }
 
     }
-    console.log(xpathExpression);
-    var nodes = xml.evaluate(xpathExpression, xml, null, XPathResult.ANY_TYPE, null);
-    console.log(nodes);
+    //console.log(xpathExpression);
+    //console.log(xmlns);
+//xmlns = (xmlns) ? "'xmlns=" + xmlns + "'" : null;
+    xmlns = (xmlns) ? xmlns : null;
+//if (xmlns)
+//{
+//xml.createNSResolver
+//}
+    var xpe = new XPathEvaluator();
+
+    var nsResolver = (function(element) {
+        var
+                nsResolver = element.ownerDocument.createNSResolver(element),
+                defaultNamespace = element.getAttribute('xmlns');
+
+        return function(prefix) {
+            return nsResolver.lookupNamespaceURI(prefix) || defaultNamespace;
+        };
+    }(xml.documentElement));
+
+    //console.log(nsResolver);
+    var nodes = xpe.evaluate(xpathExpression, xml, nsResolver, XPathResult.ANY_TYPE, null);
+    //console.log(nodes);
+//console.log(typeof (nodes));
     result = nodes;
     var node = nodes.iterateNext();
-    console.log(node);
-    console.log($(nodes));
+    //console.log(typeof (node));
+    //console.log(node);
+    if (node === null)
+    {
+        //TODO: FIx Slave narratives
+        //console.log('null detected');
+        node = nodes.iterateNext();
+        //console.log(node);
+    }
+    //console.log($(nodes));
     if (node)
     {
-        //    result = node.childNodes[0].nodeValue;
-
-//    console.log(result);
         if (node.childNodes && node.childNodes[0] && node.childNodes.length > 0)
         {
-            console.log(node.childNodes);
-            console.log('child nodes');
             result = node.childNodes[0].nodeValue;
         }
         else
         {
-            console.log('node');
-            console.log(node);
-            console.log(typeof (node));
-            console.log(node.toString());
             if (typeof (node) == 'object')
             {
-                console.log($(node));
+                //console.log($(node));
                 result = $(node)[0].nodeValue;
             }
             else
                 result = node;
-
-//        result = node;
         }
     }
-//    else
-//        result = nodes;
-    console.log(result);
-//    result = (result.childNodes[0])? result.childNodes[0].nodeValue: result;
-    /*   var temp = result;
-     while (temp)
-     {
-     console.log(temp);
-     console.log(temp.childNodes[0].nodeValue);
-     temp = $(nodes.iterateNext()).text();
-     
-     //        result = nodes.iterateNext();
-     }
-     //    console.log(nodes);
-     //    console.log($(result).text());
-     //    while (result)
-     */
     return result;
 }

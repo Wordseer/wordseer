@@ -1,16 +1,23 @@
-<table id='output-preview-table'>
-    <% if(data.length>0) {%>
-    <tr>
-        <% _.each(data[0], function(value, key){%>
-        <td title='<%=value.help%>'><%=value.name%> (<%=value.tag%>)</td>
+<div id='output-preview-header' class='panel-heading'></div>
+<div class='panel-body'>
+    <table id='output-preview-table' class='table'>
+        <% if(data.length>0) {%>
+        <thead>
+        <tr>
+            <% _.each(data[0], function(value, key){%>
+            <th title='<%=value.help%>' class="<%=value.id%>"><%=value.name%> (<%=value.tag%>)</th>
+            <%});%>
+        </tr>
+        </thead>
+        <tbody>
+        <% _.each(data, function(row){%>
+        <tr>
+            <% _.each(row, function(value, key){%>
+            <td title='<%=value.help%>' class="<%=value.id%>"><%=value.value%></td>
+            <%});%>
+        </tr>
         <%});%>
-    </tr>
-    <% _.each(data, function(row){%>
-    <tr>
-        <% _.each(row, function(value, key){%>
-        <td title='<%=value.help%>'><%=value.value%></td>
-        <%});%>
-    </tr>
-    <%});%>
-    <%}%>
-</table>
+        <%}%>
+        </tbody>
+    </table>
+</div>

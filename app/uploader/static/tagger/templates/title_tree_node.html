@@ -1,4 +1,5 @@
-<div id='tree-<%=id%>' class='tagger-node'>
+<div id='title-<%=id%>' class='tagger-node'>
+    
      <span>
     <% if(units.length>0 || metadata.length>0){%>
    
@@ -7,21 +8,20 @@
  
     <%} else {%> <span class="glyphicon glyphicon-minus-sign" style="color:white;"></span><%}%>
        </span>
-    <button type='button' class='btn btn-sm tagger-tooltip  
-            node-tag node-tag-<%=type%> <%=id%> 
+    <button type='button' class='btn btn-sm tagger-tooltip 
+            <%=id%>
             <% if(type==="subunit") 
             {%> btn-primary <%} 
             else if(type==="metadata") 
             {%> btn-info <% }
             else
-            { %> btn-success <%}%>' 
+            { %> btn-success <%}%> title-node-tag title-node-tag-<%=type%>' 
             data-id='<%= id %>' data-xpaths='<%= xpaths[0] %>' 
             data-type='<%=type%>'
             data-isattribute='<%if(isAttribute){%>1<% }else{ %>0<%}%>'
-            title='Click to preview' ><%=tag%></button>
-<% if(type!=="document") {%>
-<span class='node-tag-action node-tag-action-text <%=id%>' data-id='<%= id %>' data-type='<%=type%>' data-node-type='text' data-xpaths='<%= xpaths[0] %>' title='Use as Text'> <span class='glyphicon glyphicon-ok'></span>&nbsp;Text</span>
-    <span class='node-tag-action node-tag-action-property <%=id%>' data-id='<%= id %>' data-type='<%=type%>' data-node-type='property' data-xpaths='<%= xpaths[0] %>' title='Use as Property'> <span class='glyphicon glyphicon-ok'></span>&nbsp;Property</span>
-<%}%>
+            title='Click to preview' 
+            <% if(type==="subunit"){%>disabled<%}%>
+            ><%=tag%></button>
+
     <div class='tagger-node-children'></div>
 </div>

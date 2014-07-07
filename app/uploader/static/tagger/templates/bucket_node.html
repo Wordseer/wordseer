@@ -6,10 +6,11 @@
         {%> btn-info <% }
         else
         { %> btn-success <%}%> 
-        <% if (isDimension){%> bucket-tag-dimension<%}%>" 
+        <% if (isProperty){%> bucket-tag-property<%}%>
+        <% if (isSentence){%> bucket-tag-sentence<%}%>" 
         data-id='<%= id %>' data-xpaths='<%= xpaths[0] %>' 
         data-type='<%=type%>'
         data-isattribute='<%if(isAttribute){%>1<% }else{ %>0<%}%>'
-        title="belongs to <%=belongsTo%><%if(isDimension){%>. Click to rename<%}%>">
-    <%=tag%>    <% if(isDimension){%><span class='glyphicon glyphicon-edit'></span><%}%>
+        title="belongs to <%=belongsTo%><%if(isProperty){%>. Click to rename<%}%>">
+    <%=name%> (<%=tag%>)  <% if(isProperty){%><span class='glyphicon glyphicon-edit'></span><%}%>
 </button>
