@@ -1,0 +1,73 @@
+{'sentences':
+    [{
+        'parsetree': '(ROOT (S (NP (DT this)) (VP (VBZ is) (NP (DT a) (NN sentence))) (. .)))',
+        'text': 'this is a sentence.',
+        'dependencies': [
+            ('nsubj', 'sentence', '4', 'this', '1'),
+            ('cop', 'sentence', '4', 'is', '2'),
+            ('det', 'sentence', '4', 'a', '3'),
+            ('root', 'ROOT', '0', 'sentence', '4')],
+        'words': [
+            ('this',
+                {'CharacterOffsetEnd': '4',
+                'Lemma': 'this',
+                'PartOfSpeech': 'DT',
+                'CharacterOffsetBegin': '0'}),
+            ('is',
+                {'CharacterOffsetEnd': '7',
+                'Lemma': 'be',
+                'PartOfSpeech': 'VBZ',
+                'CharacterOffsetBegin': '5'}),
+            ('a',
+                {'CharacterOffsetEnd': '9',
+                'Lemma': 'a',
+                'PartOfSpeech': 'DT',
+                'CharacterOffsetBegin': '8'}),
+            ('sentence',
+                {'CharacterOffsetEnd': '18',
+                'Lemma': 'sentence',
+                'PartOfSpeech': 'NN',
+                'CharacterOffsetBegin': '10'}),
+            ('.',
+                {'CharacterOffsetEnd': '19',
+                'Lemma': '.',
+                'PartOfSpeech': '.',
+                'CharacterOffsetBegin': '18'}
+            )
+        ]
+    },{
+        'parsetree': '(ROOT (S (NP (DT this)) (VP (VBZ is) (NP (QP (DT another) (CD one)))) (. .)))',
+        'text': 'this is another one.',
+        'dependencies': [
+            ('nsubj', 'one', '4', 'this', '1'),
+            ('cop', 'one', '4', 'is', '2'),
+            ('quantmod', 'one', '4', 'another', '3'),
+            ('root', 'ROOT', '0', 'one', '4')],
+        'words': [
+            ('this', {
+                'CharacterOffsetEnd': '24',
+                'Lemma': 'this',
+                'PartOfSpeech': 'DT',
+                'CharacterOffsetBegin': '20'}),
+            ('is', {
+                'CharacterOffsetEnd': '27',
+                'Lemma': 'be',
+                'PartOfSpeech': 'VBZ',
+                'CharacterOffsetBegin': '25'}),
+            ('another', {
+                'CharacterOffsetEnd': '35',
+                'Lemma': 'another', 'PartOfSpeech': 'DT',
+                'CharacterOffsetBegin': '28'}),
+            ('one', {
+                'CharacterOffsetEnd': '39',
+                'Lemma': 'one',
+                'PartOfSpeech': 'CD',
+                'CharacterOffsetBegin': '36'}),
+            ('.', {
+                'CharacterOffsetEnd': '40',
+                'Lemma': '.',
+                'PartOfSpeech': '.',
+                'CharacterOffsetBegin': '39'})]
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+<article>
+<time>2012-03-26</time>
+<title>Post 3</title>
+<author>allison</author>
+<tags>
+ <tag>Tag 1</tag>
+ <tag>Tag 2</tag>
+</tags>
+<number>3</number>
+<text>
+	This is the text of post 3. There are two sentences here.
+</text>
+</article>
