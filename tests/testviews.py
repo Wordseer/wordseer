@@ -251,7 +251,18 @@ class TestDocumentViews(unittest.TestCase):
             
         self.doc1.properties.append(self.prop1)
         self.doc1.properties.append(self.prop2)
-            
+        
+        # create words, sentences, units and associate with document
+        self.word1 = models.word.Word(word="hello")
+        self.word2 = models.word.Word(word="world")
+        self.sent1 = models.sentence.Sentence()
+        self.sent1.words.append(self.word1)
+        self.sent1.words.append(self.word2)
+        self.chap1 = models.unit.Unit()
+        self.chap1.sentences.append(self.sent1)
+        self.doc1.children.append(self.chap1)
+        
+        db.session.add_all([self.word1, self.word2, self.sent1, self.chap1])
         db.session.commit()
         
     def test_get_document(self):
@@ -263,8 +274,20 @@ class TestDocumentViews(unittest.TestCase):
             
             # inspect the response
             data = json.loads(response.data)
-            self.assertEqual(data["metadata"][0]["name"], self.prop1.name)
+            self.assertEqual(data["metadata"][0]["property_name"], self.prop1.name)
             self.assertEqual(data["metadata"][1]["name_is_displayed"],
                 self.prop2meta.display)
+            
+            #TODO: to test fulltext response, really need a fully processed doc?
+            response = c.get("/api/documents/single/?instance=testp&id="+\
+                str(self.doc1.id) + "&include_text=true")
+            self.assertEqual(response.status_code, 200, msg=self.doc1.id)
+            data = json.loads(response.data)
+            self.assertEqual(data["metadata"][0]["property_name"], self.prop1.name)
+            self.assertEqual(data["metadata"][1]["name_is_displayed"],
+                self.prop2meta.display)
+            # self.assertEqual(1,0,msg=response.data)
+            
+            
             
             

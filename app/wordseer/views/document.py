@@ -56,11 +56,12 @@ class GetDocument(View):
             property = {
                 "document_id": self.doc_id,
                 "unit_name": unit.type,
-                "name": current_prop.name,
+                "property_name": current_prop.name,
                 "value": current_prop.value,
                 "has_value": bool(current_prop.value),
                 "property_id": meta.id, #TODO: doublecheck this is what it wants
-                "format": meta.type,
+                "format": "",
+                "type": meta.type,
                 "is_category": meta.is_category,
                 "name_is_displayed": meta.display,
                 "name_to_display": meta.display_name,
@@ -68,6 +69,16 @@ class GetDocument(View):
             properties.append(property)
         
         return properties
+    
+    def list_unit_subtree(self, unit):
+        """recursively get all the descendants of a unit, return flat list"""
+        results = []
+        for child in unit.children:
+            results.append(child)
+            nextlevel = self.list_unit_subtree(child)
+            for grandchild in nextlevel:
+                results.append(grandchild)
+        return results
         
     def dispatch_request(self):
         """Functions for fetching a single document's sub-structure, along
@@ -94,34 +105,32 @@ class GetDocument(View):
             if self.metadata: 
                 self.metadata =json.loads(self.metadata)
             
-            # TODO: requires some methods from GetMetadata class
+            # TODO: requires some methods from GetMetadata class?
             
             # retrieve all children of document unit
             units["document"] = {
                 self.doc_id: {
-                    "metadata": {},
+                    "metadata": self.list_properties(self.doc),
                     "unit_id": self.doc_id, 
                     "unit_name": "document",
                     }
             }
             
-            parent_ids = []
+            parent_ids = {}
             unit_ids = []
             
-            for unit in self.doc.children: 
-                # TODO: recursively? but not nested
-                # TODO: model method to retrieve entire subtree?
+            for unit in self.list_unit_subtree(self.doc): 
             
                 unit_ids.append(unit.id)
                 
                 # create unit type key if not present
-                if unit.name not in units: 
-                    units[unit.name] = {}
-                    parent_ids[unit.name] = {}
+                if unit.type not in units: 
+                    units[unit.type] = {}
+                    parent_ids[unit.type] = {}
                     
                 # create unit id key if not present
-                if unit.id not in units[unit.name]:
-                    units[unit.name][unit.id] = {
+                if unit.id not in units[unit.type]:
+                    units[unit.type][unit.id] = {
                         # the whole row from old document_structure table
                         # TODO: this seems redundant
                         "unit_id": unit.id,
@@ -133,30 +142,48 @@ class GetDocument(View):
                         "metadata": self.list_properties(unit)
                     }
                     
-                    parent_ids[unit.name][unit.id] = [
+                    parent_ids[unit.type][unit.id] = [
                         unit.parent_id,
                         unit.parent.type
                     ]
                     
-                    if unit.name == "sentence":
-                        units[unit.name][unit.id]["sentence_id"] = unit.id
+                    if unit.type not in children:
+                        children[unit.type] = {}
+                    if unit.id not in children[unit.type]:
+                        children[unit.type][unit.id] = {}
+                    
+                    if unit.parent.type not in children:
+                        children[unit.parent.type] = {}
+                    
+                    if unit.parent.id not in children[unit.parent.type]:
+                        children[unit.parent.type][unit.parent.id] = []
+                    
+                    children[unit.parent.type][unit.parent.id].append(
+                        {"id": unit.id, "name": unit.type})
+                    # TODO: also a unit above document with no name?
+                
+                # retrieve sentences separately bc they are not Units
+                #TODO: will this cause any problems on the front end? 
+                units["sentence"] = {}
+                for sentence in unit.sentences:
+                    if sentence.id not in units["sentence"]:
+                        units["sentence"][sentence.id] = {}
                         
-                        # Get the words in each sentence in the document.
-                        units[unit.name][unit.id]["words"] = [
-                            {
-                                "word": word.word,
-                                "word_id": word.id,
-                                "space_after": "", # TODO: from WordInSentence
-                                # TODO: phrase set memberships
-                            } for word in unit.words
-                        ]
+                    units["sentence"][sentence.id]["sentence_id"] = sentence.id
+
+                    # Get the words in each sentence in the document.
+                    units["sentence"][sentence.id]["words"] = [
+                        {
+                            "word": word.word,
+                            "word_id": word.id,
+                            "space_after": " ", # TODO: from WordInSentence
+                            #TODO: WordInSentence has space_before instead?
+                            # TODO: phrase set memberships
+                        } for word in sentence.words
+                    ]
                         
-                    else:
-                        if unit.type not in children:
-                            children[unit.type] = {}
-                        if unit.id not in children[unit.type]:
-                            children[unit.type][unit.id] = {}    
-        
+                                
+            
             # The top-level metadata for the document is under the "document" unit,
             # so pull it out.    
             properties = units["document"][self.doc_id]["metadata"]
