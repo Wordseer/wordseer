@@ -27,9 +27,16 @@ and open the template in the editor.
 #tagger-node-preview{
     margin: 0 10px 10px 0;
 }
-#tagger-node-preview .tagger-container-body, #tagger-xml-preview .tagger-container-body, #title-tree-nodes{
+#tagger-node-preview .tagger-container-body, #tagger-xml-preview .tagger-container-body{
     overflow:auto;
     max-height: 300px;
+}
+#title-tree-nodes{
+    overflow:auto;
+    max-height: 150px;
+}
+#title-tree-node h3{
+    margin-top: 5px;
 }
 #tagger-previews{
     width:100%;
@@ -191,5 +198,11 @@ and open the template in the editor.
     top:10%;
     left:25%;
     position: fixed;
-    
+
+}
+
+#save-structure-button{
+    float:right;
+    display:inline-block;
+    margin-bottom: 5px;
 }

@@ -45,5 +45,9 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
-
-.elasticbeanstalk/
+
+
+.elasticbeanstalk/
+
+!/db/
+!/wordseer_flask_dev.db

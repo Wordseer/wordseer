@@ -35,9 +35,6 @@
 
 {% block tagger %}
 <div id='tagger'>
-    <!--<h2> Create structure file</h2>-->
-    <p>Description here</p>
-
     <input type="hidden" id="project-id" value="{{project.id}}"/>
     <input type="hidden" id="document-id" value="{{document.id}}"/>
     <input type="hidden" id="document-url" value="{{document_url}}"/>
@@ -48,8 +45,8 @@
         <div id="tagger-node-preview" class="panel panel-default tagger-box"></div>
         <div id="tagger-xml-preview" class="panel panel-default tagger-box"></div>
     </div>
-    <div id="tagger-buckets" class="panel panel-default tagger-box"></div>
-    <div id="tagger-output-preview" class="panel panel-default tagger-box"></div>
+    <div id="tagger-buckets" class="tagger-box"></div>
+    <div id="tagger-output-preview" class="tagger-box"></div>
     <div id="tagger-rename-dialogue" style="display:none"></div>
 </div>
 {% endblock %}

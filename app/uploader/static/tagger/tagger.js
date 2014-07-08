@@ -73,7 +73,7 @@ function loadRequestParams()
 function saveStructureFile()
 {
     alert('Saving structure file');
-    var data = nodes.toJSON();
+    var data = nodes.toActiveJSON();
     console.log(data);
 
 }
@@ -146,6 +146,9 @@ function renderContainers()
     renderTemplate('#tagger-xml-preview', TEMPLATES.CONTAINER,
             {id: 'tagger-xml-preview-container', header: 'XML Preview',
                 help: 'a preview of the source XML document'});
+    renderTemplate('#tagger-output-preview', TEMPLATES.CONTAINER,
+            {id: 'tagger-output-preview-container', header: 'XML Preview',
+                help: 'a preview of the source Output text and properties document'});
 }
 
 
@@ -357,13 +360,13 @@ function removeTextElement(id)
     var node = nodes.map[id];
     node.deactivate();
     node.setAsSentence(false);
-    removeNode('#sentence-bucket > .bucket-body .' + id);
+    removeNode('#sentence-bucket .bucket-body .' + id);
 }
 function removePropertyElement(id)
 {
     var node = nodes.map[id];
     node.deactivate();
-    removeNode('#property-bucket > .bucket-body .' + id);
+    removeNode('#property-bucket .bucket-body .' + id);
 }
 
 function refreshElement(id) {
@@ -462,9 +465,9 @@ function loadOutputPreview()
     {
         var data = nodes.getSample();
         console.log(data);
-        $('#tagger-output-preview').empty();
-        for(var i = 0, j=data.length;i<j;i++)
-        renderTemplate('#tagger-output-preview', TEMPLATES.OUTPUT_PREVIEW, {data: data[i]});
+        $('#tagger-output-preview-container').empty();
+        for (var i = 0, j = data.length; i < j; i++)
+            renderTemplate('#tagger-output-preview-container', TEMPLATES.OUTPUT_PREVIEW, {data: data[i]});
     });
 }
 

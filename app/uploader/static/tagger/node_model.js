@@ -12,9 +12,9 @@ var DOCUMENT_TAG = 'document',
         ;
 var NodeModel = function() {
     var self = {}, xml, xmlns, url, filename, xml_raw;
-    var primaryKeys = ['id', 'tag', 'type', 'xpaths', 'name', 'active'],
-            document_keys = ['filename', 'url', 'xml'],
-            subunit_keys = ['titleXPaths', 'structureName'],
+    var primaryKeys = ['id', 'tag', 'type', 'xpaths', 'name', 'isActive'],
+            document_keys = ['titleXPaths'],
+            subunit_keys = ['structureName'],
             metadata_keys = ['attr', 'propertyName', 'displayName', 'dataType', 'nameIsDisplayed', 'valueIsDisplayed', 'isCategory'];
     self.attributes = {filename: '', url: '', xml: {}, id: '', tag: '', type: '',
         xpaths: [], name: '', titleXpaths: [], titleId: '',
@@ -155,6 +155,7 @@ var NodeModel = function() {
         self.map[id].rename(TITLE_NODE_TAG);
         self.map[id].attributes.isTitle = true;
         self.attributes.titleId = id;
+        self.attributes.titleXPaths = self.map[id].attributes.xpaths[0];
     };
     self.hasChildren = function() {
         return self.attributes.children.length > 0;
@@ -205,6 +206,11 @@ var NodeModel = function() {
             if (self.attributes[key])
                 json[key] = self.attributes[key];
         });
+        //put document attributes
+        if (self.attributes.type === DOCUMENT_TAG)
+            _.each(document_keys, function(key) {
+                json[key] = self.attributes[key];
+            });
         //put metadata attributes
         if (self.attributes.type === METADATA_TAG)
             _.each(metadata_keys, function(key) {
@@ -216,11 +222,13 @@ var NodeModel = function() {
                 json[key] = self.attributes[key];
             });
         //create subnit child objects
+        json['children'] = [];
         if (self.attributes.metadata.length > 0)
         {
             json['metadata'] = [];
             _.each(self.attributes.metadata, function(unit) {
                 json.metadata.push(unit.toJSON(activeOnly));
+                json.children.push(unit.toJSON(activeOnly));
             });
         }
         if (self.attributes.units.length > 0)
@@ -229,23 +237,78 @@ var NodeModel = function() {
             _.each(self.attributes.units, function(unit) {
 //                var children = unit
 //                if (self.attributes.isActive || !activeOnly)//if activeOnly, only process active nodes
-                    json.units.push(unit.toJSON(activeOnly));
-              /*  else
-                {
-                    _.each(unit.attributes.units, function(sub_unit){
-                        
-                    })
-
-                }*/
+                json.units.push(unit.toJSON(activeOnly));
+                json.children.push(unit.toJSON(activeOnly));
+                /*  else
+                 {
+                 _.each(unit.attributes.units, function(sub_unit){
+                 
+                 })
+                 
+                 }*/
             });
         }
         //create metadata child objects
 
         if (self.attributes.isRoot)
             json['WORDSEER_CONFIG'] = self;
+        if (json['children'].length === 0)
+            delete json['children'];
         return json;
     };
+    self.toActiveJSON = function() {
+        var jsonIn = self.toJSON(), json;
 
+        function cleanUp(node)
+        {
+            var out, tempMeta = [], tempUnits = [];
+            _.each(node.children, function(child)
+            {
+                if (child.type === METADATA_TAG && child.isActive)
+                    tempMeta.push(child);
+                else if (child.type === SUBUNIT_TAG)
+                {
+                    var tempNode = cleanUp(child);
+                    if ($.isArray(tempNode))
+                    {
+                        _.each(tempNode, function(tempNodeChild)
+                        {
+                            if (tempNodeChild.type === METADATA_TAG)
+                                tempMeta.push(tempNodeChild);
+                            else
+                                tempUnits.push(tempNodeChild);
+                        })
+                    }
+                    else
+                    {
+                        if (tempNode.type === METADATA_TAG)
+                            tempMeta.push(tempNode);
+                        else
+                            tempUnits.push(tempNode);
+                    }
+                }
+            });
+
+            if (node.isActive)
+            {
+                node.metadata = tempMeta;
+                node.units = tempUnits;
+                delete node['children'];
+                delete node['isActive'];
+                out = node;
+            }
+            else
+            {
+                out = [];
+                out = $.merge(tempUnits, tempMeta);
+            }
+
+            return out;
+        }
+
+        json = cleanUp(jsonIn);
+        return json;
+    };
     self.getSample = function(size)
     {
         size = (size) ? size : 10;
