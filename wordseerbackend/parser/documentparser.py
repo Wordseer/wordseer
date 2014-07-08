@@ -45,8 +45,12 @@ class DocumentParser(object):
             current_max = 0
             logger.log(LATEST_SENT_ID, str(current_max), logger.REPLACE)
 
+        #TODO: both of the below comments should replace the lines below
+        # them once the pipeline is integrated with the main application
+        #for sentence in document.all_sentences:
         for sentence in document.sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
+                #parse_products = self.parser.parse(sentence.text)
                 parse_products = self.parser.parse(sentence.sentence)
                 parsed.add_sentence(sentence, parse_products)
                 count += 1
@@ -84,3 +88,4 @@ class DocumentParser(object):
         logger.log(LATEST_SEQ_SENT, str(current_max), logger.REPLACE)
         #TODO: reader_writer
         self.reader_writer.write_sequences()
+
