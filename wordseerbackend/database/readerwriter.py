@@ -1,4 +1,6 @@
-from app.models import *
+#from app.models import *
+#TODO: deactivated for testing, reactivate when integrated with main app
+#TODO: docstrings for module and class
 
 class ReaderWriter:
 

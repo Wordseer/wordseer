@@ -2,8 +2,10 @@
 Tests for the SequenceProcessor class.
 """
 
+import mock
 import unittest
 
+from wordseerbackend.database.readerwriter import ReaderWriter
 from wordseerbackend.document.taggedword import TaggedWord
 from wordseerbackend.document.sentence import Sentence
 from wordseerbackend.sequence.sequenceprocessor import (SequenceProcessor,
@@ -15,7 +17,8 @@ class SequenceProcessorTests(unittest.TestCase):
     def setUp(self):
         """Obtain a SequenceProcessor.
         """
-        self.seq_proc = SequenceProcessor("")
+        mock_reader_writer = mock.create_autospec(ReaderWriter)
+        self.seq_proc = SequenceProcessor(mock_reader_writer)
 
         self.words = [TaggedWord(lemma="first", word="first"),
             TaggedWord(lemma="second", word="second"),
@@ -167,3 +170,4 @@ def get_sequence_text(sequences):
                 sequences[seq_type][stop_type][i] = seq_list[i].sequence
 
     return sequences
+
