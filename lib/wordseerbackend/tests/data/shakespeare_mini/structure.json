@@ -1,0 +1,141 @@
+{
+    "structureName": "document",
+    "xpaths": [
+        "/PLAY"
+    ],
+    "titleXpaths": [
+        "./TITLE/text()"
+    ],
+    "units": [
+        {
+            "belongsTo": "document",
+            "structureName": "act",
+            "xpaths": [
+                "./ACT"
+            ],
+            "units": [
+                {
+                    "belongsTo": "act",
+                    "structureName": "scene",
+                    "xpaths": [
+                        "./SCENE"
+                    ],
+                    "units": [
+                        {
+                            "belongsTo": "scene",
+                            "structureName": "speech",
+                            "xpaths": [
+                                "./SPEECH"
+                            ],
+                            "units": [
+                                {
+                                    "belongsTo": "speech",
+                                    "structureName": "sentence",
+                                    "xpaths": [
+                                        "./LINE/text()"
+                                    ]
+                                }
+                            ],
+                            "metadata": [
+                                {
+                                    "belongsTo": "speech",
+                                    "propertyName": "speaker",
+                                    "xpaths": [
+                                        "./SPEAKER/text()"
+                                    ],
+                                    "nameIsDisplayed": false,
+                                    "valueIsDisplayed": true,
+                                    "displayName": "Speaker",
+                                    "isCategory": true,
+                                    "type": "string"
+                                },
+                                {
+                                    "belongsTo": "speech",
+                                    "propertyName": "StageDirection",
+                                    "xpaths": [
+                                        "./STAGEDIR/text()"
+                                    ],
+                                    "valueIsDisplayed": true,
+                                    "nameIsDisplayed": false,
+                                    "displayName": "Stage directions",
+                                    "isCategory": false,
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        {
+                            "belongsTo": "scene",
+                            "structureName": "stage",
+                            "xpaths": [
+                                "./STAGEDIR"
+                            ],
+                            "units": [
+                                {
+                                    "belongsTo": "stage",
+                                    "structureName": "sentence",
+                                    "xpaths": [
+                                        "./text()"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "metadata": [
+                        {
+                            "belongsTo": "scene",
+                            "propertyName": "Scene",
+                            "xpaths": [
+                                "./TITLE/text()"
+                            ],
+                            "nameIsDisplayed": false,
+                            "displayName": "Scene",
+                            "valueIsDisplayed": true,
+                            "isCategory": true,
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "metadata": [
+                {
+                    "belongsTo": "act",
+                    "propertyName": "Act",
+                    "xpaths": [
+                        "./TITLE/text()"
+                    ],
+                    "valueIsDisplayed": true,
+                    "displayName": "Act",
+                    "nameIsDisplayed": false,
+                    "type": "string",
+                    "isCategory": true
+                }
+            ]
+        }
+    ],
+    "metadata": [
+        {
+            "belongsTo": "document",
+            "propertyName": "Title",
+            "xpaths": [
+                "./TITLE/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "string",
+            "displayName": "Title",
+            "isCategory": true
+        },
+        {
+            "belongsTo": "document",
+            "propertyName": "characters",
+            "xpaths": [
+                "PERSONAE/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": false,
+            "type": "string",
+            "displayName": "Characters",
+            "isCategory": false
+        }
+    ]
+}

@@ -1,15 +1,17 @@
+"""This is the ORM implementation of the reader writer. It has performance issues
+and is left here mostly for reference.
+"""
+
 from app.models import *
 import pdb
-from sqlalchemy.orm.exc import NoResultFound
 
 from app import db
 
 class ReaderWriter:
 
     Base.commit_on_save = False
-    engine = db.engine
-    connection = engine.connect()
 
+    @profile
     def write_parse_products(self, products):
         """Converts ParseProducts into the corresponding models and writes them
         into the database.
@@ -31,7 +33,7 @@ class ReaderWriter:
             sentence = products.sentences[sentence_index]
             # NOTE: this assumes that the sentence indices match the parses
 
-            print(sentence.__dict__)
+            # print(parse.__dict__)
 
             # Read in the data for each dependency in the sentence
             for dep in parse.dependencies:
@@ -101,6 +103,7 @@ class ReaderWriter:
 
         return Document.query.get(doc_id)
 
+    @profile
     def create_new_document(self, doc, num_files):
         """Initialize the document and its subunits and save it to the database.
 
@@ -108,18 +111,18 @@ class ReaderWriter:
         tree.
         """
 
-        document_id = self.connection.execute(Unit.__table__.insert(),
-            number = num_files,
-            type = 'document'
-        ).inserted_primary_key[0]
+        document = Document(title=_get_title(doc))
+        document.number = num_files
 
-        # TODO: add title as property
-
-        subunit_number = 0
         for unit in doc.units:
-            self._init_unit(unit, document_id, document_id, subunit_number)
-            subunit_number += 1
+            unit = _init_unit(unit, document)
+            document.children.append(unit)
 
+        document.save()
+        db.session.commit()
+        return document
+
+    @profile
     def index_sequence(self, sequence):
         """Reads in sequence data to create and save sequeunces into the
         database.
@@ -180,77 +183,70 @@ class ReaderWriter:
         pass
 
     def calculate_lin_similarities(self):
-        self.connection.close()
+        pass
 
+"""
+Helpers
+"""
+
+@profile
+def _init_unit(unit, document):
+    """Helper to recursively initialize subunits
     """
-    Helpers
-    """
 
-    def _init_unit(self, unit, document_id, parent_id, number):
-        """Helper to recursively initialize subunits
-        """
+    new_unit = Unit()
 
-        unit_id = self.connection.execute(Unit.__table__.insert(),
-            number = number,
-            parent_id = parent_id
-        ).inserted_primary_key[0]
-
-        self.connection.execute(Property.__table__.insert(),
-            [ { "name": property_data.property_name,
-                "value": property_data.value
-            } for property_data in unit.metadata ]
+    for property_data in unit.metadata:
+        unit_property = Property(
+            name = property_data.property_name,
+            value = property_data.value
         )
 
+        new_unit.properties.append(unit_property)
 
-        for sentence_text in unit.sentences:
+    for sentence_text in unit.sentences:
+        sentence = Sentence(text = sentence_text.text)
+        sentence.document = document
 
-            sentence_id = self.connection.execute(Sentence.__table__.insert(),
-                text = sentence_text.text,
-                document_id = document_id,
-                unit_id = unit_id
-            ).inserted_primary_key[0]
+        position = 0
+        for tagged_word in sentence_text.tagged:
+            word = Word.find_or_create(
+                word = tagged_word.word[0],
+                lemma = tagged_word.lemma,
+                tag = tagged_word.tag
+            )
 
-            position = 0
-            for tagged_word in sentence_text.tagged:
+            sentence.add_word(
+                word = word,
+                position = position,
+                space_before = tagged_word.space_before,
+                tag = tagged_word.tag
+            )
 
-                word_id = None
-                try:
-                    word_id = Word.query.filter_by(
-                        word = tagged_word.word[0],
-                        lemma = tagged_word.lemma,
-                        tag = tagged_word.tag
-                    ).one().id
-                except NoResultFound:
-                    word_id = self.connection.execute(Word.__table__.insert(),
-                        word = tagged_word.word[0],
-                        lemma = tagged_word.lemma,
-                        tag = tagged_word.tag
-                    ).inserted_primary_key[0]
+            position += 1
+            db.session.commit()
 
-                self.connection.execute(WordInSentence.__table__.insert(),
-                    word_id = word_id,
-                    sentence_id = sentence_id,
-                    position = position,
-                    space_before = tagged_word.space_before,
-                    tag = tagged_word.tag
-                )
+        new_unit.sentences.append(sentence)
 
-                position += 1
+    subunit_number = 0
+    for subunit in unit.units:
+        new_subunit = _init_unit(subunit, document)
+        new_subunit.number = subunit_number
 
-        subunit_number = 0
-        for subunit in unit.units:
-            self._init_unit(subunit, document_id, unit_id, subunit_number)
-            subunit_number += 1
+        new_unit.children.append(new_subunit)
 
-    def _get_title(doc):
-        """Helper to find the title metadata from the list of metadata
-        """
+    new_unit.save()
+    return new_unit
 
-        title = ""
+def _get_title(doc):
+    """Helper to find the title metadata from the list of metadata
+    """
 
-        for data in doc.metadata:
-            if data.property_name.lower().strip() == "title":
-                title = data.value
+    title = ""
 
-        return title
+    for data in doc.metadata:
+        if data.property_name.lower().strip() == "title":
+            title = data.value
+
+    return title
 

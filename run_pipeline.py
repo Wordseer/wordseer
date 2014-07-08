@@ -1,5 +1,5 @@
 from lib.wordseerbackend.wordseerbackend.collectionprocessor import CollectionProcessor
-from lib.wordseerbackend.reader_writer import ReaderWriter
+from lib.wordseerbackend.wordseerbackend.database.readerwriter import ReaderWriter
 
 import os
 import database
