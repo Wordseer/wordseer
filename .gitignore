@@ -49,5 +49,4 @@ nosetests.xml
 
 .elasticbeanstalk/
 
-!/db/
 !/wordseer_flask_dev.db
