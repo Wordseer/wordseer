@@ -17,8 +17,8 @@ from app.models import Unit
 from app.models import Word
 import database
 
-class TestDocumentModels(unittest.TestCase):
-    """Tests for the document models: ``Unit``, ``Document``, etc.
+class TestWordModel(unittest.TestCase):
+    """Tests for the ``Word`` model.
     """
     def setUp(self):
         """Clean the current database.
@@ -54,6 +54,14 @@ class TestDocumentModels(unittest.TestCase):
         db.session.commit()
 
         assert word_2.sentences == [sen1, sen2]
+
+class TestSentenceModel(unittest.TestCase):
+    """Tests for the ``Sentence`` model.
+    """
+    def setUp(self):
+        """Clean the current database.
+        """
+        database.restore_cache()
 
     def test_model_sentence(self):
         """Test to make sure that Sentence is working properly.
@@ -93,6 +101,66 @@ class TestDocumentModels(unittest.TestCase):
         db.session.add_all([sequence1, sequence2])
         db.session.commit()
 
+    def test_add_word(self):
+        """Test the ``add_word()`` method of ``Sentence``.
+        """
+
+        sentence = Sentence(text="foo")
+        word = Word(word="foo")
+
+        sentence.save()
+        word.save()
+
+        rel = sentence.add_word(word, position=4, space_before=" ", tag="ADF")
+
+        assert rel.word == word
+        assert rel.sentence == sentence
+        assert rel.position == 4
+        assert rel.space_before == " "
+        assert rel.tag = "ADF"
+
+    def test_add_dependency(self):
+        """Test the ``add_dependency()`` method of ``Sentence``.
+        """
+
+        sentence = Sentence(text="foo")
+        dependency = Dependency(sentence_count=4)
+
+        sentence.save()
+        dependency.save()
+
+        rel = sentence.add_dependency(dependency, governor_index=1,
+            dependent_index=2)
+
+        assert rel.dependency == dependency
+        assert rel.sentence == sentence
+        assert rel.governor_index == 1
+        assert rel.dependent_index == 2
+
+    def test_add_sequence(self):
+        """Test the ``add_sequence()`` method of ``Sentence``.
+        """
+
+        sentence = Sentence(text="foo")
+        sequence = Sequence(lemmatized=False)
+
+        sentence.save()
+        sequence.save()
+
+        rel = sentence.add_sequence(sequence, position=1)
+
+        assert rel.sequence == sequence
+        assert rel.sentence == sentence
+        assert rel.position == 1
+
+class TestDependencyModel(unittest.TestCase):
+    """Tests for the ``Depenedency`` model.
+    """
+    def setUp(self):
+        """Clean the current database.
+        """
+        database.restore_cache()
+
     def test_model_dependency(self):
         """Test to make sure that Dependency is working properly.
         """
@@ -108,6 +176,14 @@ class TestDocumentModels(unittest.TestCase):
         db.session.add_all([sentence1, sentence2])
         db.session.commit()
 
+class TestSequenceModel(unittest.TestCase):
+    """Tests for the ``Sequence`` model.
+    """
+    def setUp(self):
+        """Clean the current database.
+        """
+        database.restore_cache()
+
     def test_model_sequence(self):
         """Test to make sure that Sequence is working properly.
         """
@@ -121,6 +197,14 @@ class TestDocumentModels(unittest.TestCase):
         sequence.sentences = [sentence1, sentence2]
 
         db.session.add_all([sentence1, sentence2])
+
+class TestUnitModels(unittest.TestCase):
+    """Tests for ``Unit`` and all models that inherit from ``Unit``.
+    """
+    def setUp(self):
+        """Clean the current database.
+        """
+        database.restore_cache()
 
     def test_model_unit(self):
         """Test to make sure that Unit is working properly.
@@ -155,6 +239,49 @@ class TestDocumentModels(unittest.TestCase):
         assert retrieved_prop.unit.type == "unit"
         assert retrieved_prop.unit.number == unit.number
 
+    def test_model_document(self):
+        """Test to make sure that Document is working properly.
+        """
+
+        d1 = Document(title="test", path="/path/to/d1")
+        d1.save()
+
+        assert d1.type == "document"
+
+        u1 = Unit()
+        u1.save()
+
+        d1.children.append(u1)
+        d1.save()
+
+        assert d1.children == [u1]
+        assert u1.parent == d1
+
+    def test_document_belongs_to(self):
+        """Check if ``belongs_to()`` on ``Document`` is working properly.
+        """
+
+        user = User()
+        project = Project()
+        document = Document()
+
+        project.documents = [document]
+        user.projects = [project]
+
+        user.save()
+        project.save()
+        document.save()
+
+        assert document.belongs_to(user)
+
+class TestPropertyModel(unittest.TestCase):
+    """Tests for the ``Property`` model.
+    """
+    def setUp(self):
+        """Clean the current database.
+        """
+        database.restore_cache()
+
     def test_model_property(self):
         """Test to make sure that Property is working properly.
         """
@@ -178,25 +305,7 @@ class TestDocumentModels(unittest.TestCase):
         assert retrieved_prop.name == prop.name
         assert retrieved_prop.value == prop.value
 
-    def test_model_document(self):
-        """Test to make sure that Document is working properly.
-        """
-
-        d1 = Document(title="test", path="/path/to/d1")
-        d1.save()
-
-        assert d1.type == "document"
-
-        u1 = Unit()
-        u1.save()
-
-        d1.children.append(u1)
-        d1.save()
-
-        assert d1.children == [u1]
-        assert u1.parent == d1
-
-class TestSets(unittest.TestCase):
+class TestSetsModels(unittest.TestCase):
     """Test all the different ``Set`` models.
     """
 

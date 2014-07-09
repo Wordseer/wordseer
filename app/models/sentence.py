@@ -65,7 +65,7 @@ class Sentence(db.Model, Base):
     def tagged(self):
         """Temporary compatibility method
         """
-
+        #TODO: remove this method
         return self.words
 
     def add_word(self, word, position=None, space_before="", tag=""):
