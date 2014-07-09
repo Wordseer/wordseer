@@ -45,6 +45,6 @@ class Unit(db.Model, Base):
         by its ordering number.
         """
 
-        return "<Unit: " + " ".join([str(self.unit_type),
+        return "<Unit: " + " ".join([str(self.type),
             str(self.number)]) + ">"
 

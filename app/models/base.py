@@ -10,10 +10,19 @@ from app import db
 
 class Base(object):
     """This is a mixin to add to Flask-SQLAlchemy"s db.Model class.
+
+    Attributes:
+        id (int): the primary key for all models
+        holds (dict): a dictionary that maps model class names to a set of
+            instances of that model. Used for mass-commits to avoid commit
+            overhead.
     """
 
     # Define the primary key
     id = db.Column(db.Integer, primary_key=True)
+
+    # Initialize holding area for mass-commits
+    holds = dict()
 
     @declared_attr
     def __tablename__(cls):
@@ -28,19 +37,40 @@ class Base(object):
 
     def save(self):
         """Commits this model instance to the database
-
-        TODO: should return either True or False depending on its success.
-        TODO: manage sequential saves better.
-
         """
+
         db.session.add(self)
         db.session.commit()
 
     def delete(self):
         """Deletes this model instance and commits.
         """
+
         db.session.delete(self)
         db.session.commit()
+
+    def hold(self):
+        """Holds the object in a list mapped to its model class for committing
+        later.
+        """
+
+        class_name = self.__class__.__name__
+
+        if class_name in Base.holds.keys():
+            Base.holds[class_name].add(self)
+        else:
+            Base.holds[class_name] = set([self])
+
+    @classmethod
+    def save_holds(cls):
+        """Commits all objects from the class in the hold area to the database
+        and clears the hold list
+        """
+
+        class_name = cls.__name__
+        db.session.add_all(Base.holds[class_name])
+        db.session.commit()
+        Base.holds[class_name] = set()
 
     @classmethod
     def find_or_create(cls, **kwargs):
@@ -61,6 +91,30 @@ class Base(object):
         except NoResultFound:
             new_record = cls(**kwargs)
             new_record.save()
+            return new_record
+        except MultipleResultsFound:
+            return False
+
+        return match
+
+    @classmethod
+    def find_or_initialize(cls, **kwargs):
+        """Retrieves a record that matches the query, or initialize a new record
+        with the parameters of the query.
+
+        Arguments:
+            kwargs: Conditions that the record should match.
+
+        Returns:
+            ``False`` if more than one record is retrieved, a new instance
+            of the model if none are found, and the existing instance if one
+            is found.
+        """
+
+        try:
+            match = cls.query.filter_by(**kwargs).one()
+        except NoResultFound:
+            new_record = cls(**kwargs)
             return new_record
         except MultipleResultsFound:
             return False
