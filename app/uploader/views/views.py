@@ -31,6 +31,8 @@ from app import app
 from app import db
 from app.models import User
 
+import pdb
+
 def generate_form_token():
     """Sets a token to prevent double posts."""
     if '_form_token' not in session:
@@ -117,7 +119,7 @@ class CLPDView(View):
         """If necessary, reset fields.
         """
         self.create_form.submitted.data = "true"
-        self.process_form.submitted.dat = "true"
+        self.process_form.submitted.data = "true"
 
     def pre_tests(self, **kwargs):
         """If necessary, run checks before continuing with the view logic.
@@ -132,6 +134,7 @@ class CLPDView(View):
 
         self.set_choices(**kwargs)
 
+        pdb.set_trace()
         if helpers.really_submitted(self.create_form):
             self.handle_create(**kwargs)
 
@@ -171,11 +174,11 @@ class ProjectsCLPD(CLPDView):
         """Created projects are created in the database with a name, a user,
         and a path. Their path is also created.
         """
+        #pdb.set_trace()
         project = Project(
             name=self.create_form.name.data,
             user=current_user)
-        db.session.add(project)
-        db.session.flush()
+        project.save()
         project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
         project.save()
         os.mkdir(project.path)
@@ -185,6 +188,7 @@ class ProjectsCLPD(CLPDView):
         """For deletion, delete call delete_object on the object and delete
         its path. For processing, send the project to the processor.
         """
+        #pdb.set_trace()
         selected_projects = request.form.getlist("process-selection")
         if request.form["action"] == self.process_form.DELETE:
             for project_id in selected_projects:
