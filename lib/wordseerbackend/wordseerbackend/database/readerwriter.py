@@ -261,16 +261,17 @@ class ReaderWriter:
         for sentence_text in unit.sentences:
 
             connection = self.engine.connect()
-            with connection.begin() as trans:
 
-                sentence_id = connection.execute(Sentence.__table__.insert(), {
-                    "text": sentence_text.text,
-                    "document_id": document_id,
-                    "unit_id": unit_id
-                }).inserted_primary_key[0]
+            sentence_id = connection.execute(Sentence.__table__.insert(), {
+                "text": sentence_text.text,
+                "document_id": document_id,
+                "unit_id": unit_id
+            }).inserted_primary_key[0]
 
-                position = 0
-                for tagged_word in sentence_text.tagged:
+            position = 0
+            for tagged_word in sentence_text.tagged:
+
+                with connection.begin() as trans:
 
                     word_id = None
                     try:
