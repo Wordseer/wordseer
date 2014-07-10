@@ -68,6 +68,13 @@ class Sentence(db.Model, Base):
 
         return self.words
 
+    @property
+    def sentence(self):
+        """Temporary compatibility method
+        """
+
+        return self.text
+
     def add_word(self, word, position=None, space_before="", tag=""):
         """Add a word to the sentence by explicitly creating the association
         object.
