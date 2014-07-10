@@ -117,7 +117,7 @@ class CLPDView(View):
         """If necessary, reset fields.
         """
         self.create_form.submitted.data = "true"
-        self.process_form.submitted.dat = "true"
+        self.process_form.submitted.data = "true"
 
     def pre_tests(self, **kwargs):
         """If necessary, run checks before continuing with the view logic.
@@ -174,8 +174,7 @@ class ProjectsCLPD(CLPDView):
         project = Project(
             name=self.create_form.name.data,
             user=current_user)
-        db.session.add(project)
-        db.session.flush()
+        project.save()
         project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
         project.save()
         os.mkdir(project.path)
