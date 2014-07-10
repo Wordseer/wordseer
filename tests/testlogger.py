@@ -4,9 +4,9 @@ Tests for the Logger class.
 
 import unittest
 
-from wordseerbackend import logger
-from wordseerbackend.database import database
-from wordseerbackend.models import Log
+from lib.wordseerbackend.wordseerbackend import logger
+from lib.wordseerbackend.wordseerbackend.database import database
+from lib.wordseerbackend.wordseerbackend.models import Log
 
 class LoggerTests(unittest.TestCase):
     """Run tests on the Logger class.
@@ -26,7 +26,7 @@ class LoggerTests(unittest.TestCase):
         self.failUnless(logger.get("logtest") == "true [false] ")
 
     def test_get(self):
-        """Test the get() method. 
+        """Test the get() method.
         """
         entry = Log(item_value="true", log_item="logtest")
         self.db.session.merge(entry)
@@ -36,3 +36,4 @@ class LoggerTests(unittest.TestCase):
             all()[0].item_value)
 
         self.failUnless(logger.get("fakerandomname") == "")
+

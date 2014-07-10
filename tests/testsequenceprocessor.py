@@ -5,10 +5,10 @@ Tests for the SequenceProcessor class.
 import mock
 import unittest
 
-from wordseerbackend.database.readerwriter import ReaderWriter
-from wordseerbackend.document.taggedword import TaggedWord
-from wordseerbackend.document.sentence import Sentence
-from wordseerbackend.sequence.sequenceprocessor import (SequenceProcessor,
+from lib.wordseerbackend.wordseerbackend.database.readerwriter import ReaderWriter
+from lib.wordseerbackend.wordseerbackend.document.taggedword import TaggedWord
+from lib.wordseerbackend.wordseerbackend.document.sentence import Sentence
+from lib.wordseerbackend.wordseerbackend.sequence.sequenceprocessor import (SequenceProcessor,
     join_tws, LEMMA, WORD)
 
 class SequenceProcessorTests(unittest.TestCase):

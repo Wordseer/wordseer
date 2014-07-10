@@ -5,11 +5,11 @@ Tests for the DocumentParser.
 import unittest
 from mock import MagicMock, patch, call
 
-from wordseerbackend.document.sentence import Sentence
-from wordseerbackend.document.parsedparagraph import ParsedParagraph
-from wordseerbackend.parser import documentparser
+from lib.wordseerbackend.wordseerbackend.document.sentence import Sentence
+from lib.wordseerbackend.wordseerbackend.document.parsedparagraph import ParsedParagraph
+from lib.wordseerbackend.wordseerbackend.parser import documentparser
 
-@patch("wordseerbackend.parser.documentparser.logger")
+@patch("lib.wordseerbackend.wordseerbackend.parser.documentparser.logger")
 class DocumentParserTests(unittest.TestCase):
     """Run tests on the DocumentParser.
     """
@@ -18,7 +18,7 @@ class DocumentParserTests(unittest.TestCase):
         """
         self.mock_reader_writer = MagicMock()
         self.mock_parser = MagicMock()
-        with patch("wordseerbackend.parser.documentparser.SequenceProcessor"):
+        with patch("lib.wordseerbackend.wordseerbackend.parser.documentparser.SequenceProcessor"):
             self.docparser = documentparser.DocumentParser(
                 self.mock_reader_writer,
                 self.mock_parser)
@@ -114,3 +114,4 @@ class DocumentParserTests(unittest.TestCase):
         rw_calls.append(call(parsed, 59))
         self.docparser.write_and_parse.assert_has_calls(rw_calls,
             any_order=True)
+

@@ -6,9 +6,9 @@ import unittest
 import json
 from lxml import etree
 
-from wordseerbackend.document import metadata, sentence
-from wordseerbackend.structureextractor import *
-from wordseerbackend.stringprocessor import StringProcessor
+from lib.wordseerbackend.wordseerbackend.document import metadata, sentence
+from lib.wordseerbackend.wordseerbackend.structureextractor import *
+from lib.wordseerbackend.wordseerbackend.stringprocessor import StringProcessor
 
 t = StringProcessor()
 
@@ -23,7 +23,7 @@ class CommonTests(object):
         :param str structure_file: The file with a JSON description of the
             XML structure.
         :param str input_file: The XML file to test.
-        
+
         """
         self.structure_file = path + structure_file
         self.input_file = path + input_file
@@ -184,3 +184,4 @@ def compare_metadata(dict_metadata, other_metadata):
         return False
 
     return True
+
