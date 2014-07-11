@@ -31,14 +31,16 @@ function init_tagger()
 {
     loadRequestParams();
     nodes = new NodeModel();
-    nodes.loadFromXMLURL(document_url);
+    nodes.loadFromXMLURL(document_url, filename);
     console.log(nodes);
     loadTemplates();
     render();
     loadNodeTreeEvents();
     loadTooltips();
     loadOutputPreview();
+    loadSubmit();
     addRootNode();
+
 
 
 //    test();
@@ -58,8 +60,8 @@ function render()
     renderContainers();
     renderBuckets();
     renderTreeNodes(nodes, '#tagger-node-preview .tagger-container-body');
-//    console.log(nodes.attributes.xml);
     renderXMLPreview(nodes.attributes.xml, '#tagger-xml-preview .tagger-container-body');
+//    $('.tagger-container').resizable();
 }
 function loadRequestParams()
 {
@@ -69,15 +71,52 @@ function loadRequestParams()
     document_url = $('#document-url').val();
     templates_url = $('#templates-url').val();
 }
-
+function loadSubmit()
+{
+    $('#tagger').submit(function() {
+        saveStructureFile();
+        return false;
+    })
+}
 function saveStructureFile()
 {
-    alert('Saving structure file');
-    var data = nodes.toActiveJSON();
-    console.log(data);
+//    alert('Saving structure file');
+    var data = nodes.toActiveJSON(), token = $('#csrf_token').val();
+    var url = window.location.href + '/save/';
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: JSON.stringify(data)
+        , dataType: 'json'
+        , contentType: "application/json"
+    }).done(function(msg) {
+        alert("Data Saved: " + msg);
 
+    }).error(function(msg) {
+        var text = msg.responseText;
+        console.log(text);
+        var pieces = url.split('/'), temp = pieces.slice(0, pieces.length - 4), redirect_url = temp.join('/');
+//        console.log(pieces);
+//        console.log(temp);
+//        alert(redirect_url);
+        if (text === 'ok')
+        {
+
+            window.location.replace(redirect_url);
+            return false;
+        }
+        else {
+            $('#tagger-save-file-response > .panel-body').html(msg.responseText);
+            $('#tagger-save-file-result').show().on('click', function() {
+                hideSaveFileResponse();
+            });
+        }
+    });
 }
-
+function hideSaveFileResponse()
+{
+    $('#tagger-save-file-result').hide();
+}
 function loadTemplates()
 {
     for (var template in TEMPLATES)
@@ -221,6 +260,7 @@ function loadNodeTreeEvents()
         var self = $(this), id = self.attr('data-id'), isAttribute = parseInt(self.attr('data-isattribute'));
         $('.xml-preview-node .highlighted-nodes').removeClass('highlighted-nodes');
         $('.xml-preview-node .' + id).addClass('highlighted-nodes');
+        $('#tagger-xml-preview-container .tagger-container-body').scrollTop(0); 
         var top = $('#tagger-xml-preview-container .' + id + ":first").offset().top - $('#tagger-xml-preview-container .tagger-container-body').position().top - 25;
         $('#tagger-xml-preview-container .tagger-container-body').scrollTop(top);
     });
@@ -464,7 +504,7 @@ function loadOutputPreview()
     $('.bucket-body').on(BODY_CHANGE_EVENT, function()
     {
         var data = nodes.getSample();
-        console.log(data);
+//        console.log(data);
         $('#tagger-output-preview-container').empty();
         for (var i = 0, j = data.length; i < j; i++)
             renderTemplate('#tagger-output-preview-container', TEMPLATES.OUTPUT_PREVIEW, {data: data[i]});

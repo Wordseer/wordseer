@@ -5,8 +5,9 @@ These are all the view functions for the app.
 import os
 import shutil
 import random
+import json
 from string import ascii_letters, digits
-
+from cStringIO import StringIO
 from flask import config
 from flask import redirect, url_for
 from flask import render_template
@@ -30,6 +31,7 @@ from ...models import User
 from app import app
 from app import db
 from app.models import User
+from app import csrf
 
 def generate_form_token():
     """Sets a token to prevent double posts."""
@@ -77,6 +79,7 @@ class CLPDView(View):
         self.create_form = create_form(prefix="create")
         self.process_form = process_form(prefix="process")
         self.confirm_delete_form = confirm_delete_form(prefix="confirm_delete")
+       
         self.template_kwargs = {}
 
     def delete_object(self, obj, data):
@@ -117,7 +120,7 @@ class CLPDView(View):
         """If necessary, reset fields.
         """
         self.create_form.submitted.data = "true"
-        self.process_form.submitted.dat = "true"
+        self.process_form.submitted.data = "true"
 
     def pre_tests(self, **kwargs):
         """If necessary, run checks before continuing with the view logic.
@@ -179,8 +182,9 @@ class ProjectsCLPD(CLPDView):
         project = Project(
             name=self.create_form.name.data,
             user=current_user)
-        db.session.add(project)
-        db.session.flush()
+#        db.session.add(project)
+#        db.session.flush()
+        project.save()
         project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
         project.save()
         os.mkdir(project.path)
@@ -320,7 +324,7 @@ def document_show(project_id, document_id):
         document=document,
         project=project,
         filename=filename)
-        
+@csrf.exempt        
 @uploader.route(app.config["PROJECT_ROUTE"]+"<int:project_id>"+
     app.config["MAP_ROUTE"] + '<int:document_id>')
 @login_required
@@ -345,13 +349,14 @@ def document_map(project_id, document_id):
     filename = os.path.split(document.path)[1]
     project = Project.query.join(User).filter(User.id == current_user.id).\
         filter(Document.id == document_id).one()
-    print document
+    map_document = forms.MapDocumentForm()
     return render_template("document_map.html",
         document=document,
         project=project,
         filename=filename, 
+        map_document = map_document,
         document_url="%s%s"%(app.config["UPLOAD_ROUTE"],document.id))
-        
+
 @uploader.route(app.config["UPLOAD_ROUTE"] + "<int:file_id>")
 @login_required
 def get_file(file_id):
@@ -377,3 +382,36 @@ def get_file(file_id):
 
     return send_from_directory(directory, filename)
 
+@csrf.exempt
+@uploader.route(app.config["PROJECT_ROUTE"]+"<int:project_id>"+
+    app.config["MAP_ROUTE"] + '<int:document_id>'+app.config["SAVE_MAP"], methods=['POST'])
+@login_required
+def upload_structure_file( project_id, document_id):
+    print 'saving structure file'
+    json_data = request.json
+    dest_path = ''
+    filename=''
+    counter = 0
+    while os.path.isfile(dest_path) or counter==0:
+        suffix = ''
+        if counter >0:
+            suffix='_%s'%counter
+        filename = json_data['filename']+"_structure"+suffix+".json"
+        filename = secure_filename(filename)
+        dest_path = os.path.join(app.config["UPLOAD_DIR"],
+            str(project_id), filename)
+        counter+=1
+    
+    # TODO: this checks if the file exists, but can we do this
+    # inside the form?
+    if not os.path.isfile(dest_path):
+        f = open(dest_path, 'w');
+        f.write(json.dumps(json_data))
+        f.close();
+        project = Project.query.filter(Project.id == project_id).one()
+        document = Document(path=dest_path, projects=[project])
+        document.save()
+    else:
+        return "A file with name " + os.path.split(dest_path)[1] + " already exists"
+
+    return 'ok'

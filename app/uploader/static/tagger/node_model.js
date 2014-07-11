@@ -13,8 +13,8 @@ var DOCUMENT_TAG = 'document',
 var NodeModel = function() {
     var self = {}, xml, xmlns, url, filename, xml_raw;
     var primaryKeys = ['id', 'tag', 'type', 'xpaths', 'name', 'isActive'],
-            document_keys = ['titleXPaths'],
-            subunit_keys = ['structureName'],
+            document_keys = ['titleXPaths', 'filename'],
+            subunit_keys = ['structureName', 'titleXPaths'],
             metadata_keys = ['attr', 'propertyName', 'displayName', 'dataType', 'nameIsDisplayed', 'valueIsDisplayed', 'isCategory'];
     self.attributes = {filename: '', url: '', xml: {}, id: '', tag: '', type: '',
         xpaths: [], name: '', titleXpaths: [], titleId: '',
@@ -27,13 +27,14 @@ var NodeModel = function() {
     self.init = function() {
 
     };
-    self.loadFromXMLURL = function(xml_filepath)
+    self.loadFromXMLURL = function(xml_filepath, fn)
     {
         var jqxhr = $.ajax({url: xml_filepath, async: false});
         xml_raw = jqxhr.responseXML;
         xml = $.parseXML(jqxhr.responseText);
         url = xml_filepath;
-        filename = xml_filepath.replace(/^.*[\\\/]/, '');
+        filename = (fn) ? fn : xml_filepath.replace(/^.*[\\\/]/, '');
+        self.attributes.filename = filename;
         self.createFromXML($(xml).children()[0]);
         //TODO: Fix slave narratives
     };
@@ -199,7 +200,7 @@ var NodeModel = function() {
             self.attributes.isSentence = false;
         }
     };
-    self.toJSON = function(activeOnly) {
+    self.toJSONAll = function(activeOnly) {
         var json = {};
         // put the primary keys in the json file
         _.each(primaryKeys, function(key) {
@@ -227,8 +228,8 @@ var NodeModel = function() {
         {
             json['metadata'] = [];
             _.each(self.attributes.metadata, function(unit) {
-                json.metadata.push(unit.toJSON(activeOnly));
-                json.children.push(unit.toJSON(activeOnly));
+                json.metadata.push(unit.toJSONAll(activeOnly));
+                json.children.push(unit.toJSONAll(activeOnly));
             });
         }
         if (self.attributes.units.length > 0)
@@ -237,8 +238,8 @@ var NodeModel = function() {
             _.each(self.attributes.units, function(unit) {
 //                var children = unit
 //                if (self.attributes.isActive || !activeOnly)//if activeOnly, only process active nodes
-                json.units.push(unit.toJSON(activeOnly));
-                json.children.push(unit.toJSON(activeOnly));
+                json.units.push(unit.toJSONAll(activeOnly));
+                json.children.push(unit.toJSONAll(activeOnly));
                 /*  else
                  {
                  _.each(unit.attributes.units, function(sub_unit){
@@ -250,14 +251,15 @@ var NodeModel = function() {
         }
         //create metadata child objects
 
-        if (self.attributes.isRoot)
-            json['WORDSEER_CONFIG'] = self;
+        /*  if (self.attributes.isRoot)
+         json['WORDSEER_CONFIG'] = self;*/
         if (json['children'].length === 0)
             delete json['children'];
         return json;
     };
     self.toActiveJSON = function() {
-        var jsonIn = self.toJSON(), json;
+        var jsonIn = self.toJSONAll(), json;
+        console.log(jsonIn);
 
         function cleanUp(node)
         {
@@ -277,7 +279,7 @@ var NodeModel = function() {
                                 tempMeta.push(tempNodeChild);
                             else
                                 tempUnits.push(tempNodeChild);
-                        })
+                        });
                     }
                     else
                     {
@@ -307,6 +309,7 @@ var NodeModel = function() {
         }
 
         json = cleanUp(jsonIn);
+        console.log(json);
         return json;
     };
     self.getSample = function(size)
@@ -346,25 +349,28 @@ var NodeModel = function() {
                 sentence.value = getXPathNode(xml_raw, xmlns, xpath, i, null, node.attributes.isAttribute);
                 sentence.xpath = xpath;
                 sentence.id = node.attributes.id;
-                outputItem.push(sentence);
-                _.each(properties, function(property)
+                if (sentence.value !== null)
                 {
-                    var dim_col = new sampleColumn(), xpath2 = property.attributes.xpaths[0], xpath2Title;
-                    dim_col.help = 'property';
-                    dim_col.tag = property.attributes.tag;
-                    dim_col.name = property.attributes.name;
-                    if (property.attributes.titleId === '')
-                        xpath2Title = xpath2;
-                    else
-                        xpath2Title = self.map[property.attributes.titleId].attributes.xpaths[0];
-                    dim_col.value = getXPathNode(xml_raw, xmlns, xpath, i, xpath2Title, property.attributes.isAttribute);
-                    //console.log(typeof (dim_col.value));
-                    dim_col.xpath = xpath2;
-                    dim_col.id = property.attributes.id;
-                    if (!property.attributes.isTitle)
-                        outputItem.push(dim_col);
-                });
-                outputItems.push(outputItem);
+                    outputItem.push(sentence);
+                    _.each(properties, function(property)
+                    {
+                        var dim_col = new sampleColumn(), xpath2 = property.attributes.xpaths[0], xpath2Title;
+                        dim_col.help = 'property';
+                        dim_col.tag = property.attributes.tag;
+                        dim_col.name = property.attributes.name;
+                        if (property.attributes.titleId === '')
+                            xpath2Title = xpath2;
+                        else
+                            xpath2Title = self.map[property.attributes.titleId].attributes.xpaths[0];
+                        dim_col.value = getXPathNode(xml_raw, xmlns, xpath, i, xpath2Title, property.attributes.isAttribute);
+                        //console.log(typeof (dim_col.value));
+                        dim_col.xpath = xpath2;
+                        dim_col.id = property.attributes.id;
+                        if (!property.attributes.isTitle)
+                            outputItem.push(dim_col);
+                    });
+                    outputItems.push(outputItem);
+                }
             }
             sample.push(outputItems);
 //console.log(node);
@@ -387,10 +393,6 @@ var NodeModel = function() {
  */
 function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, isAttribute)
 {
-//console.log(xml);
-//var xml2 = $.parseXML(xml);
-//xml = $(xml);
-//xml.setProperty("SelectionLanguage", "XPath")
     var result,
             xpathExpression = '(' + nodeXPath + ')',
             isChild = false, secondaryXPath = '';
@@ -402,8 +404,6 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, isAttribute)
                 nodeList = nodeXPath.substring(1).replace('/text()', '').split('/');
         if (S(ancestorXPath).contains(nodeXPath))
         {
-            //child nodes
-//console.log('child found');
             isChild = true;
             xpathExpression += ancestorXPath.replace(nodeXPath);
         }
@@ -413,28 +413,17 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, isAttribute)
             {
                 if (ancestorList[i] === nodeList[i])//Trees are diverging
                 {
-//console.log('chomping '+ ancestorList[i]);
                     ancestorXPathShort = S(ancestorXPathShort).chompLeft(ancestorList[i - 1] + '/').s;
                 }
             }
-//secondaryXPath = ancestorXPathShort;
             xpathExpression += (ancestorXPathShort.length > 0) ? '/ancestor::' + S(ancestorXPathShort).chompRight('/').s : '';
         }
 
     }
-    //console.log(xpathExpression);
-    //console.log(xmlns);
-//xmlns = (xmlns) ? "'xmlns=" + xmlns + "'" : null;
     xmlns = (xmlns) ? xmlns : null;
-//if (xmlns)
-//{
-//xml.createNSResolver
-//}
     var xpe = new XPathEvaluator();
-
     var nsResolver = (function(element) {
-        var
-                nsResolver = element.ownerDocument.createNSResolver(element),
+        var nsResolver = element.ownerDocument.createNSResolver(element),
                 defaultNamespace = element.getAttribute('xmlns');
 
         return function(prefix) {
@@ -442,22 +431,16 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, isAttribute)
         };
     }(xml.documentElement));
 
-    //console.log(nsResolver);
     var nodes = xpe.evaluate(xpathExpression, xml, nsResolver, XPathResult.ANY_TYPE, null);
-    //console.log(nodes);
-//console.log(typeof (nodes));
     result = nodes;
     var node = nodes.iterateNext();
-    //console.log(typeof (node));
-    //console.log(node);
+
     if (node === null)
     {
         //TODO: FIx Slave narratives
         //console.log('null detected');
         node = nodes.iterateNext();
-        //console.log(node);
     }
-    //console.log($(nodes));
     if (node)
     {
         if (node.childNodes && node.childNodes[0] && node.childNodes.length > 0)
@@ -468,12 +451,15 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, isAttribute)
         {
             if (typeof (node) == 'object')
             {
-                //console.log($(node));
                 result = $(node)[0].nodeValue;
             }
             else
                 result = node;
         }
+        return result;
     }
-    return result;
+    else
+    {
+        return null;
+    }
 }

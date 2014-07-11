@@ -185,7 +185,7 @@ and open the template in the editor.
 }
 
 
-#tagger-rename-dialogue{
+#tagger-rename-dialogue, .hidden-box{
     width:100%;
     height: 100%;
     position: fixed;
@@ -193,11 +193,13 @@ and open the template in the editor.
     left:0;
     background-color: rgba(0,0,0,.4);
 }
-#rename-form{
+#rename-form, #tagger-save-file-response{
     width:50%;
     top:10%;
     left:25%;
     position: fixed;
+    overflow: auto;
+    max-height: 80%
 
 }
 

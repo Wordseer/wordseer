@@ -10,7 +10,8 @@
         <!-- Bootstrap stuff -->
         <!--TODO: change bootstrap to local reference -->
         <link rel="stylesheet"
-        href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+       href="{{ url_for('uploader.static',
+            filename='external_lib/bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('uploader.static',
             filename='custom_styles.css') }}">
     </head>
@@ -77,12 +78,14 @@
             {% block body %}{% endblock %}
         </div>
         {% block toplevel %}{% endblock %}
-        <script
+      <!--  <script
             src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js">
         </script>
         <script
             src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js">
-        </script>
+        </script>-->
+      <script src="{{ url_for('uploader.static', filename='external_lib/jquery-1.11.1.min.js') }}"></script>
+      <script src="{{ url_for('uploader.static', filename='external_lib/bootstrap.min.js') }}"></script>
         {% block scripts %}{% endblock %}
     </body>
 </html>
