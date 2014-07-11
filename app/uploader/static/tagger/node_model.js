@@ -100,6 +100,11 @@ var NodeModel = function() {
                 }
             });
         }
+        else if (attrs.length > 0)
+        {
+            self.attributes.type = SUBUNIT_TAG;
+            self.attributes.xpaths[0] += 'text()';
+        }
         else {
             self.attributes.type = METADATA_TAG;
             self.attributes.xpaths[0] += 'text()';
