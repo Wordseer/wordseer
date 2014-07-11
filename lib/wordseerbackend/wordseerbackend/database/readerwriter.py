@@ -9,6 +9,7 @@ class ReaderWriter:
     Base.commit_on_save = False
     engine = db.engine
 
+    @profile
     def write_parse_products(self, products):
         """Converts ParseProducts into the corresponding models and writes them
         into the database.
@@ -100,7 +101,6 @@ class ReaderWriter:
                     #  print("dependent", dependent)
                     #  print("dependency", dependency)
 
-                    trans.commit()
 
             sentence_index += 1
 
@@ -140,8 +140,6 @@ class ReaderWriter:
                 "title": self._get_title(doc),
             }).inserted_primary_key[0]
 
-            print(document_id)
-
             # TODO: add title as property
 
         subunit_number = 0
@@ -178,7 +176,10 @@ class ReaderWriter:
         """Batch-process all sequences
         """
 
-        with self.engine.begin() as connection:
+        connection = self.engine.connect()
+        connection.execution_options(autocommit=False)
+
+        with connection.begin() as trans:
 
             for sequence in sequences:
                 sequence_id = connection.execute(Sequence.__table__.insert(), {
