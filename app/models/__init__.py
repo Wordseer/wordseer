@@ -4,6 +4,7 @@ from .dependency import Dependency
 from .document import Document
 from .flask_security import User, Role
 from .grammatical_relationship import GrammaticalRelationship
+from .log import Log
 from .project import Project
 from .property import Property
 from .property_metadata import PropertyMetadata
