@@ -58,11 +58,7 @@ Or, on windows, simply run `make.bat`.
 ## Pipeline
 
 ### Installing
-1. In the `lib/wordseerbackend` directory, run:
-
-        pip install -r requirements.txt
-
-2. `corenlp` must be installed manually. Clone the repository:
+1. `corenlp` must be installed manually. Clone the repository:
 
         git clone https://github.com/silverasm/stanford-corenlp-python.git
         cd stanford-corenlp-python
@@ -91,7 +87,7 @@ Or, on windows, simply run `make.bat`.
         unzip stanford-corenlp-full-2013-06-20.zip
         mv stanford-corenlp-full-2013-06-20 stanford-corenlp
 
-3. Then run:
+3. In the `lib/wordseerbackend` directory, run:
 
         python createdb.py
 
