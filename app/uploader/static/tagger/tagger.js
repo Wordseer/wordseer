@@ -32,7 +32,7 @@ function init_tagger()
     loadRequestParams();
     nodes = new NodeModel();
     nodes.loadFromXMLURL(document_url, filename);
-    console.log(nodes);
+//    console.log(nodes);
     loadTemplates();
     render();
     loadNodeTreeEvents();
@@ -40,11 +40,6 @@ function init_tagger()
     loadOutputPreview();
     loadSubmit();
     addRootNode();
-
-
-
-//    test();
-//    console.log(JSON.stringify(nodes.toJSON()));
 }
 function test()
 {
@@ -53,7 +48,6 @@ function test()
     {
         item.attributes.dataType = 'text ' + counter++;
     });
-//    console.log(nodes);
 }
 function render()
 {
@@ -76,7 +70,7 @@ function loadSubmit()
     $('#tagger').submit(function() {
         saveStructureFile();
         return false;
-    })
+    });
 }
 function saveStructureFile()
 {
@@ -96,9 +90,6 @@ function saveStructureFile()
         var text = msg.responseText;
         console.log(text);
         var pieces = url.split('/'), temp = pieces.slice(0, pieces.length - 4), redirect_url = temp.join('/');
-//        console.log(pieces);
-//        console.log(temp);
-//        alert(redirect_url);
         if (text === 'ok')
         {
 
@@ -123,7 +114,6 @@ function loadTemplates()
     {
         TEMPLATES[template]['url'] = templates_url + '/' + TEMPLATES[template].filename;
         TEMPLATES[template]['html'] = loadTemplate(TEMPLATES[template].url);
-//        console.log(TEMPLATES[template]);
         TEMPLATES[template]['render'] = _.template(TEMPLATES[template]['html']);
     }
 }
@@ -162,12 +152,6 @@ function renderTemplate(target, template, args, replace, id)
     }
     $(target).trigger(BODY_CHANGE_EVENT);
 }
-/*
- function replaceTemplate(target, template, args)
- {
- $(target).replaceWith(template.render(args));
- $(target).trigger(BODY_CHANGE_EVENT);
- }*/
 function removeNode(target) {
 
     var parent = $(target).parent();
@@ -215,7 +199,6 @@ function renderNodes(node, template, target, target_prefix)
         if (node.attributes.metadata && $.isArray(node.attributes.metadata))
             for (var meta in node.attributes.metadata)
             {
-
                 renderNodes(node.attributes.metadata[meta], template, target_id, target_prefix);
             }
         if (node.attributes.units && $.isArray(node.attributes.units))
@@ -224,7 +207,6 @@ function renderNodes(node, template, target, target_prefix)
                 renderNodes(node.attributes.units[unit], template, target_id, target_prefix);
             }
     }
-//    }
 }
 
 function renderXMLPreview(xml, target, parent_id)
@@ -247,7 +229,6 @@ function addRootNode()
 {
     var root_node = $('.node-tag-document');
     var root_id = root_node.attr('data-id');
-//    addPropertyElement(root_id, true);
     addElement(null, root_id, NODE_TYPES.PROPERTY, true);
 }
 /********************
@@ -257,10 +238,10 @@ function loadNodeTreeEvents()
 {
     loadGenericNodeTreeEvents();
     $('.node-tag').on('click', function() {
-        var self = $(this), id = self.attr('data-id'), isAttribute = parseInt(self.attr('data-isattribute'));
+        var self = $(this), id = self.attr('data-id');
         $('.xml-preview-node .highlighted-nodes').removeClass('highlighted-nodes');
         $('.xml-preview-node .' + id).addClass('highlighted-nodes');
-        $('#tagger-xml-preview-container .tagger-container-body').scrollTop(0); 
+        $('#tagger-xml-preview-container .tagger-container-body').scrollTop(0);
         var top = $('#tagger-xml-preview-container .' + id + ":first").offset().top - $('#tagger-xml-preview-container .tagger-container-body').position().top - 25;
         $('#tagger-xml-preview-container .tagger-container-body').scrollTop(top);
     });
@@ -298,24 +279,20 @@ function loadGenericNodeTreeEvents()
 }
 
 function addBucketTagEvents(id) {
-    $('.bucket-body .' + id).on('mouseover', function()
+    $('.bucket-body > .' + id).on('mouseover', function()
     {
+        console.log('hovering over '+id)
         $('#tagger-node-preview .' + id).addClass('highlighted-tag');
         $('#tagger-output-preview .' + id).addClass('highlighted-tag');
     }).on('mouseout', function()
     {
         $('#tagger-node-preview  .' + id).removeClass('highlighted-tag');
         $('#tagger-output-preview  .' + id).removeClass('highlighted-tag');
-    })
+    });
     $('.bucket-body .bucket-tag-property.' + id).on('click', function()
     {
         var self = $(this), type = self.attr('data-type');
         showRenameDialogue(id);
-        /*if (type === SUBUNIT_TAG || type === DOCUMENT_TAG)
-         {
-         showRenameDialogue(id);
-         
-         }*/
     });
 }
 
@@ -377,7 +354,6 @@ function addTextElement(id)
     } else {
         alert('node already added');
     }
-
 }
 function addPropertyElement(id, renameDialogue)
 {
@@ -412,7 +388,6 @@ function removePropertyElement(id)
 function refreshElement(id) {
 
     var node = nodes.map[id], target = '.bucket-tag.' + id;
-//    console.log('refreshing ' + target);
     renderTemplate(target, TEMPLATES.BUCKET_NODE, node.attributes, true, id);
     addBucketTagEvents(id);
 
@@ -431,11 +406,14 @@ function showRenameDialogue(id)
     renderTemplate('#tagger-rename-dialogue', TEMPLATES.RENAME_FORM, node.attributes);
     if (node.attributes.type !== METADATA_TAG)
         renderTitleTreeNodes(node, '#rename-form #title-tree-nodes');
+//    renderXMLPreview(nodes.attributes.xml, '#title-tree-xml-preview', null, 'title-xml-preview-node');
+    $('#tagger-xml-preview .xml-preview-node:first').clone().appendTo('#title-tree-xml-preview');
+    $('#title-tree-xml-preview .xml-preview-node').addClass('title-xml-preview-node').removeClass('xml-preview-node');
     $('#tagger-rename-dialogue').fadeIn();
     loadRenameDialogueEvents();
     if (node.attributes.titleId !== '')
     {
-        console.log('has title ' + node.attributes.titleId);
+//        console.log('has title ' + node.attributes.titleId);
         $('.title-node-tag.' + node.attributes.titleId).trigger('click');
     }
 }
@@ -452,12 +430,22 @@ function loadRenameDialogueEvents()
                 $('.title-node-tag').removeClass('highlighted-tag');
                 self.addClass('highlighted-tag');
 
+            })
+            .on('mouseover', function()
+            {
+                var self = $(this), id = self.attr('data-id');
+                $('.title-xml-preview-node .highlighted-nodes').removeClass('highlighted-nodes');
+                $('.title-xml-preview-node .' + id).addClass('highlighted-nodes');
+                $('#title-tree-xml-preview').scrollTop(0);
+                var top = $('#title-tree-xml-preview .' + id + ":first").offset().top - $('#title-tree-xml-preview').position().top - 160;
+                $('#title-tree-xml-preview').scrollTop(top);
             });
+
     $('#rename-form-clear-title').unbind('click').on('click', function()
     {
         $('#selected-property-title').val('').attr('data-id', '');
         $('.title-node-tag.highlighted-tag').removeClass('highlighted-tag');
-    })
+    });
 
 }
 function hideRenameDialogue()
@@ -477,22 +465,13 @@ function saveRenameDialogue()
         node.rename(new_name);
     if (nodes.map[new_target_id])
     {
-//        console.log('title set to ' + new_target_id);
         node.setTitleAsXPath(nodes.map[new_target_id].attributes.xpaths[0]);
         node.setTitleNode(new_target_id);
         var tag;
-//        $('')
-
         addElement(tag, new_target_id, NODE_TYPES.PROPERTY, false);
     }
-    else
-    {
-//        console.log('title set manually');
-    }
-//    console.log(node);
     refreshElement(id);
     hideRenameDialogue();
-
 }
 
 /****************************
@@ -504,7 +483,6 @@ function loadOutputPreview()
     $('.bucket-body').on(BODY_CHANGE_EVENT, function()
     {
         var data = nodes.getSample();
-//        console.log(data);
         $('#tagger-output-preview-container').empty();
         for (var i = 0, j = data.length; i < j; i++)
             renderTemplate('#tagger-output-preview-container', TEMPLATES.OUTPUT_PREVIEW, {data: data[i]});

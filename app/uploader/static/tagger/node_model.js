@@ -38,10 +38,12 @@ var NodeModel = function() {
         self.createFromXML($(xml).children()[0]);
         //TODO: Fix slave narratives
     };
-    self.createFromXML = function(inXML, path, id) {
+    self.createFromXML = function(inXML, path, id)
+    {
         xml = inXML;
         path = (path) ? path : '/';
         id = (id) ? id : NODE_ID_PREFIX;
+        //setup basic attributes
         self.attributes.isRoot = (path === '/') ? true : false;
         var children = $(xml).children(), attrs = xml.attributes;
         self.attributes.tag = $(xml).prop('tagName');
@@ -51,16 +53,14 @@ var NodeModel = function() {
         self.attributes.structureName = self.attributes.tag;
         self.attributes.displayName = self.attributes.structureName;
         var paths = path.split('/');
-//console.log(paths);
         if (paths.length > 1)
             self.attributes.belongsTo = paths[paths.length - 2];
+        //process node attributes
         _.each(attrs, function(attr)
         {
             self.attributes.attrs[attr.nodeName] = attr.nodeValue;
             if (attr.nodeName === 'xmlns')
             {
-//console.log('xmlns namespace detected ' + attr.nodeValue);
-//console.log(attr.nodeValue);
                 xmlns = attr.nodeValue;
             }
             var node = new NodeModel();
@@ -72,7 +72,7 @@ var NodeModel = function() {
                 self.map[node.attributes.id] = node;
             }
         });
-
+        //process child nodes
         if (children.length > 0)
         {
             if (!self.attributes.isRoot)
@@ -81,23 +81,35 @@ var NodeModel = function() {
             {
                 var node = new NodeModel();
                 node.createFromXML(child, self.attributes.xpaths[0], self.attributes.id);
-//console.log(self.attributes.sub_xpaths);
-                if (!self.map[node.attributes.id])
+                if (!self.hasChild(node.attributes.id))//if node type is new
                 {
-                    self.attributes.sub_xpaths.push(node.attributes.xpaths[0]);
-                    self.attributes.children.push(node);
-//console.log(node.attributes.id);
-                    if (node.attributes.type === METADATA_TAG)
-                        self.attributes.metadata.push(node);
-                    else
-                        self.attributes.units.push(node);
-                    self.map[node.attributes.id] = node;
-                    _.each(node.map, function(item, key)
-                    {
-                        if (!self.map[key])
-                            self.map[key] = item;
-                    });
+                    self.addChild(node);
                 }
+                else//node type processed before: compare children
+                {
+//                    console.log(node)
+                    /*
+                     if (self.map[node.attributes.id].attributes.type !== node.attributes.type)
+                     {
+                     if (node.attributes.type === SUBUNIT_TAG) {
+                     self.map[node.attributes.id] = node;
+                     console.log('node type change ' + node.attributes.id);
+                     }
+                     }*/
+                    var myChild = self.map[node.attributes.id];
+                    _.each(node.attributes.children, function(nodeChild)
+                    {
+                        if (!myChild.hasChild(nodeChild.attributes.id))
+                        {
+                            myChild.addChild(nodeChild);
+                            _.each(node.map, function(item, key)
+                            {
+                                if (!self.map[key])
+                                    self.map[key] = item;
+                            });
+                        }
+                    });
+                                  }
             });
         }
         else if (attrs.length > 0)
@@ -117,6 +129,36 @@ var NodeModel = function() {
             self.attributes.xml = xml;
             self.map[self.attributes.id] = self;
         }
+    };
+    self.hasChild = function(id)
+    {
+
+        for (var child_id in self.attributes.children)
+        {
+            var child = self.attributes.children[child_id];
+            if (child.attributes.id === id)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    };
+    self.addChild = function(node)
+    {
+        self.attributes.sub_xpaths.push(node.attributes.xpaths[0]);
+//        if(!self.attributes.children)
+        self.attributes.children.push(node);
+        if (node.attributes.type === METADATA_TAG)
+            self.attributes.metadata.push(node);
+        else
+            self.attributes.units.push(node);
+        self.map[node.attributes.id] = node;
+        _.each(node.map, function(item, key)
+        {
+            if (!self.map[key])
+                self.map[key] = item;
+        });
     };
     self.createAsAttribute = function(id, name, value, xpaths)
     {
@@ -255,9 +297,6 @@ var NodeModel = function() {
             });
         }
         //create metadata child objects
-
-        /*  if (self.attributes.isRoot)
-         json['WORDSEER_CONFIG'] = self;*/
         if (json['children'].length === 0)
             delete json['children'];
         return json;
@@ -332,12 +371,9 @@ var NodeModel = function() {
         var properties = _.filter(map, function(item) {
             return item.attributes.isProperty;
         });
-//console.log(map);
-//console.log(self);
         var sampleColumn = function() {
             return {id: '', help: '', name: '', value: '', xpath: ''};
         };
-//console.log(xml_raw);
 
         _.each(sentences, function(node, key)
         {
@@ -391,9 +427,11 @@ var NodeModel = function() {
 /**
  * 
  * @param {type} xml XML DOM
+ * @param {type} xmlns XML Name space
  * @param {type} nodeXPath the xpath to the primary node to evaluate
  * @param {type} index (optional) retrieve a specific element from the primary node
  * @param {type} ancestorXPath retrieve the andestors of the specific primary node
+ * @param {type} isAttribute is this an attribute?
  * @returns {unresolved} results
  */
 function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, isAttribute)
@@ -423,14 +461,12 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, isAttribute)
             }
             xpathExpression += (ancestorXPathShort.length > 0) ? '/ancestor::' + S(ancestorXPathShort).chompRight('/').s : '';
         }
-
     }
     xmlns = (xmlns) ? xmlns : null;
     var xpe = new XPathEvaluator();
     var nsResolver = (function(element) {
         var nsResolver = element.ownerDocument.createNSResolver(element),
                 defaultNamespace = element.getAttribute('xmlns');
-
         return function(prefix) {
             return nsResolver.lookupNamespaceURI(prefix) || defaultNamespace;
         };
@@ -454,7 +490,7 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, isAttribute)
         }
         else
         {
-            if (typeof (node) == 'object')
+            if (typeof (node) === 'object')
             {
                 result = $(node)[0].nodeValue;
             }

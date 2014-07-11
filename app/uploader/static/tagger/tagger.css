@@ -31,13 +31,16 @@ and open the template in the editor.
     overflow:auto;
     max-height: 300px;
 }
-#title-tree-nodes{
+#title-tree-nodes, #title-tree-xml-preview{
     overflow:auto;
     max-height: 150px;
+    width: 50%;
+    float:left
 }
 #title-tree-node h3{
     margin-top: 5px;
 }
+
 #tagger-previews{
     width:100%;
     display:inline-block;
@@ -194,9 +197,9 @@ and open the template in the editor.
     background-color: rgba(0,0,0,.4);
 }
 #rename-form, #tagger-save-file-response{
-    width:50%;
+    width:70%;
     top:10%;
-    left:25%;
+    left:15%;
     position: fixed;
     overflow: auto;
     max-height: 80%
