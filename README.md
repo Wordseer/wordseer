@@ -1,14 +1,29 @@
 # A Flask-based back end for WordSeer
 
 [WordSeer](http://wordseer.berkeley.edu/) is a tool for natural language
-analysis of digital corpora. This repository is a rewrite of the [original 
-implementation](https://bitbucket.org/silverasm/wordseer/overview) into python
-from PHP.
+analysis of digital corpora.
 
-This is the server-side and web interface code for the WordSeer application,
-written in Python using the Flask framework and several web framework libraries.
+There are two parts to this repository.
 
-## Running the application
+1. A rewrite of the
+[original implementation](https://bitbucket.org/silverasm/wordseer/overview)
+of wordseer into python from PHP.
+
+    This is located in `app/`. It is the server-side and web interface code for
+    the WordSeer application, written in Python using the Flask framework and
+    several web framework libraries.
+
+
+2. An implementation of
+[wordseerbackend](https://bitbucket.org/silverasm/wordseerbackend/overview) in
+more maintainable python.
+
+    This is located in `lib/wordseerbackend/`. It is the pipeline or
+    preprocessing code for uploaded data sets.
+
+## Application
+
+### Installing
 1.  Create a virtualenv
 2.  Run:
 
@@ -25,13 +40,12 @@ written in Python using the Flask framework and several web framework libraries.
 
     to migrate the model schema into the database.
 
-## Testing
+### Testing
 1. Simply run `runtests.py`:
 
         python runtests.py
 
-## Documentation
-
+### Documentation
 Documentation is
 [available on readthedocs](http://wordseer-flask.readthedocs.org). You can also
 build it yourself:
@@ -41,4 +55,64 @@ build it yourself:
 
 Or, on windows, simply run `make.bat`.
 
+## Pipeline
+
+### Installing
+1. In the `lib/wordseerbackend` directory, run:
+
+        pip install -r requirements.txt
+
+2. `corenlp` must be installed manually. Clone the repository:
+
+        git clone https://github.com/silverasm/stanford-corenlp-python.git
+        cd stanford-corenlp-python
+
+    Create a file called `setup.py` in its root directory containing the
+    following:
+
+        from setuptools import setup, find_packages
+        setup(name='corenlp',
+            version='1.0',
+            packages=find_packages(),
+            package_data = {"": ["*.properties"],
+            "corenlp": ["*.properties"]},)
+
+    Then, from the root directory of `corenlp`, execute the following:
+
+        python setup.py install
+
+    This should install `corenlp` to your system.
+
+    In order to complete the setup, version *3.2.0* of Stanford's CoreNLP
+    library must simply be in a directory accessible to the backend. From the
+    root directory of `wordseerbackend`:
+
+        wget http://nlp.stanford.edu/software/stanford-corenlp-full-2013-06-20.zip
+        unzip stanford-corenlp-full-2013-06-20.zip
+        mv stanford-corenlp-full-2013-06-20 stanford-corenlp
+
+3. Then run:
+
+        python createdb.py
+
+4. After installing the above dependencies, make sure you edit
+`lib/wordseerbackend/wordseerbackend/config.py` for your setup. Particularly
+make sure to point `CORE_NLP_DIR` to the Stanford NLP library. You should then
+be ready to parse files. Example XML and JSON files are included in
+`tests/data`.
+
+### Testing
+1. From `lib/wordseerbackend`, run the following:
+
+        python runtests.py
+
+### Documentation
+Documentation is
+[available on readthedocs](http://wordseerbackend.readthedocs.org). You can also
+build it yourself:
+
+	cd lib/wordseerbackend/docs/
+	make html
+
+Or, on windows, simply run `make.bat` in the same directory.
 

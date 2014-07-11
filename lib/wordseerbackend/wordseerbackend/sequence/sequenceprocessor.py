@@ -107,8 +107,9 @@ class SequenceProcessor(object):
                     sequences.extend(self.get_sequence(sentence, i, j))
 
         # TODO: readerwriter
-        for sequence in sequences:
-            self.reader_writer.index_sequence(sequence)
+        # for sequence in sequences:
+        #     self.reader_writer.index_sequence(sequence)
+        self.reader_writer.index_sequences(sequences)
         return sequences
 
     def get_sequence(self, sentence, i, j):

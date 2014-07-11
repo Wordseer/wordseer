@@ -54,3 +54,9 @@ class Document(Unit):
     def __repr__(self):
         return "<Document: " + str(self.title) + ">"
 
+    @property
+    def sentences(self):
+        """Temp proxy method
+        """
+
+        return self.all_sentences
