@@ -65,7 +65,7 @@ class Sentence(db.Model, Base):
     def tagged(self):
         """Temporary compatibility method
         """
-
+        #TODO: remove this method
         return self.words
 
     @property
