@@ -25,6 +25,8 @@ class Sentence(db.Model, Base):
         dependencies (list of Dependencies): ``Dependency``\s present in this
             sentence. This relationship is described with
             ``DependencyInSentence``.
+        properties (list of Propertys): ``Property``\s associated with this
+            ``Sentence``.
 
     Relationships:
         belongs to: unit, document
@@ -52,6 +54,8 @@ class Sentence(db.Model, Base):
 
     document = db.relationship("Document", foreign_keys=[document_id],
         backref="all_sentences")
+
+    properties = db.relationship("Property", backref="sentence")
 
     def __repr__(self):
         """Representation of the sentence, showing its text.

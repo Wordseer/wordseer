@@ -13,8 +13,8 @@ class Dependency(db.Model, Base):
         grammatical_relationship (GrammaticalRelationship): The
             ``GrammaticalRelationship`` which describes the relationship between
             the governor and the dependent.
-        governor_id (int): link to the governor word
-        dependent_id (int): link to the dependent word
+        governor (Word): The governor ``Word``.
+        dependent (Word): The dependent ``Word``.
         sentence_count (int): the number of sentences this appears in
         document_count (int): the number of documents this appears in
 

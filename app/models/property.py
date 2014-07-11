@@ -9,9 +9,11 @@ class Property(db.Model, Base):
     them extensible and flexible.
 
     Attributes:
-      unit_id: the primary key of the unit it belongs to
-      name: the name of the property
-      value: the value of the property
+        unit (Unit): The ``Unit`` this ``Property`` belongs to.
+        name (str): The name of the property.
+        value (str): The value of the property.
+        specification (str): The JSON description of this type of property.
+        sentence (Sentence): The ``Sentence`` this ``Property`` belongs to.
 
     Relationships:
       belongs to: unit
@@ -20,11 +22,14 @@ class Property(db.Model, Base):
 
     # Attributes
     unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     name = db.Column(db.String, index=True)
     value = db.Column(db.String, index=True)
+    specification = db.Column(db.String)
 
     def __repr__(self):
         """Representation string for properties, showing the property name
         """
 
         return "<Property: " + str(self.name) + ">"
+
