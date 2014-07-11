@@ -5,9 +5,9 @@ Tests for the tokenizer.
 import mock
 import unittest
 
-from lib.wordseerbackend.wordseerbackend.document import sentence
-from lib.wordseerbackend.wordseerbackend.parser.dependency import Dependency
-from lib.wordseerbackend.wordseerbackend.parser.parseproducts import ParseProducts
+from app.models.sentence import Sentence
+from app.models.dependency import Dependency
+from app.models.parseproducts import ParseProducts
 from lib.wordseerbackend.wordseerbackend import stringprocessor
 
 t = stringprocessor.StringProcessor()

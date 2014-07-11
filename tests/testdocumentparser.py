@@ -5,8 +5,8 @@ Tests for the DocumentParser.
 import unittest
 from mock import MagicMock, patch, call
 
-from lib.wordseerbackend.wordseerbackend.document.sentence import Sentence
-from lib.wordseerbackend.wordseerbackend.document.parsedparagraph import ParsedParagraph
+from app.models.sentence import Sentence
+from app.models.parsedparagraph import ParsedParagraph
 from lib.wordseerbackend.wordseerbackend.parser import documentparser
 
 @patch("lib.wordseerbackend.wordseerbackend.parser.documentparser.logger")

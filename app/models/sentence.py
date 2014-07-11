@@ -27,6 +27,7 @@ class Sentence(db.Model, Base):
             ``DependencyInSentence``.
         properties (list of Propertys): ``Property``\s associated with this
             ``Sentence``.
+        words (list of Words): ``Word``\s in this ``Sentence``.
 
     Relationships:
         belongs to: unit, document

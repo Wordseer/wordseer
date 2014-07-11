@@ -6,7 +6,8 @@ import unittest
 import json
 from lxml import etree
 
-from lib.wordseerbackend.wordseerbackend.document import metadata, sentence
+from app.models.metadata import Metadata
+from app.models.sentence import Sentence
 from lib.wordseerbackend.wordseerbackend.structureextractor import *
 from lib.wordseerbackend.wordseerbackend.stringprocessor import StringProcessor
 
