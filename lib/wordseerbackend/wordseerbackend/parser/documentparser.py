@@ -67,7 +67,7 @@ class DocumentParser(object):
                     parsed = ParsedParagraph()
         self.write_and_parse(parsed, current_max)
 
-    @profile
+    #@profile
     def write_and_parse(self, products, current_max):
         """Send a ParsedParagraph object to the ReaderWriter for writing, then
         process each sentence returned from the write_parse_products with
