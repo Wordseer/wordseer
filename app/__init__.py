@@ -7,7 +7,7 @@ from flask_wtf.csrf import CsrfProtect
 from config import DEFAULT_ENV
 
 app = Flask(__name__)
-CsrfProtect(app)
+csrf = CsrfProtect(app)
 
 # Load configurations for current environment by reading in the environment
 # variable FLASK_ENV and changing it to camel case with the title() function.

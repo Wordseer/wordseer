@@ -171,3 +171,6 @@ class ConfirmDeleteForm(Form, HiddenSubmitted):
         value=DELETE)
     cancel_button = ButtonField(text="No, do not delete", name="action",
         value=CANCEL)
+        
+class MapDocumentForm(Form, HiddenSubmitted):
+    print 'mapping'

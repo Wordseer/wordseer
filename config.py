@@ -38,6 +38,7 @@ class BaseConfig(object):
     DOCUMENT_ROUTE = "/documents/"
     UPLOAD_ROUTE = "/uploads/"
     MAP_ROUTE = "/map/"
+    SAVE_MAP = "/save/"
 
     #Login settings
     SECURITY_REGISTERABLE = True
