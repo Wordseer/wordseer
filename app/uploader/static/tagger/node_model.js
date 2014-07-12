@@ -19,7 +19,9 @@ var NodeModel = function() {
     self.attributes = {filename: '', url: '', xml: {}, id: '', tag: '', type: '',
         xpaths: [], name: '', titleXpaths: [], titleId: '',
         units: [], metadata: [], children: [], sub_xpaths: [], attrs: {}, attr: '',
-        belongsTo: '', isAttribute: false, isActive: false,
+        belongsTo: '', isAttribute: false, isActive: false, hasChildElements: function() {
+            return self.hasChildElements();
+        },
         isCategory: false, nameIsDisplayed: false, valueIsDisplayed: false, dataType: '',
         structureName: '', 'propertyName': '', displayName: '',
         isRoot: false, isSentence: false, isProperty: false, isTitle: false};
@@ -109,7 +111,7 @@ var NodeModel = function() {
                             });
                         }
                     });
-                                  }
+                }
             });
         }
         else if (attrs.length > 0)
@@ -159,6 +161,20 @@ var NodeModel = function() {
             if (!self.map[key])
                 self.map[key] = item;
         });
+    };
+    self.hasChildElements = function()
+    {
+        if (self.attributes.units.length > 0)
+            return true;
+        var notAttrs = _.filter(self.attributes.metadata, function(item) {
+            return !item.attributes.isAttribute;
+        });
+//        console.log(attrs);
+        if (notAttrs.length > 0) {
+            return true;
+        }
+
+        return false;
     };
     self.createAsAttribute = function(id, name, value, xpaths)
     {

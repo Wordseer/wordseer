@@ -20,7 +20,7 @@
             data-type='<%=type%>'
             data-isattribute='<%if(isAttribute){%>1<% }else{ %>0<%}%>'
             title='Click to preview' 
-            <% if(type==="subunit"){%>disabled<%}%>
+            <% if(type==="subunit" && hasChildElements()){%>disabled<%}%>
             ><%=tag%></button>
 
     <div class='tagger-node-children'></div>
