@@ -55,7 +55,6 @@ class SequenceProcessorTests(unittest.TestCase):
             Word(word="Camelot")]
 
         removed = self.seq_proc.remove_stops(with_stops)
-        dictdiff(removed[0].__dict__, without_stops[0].__dict__)
 
         self.failUnless(self.seq_proc.remove_stops(with_stops) == without_stops)
 
@@ -175,14 +174,4 @@ def get_sequence_text(sequences):
                 sequences[seq_type][stop_type][i] = seq_list[i]["sequence"]
 
     return sequences
-
-def dictdiff(dict1, dict2):
-    if len(dict1) != len(dict2):
-        print "length mismatch"
-    for key, value in dict1.iteritems():
-        try:
-            if dict2[key] != value:
-                print key
-        except KeyError:
-            print key
 
