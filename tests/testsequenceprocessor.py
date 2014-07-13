@@ -1,6 +1,7 @@
 """
 Tests for the SequenceProcessor class.
 """
+import pdb
 
 import mock
 import unittest
@@ -54,6 +55,10 @@ class SequenceProcessorTests(unittest.TestCase):
         without_stops = [Word(word="empire"),
             Word(word="Camelot")]
 
+        removed = self.seq_proc.remove_stops(with_stops)
+        dictdiff(removed[0].__dict__, without_stops[0].__dict__)
+
+        pdb.set_trace()
         self.failUnless(self.seq_proc.remove_stops(with_stops) == without_stops)
 
     def test_process(self):
@@ -149,11 +154,11 @@ def split_sequences(sequences):
 
     for sequence in sequences:
         seq_type = "words"
-        if sequence.is_lemmatized:
+        if sequence["is_lemmatized"]:
             seq_type = "lemmas"
 
         stops = "nostops"
-        if sequence.has_function_words:
+        if sequence["has_function_words"]:
             stops = "stops"
 
         result[seq_type][stops].append(sequence)
@@ -169,7 +174,17 @@ def get_sequence_text(sequences):
     for seq_type, stop_types in sequences.items():
         for stop_type, seq_list in stop_types.items():
             for i in range(0, len(seq_list)): #TODO: more pythonic?
-                sequences[seq_type][stop_type][i] = seq_list[i].sequence
+                sequences[seq_type][stop_type][i] = seq_list[i]["sequence"]
 
     return sequences
+
+def dictdiff(dict1, dict2):
+    if len(dict1) != len(dict2):
+        print "length mismatch"
+    for key, value in dict1.iteritems():
+        try:
+            if dict2[key] != value:
+                print key
+        except KeyError:
+            print key
 

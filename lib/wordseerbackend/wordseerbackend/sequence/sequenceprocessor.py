@@ -118,7 +118,7 @@ class SequenceProcessor(object):
         :param Sentence sentence: A sentence object to create sequences from.
         :param int i: The index to start the sequence from, inclusive.
         :param int j: The index to stop the sequence from, exclusive.
-        :return list: A list of Sequences.
+        :return list: A list of dicts representing sequences.
         """
 
         sequences = []
@@ -144,14 +144,14 @@ class SequenceProcessor(object):
         lemmatized_all_stop_words = len(lemmatized_phrase_nostops) == 0
 
         # Definitely make a Sequence of the surface_phrase
-        sequences.append(Sequence(start_position=i,
-            sentences=[sentence],
-            document_id=sentence.document_id,
-            sequence=surface_phrase,
-            is_lemmatized=False,
-            has_function_words=has_stops,
-            all_function_words=all_stop_words,
-            words=wordlist))
+        sequences.append({"start_position": i,
+            "sentences": [sentence],
+            "document_id": sentence.document_id,
+            "sequence": surface_phrase,
+            "is_lemmatized": False,
+            "has_function_words": has_stops,
+            "all_function_words": all_stop_words,
+            "words": wordlist})
         self.previously_indexed.append(surface_phrase)
 
         # If it's not just stops, has stops, and the first word isn't a stop,
@@ -160,25 +160,25 @@ class SequenceProcessor(object):
             all_stop_words and
             wordlist_nostops[0] == wordlist[0] and not
             surface_phrase_nostops in self.previously_indexed):
-            sequences.append(Sequence(start_position=i,
-                sentence_id=sentence.id,
-                document_id=sentence.document_id,
-                sequence=surface_phrase_nostops,
-                is_lemmatized=False,
-                has_function_words=False,
-                all_function_words=False,
-                words=wordlist_nostops))
+            sequences.append({"start_position": i,
+                "sentence_id": sentence.id,
+                "document_id": sentence.document_id,
+                "sequence": surface_phrase_nostops,
+                "is_lemmatized": False,
+                "has_function_words": False,
+                "all_function_words": False,
+                "words": wordlist_nostops})
             self.previously_indexed.append(surface_phrase_nostops)
 
         # Definitely make a Sequence of the lemmatized_phrase
-        sequences.append(Sequence(start_position=i,
-            sentence_id=sentence.id,
-            document_id=sentence.document_id,
-            sequence=lemmatized_phrase,
-            is_lemmatized=True,
-            has_function_words=lemmatized_has_stops,
-            all_function_words=lemmatized_all_stop_words,
-            words=wordlist))
+        sequences.append({"start_position": i,
+            "sentence_id": sentence.id,
+            "document_id": sentence.document_id,
+            "sequence": lemmatized_phrase,
+            "is_lemmatized": True,
+            "has_function_words": lemmatized_has_stops,
+            "all_function_words": lemmatized_all_stop_words,
+            "words": wordlist})
         self.previously_indexed.append(lemmatized_phrase)
 
         # Maybe make a sequence of the lemmatized_phrase_nostop
@@ -189,14 +189,14 @@ class SequenceProcessor(object):
             # We don't add this to previously_indexed
             #print "Lemmatized nostop"
             #print lemmatized_phrase_nostops
-            sequences.append(Sequence(start_position=i,
-                sentence_id=sentence.id,
-                document_id=sentence.document_id,
-                sequence=lemmatized_phrase_nostops,
-                is_lemmatized=True,
-                has_function_words=False,
-                all_function_words=False,
-                words=wordlist_nostops))
+            sequences.append({"start_position": i,
+                "sentence_id": sentence.id,
+                "document_id": sentence.document_id,
+                "sequence": lemmatized_phrase_nostops,
+                "is_lemmatized": True,
+                "has_function_words": False,
+                "all_function_words": False,
+                "words": wordlist_nostops})
 
         return sequences
 
