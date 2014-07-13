@@ -1,12 +1,13 @@
 """
 Tests for structureextractor.py.
 """
+import pdb
 
 import unittest
 import json
 from lxml import etree
 
-from app.models.metadata import Metadata
+from app.models.property import Property
 from app.models.sentence import Sentence
 from lib.wordseerbackend.wordseerbackend.structureextractor import *
 from lib.wordseerbackend.wordseerbackend.stringprocessor import StringProcessor
@@ -63,41 +64,46 @@ class PostTests(CommonTests, unittest.TestCase):
         self.failUnless(len(documents) == 1)
         # Check to make sure the name and title are correct
         self.failUnless(documents[0].title == self.json["structureName"])
-        self.failUnless(documents[0].name == "document")
-        # Should be one unit, with the right sentences
-        self.failUnless(len(documents[0].units) == 1)
-        self.failUnless(documents[0].units[0].sentences ==
+        # Should be one document, with the right sentences
+        self.failUnless(len(documents[0].children) == 1)
+
+        extract_sentences = [sent.sentence for sent in
+            documents[0].children[0].sentences]
+        unit_sentences = [sent.sentence for sent in
             self.extractor.extract_unit_information(self.json,
-            self.xml)[0].units[0].sentences)
+                self.xml)[0].children[0].sentences]
+
+        self.failUnless(unit_sentences == extract_sentences)
         # Only two sentences in this doc
-        self.failUnless(len(documents[0].units[0].sentences) == 2)
-        for sent in documents[0].units[0].sentences:
+        self.failUnless(len(documents[0].children[0].sentences) == 2)
+        for sent in documents[0].children[0].sentences:
             self.failUnless(sent.text in self.sentence_contents)
         # Check to make sure metadata is properly extracted
-        self.failUnless(compare_metadata(self.meta, documents[0].metadata))
+        self.failUnless(compare_metadata(self.meta, documents[0].properties))
 
     def test_extract_unit_information(self):
         """Tests for extract_unit_information.
         """
-        a = self.extractor.extract_unit_information(self.json,
+        rootinfo = self.extractor.extract_unit_information(self.json,
             self.xml.getroot())
-        b = self.extractor.extract_unit_information(self.json, self.xml)
 
-        doc_info = a[0]
-        # Make sure that root and file are the same
-        self.failUnless(a == b)
+        #TODO: could we check that these are equivalent? sqlalchemy is
+        # being weird about it
+        #fileinfo = self.extractor.extract_unit_information(self.json, self.xml)
+
+        doc_info = rootinfo[0]
         # Should only be one unit present
-        self.failUnless(len(a) == 1)
+        self.failUnless(len(rootinfo) == 1)
         # It should be named correctly
         self.failUnless(doc_info.name == self.json["structureName"])
         # It should have no sentences
         self.failUnless(doc_info.sentences == [])
         # It should have metadata
-        for meta in doc_info.metadata:
-            self.failUnless(isinstance(meta, metadata.Metadata))
+        for meta in doc_info.properties:
+            self.failUnless(isinstance(meta, Property))
         # It should only contain one other unit
-        self.failUnless(len(doc_info.units) == 1)
-        sent_info = doc_info.units[0]
+        self.failUnless(len(doc_info.children) == 1)
+        sent_info = doc_info.children[0]
         # The sentence should be named correctly
         self.failUnless(sent_info.name ==
             self.json["units"][0]["structureName"])
@@ -105,7 +111,7 @@ class PostTests(CommonTests, unittest.TestCase):
         self.failUnless(len(sent_info.sentences) == 2)
         # And the sentences should have the right text
         for sent in sent_info.sentences:
-            self.failUnless(isinstance(sent, sentence.Sentence))
+            self.failUnless(isinstance(sent, Sentence))
             self.failUnless(sent.text in self.sentence_contents)
 
     def test_get_metadata(self):
@@ -161,23 +167,29 @@ class PlayTests(CommonTests, unittest.TestCase):
             self.xml.getroot()[5], method="text").strip() + "\n")
 
 def compare_metadata(dict_metadata, other_metadata):
-    """Compare a metadata object to a dict.
-    :param list dict_metadata: A dict to check other_metadata against, like
-    self.metadata.
-    :param Metadata other_metadata: The metadata object to check.
-    :return boolean: True if they are equal, False if not.
+    """Compare a list of ``Property`` objects to a ``dict``.
+
+    Parameters:
+        dict_metadata (dict): A dict to check other_metadata against, like
+            self.metadata.
+        other_metadata (list of Propertys): The ``Property``\s to check.
+
+    Returns:
+        boolean: ``True`` if every item in the ``dict`` is represented in
+        ``other_metadata``, with values corresponding to ``Property.value``\s
+        and values corresponding to ``Property.name``\s. ``False`` if not.
     """
     unique_data = []
     for datum in other_metadata:
-        unique_data.append(datum.property_name)
+        unique_data.append(datum.name)
 
-        if datum.property_name not in dict_metadata.keys():
-            print "Property " + datum.property_name + " not in self.meta"
+        if datum.name not in dict_metadata.keys():
+            print "Property " + datum.name + " not in self.meta"
             return False
 
-        if datum.value not in dict_metadata[datum.property_name]:
+        if datum.value not in dict_metadata[datum.name]:
             print "Value " + datum.value + " not accepted for property " +\
-                datum.property_name
+                datum.name
             return False
 
     if len(list(set(unique_data))) != len(dict_metadata):
@@ -185,4 +197,14 @@ def compare_metadata(dict_metadata, other_metadata):
         return False
 
     return True
+
+def dictdiff(dict1, dict2):
+    if len(dict1) != len(dict2):
+        print "length mismatch"
+    for key, value in dict1.iteritems():
+        try:
+            if dict2[key] != value:
+                print key
+        except KeyError:
+            print key
 
