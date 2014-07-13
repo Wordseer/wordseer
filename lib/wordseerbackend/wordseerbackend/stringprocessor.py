@@ -1,5 +1,4 @@
-"""
-Methods to handle string parsing, tokenization, tagging, etc.
+"""Methods to handle string parsing, tokenization, tagging, etc.
 """
 
 from corenlp import StanfordCoreNLP
@@ -7,12 +6,11 @@ from corenlp import StanfordCoreNLP
 from . import config
 from app.models.sentence import Sentence
 from app.models.word import Word
-from app.models.dependency import Dependency
 from app.models.parseproducts import ParseProducts
-from app.models.grammaticalrelationship import GrammaticalRelationship
 
 class StringProcessor(object):
-    """Tokenize or parse a string."""
+    """Tokenize or parse a string.
+    """
 
     def __init__(self):
         """Instantiate and ready the parser. Note that readying the parser takes
