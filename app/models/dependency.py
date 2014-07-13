@@ -1,7 +1,8 @@
-from app import db
-from base import Base
 from association_objects import DependencyInSentence
 from sqlalchemy.ext.associationproxy import association_proxy
+
+from app import db
+from base import Base
 
 class Dependency(db.Model, Base):
     """A representation of the grammatical dependency between two words.
@@ -17,6 +18,7 @@ class Dependency(db.Model, Base):
         dependent (Word): The dependent ``Word``.
         sentence_count (int): the number of sentences this appears in
         document_count (int): the number of documents this appears in
+        parse_products: ??? how is this related TODO
 
     Relationships:
         Has one: dependent (Word), governor (Word), grammatical relationship
@@ -26,10 +28,11 @@ class Dependency(db.Model, Base):
     # Attributes
 
     grammatical_relationship_id = db.Column(
-        db.Integer, db.ForeignKey("grammatical_relationship.id")
-    )
+        db.Integer, db.ForeignKey("grammatical_relationship.id"))
     governor_id = db.Column(db.Integer, db.ForeignKey("word.id"))
     dependent_id = db.Column(db.Integer, db.ForeignKey("word.id"))
+    parse_products_id = db.Column(db.Integer,
+        db.ForeignKey("parse_products.id"))
     sentence_count = db.Column(db.Integer, index=True)
     document_count = db.Column(db.Integer, index=True)
 
@@ -53,9 +56,11 @@ class Dependency(db.Model, Base):
         """Representation string for the dependency
         """
 
-        rel = self.grammatical_relationship.name
-        gov = self.governor.word
-        dep = self.dependent.word
+        #rel = str(self.grammatical_relationship.name)
+        #gov = str(self.governor.word)
+        #dep = str(self.dependent.word)
 
-        return "<Dependency: " + rel + "(" + gov + ", " + dep + ") >"
+        return ("<Dependency: " + str(self.grammatical_relationship) + "(" +
+            str(self.governor) + ", " +
+            str(self.grammatical_relationship) + ") >")
 
