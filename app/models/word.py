@@ -30,6 +30,7 @@ class Word(db.Model, Base):
     word = db.Column(db.String, index=True)
     lemma = db.Column(db.String, index=True)
     tag = db.Column(db.String, index=True)
+    parse_id = db.Column(db.Integer, db.ForeignKey("parse_products.id"))
 
     # Relationships
 
@@ -46,3 +47,4 @@ class Word(db.Model, Base):
         """
 
         return "<Word: " + str(self.word) + ">"
+
