@@ -1,8 +1,6 @@
 """
 Tests for structureextractor.py.
 """
-import pdb
-
 import unittest
 import json
 from lxml import etree
@@ -197,14 +195,4 @@ def compare_metadata(dict_metadata, other_metadata):
         return False
 
     return True
-
-def dictdiff(dict1, dict2):
-    if len(dict1) != len(dict2):
-        print "length mismatch"
-    for key, value in dict1.iteritems():
-        try:
-            if dict2[key] != value:
-                print key
-        except KeyError:
-            print key
 
