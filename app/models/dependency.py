@@ -31,8 +31,6 @@ class Dependency(db.Model, Base):
         db.Integer, db.ForeignKey("grammatical_relationship.id"))
     governor_id = db.Column(db.Integer, db.ForeignKey("word.id"))
     dependent_id = db.Column(db.Integer, db.ForeignKey("word.id"))
-    parse_products_id = db.Column(db.Integer,
-        db.ForeignKey("parse_products.id"))
     sentence_count = db.Column(db.Integer, index=True)
     document_count = db.Column(db.Integer, index=True)
 
