@@ -1,7 +1,6 @@
 """
 Tests for the SequenceProcessor class.
 """
-import pdb
 
 import mock
 import unittest
@@ -58,7 +57,6 @@ class SequenceProcessorTests(unittest.TestCase):
         removed = self.seq_proc.remove_stops(with_stops)
         dictdiff(removed[0].__dict__, without_stops[0].__dict__)
 
-        pdb.set_trace()
         self.failUnless(self.seq_proc.remove_stops(with_stops) == without_stops)
 
     def test_process(self):
