@@ -21,3 +21,9 @@ class GrammaticalRelationship(db.Model, Base):
 
     name = db.Column(db.String, index=True)
 
+    def __repr__(self):
+        """Return a string representation of this ``GrammaticalRelationship``.
+        """
+
+        return str(self.name)
+
