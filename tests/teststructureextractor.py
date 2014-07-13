@@ -1,6 +1,6 @@
+"""Tests for structureextractor.py.
 """
-Tests for structureextractor.py.
-"""
+
 import unittest
 import json
 from lxml import etree
