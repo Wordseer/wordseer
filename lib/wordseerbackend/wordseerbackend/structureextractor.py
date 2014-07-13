@@ -12,7 +12,6 @@ from app.models.sentence import Sentence
 from app.models.unit import Unit
 from app.models.property import Property
 
-import pdb
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
     JSON file. It generates document classes (Sentences, Documents, Propertys,
