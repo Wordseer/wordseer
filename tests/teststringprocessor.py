@@ -1,7 +1,5 @@
+"""Tests for the StringProcessor.
 """
-Tests for the tokenizer.
-"""
-
 import mock
 import unittest
 
@@ -27,8 +25,11 @@ class CommonTests(object):
         """
         for s in range(0, len(self.result)):
             for w in range(0, len(self.result[s].words)):
-                self.failUnless(self.result[s].words[w] ==
-                    self.raw["sentences"][s]["words"][w][0])
+                word = self.result[s].words[w]
+                raw_word = self.raw["sentences"][s]["words"][w]
+                self.failUnless(word.word == raw_word[0])
+                self.failUnless(word.lemma == raw_word[1]["Lemma"])
+                self.failUnless(word.tag == raw_word[1]["PartOfSpeech"])
 
     def test_tags(self):
         """Test to make sure the words are accurately tagged.
@@ -60,8 +61,8 @@ class TokenizeParagraphTests(CommonTests, unittest.TestCase):
         """
         # Todo: Check without hardcoding the ends?
         for sent in self.result:
-            self.failUnless(isinstance(sent, sentence.Sentence))
-            self.failUnless(sent.tagged[-2].word[0] in ["word", "death",
+            self.failUnless(isinstance(sent, Sentence))
+            self.failUnless(sent.tagged[-2].word in ["word", "death",
                 "candle", "more", "nothing"])
 
 class TokenizeSentenceTests(CommonTests, unittest.TestCase):
@@ -77,7 +78,7 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
         """Make sure it's a list of the given sentence.
         """
         self.failUnless(len(self.result) == 1)
-        self.failUnless(isinstance(self.result[0], sentence.Sentence))
+        self.failUnless(isinstance(self.result[0], Sentence))
         self.failUnless(self.result[0].text == self.example)
 
     def test_space_before(self):
@@ -139,14 +140,17 @@ class ParseTests(unittest.TestCase):
         for dep in deps[0:3]:
             dep_index = int(dep[4]) - 1
             gov_index = int(dep[2]) - 1
-            expected_deps.append(Dependency(dep[0], dep[1], gov_index,
-                words[gov_index][1]["PartOfSpeech"],
-                dep[3], dep_index,
-                words[dep_index][1]["PartOfSpeech"]))
+            expected_deps.append({
+                "grammatical_relationship": dep[0],
+                "governor": dep[1],
+                "governor_index": gov_index,
+                "governor_pos": words[gov_index][1]["PartOfSpeech"],
+                "dependent": dep[3],
+                "dependent_index": dep_index,
+                "dependent_pos": words[dep_index][1]["PartOfSpeech"]})
 
         expected_result = ParseProducts(parsetree,
             expected_deps, mock_tokenizer(parsed_dict, sent)[0].tagged)
-
         self.failUnless(expected_result == result)
 
     def test_parse_twosentences(self, mock_parser, mock_tokenizer):
