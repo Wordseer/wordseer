@@ -6,8 +6,9 @@ from app import db
 from .base import Base
 from .association_objects import WordInSentence
 from .association_objects import WordInSequence
+from .mixins import NonPrimaryKeyEquivalenceMixin
 
-class Word(db.Model, Base):
+class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     """A model representing a word.
 
     Words are the most basic building blocks of everything.
