@@ -1,13 +1,15 @@
+"""This is the ORM implementation of the reader writer. It has performance issues
+and is left here mostly for reference.
+"""
+
 from app.models import *
 import pdb
-from sqlalchemy.orm.exc import NoResultFound
 
 from app import db
 
 class ReaderWriter:
 
     Base.commit_on_save = False
-    engine = db.engine
 
     @profile
     def write_parse_products(self, products):
@@ -31,76 +33,56 @@ class ReaderWriter:
             sentence = products.sentences[sentence_index]
             # NOTE: this assumes that the sentence indices match the parses
 
+            # print(parse.__dict__)
+
             # Read in the data for each dependency in the sentence
             for dep in parse.dependencies:
+                # print(dep.__dict__)
 
-                connection = self.engine.connect()
-                connection.execution_options(autocommit=False)
-                with connection.begin() as trans:
-                    # print(dep.__dict__)
+                # Retrieve the corresponding grammatical relationship, or
+                # create a new grammatical relationship.
+                relationship = GrammaticalRelationship.find_or_create(
+                    name = dep.relationship
+                )
 
-                    # Retrieve the corresponding grammatical relationship, or
-                    # create a new grammatical relationship.
-                    relationship_id = None
+                # Read the data for the governor, and find the corresponding word
+                governor_data = parse.pos_tags[dep.gov_index]
+                governor = Word.query.filter_by(
+                    word = governor_data.word[0],
+                    lemma = governor_data.lemma,
+                    tag = governor_data.tag
+                ).first()
 
-                    try:
-                        relationship_id = GrammaticalRelationship.query.filter_by(
-                            name = dep.relationship
-                        ).one().id
-                    except(NoResultFound):
-                        relationship_id = connection.execute(
-                              GrammaticalRelationship.__table__.insert(),
-                              { "name": dep.relationship }
-                        ).inserted_primary_key[0]
+                # Same as above for the dependent in the relationship
+                dependent_data = parse.pos_tags[dep.dep_index]
+                dependent = Word.query.filter_by(
+                    word = dependent_data.word[0],
+                    lemma = dependent_data.lemma,
+                    tag = dependent_data.tag
+                ).first()
 
+                # Create the dependency between the two words
+                dependency = Dependency.find_or_create(
+                    grammatical_relationship = relationship,
+                    governor = governor,
+                    dependent = dependent
+                )
 
-                    # Read the data for the governor, and find the corresponding word
-                    governor_data = parse.pos_tags[dep.gov_index]
-                    governor_id = Word.query.filter_by(
-                        word = governor_data.word[0],
-                        lemma = governor_data.lemma,
-                        tag = governor_data.tag
-                    ).first().id
+                # Add the dependency to the sentence
+                sentence.add_dependency(
+                    dependency = dependency,
+                    governor_index = dep.gov_index,
+                    dependent_index = dep.dep_index
+                )
 
-                    # Same as above for the dependent in the relationship
-                    dependent_data = parse.pos_tags[dep.dep_index]
-                    dependent_id = Word.query.filter_by(
-                        word = dependent_data.word[0],
-                        lemma = dependent_data.lemma,
-                        tag = dependent_data.tag
-                    ).first().id
+                #  print("relationship", relationship)
+                #  print("governor", governor)
+                #  print("dependent", dependent)
+                #  print("dependency", dependency)
 
-                    # Create the dependency between the two words
-                    dependency_id = None
+                dependency.save()
 
-                    try:
-                        dependency_id = Dependency.query.filter_by(
-                            grammatical_relationship_id = relationship_id,
-                            governor_id = governor_id,
-                            dependent_id = dependent_id
-                        ).one().id
-                    except(NoResultFound):
-                        dependency_id = connection.execute(
-                            Dependency.__table__.insert(),
-                            {
-                                "grammatical_relationship_id": relationship_id,
-                                "governor_id": governor_id,
-                                "dependent_id": dependent_id
-                            }
-                          ).inserted_primary_key[0]
-
-                    # Add the dependency to the sentence
-                    connection.execute(DependencyInSentence.__table__.insert(), {
-                        "dependency_id": dependency_id,
-                        "governor_index": dep.gov_index,
-                        "dependent_index": dep.dep_index
-                    })
-
-                    #  print("relationship", relationship)
-                    #  print("governor", governor)
-                    #  print("dependent", dependent)
-                    #  print("dependency", dependency)
-
+            db.session.commit()
 
             sentence_index += 1
 
@@ -121,6 +103,7 @@ class ReaderWriter:
 
         return Document.query.get(doc_id)
 
+    @profile
     def create_new_document(self, doc, num_files):
         """Initialize the document and its subunits and save it to the database.
 
@@ -128,24 +111,16 @@ class ReaderWriter:
         tree.
         """
 
-        with self.engine.begin() as connection:
+        document = Document(title=_get_title(doc))
+        document.number = num_files
 
-            document_unit_id = connection.execute(Unit.__table__.insert(), {
-                "number": num_files,
-                "type": "document",
-            }).inserted_primary_key[0]
-
-            document_id = connection.execute(Document.__table__.insert(), {
-                "id": document_unit_id,
-                "title": self._get_title(doc),
-            }).inserted_primary_key[0]
-
-            # TODO: add title as property
-
-        subunit_number = 0
         for unit in doc.units:
-            self._init_unit(unit, document_id, document_id, subunit_number)
-            subunit_number += 1
+            unit = _init_unit(unit, document)
+            document.children.append(unit)
+
+        document.save()
+        db.session.commit()
+        return document
 
     def index_sequence(self, sequence):
         """Reads in sequence data to create and save sequeunces into the
@@ -173,41 +148,35 @@ class ReaderWriter:
         sentence.add_sequence(new_sequence, sequence.start_position)
 
     def index_sequences(self, sequences):
-        """Batch-process all sequences
+        """Batch-save sequences
         """
 
-        connection = self.engine.connect()
-        connection.execution_options(autocommit=False)
+        # Find the sentence that this sequence belongs to
+        for sequence in sequences:
+            sentence = Sentence.query.get(sequence.sentence_id)
 
-        with connection.begin() as trans:
+            new_sequence = Sequence(
+                sequence = sequence.sequence,
+                lemmatized = sequence.is_lemmatized,
+                has_function_words = sequence.has_function_words,
+                all_function_words = sequence.all_function_words,
+                length = len(sequence.words)
+            )
 
-            for sequence in sequences:
-                sequence_id = connection.execute(Sequence.__table__.insert(), {
-                    'sequence': sequence.sequence,
-                    'lemmatized': sequence.is_lemmatized,
-                    'has_function_words': sequence.has_function_words,
-                    'all_function_words': sequence.all_function_words,
-                    'length': len(sequence.words)
-                }).inserted_primary_key[0]
+            #print(new_sequence)
+            #print("\n")
 
-                #print(new_sequence)
-                #print("\n")
+            new_sequence.save()
+            sentence.add_sequence(new_sequence, sequence.start_position)
 
-                connection.execute(SequenceInSentence.__table__.insert(), {
-                  "sentence_id": sequence.sentence_id,
-                  "sequence_id": sequence_id,
-                  "position": sequence.start_position
-                })
 
     def write_sequences(self):
-        pass
+        db.session.commit()
 
     def finish_grammatical_processing(self):
         """Counts the number of documents and sentences in which each individual
         dependency and word appear.
         """
-
-        return
 
         # Calculate counts for documents
         for document in Document.query.all():
@@ -220,6 +189,7 @@ class ReaderWriter:
             dependency.document_count = len(set([sentence.document for sentence in dependency.sentences]))
             dependency.save()
 
+        db.session.commit()
 
     def finish_indexing_sequences(self):
         """For each sequence, count the number of sentences and documents
@@ -237,81 +207,68 @@ class ReaderWriter:
     def calculate_lin_similarities(self):
         pass
 
+"""
+Helpers
+"""
+
+@profile
+def _init_unit(unit, document):
+    """Helper to recursively initialize subunits
     """
-    Helpers
-    """
 
-    def _init_unit(self, unit, document_id, parent_id, number):
-        """Helper to recursively initialize subunits
-        """
+    new_unit = Unit()
 
-        with self.engine.begin() as connection:
+    for property_data in unit.metadata:
+        unit_property = Property(
+            name = property_data.property_name,
+            value = property_data.value
+        )
 
-            unit_id = connection.execute(Unit.__table__.insert(), {
-                "number": number,
-                "parent_id": parent_id
-            }).inserted_primary_key[0]
+        new_unit.properties.append(unit_property)
 
-            connection.execute(Property.__table__.insert(),
-                [ { "name": property_data.property_name,
-                    "value": property_data.value
-                } for property_data in unit.metadata ]
+    for sentence_text in unit.sentences:
+        sentence = Sentence(text = sentence_text.text)
+        sentence.document = document
+
+        position = 0
+        for tagged_word in sentence_text.tagged:
+            word = Word.find_or_create(
+                word = tagged_word.word[0],
+                lemma = tagged_word.lemma,
+                tag = tagged_word.tag
             )
 
+            sentence.add_word(
+                word = word,
+                position = position,
+                space_before = tagged_word.space_before,
+                tag = tagged_word.tag
+            )
 
-        for sentence_text in unit.sentences:
+            position += 1
+            db.session.commit()
 
-            connection = self.engine.connect()
+        new_unit.sentences.append(sentence)
 
-            sentence_id = connection.execute(Sentence.__table__.insert(), {
-                "text": sentence_text.text,
-                "document_id": document_id,
-                "unit_id": unit_id
-            }).inserted_primary_key[0]
+    subunit_number = 0
+    for subunit in unit.units:
+        new_subunit = _init_unit(subunit, document)
+        new_subunit.number = subunit_number
 
-            position = 0
-            for tagged_word in sentence_text.tagged:
+        new_unit.children.append(new_subunit)
 
-                with connection.begin() as trans:
+    new_unit.save()
+    return new_unit
 
-                    word_id = None
-                    try:
-                        word_id = Word.query.filter_by(
-                            word = tagged_word.word[0],
-                            lemma = tagged_word.lemma,
-                            tag = tagged_word.tag
-                        ).one().id
-                    except NoResultFound:
-                        word_id = connection.execute(Word.__table__.insert(), {
-                            "word": tagged_word.word[0],
-                            "lemma": tagged_word.lemma,
-                            "tag": tagged_word.tag
-                        }).inserted_primary_key[0]
+def _get_title(doc):
+    """Helper to find the title metadata from the list of metadata
+    """
 
-                    connection.execute(WordInSentence.__table__.insert(), {
-                        "word_id": word_id,
-                        "sentence_id": sentence_id,
-                        "position": position,
-                        "space_before": tagged_word.space_before,
-                        "tag": tagged_word.tag
-                    })
+    title = ""
 
-                    position += 1
+    for data in doc.metadata:
+        if data.property_name.lower().strip() == "title":
+            title = data.value
 
-        subunit_number = 0
-        for subunit in unit.units:
-            self._init_unit(subunit, document_id, unit_id, subunit_number)
-            subunit_number += 1
-
-    def _get_title(self, doc):
-        """Helper to find the title metadata from the list of metadata
-        """
-
-        title = ""
-
-        for data in doc.metadata:
-            if data.property_name.lower().strip() == "title":
-                title = data.value
-
-        return title
+    return title
 
