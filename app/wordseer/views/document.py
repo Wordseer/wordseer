@@ -4,11 +4,14 @@ from flask import abort
 from flask import request
 from flask.json import jsonify
 from flask.views import View
+from flask.ext.sqlalchemy.sqlalchemy import func
 
 from app.models.document import Document
 from app.models.property import Property
 from app.models.property_metadata import PropertyMetadata
-from app.wordseer import wordseer
+from app.models.sequence import Sequence
+from app.wordseer import wordseer, views
+
 
 
 class DocumentView(View):
@@ -48,8 +51,8 @@ class DocumentView(View):
 
 #         deal with the rest of the variables
         self.include_text = request.args.get("include_text", type=bool)
-        self.collection = request.args.get("collection")
-        self.phrases = request.args.get("phrases")
+        self.set = request.args.get("collection")
+        self.sequences = request.args.get("phrases") # string: "('word' or 'phrase')_(id)"
         self.metadata = request.args.get("metadata")
         self.unit = request.args.get("unit")
         self.search = request.args.get("search")
@@ -96,12 +99,14 @@ class DocumentView(View):
         return results
     
     def filter_sentences(self):
-        """Returns the sentence id's that match the given filters. Also consults
-        the GET param "document_id" 
+        """Returns the sentence id's that match the given filters.
+        Also returns the document counts 
+        Also consults the GET param "document_id" 
         """
         # TODO: run filters to get a list of sentence ids
-        ids = []
-
+        
+        results = None
+        
         # filter by metadata
         if self.metadata:
             properties = json.loads(self.metadata)
@@ -145,22 +150,42 @@ class DocumentView(View):
             
             
         elif self.doc_id:
-            # just get that document
+            # just get that document?
             pass
-        else:
-            metafilter = None
 
-        # filter by collection
+        # short circuit
+        if ids == []:
+            return ids
         
-        # filter by phrases
+        # filter by sets
+        if self.set and self.set != "all":
+            # TODO: don't have working retrieval methods for set views yet
+            pass
         
-        # intersect the filtered sets
+        # filter by sequences
+        if self.sequences:
+            temp_ids = []
+            for seq in self.sequences:
+                if seq:
+                    seq_id = views.sequences.SequenceView.get_sequence_ids(seq)
+                    seq_obj = Sequence.query.get(seq_id)
+                    for sentence in seq_obj.sentences:
+                        temp_ids.add(sentence.document.id)
+            
+            if ids == None:
+                ids =  temp_ids
+            else:
+                # intersect
+                ids += temp_ids
+        
+        return ids
+                    
         
         # return the intersected result
         
         #TODO: is an empty result set the same as "all"?
         # or return "all"
-        return "all"
+#         return "all"
     
     #===========================================================================
     # endpoint methods
@@ -334,7 +359,14 @@ class DocumentView(View):
                 docs.append(doc)
         else: 
             # run a filtered query
-            pass
+            doc_ids = self.filter_sentences()
+            docs_query = Document.query.get_all(doc_ids)
+            docs = []
+            for row in docs_query:
+                doc = self.get_document(row.id)
+                doc["matches"] = doc_ids.count(row.id)
+                docs.append(doc)
+            
         
 #        TODO: update frontend, can't return top-level array
         return {"documents": docs}
