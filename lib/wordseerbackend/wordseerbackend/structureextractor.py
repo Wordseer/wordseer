@@ -173,7 +173,7 @@ def get_metadata(structure, node):
                 metadata_list.append(Property(
                     value=val,
                     name=spec["propertyName"],
-                    specification=spec))
+                ))
     return metadata_list
 
 def get_xpath_attribute(xpath_pattern, attribute, node):

@@ -46,7 +46,7 @@ class DocumentParser(object):
         #TODO: both of the below comments should replace the lines below
         # them once the pipeline is integrated with the main application
         #for sentence in document.all_sentences:
-        for sentence in document.sentences:
+        for sentence in document.all_sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
                 parse_products = self.parser.parse(sentence.text)
                 parsed.add_sentence(sentence, parse_products)

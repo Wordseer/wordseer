@@ -23,14 +23,16 @@ class ReaderWriter:
         saves them into the database.
         """
 
-        # print("product", str(products.__dict__))
-
-
         relationships = dict()
         dependencies = dict()
 
         sentence_index = 0
 
+        for i in range(len(products.sentences)):
+            print(products.sentences[i])
+            print(products.parses[i])
+
+        pdb.set_trace()
         # Read in the parsed sentences
         for parse in products.parses:
 
@@ -253,65 +255,54 @@ def _init_unit(unit, document):
     words = dict()
 
     for sentence in unit.sentences:
-        print(sentence.__dict__)
-        pdb.set_trace()
         sentence.document = document
 
         position = 0
-        for tagged_word in sentence_text.tagged:
-            word = Word.find_or_create(
-                word = tagged_word.word[0],
-                lemma = tagged_word.lemma,
-                tag = tagged_word.tag
-            )
+        for word in sentence.tagged_words:
 
-            word = None
-            key = (tagged_word.word[0], tagged_word.lemma, tagged_word.tag)
+            key = (word.word, word.lemma, word.tag)
 
             if key in words.keys():
-                word = words[key]
+                new_word = words[key]
+                print("In dict " + str(new_word))
             else:
 
                 try:
-                    word = Word.query.filter_by(
+                    new_word = Word.query.filter_by(
                         word = key[0],
                         lemma = key[1],
                         tag = key[2]
                     ).one()
+                    print("Found word " + str(new_word))
                 except(MultipleResultsFound):
                     print("ERROR: duplicate records found for:")
                     print("\t" + str(key))
                 except(NoResultFound):
-                    word = Word(
+                    new_word = Word(
                         word = key[0],
                         lemma = key[1],
                         tag = key[2]
                     )
+                    print("New word " + str(new_word))
                     
-                words[key] = word
+                words[key] = new_word
 
             sentence.add_word(
-                word = word,
+                word = new_word,
                 position = position,
-                space_before = tagged_word.space_before,
-                tag = tagged_word.tag
+                space_before = word.space_before,
+                tag = word.tag
             )
 
-            position += 1
-            
-        db.session.commit()
-
-        new_unit.sentences.append(sentence)
+    db.session.commit()
 
     subunit_number = 0
-    for subunit in unit.units:
+    for subunit in unit.children:
         new_subunit = _init_unit(subunit, document)
         new_subunit.number = subunit_number
 
-        new_unit.children.append(new_subunit)
-
-    new_unit.save()
-    return new_unit
+    unit.save()
+    return unit
 
 def _get_title(doc):
     """Helper to find the title metadata from the list of metadata

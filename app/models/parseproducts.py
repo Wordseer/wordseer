@@ -41,7 +41,7 @@ class ParseProducts(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
 
         output += "+++ Part-of-speech tags:\n"
 
-        for word in self.pos_tags:
+        for word in self.words:
             output += str(word) + "\n"
 
         return output

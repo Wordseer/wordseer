@@ -97,6 +97,7 @@ def tokenize_from_raw(parsed_text, txt):
         word_list = [] # a list of words
         tagged_words = [] # a list of Words
         sent_text = s["text"]
+        sentence = Sentence(text=sent_text)
 
         for w in s["words"]:
             #FIXME not quite right
@@ -109,8 +110,8 @@ def tokenize_from_raw(parsed_text, txt):
             word_list.append(w[0])
             tagged_words.append(tw)
 
-        paragraph.append(Sentence(text=sent_text,
-            words=tagged_words))
+        sentence.tagged_words = tagged_words
+        paragraph.append(sentence)
 
     return paragraph
 
