@@ -66,7 +66,7 @@ class Sentence(db.Model, Base):
         NOTE: could be trucated to save print space
         """
 
-        return "<Sentence: " + self.text + ">"
+        return "<Sentence: " + str(self.text) + ">"
 
     @property
     def tagged(self):
