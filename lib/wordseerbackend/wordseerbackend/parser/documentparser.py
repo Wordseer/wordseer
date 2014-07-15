@@ -1,17 +1,15 @@
-"""
-The DocumentParser takes in a Document object and parses it by creating a
+"""The DocumentParser takes in a Document object and parses it by creating a
 ParsedParagraph object for every sentence in the Document.
 
 The ParsedParagraph will then be written to the database, and each sentence
 returned from the write_parse_products method will be passed to
 SequenceProcessor.process().
 """
-
 from datetime import datetime
 
-from ..document.parsedparagraph import ParsedParagraph
+from app.models.parsedparagraph import ParsedParagraph
 from .. import logger
-from ..parser.parseproducts import ParseProducts
+from app.models.parseproducts import ParseProducts
 from ..sequence.sequenceprocessor import SequenceProcessor
 
 LATEST_SENT_ID = "latest_parsed_sentence_id"
@@ -26,7 +24,7 @@ class DocumentParser(object):
         self.sequence_processor = SequenceProcessor(reader_writer)
 
     def parse_document(self, document):
-        """ Parse a document and write it to the database.
+        """Parse a document and write it to the database.
 
         Given a certain document, this method will parse every sentence in
         it to a ParsedParagraph object. Ater every 50th sentence it will call
@@ -50,8 +48,7 @@ class DocumentParser(object):
         #for sentence in document.all_sentences:
         for sentence in document.sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
-                #parse_products = self.parser.parse(sentence.text)
-                parse_products = self.parser.parse(sentence.sentence)
+                parse_products = self.parser.parse(sentence.text)
                 parsed.add_sentence(sentence, parse_products)
                 count += 1
                 current_max = sentence.id
@@ -88,4 +85,3 @@ class DocumentParser(object):
         logger.log(LATEST_SEQ_SENT, str(current_max), logger.REPLACE)
         #TODO: reader_writer
         self.reader_writer.write_sequences()
-

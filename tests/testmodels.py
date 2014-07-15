@@ -8,12 +8,14 @@ from app.models import Dependency
 from app.models import Document
 from app.models import DocumentSet
 from app.models import Property
+from app.models import Project
 from app.models import Sentence
 from app.models import Set
 from app.models import Sequence
 from app.models import SequenceSet
 from app.models import SentenceSet
 from app.models import Unit
+from app.models import User
 from app.models import Word
 import database
 
@@ -117,7 +119,7 @@ class TestSentenceModel(unittest.TestCase):
         assert rel.sentence == sentence
         assert rel.position == 4
         assert rel.space_before == " "
-        assert rel.tag = "ADF"
+        assert rel.tag == "ADF"
 
     def test_add_dependency(self):
         """Test the ``add_dependency()`` method of ``Sentence``.
