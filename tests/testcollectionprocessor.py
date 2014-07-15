@@ -209,14 +209,6 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         # Reset the previously used mocks
         mock_writer.reset_mock()
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.Database")
-    def test_process_reset(self, mock_db):
-        """Test that database reset works properly.
-        """
-        colproc.process("", "", "", True)
-
-        mock_db.reset.assert_called_once()
-
     @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.config", autospec=config)
     @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)
     def test_process_e_r_m(self, mock_logger, mock_config):

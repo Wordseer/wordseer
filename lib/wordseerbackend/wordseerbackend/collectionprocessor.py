@@ -7,7 +7,6 @@ from datetime import datetime
 import os
 
 from . import config
-from .database.database import Database
 from . import logger
 from .parser.documentparser import DocumentParser
 from .sequence.sequenceprocessor import SequenceProcessor
