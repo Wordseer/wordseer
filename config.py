@@ -42,7 +42,6 @@ class BaseConfig(object):
     SECURITY_REGISTERABLE = True
     SECURITY_CHANGEABLE = True
     SECURITY_RECOVERABLE = True
-
     SECRET_KEY = "secret"
 
     #Email settings
@@ -51,7 +50,6 @@ class BaseConfig(object):
     SECURITY_SEND_REGISTER_EMAIL = False
 
     #TODO: unify these options with the pipeline
-
     STOPWORDS = (u"'ve ’s ’ 're does o t went was is had be were did are have "
         "do has being am 's been go 'm the and so are for be but this what 's "
         "did had they doth a to is that was as are at an of with . , ; ? ' \" "
@@ -63,6 +61,22 @@ class BaseConfig(object):
 
     # Number of rows to return for paginated queries
     PAGE_SIZE = 100
+
+    # Pipeline options
+    #WORDSEER_DIR = os.path.dirname(os.path.realpath(__file__))
+
+    # NLP locations. Paths should be absolute.
+    CORE_NLP_DIR = os.path.join(ROOT, "lib/wordseerbackend/wordseerbackend/stanford-corenlp/")
+
+    # Processing options
+    GRAMMATICAL_PROCESSING = True
+    PART_OF_SPEECH_TAGGING = True
+    WORD_TO_WORD_SIMILARITY = True
+    SEQUENCE_INDEXING = True
+
+    # Database options
+    #DB_URL = "sqlite:///" + os.path.join(ROOT, 'wordseer.db')
+
 
 class Production(BaseConfig):
     """Config for the production server.
