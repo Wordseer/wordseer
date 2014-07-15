@@ -141,19 +141,16 @@ class ReaderWriter:
         return Document.query.get(doc_id)
 
     
-    def create_new_document(self, doc, num_files):
+    def create_new_document(self, document, num_files):
         """Initialize the document and its subunits and save it to the database.
 
         This method calls a helper method to recursively initialize the subunit
         tree.
         """
 
-        document = Document(title=_get_title(doc))
         document.number = num_files
 
-        for unit in doc.units:
-            unit = _init_unit(unit, document)
-            document.children.append(unit)
+        [ _init_unit(child, document) for child in document.children ]            
 
         document.save()
         db.session.commit()
@@ -253,20 +250,11 @@ def _init_unit(unit, document):
     """Helper to recursively initialize subunits
     """
 
-    new_unit = Unit()
-
-    for property_data in unit.metadata:
-        unit_property = Property(
-            name = property_data.property_name,
-            value = property_data.value
-        )
-
-        new_unit.properties.append(unit_property)
-
     words = dict()
 
-    for sentence_text in unit.sentences:
-        sentence = Sentence(text = sentence_text.text)
+    for sentence in unit.sentences:
+        print(sentence.__dict__)
+        pdb.set_trace()
         sentence.document = document
 
         position = 0
