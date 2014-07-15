@@ -66,7 +66,7 @@ class BaseConfig(object):
     #WORDSEER_DIR = os.path.dirname(os.path.realpath(__file__))
 
     # NLP locations. Paths should be absolute.
-    CORE_NLP_DIR = os.path.join(ROOT, "lib/wordseerbackend/wordseerbackend/stanford-corenlp/")
+    CORE_NLP_DIR = os.path.join(ROOT, "lib/wordseerbackend/stanford-corenlp/")
 
     # Processing options
     GRAMMATICAL_PROCESSING = True
