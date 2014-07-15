@@ -6,12 +6,10 @@ from app.models import *
 import pdb
 
 from app import db
-
 class ReaderWriter:
 
     Base.commit_on_save = False
 
-    @profile
     def write_parse_products(self, products):
         """Converts ParseProducts into the corresponding models and writes them
         into the database.
@@ -35,15 +33,38 @@ class ReaderWriter:
 
             # print(parse.__dict__)
 
+            relationships = dict()
+            dependencies = dict()
+
             # Read in the data for each dependency in the sentence
             for dep in parse.dependencies:
                 # print(dep.__dict__)
 
                 # Retrieve the corresponding grammatical relationship, or
                 # create a new grammatical relationship.
-                relationship = GrammaticalRelationship.find_or_create(
-                    name = dep.relationship
-                )
+
+                if dep.relationship in relationships.keys():
+                    print("Found key " + str(dep.relationship))
+                    relationship = relationships[dep.relationship]
+                else:
+                    relationship = GrammaticalRelationship.query.filter_by(
+                        name = dep.relationship
+                    )
+
+                    if relationship.count() > 1:
+                        print("WARNING: multiple results found")
+                    else:
+                        relationship = relationship.first()
+
+                    if not relationship:
+                        relationship = GrammaticalRelationship(
+                            name = dep.relationship
+                        )
+                        print("Created relationship " + str(relationship))
+                    else:
+                        print("Found relationship " + str(relationship))
+                        
+                    relationships[dep.relationship] = relationship
 
                 # Read the data for the governor, and find the corresponding word
                 governor_data = parse.pos_tags[dep.gov_index]
@@ -61,12 +82,34 @@ class ReaderWriter:
                     tag = dependent_data.tag
                 ).first()
 
-                # Create the dependency between the two words
-                dependency = Dependency.find_or_create(
-                    grammatical_relationship = relationship,
-                    governor = governor,
-                    dependent = dependent
-                )
+                key = (relationship, governor, dependent)
+
+                if key in dependencies.keys():
+                    print("Found key " + str(key))
+                    dependency = dependencies[key]
+                else:
+                    dependency = Dependency.query.filter_by(
+                        grammatical_relationship = relationship,
+                        governor = governor,
+                        dependent = dependent
+                    )
+
+                    if dependency.count() > 1:
+                        print("WARNING: multiple results found")
+                    else:
+                        dependency = dependency.first()
+
+                    if not dependency:
+                        dependency = Dependency(
+                            grammatical_relationship = relationship,
+                            governor = governor,
+                            dependent = dependent
+                        )
+                        print("Created dependency " + str(dependency))
+                    else:
+                        print("Found dependency " + str(dependency))
+                        
+                    dependencies[key] = dependency
 
                 # Add the dependency to the sentence
                 sentence.add_dependency(
