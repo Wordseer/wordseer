@@ -5,8 +5,8 @@ the pipeline.
 """
 from sqlalchemy.orm.exc import NoResultFound
 
-from .database import database
-from .models import Log
+from app import db
+from app.models.log import Log
 
 REPLACE = "replace"
 UPDATE = "update"
@@ -24,25 +24,22 @@ def log(item, value, replace_value):
     """
 
     entry = Log(log_item=item, item_value=value)
-    session = database.Database().session
-    session._model_changes = {}
 
     if REPLACE == replace_value:
-        entry = session.merge(entry)
+        entry = db.session.merge(entry)
 
     elif UPDATE == replace_value:
         try:
-            existing_entry = session.query(Log).\
+            existing_entry = Log.query.\
                 filter(Log.log_item == item).one()
         except NoResultFound:
             existing_entry = Log(log_item=item, item_value="")
 
         entry.item_value = existing_entry.item_value + " [" +\
             entry.item_value + "] "
-        session.merge(entry)
+        db.session.merge(entry)
 
-    session.commit()
-    session.close()
+    db.session.commit()
 
 def get(item):
     """Get the value for a specific log item.
@@ -51,11 +48,10 @@ def get(item):
     :return string: The value of the given item, blank if the item does
         not exist, the first one if there are several instances.
     """
-
-    session = database.Database().session
-    results = session.query(Log).filter(Log.log_item == item).first()
+    results = Log.query.filter(Log.log_item == item).first()
 
     if results:
         return results.item_value
 
     return ""
+

@@ -9,7 +9,7 @@ class ReaderWriter:
     Base.commit_on_save = False
     engine = db.engine
 
-    @profile
+    #@profile
     def write_parse_products(self, products):
         """Converts ParseProducts into the corresponding models and writes them
         into the database.
