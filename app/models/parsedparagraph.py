@@ -1,7 +1,8 @@
 from .base import Base
 from app import db
+from .mixins import NonPrimaryKeyEquivalenceMixin
 
-class ParsedParagraph(db.Model, Base):
+class ParsedParagraph(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     """A container for a paragraph that has been parsed, containing both the
     original text and the result of parsing each sentence with the parser.
 
@@ -29,5 +30,9 @@ class ParsedParagraph(db.Model, Base):
         """
         self.sentences.append(sentence)
         self.parses.append(parse)
-        self.text = str(self) #TODO: why does this happen?
+        #self.text = str(self) #TODO: why does this happen?
+
+    def __repr__(self):
+        return ("<ParsedParagraph: " + str(self.sentences) + " | " +
+            str(self.parses) + ">")
 
