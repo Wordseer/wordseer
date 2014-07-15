@@ -21,7 +21,6 @@ class CollectionProcessor(object):
         self.reader_writer = reader_writer
         self.str_proc = StringProcessor()
 
-    @profile
     def process(self, collection_dir, docstruc_filename,
         filename_extension, start_from_scratch):
         """

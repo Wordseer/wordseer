@@ -4,6 +4,8 @@ and is left here mostly for reference.
 
 from app.models import *
 import pdb
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound
 
 from app import db
 class ReaderWriter:
@@ -23,6 +25,10 @@ class ReaderWriter:
 
         # print("product", str(products.__dict__))
 
+
+        relationships = dict()
+        dependencies = dict()
+
         sentence_index = 0
 
         # Read in the parsed sentences
@@ -33,8 +39,6 @@ class ReaderWriter:
 
             # print(parse.__dict__)
 
-            relationships = dict()
-            dependencies = dict()
 
             # Read in the data for each dependency in the sentence
             for dep in parse.dependencies:
@@ -44,25 +48,20 @@ class ReaderWriter:
                 # create a new grammatical relationship.
 
                 if dep.relationship in relationships.keys():
-                    print("Found key " + str(dep.relationship))
                     relationship = relationships[dep.relationship]
                 else:
-                    relationship = GrammaticalRelationship.query.filter_by(
-                        name = dep.relationship
-                    )
 
-                    if relationship.count() > 1:
-                        print("WARNING: multiple results found")
-                    else:
-                        relationship = relationship.first()
-
-                    if not relationship:
+                    try:
+                        relationship = GrammaticalRelationship.query.filter_by(
+                            name = dep.relationship
+                        ).one()
+                    except(MultipleResultsFound):
+                        print("ERROR: duplicate records found for:")
+                        print("\t" + str(dep.relationship))
+                    except(NoResultFound):
                         relationship = GrammaticalRelationship(
                             name = dep.relationship
                         )
-                        print("Created relationship " + str(relationship))
-                    else:
-                        print("Found relationship " + str(relationship))
                         
                     relationships[dep.relationship] = relationship
 
@@ -85,29 +84,24 @@ class ReaderWriter:
                 key = (relationship, governor, dependent)
 
                 if key in dependencies.keys():
-                    print("Found key " + str(key))
                     dependency = dependencies[key]
                 else:
-                    dependency = Dependency.query.filter_by(
-                        grammatical_relationship = relationship,
-                        governor = governor,
-                        dependent = dependent
-                    )
 
-                    if dependency.count() > 1:
-                        print("WARNING: multiple results found")
-                    else:
-                        dependency = dependency.first()
-
-                    if not dependency:
+                    try:
+                        dependency = Dependency.query.filter_by(
+                            grammatical_relationship = relationship,
+                            governor = governor,
+                            dependent = dependent
+                        ).one()
+                    except(MultipleResultsFound):
+                        print("ERROR: duplicate records found for:")
+                        print("\t" + str(key))
+                    except(NoResultFound):
                         dependency = Dependency(
                             grammatical_relationship = relationship,
                             governor = governor,
                             dependent = dependent
                         )
-                        print("Created dependency " + str(dependency))
-                    else:
-                        print("Found dependency " + str(dependency))
                         
                     dependencies[key] = dependency
 
@@ -125,9 +119,9 @@ class ReaderWriter:
 
                 dependency.save()
 
-            db.session.commit()
-
             sentence_index += 1
+
+        db.session.commit()
 
         return products.sentences
         # TODO: figure out what the output is really supposed to be
@@ -146,7 +140,7 @@ class ReaderWriter:
 
         return Document.query.get(doc_id)
 
-    @profile
+    
     def create_new_document(self, doc, num_files):
         """Initialize the document and its subunits and save it to the database.
 
@@ -254,7 +248,7 @@ class ReaderWriter:
 Helpers
 """
 
-@profile
+
 def _init_unit(unit, document):
     """Helper to recursively initialize subunits
     """
@@ -269,6 +263,8 @@ def _init_unit(unit, document):
 
         new_unit.properties.append(unit_property)
 
+    words = dict()
+
     for sentence_text in unit.sentences:
         sentence = Sentence(text = sentence_text.text)
         sentence.document = document
@@ -281,6 +277,31 @@ def _init_unit(unit, document):
                 tag = tagged_word.tag
             )
 
+            word = None
+            key = (tagged_word.word[0], tagged_word.lemma, tagged_word.tag)
+
+            if key in words.keys():
+                word = words[key]
+            else:
+
+                try:
+                    word = Word.query.filter_by(
+                        word = key[0],
+                        lemma = key[1],
+                        tag = key[2]
+                    ).one()
+                except(MultipleResultsFound):
+                    print("ERROR: duplicate records found for:")
+                    print("\t" + str(key))
+                except(NoResultFound):
+                    word = Word(
+                        word = key[0],
+                        lemma = key[1],
+                        tag = key[2]
+                    )
+                    
+                words[key] = word
+
             sentence.add_word(
                 word = word,
                 position = position,
@@ -289,7 +310,8 @@ def _init_unit(unit, document):
             )
 
             position += 1
-            db.session.commit()
+            
+        db.session.commit()
 
         new_unit.sentences.append(sentence)
 

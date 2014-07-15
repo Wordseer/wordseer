@@ -5,7 +5,7 @@ import os
 import database
 import pdb
 
-collection_dir = os.path.join("lib", "wordseerbackend", "tests", "data", "articles")
+collection_dir = os.path.join("lib", "wordseerbackend", "tests", "data", "r_and_j")
 extension = ".xml"
 structure_file = os.path.join(collection_dir, "structure.json")
 
