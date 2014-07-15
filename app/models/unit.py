@@ -10,12 +10,13 @@ class Unit(db.Model, Base):
     Units are hierarchical; one unit can contain many children units.
 
     Attributes:
-      type (str): the unit type (document, section, etc.).
-      number (int): a sequencing number (e.g. 2 for chapter 2).
-      parent (Unit): The ``Unit`` that owns this ``Unit``.
-      children (list of Units): ``Unit``s that this ``Unit`` owns.
-      sentences (list of Sentences): ``Sentences`` found in this ``Unit``.
-      properties (list of Properties): Metadata for this unit.
+        type (str): the unit type (document, section, etc.).
+        number (int): a sequencing number (e.g. 2 for chapter 2).
+        parent (Unit): The ``Unit`` that owns this ``Unit``.
+        children (list of Units): ``Unit``s that this ``Unit`` owns.
+        sentences (list of Sentences): ``Sentences`` found in this ``Unit``.
+        properties (list of Properties): Metadata for this ``Unit``.
+        name (str): A name for this ``Unit``.
 
     Relationships:
       has one: parent
@@ -28,6 +29,7 @@ class Unit(db.Model, Base):
     type = db.Column(db.String(64))
     number = db.Column(db.Integer, index=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
+    name = db.Column(db.String)
 
     # Relationships
     children = db.relationship("Unit", backref=db.backref("parent",

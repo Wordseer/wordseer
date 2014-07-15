@@ -6,8 +6,9 @@ from app import db
 from .base import Base
 from .association_objects import WordInSentence
 from .association_objects import WordInSequence
+from .mixins import NonPrimaryKeyEquivalenceMixin
 
-class Word(db.Model, Base):
+class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     """A model representing a word.
 
     Words are the most basic building blocks of everything.
@@ -30,6 +31,7 @@ class Word(db.Model, Base):
     word = db.Column(db.String, index=True)
     lemma = db.Column(db.String, index=True)
     tag = db.Column(db.String, index=True)
+    parse_id = db.Column(db.Integer, db.ForeignKey("parse_products.id"))
 
     # Relationships
 
@@ -46,3 +48,4 @@ class Word(db.Model, Base):
         """
 
         return "<Word: " + str(self.word) + ">"
+

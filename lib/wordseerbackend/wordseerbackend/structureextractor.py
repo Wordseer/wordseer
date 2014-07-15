@@ -7,14 +7,14 @@
 import json
 from lxml import etree
 
-from .document.document import Document
-from .document.sentence import Sentence
-from .document.unit import Unit
-from .document.metadata import Metadata
+from app.models.document import Document
+from app.models.sentence import Sentence
+from app.models.unit import Unit
+from app.models.property import Property
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
-    JSON file. It generates document classes (Sentences, Documents, Metadatas,
+    JSON file. It generates document classes (Sentences, Documents, Propertys,
     etc.) from the input file.
     """
     def __init__(self, str_proc, structure_file):
@@ -42,14 +42,14 @@ class StructureExtractor(object):
         units = self.extract_unit_information(self.document_structure, doc)
 
         for extracted_unit in units:
-            d = Document(metadata=extracted_unit.metadata,
-                name="document",
+            d = Document(properties=extracted_unit.properties,
                 sentences=extracted_unit.sentences,
                 title=extracted_unit.name,
-                units=extracted_unit.units)
+                children=extracted_unit.children)
             documents.append(d)
 
         return documents
+
 
     def extract_unit_information(self, structure, parent_node):
         """Process the given node, according to the given structure, and return
@@ -68,7 +68,7 @@ class StructureExtractor(object):
             for node in nodes:
                 current_unit = Unit(name=structure["structureName"])
                 # Get the metadata
-                current_unit.metadata = get_metadata(structure, node)
+                current_unit.properties = get_metadata(structure, node)
                 # If there are child units, retrieve them and put them in a
                 # list, otherwise get the sentences
                 children = []
@@ -82,7 +82,7 @@ class StructureExtractor(object):
                     current_unit.sentences = self.get_sentences(structure, node,
                         True)
 
-                current_unit.units = children
+                current_unit.children = children
                 units.append(current_unit)
 
         return units
@@ -99,7 +99,7 @@ class StructureExtractor(object):
 
         result_sentences = [] # a list of sentences
         sentence_text = ""
-        sentence_metadata = [] # List of Metadata objects
+        sentence_metadata = [] # List of Property objects
         unit_xpaths = structure["xpaths"]
 
         for xpath in unit_xpaths:
@@ -112,13 +112,13 @@ class StructureExtractor(object):
             for sentence_node in sentence_nodes:
                 sentence_text += etree.tostring(sentence_node,
                     method="text").strip() + "\n"
-                sentence_metadata.append(get_metadata(structure,
+                sentence_metadata.extend(get_metadata(structure,
                     sentence_node))
 
         if tokenize:
             sents = self.str_proc.tokenize(sentence_text)
             for sent in sents:
-                sent.metadata = sentence_metadata
+                sent.properties = sentence_metadata
                 result_sentences.append(sent)
 
         else:
@@ -128,20 +128,20 @@ class StructureExtractor(object):
 
 
 def get_metadata(structure, node):
-    """Return a list of Metadata objects of the metadata of the Tags in
+    """Return a list of Property objects of the metadata of the Tags in
     node according to the rules in metadata_structure.
 
     If the Tags have attributes, then the value fields of the metadata
     objects will be those attributes. Otherwise, the text in the Tags
     will be the values. property_name is set according to PropertyName in
     metadata_strcuture. specification is set as the object in the JSON
-    file that describes the xpath and propertyName of that Metadata object.
+    file that describes the xpath and propertyName of that Property object.
     This function iterates over every child of metadata in the structure
     file.
 
     :param list structure: A JSON description of the structure
     :param etree node: An lxml element tree to get metadata from.
-    :return list: A list of Metadata objects
+    :return list: A list of Property objects
     """
 
     try:
@@ -149,7 +149,7 @@ def get_metadata(structure, node):
     except KeyError:
         return []
 
-    metadata_list = [] # A list of Metadata
+    metadata_list = [] # A list of Property
 
     for spec in metadata_structure:
         try:
@@ -170,9 +170,9 @@ def get_metadata(structure, node):
             else:
                 extracted = get_xpath_text(xpath, node)
             for val in extracted:
-                metadata_list.append(Metadata(
+                metadata_list.append(Property(
                     value=val,
-                    property_name=spec["propertyName"],
+                    name=spec["propertyName"],
                     specification=spec))
     return metadata_list
 
@@ -240,3 +240,4 @@ def get_nodes_from_xpath(xpath, nodes):
     if len(xpath.strip()) == 0 or nodes in nodes.xpath("../" + xpath):
         return [nodes]
     return nodes.xpath(xpath)
+
