@@ -4,7 +4,7 @@ Methods to handle string parsing, tokenization, tagging, etc.
 
 from corenlp import StanfordCoreNLP
 
-from . import config
+from app import app
 from .document import taggedword, sentence
 from .parser.dependency import Dependency
 from .parser.parseproducts import ParseProducts
@@ -17,7 +17,7 @@ class StringProcessor(object):
         some time.
         """
 
-        self.parser = StanfordCoreNLP(config.CORE_NLP_DIR)
+        self.parser = StanfordCoreNLP(app.config["CORE_NLP_DIR"])
 
     def tokenize(self, txt):
         """Turn a string of one or more sentences into a list of Sentence

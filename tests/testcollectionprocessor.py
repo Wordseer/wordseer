@@ -1,5 +1,4 @@
-"""
-Unit tests for the collectionprocessor module.
+"""Unit tests for the collectionprocessor module.
 """
 
 import mock
@@ -7,7 +6,7 @@ import os
 import unittest
 
 from lib.wordseerbackend.wordseerbackend import collectionprocessor
-from lib.wordseerbackend.wordseerbackend import config
+from app import app
 from lib.wordseerbackend.wordseerbackend.document.document import Document
 from lib.wordseerbackend.wordseerbackend.parser import documentparser
 from lib.wordseerbackend.wordseerbackend.sequence import sequenceprocessor
@@ -217,35 +216,43 @@ class TestCollectionProcessorProcess(unittest.TestCase):
 
         mock_db.reset.assert_called_once()
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.config", autospec=config)
     @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)
-    def test_process_e_r_m(self, mock_logger, mock_config):
+    def test_process_e_r_m(self, mock_logger):
         """Test that extract_record_metadata() is called properly.
         """
         mock_logger.get.side_effect = self.log_dict.__getitem__
         # Should just extract_record_metadata
         self.log_dict["finished_recording_text_and_metadata"] = "false"
-        mock_config.SEQUENCE_INDEXING = False
-        mock_config.PART_OF_SPEECH_TAGGING = False
-        mock_config.GRAMMATICAL_PROCESSING = False
-        colproc.process(*self.args)
+
+        mock_config = {
+            "SEQUENCE_INDEXING": False,
+            "PART_OF_SPEECH_TAGGING": False,
+            "GRAMMATICAL_PROCESSING": False,
+        }
+
+        with mock.patch.dict(app.config, mock_config):
+            colproc.process(*self.args)
 
         assert colproc.extract_record_metadata.called
         assert colproc.calculate_index_sequences.called == False
         assert colproc.parse_documents.called == False
         assert len(colproc.reader_writer.method_calls) == 0
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.config", autospec=config)
     @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)
-    def test_process_parse_documents(self, mock_logger, mock_config):
+    def test_process_parse_documents(self, mock_logger):
         """Test that parse_documents is called properly
         """
         mock_logger.get.side_effect = self.log_dict.__getitem__
 
         # Should only run parse_documents
         self.log_dict["finished_grammatical_processing"] = "false"
-        mock_config.SEQUENCE_INDEXING = False
-        colproc.process(*self.args)
+
+        mock_config = {
+            "SEQUENCE_INDEXING": False
+        }
+
+        with mock.patch.dict(app.config, mock_config):
+            colproc.process(*self.args)
 
         assert colproc.parse_documents.call_count == 1
         assert colproc.calculate_index_sequences.called == False
