@@ -3,7 +3,7 @@
 
 from corenlp import StanfordCoreNLP
 
-from . import config
+from app import app
 from app.models.sentence import Sentence
 from app.models.word import Word
 from app.models.parseproducts import ParseProducts
@@ -17,7 +17,7 @@ class StringProcessor(object):
         some time.
         """
 
-        self.parser = StanfordCoreNLP(config.CORE_NLP_DIR)
+        self.parser = StanfordCoreNLP(app.config["CORE_NLP_DIR"])
 
     def tokenize(self, txt):
         """Turn a string of one or more ``Sentence``\s into a list of
