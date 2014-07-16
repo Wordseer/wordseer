@@ -11,9 +11,22 @@ from .. import wordseer
 from .. import helpers
 
 
-class User(View):
+class UserView(View):
     """Called by signIn in user.js in service of
     all main application web pages, to handle user authentication.
     Returns a JSON object containing user data or information about
     errors."""
-    pass
+    # php equivalent: user/user.php
+    
+    def __init__(self, operation):
+        """deal with all the variables"""
+        # for use in dispatch_request
+        self.operation = operation
+
+    def dispatch_request(self):
+        operations = {
+            
+        }
+
+        result = operations[self.operation](self)
+        return jsonify(result)

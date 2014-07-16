@@ -10,7 +10,7 @@ from app.models.flask_security import User
 from app.models.sets import Set
 from app.wordseer import wordseer
 
-class CRUD(View):
+class SetsView(View):
     """CRUD ``Set``s"""
     def __init__(self):
         """initialize variables needed for ``Set`` operations
@@ -372,4 +372,4 @@ class CRUD(View):
         return jsonify(result)
 
 # routing instructions
-wordseer.add_url_rule('/api/sets/', view_func=CRUD.as_view("sets"))
+wordseer.add_url_rule('/api/sets/', view_func=SetsView.as_view("sets"))

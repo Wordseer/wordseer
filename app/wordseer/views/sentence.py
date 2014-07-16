@@ -11,8 +11,8 @@ from .. import wordseer
 from .. import helpers
 
 
-class WordFrequenciesView(View):
-    """Utilities for fetching word counts over a dimension of metadata"""
+class SentenceView(View):
+    """Utilities and functions for getting a specific set of sentences"""
     def __init__(self, operation):
         """deal with all the variables"""
         # for use in dispatch_request
@@ -22,17 +22,17 @@ class WordFrequenciesView(View):
     # endpoint methods
     #===========================================================================
     
-    def bar_chart(self):
-        # php equivalent: word-frequencies/bar-charts.php
+    def get_sentence(self):
+        # php equivalent: stripvis/getsentence.php
         pass
     
     def dispatch_request(self):
         operations = {
-            "bar_chart": self.bar_chart,
+            "get_sentence": self.get_sentence,
         }
 
         result = operations[self.operation](self)
         return jsonify(result)
-    
-wordseer.add_url_rule("/api/word_frequencies/bar_chart",
-    view_func=WordFrequenciesView.as_view("word_freq_bar_chart", "bar_chart"))
+
+wordseer.add_url_rule("/api/sentences/get_sentence/",
+    view_func=SentenceView.as_view("sentence_get", "get_sentence"))

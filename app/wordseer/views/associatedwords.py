@@ -15,6 +15,7 @@ from .. import helpers
 
 from ...models import CachedSentences, WordInSentence
 
+# TODO: refactor as a single class with a dispatch method
 class GetAssociatedWords(View):
     """Return adjectives, nouns, and verbs with high TF-IDF scores that
     tend to occur within 10 sentences of the given word.

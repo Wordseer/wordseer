@@ -14,6 +14,8 @@ from .. import wordseer
 from ...models import PropertyMetadata, Property, Sequence, SequenceInSentence
 from app import db
 
+# TODO: update existing code, refactor
+
 class AutoSuggest(View):
     """Retrieve a list of suggested ``Set``\s, ``Sequence``\s, and
     ``Property``\s.
