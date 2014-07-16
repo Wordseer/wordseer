@@ -36,9 +36,6 @@ Ext.define('WordSeer.controller.WindowingController', {
 				navButtonClicked: function(panel, type) {
 					console.log("Nav button of type " + type + " clicked");
 					switch (type) {
-						case 'move':
-							this.movePanel(panel); //TODO implement this.
-							break;
 						case 'close':
 							this.closeToolClicked(panel);
 							break;
