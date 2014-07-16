@@ -1,4 +1,5 @@
-/* Copyright 2012 Aditi Muralidharan. See the file "LICENSE" for the full license governing this code. */
+/* Copyright 2012 Aditi Muralidharan. See the file "LICENSE" for the full 
+ * license governing this code. */
 /** Displays a single widget and tools for navigating search history, adding
 other panel, and switching searches between widgets.
 */
@@ -36,7 +37,7 @@ Ext.define('WordSeer.view.windowing.viewport.LayoutPanel',  {
             };
         });
         // Create the DOMHelpers for the buttons.
-        var button_actions = ['forward','back', 'close','save','move'];
+        var button_actions = ['forward','back', 'close','save'];
         var nav_controls = button_actions.map(function(action) {
             return {
                 tag: 'span',
