@@ -8,7 +8,7 @@ import unittest
 
 from lib.wordseerbackend.wordseerbackend import collectionprocessor
 from lib.wordseerbackend.wordseerbackend import config
-from lib.wordseerbackend.wordseerbackend.document.document import Document
+from app.models.document import Document
 from lib.wordseerbackend.wordseerbackend.parser import documentparser
 from lib.wordseerbackend.wordseerbackend.sequence import sequenceprocessor
 from lib.wordseerbackend.wordseerbackend import stringprocessor
@@ -208,14 +208,6 @@ class TestCollectionProcessorProcess(unittest.TestCase):
 
         # Reset the previously used mocks
         mock_writer.reset_mock()
-
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.database")
-    def test_process_reset(self, mock_db):
-        """Test that database reset works properly.
-        """
-        colproc.process("", "", "", True)
-
-        mock_db.reset.assert_called_once()
 
     @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.config", autospec=config)
     @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)

@@ -10,6 +10,7 @@ __pycache__
 
 # Database
 *.db
+db
 
 # Documentation
 docs/build

@@ -5,9 +5,10 @@ Tests for the SequenceProcessor class.
 import mock
 import unittest
 
+from app.models.document import Document
 from lib.wordseerbackend.wordseerbackend.database.readerwriter import ReaderWriter
-from lib.wordseerbackend.wordseerbackend.document.taggedword import TaggedWord
-from lib.wordseerbackend.wordseerbackend.document.sentence import Sentence
+from app.models.word import Word
+from app.models.sentence import Sentence
 from lib.wordseerbackend.wordseerbackend.sequence.sequenceprocessor import (SequenceProcessor,
     join_tws, LEMMA, WORD)
 
@@ -20,9 +21,9 @@ class SequenceProcessorTests(unittest.TestCase):
         mock_reader_writer = mock.create_autospec(ReaderWriter)
         self.seq_proc = SequenceProcessor(mock_reader_writer)
 
-        self.words = [TaggedWord(lemma="first", word="first"),
-            TaggedWord(lemma="second", word="second"),
-            TaggedWord(lemma="third", word="third")]
+        self.words = [Word(lemma="first", word="first"),
+            Word(lemma="second", word="second"),
+            Word(lemma="third", word="third")]
         self.string = "first second third"
 
     def test_join_lemmas(self):
@@ -38,35 +39,38 @@ class SequenceProcessorTests(unittest.TestCase):
     def test_remove_stops(self):
         """Test remove_stops()
         """
-        with_stops = [TaggedWord(word="."),
-            TaggedWord(word="a"),
-            TaggedWord(word="around"),
-            TaggedWord(word="empire"),
-            TaggedWord(word="!"),
-            TaggedWord(word="Camelot"),
-            TaggedWord(word="theirs"),
-            TaggedWord(word="who"),
-            TaggedWord(word="wouldst"),
-            TaggedWord(word="were"),
-            TaggedWord(word="again")]
+        with_stops = [Word(word="."),
+            Word(word="a"),
+            Word(word="around"),
+            Word(word="empire"),
+            Word(word="!"),
+            Word(word="Camelot"),
+            Word(word="theirs"),
+            Word(word="who"),
+            Word(word="wouldst"),
+            Word(word="were"),
+            Word(word="again")]
 
-        without_stops = [TaggedWord(word="empire"),
-            TaggedWord(word="Camelot")]
+        without_stops = [Word(word="empire"),
+            Word(word="Camelot")]
+
+        removed = self.seq_proc.remove_stops(with_stops)
 
         self.failUnless(self.seq_proc.remove_stops(with_stops) == without_stops)
 
     def test_process(self):
         """Test process()
         """
+        document = Document()
         sentence = Sentence(text="The quick brown fox jumped over the lazy dog",
-            tagged=[TaggedWord(lemma="the", word="the"),
-                TaggedWord(lemma="fox", word="fox"),
-                TaggedWord(lemma="jump", word="jumped"),
-                TaggedWord(lemma="over", word="over"),
-                TaggedWord(lemma="the", word="the"),
-                TaggedWord(lemma="dog", word="dog")],
+            words=[Word(lemma="the", word="the"),
+                Word(lemma="fox", word="fox"),
+                Word(lemma="jump", word="jumped"),
+                Word(lemma="over", word="over"),
+                Word(lemma="the", word="the"),
+                Word(lemma="dog", word="dog")],
             id=1,
-            document_id=2)
+            document=document)
         result = self.seq_proc.process(sentence)
         sequences = split_sequences(result)
         sequence_sequences = get_sequence_text(sequences)
@@ -147,11 +151,11 @@ def split_sequences(sequences):
 
     for sequence in sequences:
         seq_type = "words"
-        if sequence.is_lemmatized:
+        if sequence["is_lemmatized"]:
             seq_type = "lemmas"
 
         stops = "nostops"
-        if sequence.has_function_words:
+        if sequence["has_function_words"]:
             stops = "stops"
 
         result[seq_type][stops].append(sequence)
@@ -167,7 +171,7 @@ def get_sequence_text(sequences):
     for seq_type, stop_types in sequences.items():
         for stop_type, seq_list in stop_types.items():
             for i in range(0, len(seq_list)): #TODO: more pythonic?
-                sequences[seq_type][stop_type][i] = seq_list[i].sequence
+                sequences[seq_type][stop_type][i] = seq_list[i]["sequence"]
 
     return sequences
 
