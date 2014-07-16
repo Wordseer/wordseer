@@ -95,12 +95,17 @@ class DependencyInSentence(db.Model, Base):
             ``dependency`` in ``sentence``.
         dependent_index (int): The position (0-indexed) of the dependent of
             ``dependency`` in ``sentence``.
+        governor_pos (str): The part of speech of the governor.
+        dependent_pos (str): The part of speech of the dependency.
     """
+    #TODO: is POS redundant here?
 
     dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id"))
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     governor_index = db.Column(db.Integer)
     dependent_index = db.Column(db.Integer)
+    governor_pos = db.Column(db.String)
+    dependent_pos = db.Column(db.String)
 
     dependency = db.relationship("Dependency",
         backref=db.backref(
@@ -113,3 +118,4 @@ class DependencyInSentence(db.Model, Base):
             "dependency_in_sentence", cascade="all, delete-orphan"
         )
     )
+

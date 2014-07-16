@@ -7,7 +7,7 @@ from datetime import datetime
 import os
 
 from . import config
-from .database.database import Database
+import database
 from . import logger
 from .parser.documentparser import DocumentParser
 from .sequence.sequenceprocessor import SequenceProcessor
@@ -21,7 +21,7 @@ class CollectionProcessor(object):
         self.reader_writer = reader_writer
         self.str_proc = StringProcessor()
 
-    @profile
+    #@profile
     def process(self, collection_dir, docstruc_filename,
         filename_extension, start_from_scratch):
         """
@@ -44,8 +44,7 @@ class CollectionProcessor(object):
         """
 	# Set up database if necessary
         if start_from_scratch is True:
-            with Database() as database:
-                database.reset()
+            database.reset()
 
         # Extract metadata, populate documents, sentences, and doc structure
         # tables

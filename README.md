@@ -40,10 +40,6 @@ more maintainable python.
 
     to migrate the model schema into the database.
 
-### Testing
-1. Simply run `runtests.py`:
-
-        python runtests.py
 
 ### Documentation
 Documentation is
@@ -87,20 +83,11 @@ Or, on windows, simply run `make.bat`.
         unzip stanford-corenlp-full-2013-06-20.zip
         mv stanford-corenlp-full-2013-06-20 stanford-corenlp
 
-3. In the `lib/wordseerbackend` directory, run:
-
-        python createdb.py
-
-4. After installing the above dependencies, make sure you edit
+2. After installing the above dependencies, make sure you edit
 `lib/wordseerbackend/wordseerbackend/config.py` for your setup. Particularly
 make sure to point `CORE_NLP_DIR` to the Stanford NLP library. You should then
 be ready to parse files. Example XML and JSON files are included in
 `tests/data`.
-
-### Testing
-1. From `lib/wordseerbackend`, run the following:
-
-        python runtests.py
 
 ### Documentation
 Documentation is
@@ -111,4 +98,9 @@ build it yourself:
 	make html
 
 Or, on windows, simply run `make.bat` in the same directory.
+
+## Testing
+1. Simply run `runtests.py`:
+
+        python runtests.py
 

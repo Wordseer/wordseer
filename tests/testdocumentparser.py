@@ -1,15 +1,16 @@
+"""Tests for the DocumentParser.
 """
-Tests for the DocumentParser.
-"""
-
 import unittest
-from mock import MagicMock, patch, call
+from mock import MagicMock, patch, call, create_autospec
 
-from wordseerbackend.document.sentence import Sentence
-from wordseerbackend.document.parsedparagraph import ParsedParagraph
-from wordseerbackend.parser import documentparser
+from app.models.document import Document
+from app.models.sentence import Sentence
+from app.models.parsedparagraph import ParsedParagraph
+from lib.wordseerbackend.wordseerbackend.parser import documentparser
+from lib.wordseerbackend.wordseerbackend.stringprocessor import StringProcessor
 
-@patch("wordseerbackend.parser.documentparser.logger")
+@patch("lib.wordseerbackend.wordseerbackend.parser.documentparser.logger",
+    autospec=True)
 class DocumentParserTests(unittest.TestCase):
     """Run tests on the DocumentParser.
     """
@@ -17,11 +18,11 @@ class DocumentParserTests(unittest.TestCase):
         """Get the documentparser instance.
         """
         self.mock_reader_writer = MagicMock()
-        self.mock_parser = MagicMock()
-        with patch("wordseerbackend.parser.documentparser.SequenceProcessor"):
+        self.mock_str_proc = MagicMock()
+        with patch("lib.wordseerbackend.wordseerbackend.parser.documentparser.SequenceProcessor"):
             self.docparser = documentparser.DocumentParser(
                 self.mock_reader_writer,
-                self.mock_parser)
+                self.mock_str_proc)
 
     def test_write_and_parse(self, mock_logger):
         """Test the write_and_parse method.
@@ -60,7 +61,7 @@ class DocumentParserTests(unittest.TestCase):
 
         self.mock_reader_writer.write_sequences.assert_called_once_with()
 
-    def test_parse_document_long(self, mock_logger):
+    def test_parse_document(self, mock_logger):
         """Test the parse_document method.
 
         This method supplies a document of sixty sentences to make sure that
@@ -68,24 +69,25 @@ class DocumentParserTests(unittest.TestCase):
         parse_document().
         """
         latest_sent = 5
+        runs = 60
         # Mock out the write_and_parse method
         self.docparser.write_and_parse = MagicMock()
 
         # Simulate a logger
-        attrs = {"get.return_value": "5"}
+        attrs = {"get.return_value": str(latest_sent)}
         mock_logger.configure_mock(**attrs)
 
         # Simulate a document with lots of sentences
         mock_sents = []
-        for i in range(0, 60):
+        for i in range(0, runs):
             mock_sents.append(MagicMock(id=i, name="Sentence " + str(i)))
 
-        mock_doc = MagicMock(sentences=mock_sents)
+        mock_doc = create_autospec(Document, sentences=mock_sents)
 
         # Configure the mock parser
         mock_products = MagicMock(name="Mock products")
         attrs = {"parse.return_value": mock_products}
-        self.mock_parser.configure_mock(**attrs)
+        self.mock_str_proc.configure_mock(**attrs)
 
         # Run the method
         self.docparser.parse_document(mock_doc)
@@ -95,22 +97,23 @@ class DocumentParserTests(unittest.TestCase):
 
         # The parser should have only been called on sentences with an id > 5
         parse_calls = []
-        for i in range(latest_sent + 1, 60):
-            parse_calls.append(call(mock_sents[i].sentence))
-        self.mock_parser.parse.assert_has_calls(parse_calls, any_order=True)
+        for i in range(latest_sent + 1, runs):
+            parse_calls.append(call(mock_sents[i].text))
+        self.mock_str_proc.parse.assert_has_calls(parse_calls, any_order=True)
 
         # Write and parse should have been called once for every block of 50
+        parsed = ParsedParagraph()
         rw_calls = []
-        parsed = ParsedParagraph()
-        for i in range(latest_sent + 1, 60 - latest_sent + 1):
+        max_id = 0
+        for i in range(latest_sent + 1, runs):
             parsed.add_sentence(mock_sents[i], mock_products)
+            max_id = i
+            if len(parsed.sentences) % 50 == 0:
+                rw_calls.append(call(parsed, i))
+                parsed = ParsedParagraph()
 
-        rw_calls.append(call(parsed, 60 - latest_sent))
-        parsed = ParsedParagraph()
+        rw_calls.append(call(parsed, max_id))
 
-        for i in range(60 - latest_sent + 1, 60):
-            parsed.add_sentence(mock_sents[i], mock_products)
-
-        rw_calls.append(call(parsed, 59))
         self.docparser.write_and_parse.assert_has_calls(rw_calls,
             any_order=True)
+
