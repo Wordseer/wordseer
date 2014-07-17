@@ -13,7 +13,7 @@ class WordInSentence(db.Model, Base):
         sentence (Sentence): The ``Sentence`` in this relationship.
         position (int): The position of ``word`` in ``sentence``.
         space_before (str): The space before ``word`` (if any).
-        tag (str): The part of speech of ``word``.
+        part_of_speech (str): The part of speech of ``word``.
         surface (str): The ``Word`` with exact capitalization.
     """
 
@@ -21,7 +21,7 @@ class WordInSentence(db.Model, Base):
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     position = db.Column(db.Integer)
     space_before = db.Column(db.String)
-    tag = db.Column(db.String)
+    part_of_speech = db.Column(db.String)
     surface = db.Column(db.String)
 
     sentence = db.relationship("Sentence",
@@ -95,8 +95,8 @@ class DependencyInSentence(db.Model, Base):
             ``dependency`` in ``sentence``.
         dependent_index (int): The position (0-indexed) of the dependent of
             ``dependency`` in ``sentence``.
-        governor_pos (str): The part of speech of the governor.
-        dependent_pos (str): The part of speech of the dependency.
+        governor_part_of_speech (str): The part of speech of the governor.
+        dependent_part_of_speech (str): The part of speech of the dependency.
     """
     #TODO: is POS redundant here?
 
@@ -104,8 +104,8 @@ class DependencyInSentence(db.Model, Base):
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     governor_index = db.Column(db.Integer)
     dependent_index = db.Column(db.Integer)
-    governor_pos = db.Column(db.String)
-    dependent_pos = db.Column(db.String)
+    governor_part_of_speech = db.Column(db.String)
+    dependent_part_of_speech = db.Column(db.String)
 
     dependency = db.relationship("Dependency",
         backref=db.backref(
