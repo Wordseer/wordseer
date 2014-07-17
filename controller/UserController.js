@@ -8,7 +8,7 @@ Ext.define('WordSeer.controller.UserController', {
 		'desktop.topbar.User',
 	],
 	init: function() {
-		console.log('User Controller Loaded');
+//		console.log('User Controller Loaded');
 		this.control({
 			'user-button': {
 				click: function(button) {
@@ -166,7 +166,7 @@ Ext.define('WordSeer.controller.UserController', {
 	src/php/user/user.php.
 	*/
     processUserData:function(response){
-      console.log(response);
+//      console.log(response);
         data = Ext.decode(response.responseText);
     	if(data.error == "no-error"){
     		setUsername(data.username)  // in util.js

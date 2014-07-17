@@ -7,6 +7,5 @@ Ext.define('WordSeer.view.search.SentenceSetComboBox',{
         this.callParent();
         this.store = SENTENCE_COLLECTIONS_LIST_STORE;
         this.store.refreshStore();
-        console.log('using sentence collections combo box'); //TODO delete
     },
 });

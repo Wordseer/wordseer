@@ -148,7 +148,7 @@ Ext.define('WordSeer.view.desktop.panel.Panel',{
             me.populate();
         },
         navButtonClicked: function(me, type) {
-            console.log('Nav button of type ' + type + ' clicked');
+//            console.log('Nav button of type ' + type + ' clicked');
         }
     },
 

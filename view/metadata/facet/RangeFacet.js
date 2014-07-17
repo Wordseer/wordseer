@@ -214,7 +214,7 @@ Ext.define('WordSeer.view.metadata.facet.RangeFacet',{
 					  .style("display", "none")
 					  .on("click", function() {
 					  	var extent = brush.extent()
-					  	console.log(extent);
+//					  	console.log(extent);
 					    panel.fireEvent("filter",
 					    	panel,
 					    	panel.formatter(extent[0]),

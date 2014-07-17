@@ -28,7 +28,7 @@ Ext.define('WordSeer.controller.PhraseSetsController', {
 	],
 	init: function() {
 		this.refreshPhraseSetList();
-		console.log('PhraseSet controller initialized');
+//		console.log('PhraseSet controller initialized');
 		this.control({
 			'phrase-set-tag-list': {
 				optionEvent: function(view, event,  option, option_el) {
@@ -286,7 +286,7 @@ Ext.define('WordSeer.controller.PhraseSetsController', {
 			var record = menuitem.getPhraseSet();
 			var word = menuitem.getCurrent().get('word');
 			record.addWords(word, function(){
-				console.log("loading word set store after adding");
+//				console.log("loading word set store after adding");
 				this.refreshPhraseSetList();
 				this.getController('MetadataController').subsetsChanged();
 			}, this)

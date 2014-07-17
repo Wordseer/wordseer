@@ -76,7 +76,7 @@
 		var viewport = Ext.ComponentQuery.query('viewport')[0];
 		Ext.destroy(window);
 		viewport.add({xtype:'progresslogwatcher', instanceId:instanceId});
-		console.log('Started processing');
+//		console.log('Started processing');
 		Ext.ComponentQuery
 				.query('progresslogwatcher')[0].show()
 	},

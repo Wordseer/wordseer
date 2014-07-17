@@ -24,7 +24,7 @@ Ext.define('WordSeer.controller.SetsController', {
 	init: function() {
 		Ext.getStore('DocumentSetStore').load({params:{user:getUsername()}});
 		Ext.getStore('SentenceSetStore').load({params:{user:getUsername()}});
-		console.log('SetsController initialized');
+//		console.log('SetsController initialized');
 		this.control({
 			'layout-panel': {
 				menuButtonClicked: function(panel, type, button) {

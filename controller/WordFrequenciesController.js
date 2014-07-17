@@ -9,7 +9,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		'visualize.wordfrequencies.WordFrequencies',
 	],
 	init:function() {
-		console.log('Word Frequencies Controller Initialized');
+//		console.log('Word Frequencies Controller Initialized');
 		this.control({
 			'word-frequencies': {
 				'search': this.requestWordFrequenciesData,
@@ -54,7 +54,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 	@param {Ext.form.field.Combobox} combobox The "top N" combobox
 	*/
 	changeTopN: function(combobox) {
-		console.log("changed");
+//		console.log("changed");
 	  	var value = combobox.getValue();
 	  	var panel = combobox.up('word-frequencies');
 	  	panel.top_n = value;
@@ -112,7 +112,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 	rendered.
 	*/
 	requestWordFrequenciesData: function(formValues, word_frequencies_panel) {
-		console.log("requested word frequencies data");
+//		console.log("requested word frequencies data");
 		word_frequencies_panel.getEl().mask('loading');
 		var values = formValues.serialize();
 		Ext.Ajax.request({

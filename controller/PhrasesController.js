@@ -16,7 +16,7 @@ Ext.define('WordSeer.controller.PhrasesController', {
 		'frequentwords.FrequentWordsList',
 	],
 	init: function() {
-		console.log('Phrases controller initialized');
+//		console.log('Phrases controller initialized');
 		this.control({
 			'layout-panel': {
 				newSlice: this.getFrequentPhrasesForSlice

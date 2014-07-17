@@ -27,14 +27,14 @@ Ext.define('WordSeer.controller.WindowingController', {
 		'menu.ResultListMenu'
 	],
 	init: function() {
-		console.log('Windowing Controller Loaded');
+//		console.log('Windowing Controller Loaded');
 		this.control({
 			'windowing-viewport': {
 				afterrender: this.start,
 			},
 			'layout-panel' : {
 				navButtonClicked: function(panel, type) {
-					console.log("Nav button of type " + type + " clicked");
+//					console.log("Nav button of type " + type + " clicked");
 					switch (type) {
 						case 'close':
 							this.closeToolClicked(panel);

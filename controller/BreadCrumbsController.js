@@ -56,7 +56,7 @@ Ext.define('WordSeer.controller.BreadCrumbsController', {
                                 values.search.splice(i, 1)
                             }
                         }
-                        console.log(values.search);
+//                        console.log(values.search);
                         if (values.search.length > 0) {
                             var new_search = values.search[0];
                             values.gov = new_search.gov;

@@ -87,7 +87,7 @@ Ext.define('WordSeer.view.treepanel.MultiTable', {
 			this.sort(me, columnDefinition);
 		});
 		this.addListener('toggle', function(me, element, record) {
-			console.log(record);
+//			console.log(record);
 		});
 		this.autoEl.cls = 'multitable';
 		var body = this.autoEl.children.filter(function(domHelper) {

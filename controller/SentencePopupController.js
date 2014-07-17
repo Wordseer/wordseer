@@ -4,7 +4,7 @@
 		'visualize.wordtree.SentencePopup',
 	],
 	init: function() {
-		console.log('SentencePopup Controller initialized');
+//		console.log('SentencePopup Controller initialized');
 		this.control({
 			'sentence-popup': {
 				'mouseenter': this.sentencePopupMouseEnter,

@@ -93,11 +93,11 @@
             var ot = OrganizeTool.getInstance();
             var canvas = ot.canvas;
             
-            console.log(element.id);
+//            console.log(element.id);
             
             var children = canvas.selectAll(".foreground").select(function(d) {
                 if(GroupHierarchy.isDescendant(this, element, canvas) ) {
-                    console.log("child: " + this.id);
+//                    console.log("child: " + this.id);
                     return this;
                 }
                 else {
@@ -105,7 +105,7 @@
                 }
             });
             
-            console.log(children);
+//            console.log(children);
             
             children.each(function(d) {
                 Color.changeColor(this, color);

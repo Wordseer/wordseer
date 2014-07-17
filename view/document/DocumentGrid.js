@@ -17,7 +17,7 @@ Ext.define('WordSeer.view.document.DocumentGrid',{
                 console.time('document-grid drawn');
             },
             added: function() {
-                console.log('hi');
+//                console.log('hi');
                 console.timeEnd('document-grid drawn');
             }
         }

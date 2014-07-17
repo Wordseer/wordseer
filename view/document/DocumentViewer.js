@@ -37,8 +37,8 @@ Ext.define('WordSeer.view.document.DocumentViewer', {
         var t1 = new Date();
         this.drawDocument();
         var t2 = new Date();
-        console.log("Time to draw HTML: " +
-            ((t2.getTime() - t1.getTime())/1000)+"s");
+//        console.log("Time to draw HTML: " +
+//            ((t2.getTime() - t1.getTime())/1000)+"s");
         if (this.sentence_id) {
             this.scrollToSentence(this.sentence_id);
         }
@@ -108,7 +108,7 @@ Ext.define('WordSeer.view.document.DocumentViewer', {
         }
         html.append('</div>')
         html.append('</div class="unit">');
-        console.log("drawing unit: " + unit.unit_id);
+//        console.log("drawing unit: " + unit.unit_id);
     },
 
     /** Adds HTML for the given sentence to the string buffer containing the

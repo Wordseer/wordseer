@@ -51,7 +51,7 @@ Ext.define('WordSeer.controller.HistoryController', {
 		store.insert(0, history_item);
 		store.setCurrent(history_item);
 		store.sync();
-		console.log(store.count());
+//		console.log(store.count());
 		return history_item;
 	},
 

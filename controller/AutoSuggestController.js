@@ -19,7 +19,7 @@ Ext.define('WordSeer.controller.AutoSuggestController', {
 	],
 
 	init: function() {
-		console.log("Initialized autosuggest controller");
+//		console.log("Initialized autosuggest controller");
 		this.control({
 			'phrases-autosuggest-menuitem': {
 				//highlight: this.showGrammaticalPhrasesOverlay

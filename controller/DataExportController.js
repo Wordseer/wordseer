@@ -7,7 +7,7 @@ Ext.define('WordSeer.controller.DataExportController', {
 		'export.ExportableTable',
 	],
 	init: function() {
-		console.log("Initialized data export controller");
+//		console.log("Initialized data export controller");
 		this.control({
 			'tool[action=export-metadata]': {
 				'click': this.exportMetadata,

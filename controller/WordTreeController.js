@@ -8,7 +8,7 @@ Ext.define('WordSeer.controller.WordTreeController', {
 		'visualize.wordtree.SentencePopup',
 	],
 	init:function() {
-		console.log('WordTree Controller Initialized');
+//		console.log('WordTree Controller Initialized');
 		this.control({
 			'word-tree': {
 				// 'filter': function(view, selected_phrase, main_phrase) {

@@ -169,7 +169,7 @@ Ext.define('WordSeer.controller.MetadataController', {
             panel.getLayoutPanelModel().getMetadataListStore().load(
                 {params:formValues.serialize()});
             this.getMetadata(formValues, panel);
-            console.log('Loading metadata');
+//            console.log('Loading metadata');
         }
     },
 

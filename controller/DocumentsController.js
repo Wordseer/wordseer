@@ -24,7 +24,7 @@ Ext.define('WordSeer.controller.DocumentsController', {
 		'sentence.SentenceList'
 	],
 	init: function() {
-		console.log('Document controller initialized');
+//		console.log('Document controller initialized');
 		Ext.Ajax.request({
 			url:'../../src/php/document/get-metadata-fields.php',
 			method:'GET',

@@ -28,7 +28,7 @@ Ext.define('WordSeer.controller.WordMenuController',{
 		'WordModel',
 	],
 	init: function() {
-		console.log('WordMenu controller initialized.');
+//		console.log('WordMenu controller initialized.');
 		this.control({
 			'document-viewer, sentence-list': {
 				wordclicked: this.fromHTMLSpan

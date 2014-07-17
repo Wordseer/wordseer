@@ -8,7 +8,7 @@ Ext.define('WordSeer.controller.ColumnVisController', {
 		'WordSeer.view.visualize.columnvis.ColumnVis',
 	],
 	init: function() {
-        console.log('SentencePopup controller Initialized');
+//        console.log('SentencePopup controller Initialized');
 		this.control({
 			'column-vis': {
 				'search': this.requestColumnVisData,
