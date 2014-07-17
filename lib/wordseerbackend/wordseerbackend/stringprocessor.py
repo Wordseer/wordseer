@@ -45,11 +45,11 @@ class StringProcessor(object):
 
         # This isn't a perfect way to check how many words are in a sentence,
         # but it's not so bad.
-        if len(sent.split(" ")) > max_length:
+        if len(sent.text.split(" ")) > max_length:
             raise ValueError("Sentence appears to be too long, max length " +
                 "is " + str(max_length))
 
-        parsed = self.parser.raw_parse(sent)
+        parsed = self.parser.raw_parse(sent.text)
         parsed_sentence = parsed["sentences"][0]
         dependencies = []
 
@@ -64,21 +64,31 @@ class StringProcessor(object):
                 dep_index = int(dependency[4]) - 1
                 governor_pos = parsed_sentence["words"][gov_index][1]\
                     ["PartOfSpeech"]
+                governor_lemma = parsed_sentence["words"][gov_index][1]\
+                    ["Lemma"]
 
                 dependent_pos = parsed_sentence["words"][dep_index][1]\
                     ["PartOfSpeech"]
+                dependent_lemma = parsed_sentence["words"][dep_index][1]\
+                    ["Lemma"]
 
                 dependencies.append({
                     "grammatical_relationship": dependency[0],
                     "governor": dependency[1],
                     "governor_index": gov_index,
                     "governor_pos": governor_pos,
+                    "governor_lemma": governor_lemma,
                     "dependent": dependency[3],
                     "dependent_index": dep_index,
-                    "dependent_pos": dependent_pos})
+                    "dependent_pos": dependent_pos,
+                    "dependent_lemma": dependent_lemma,
+                    "sentence_id": sent.id,
+                })
 
-        return ParseProducts(parsed["sentences"][0]["parsetree"],
-            dependencies, tokenize_from_raw(parsed, sent)[0].tagged)
+        parse_product = { "dependencies": dependencies } # add other keys as needed
+        # return ParseProducts(parsed["sentences"][0]["parsetree"],
+        #     dependencies, tokenize_from_raw(parsed, sent)[0].tagged)
+        return parse_product
 
 def tokenize_from_raw(parsed_text, txt):
     """Given the output of a call to raw_parse, produce a list of Sentences
@@ -97,20 +107,20 @@ def tokenize_from_raw(parsed_text, txt):
         word_list = [] # a list of words
         tagged_words = [] # a list of Words
         sent_text = s["text"]
-        sentence = Sentence(text=sent_text)
+        sentence = { "text": sent_text }
 
         for w in s["words"]:
-            #FIXME not quite right
-            tw = Word(word=w[0], tag=w[1]["PartOfSpeech"],
-                lemma=w[1]["Lemma"])
+            word = w[0]
+            tag = w[1]["PartOfSpeech"]
+            lemma = w[1]["Lemma"]
 
-            if txt[int(w[1]["CharacterOffsetBegin"])] != " ":
-                tw.space_before = ""
+            # TODO: proper space_before implementation
 
-            word_list.append(w[0])
-            tagged_words.append(tw)
+            tagged_word = { "word": word, "tag": tag, "lemma": lemma }
 
-        sentence.tagged_words = tagged_words
+            tagged_words.append(tagged_word)
+
+        sentence["words"] = tagged_words
         paragraph.append(sentence)
 
     return paragraph

@@ -35,7 +35,7 @@ class DocumentParser(object):
 
         start_time = datetime.now()
         count = 0
-        parsed = ParsedParagraph()
+        products = []
 
         try:
             current_max = int(logger.get(LATEST_SENT_ID))
@@ -43,13 +43,10 @@ class DocumentParser(object):
             current_max = 0
             logger.log(LATEST_SENT_ID, str(current_max), logger.REPLACE)
 
-        #TODO: both of the below comments should replace the lines below
-        # them once the pipeline is integrated with the main application
-        #for sentence in document.all_sentences:
         for sentence in document.all_sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
-                parse_products = self.parser.parse(sentence.text)
-                parsed.add_sentence(sentence, parse_products)
+                parsed = self.parser.parse(sentence)
+                products.append(parsed)
                 count += 1
                 current_max = sentence.id
 
@@ -59,10 +56,10 @@ class DocumentParser(object):
                         " sentences: " + str(average_time / count) +
                         " seconds per sentence")
 
-                    self.write_and_parse(parsed, current_max)
+                    self.write_and_parse(products, current_max)
 
-                    parsed = ParsedParagraph()
-        self.write_and_parse(parsed, current_max)
+                    products = []
+        self.write_and_parse(products, current_max)
 
     def write_and_parse(self, products, current_max):
         """Send a ParsedParagraph object to the ReaderWriter for writing, then

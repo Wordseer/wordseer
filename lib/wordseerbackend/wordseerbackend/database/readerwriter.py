@@ -26,61 +26,48 @@ class ReaderWriter:
         relationships = dict()
         dependencies = dict()
 
-        sentence_index = 0
-
-        for i in range(len(products.sentences)):
-            print(products.sentences[i])
-            print(products.parses[i])
-
-        pdb.set_trace()
+        sentence_ids = []
         # Read in the parsed sentences
-        for parse in products.parses:
-
-            sentence = products.sentences[sentence_index]
-            # NOTE: this assumes that the sentence indices match the parses
-
-            # print(parse.__dict__)
-
+        for parse in products:
 
             # Read in the data for each dependency in the sentence
-            for dep in parse.dependencies:
+            for dep in parse["dependencies"]:
                 # print(dep.__dict__)
 
                 # Retrieve the corresponding grammatical relationship, or
                 # create a new grammatical relationship.
+                key = dep["grammatical_relationship"]
 
-                if dep.relationship in relationships.keys():
-                    relationship = relationships[dep.relationship]
+                if key in relationships.keys():
+                    relationship = relationships[key]
                 else:
 
                     try:
                         relationship = GrammaticalRelationship.query.filter_by(
-                            name = dep.relationship
+                            name = key
                         ).one()
                     except(MultipleResultsFound):
                         print("ERROR: duplicate records found for:")
-                        print("\t" + str(dep.relationship))
+                        print("\t" + str(key))
                     except(NoResultFound):
                         relationship = GrammaticalRelationship(
-                            name = dep.relationship
+                            name = key
                         )
                         
-                    relationships[dep.relationship] = relationship
+                    relationships[key] = relationship
 
                 # Read the data for the governor, and find the corresponding word
-                governor_data = parse.pos_tags[dep.gov_index]
                 governor = Word.query.filter_by(
-                    word = governor_data.word[0],
-                    lemma = governor_data.lemma,
-                    tag = governor_data.tag
+                    word = dep["governor"],
+                    lemma = dep["governor_lemma"],
+                    tag = dep["governor_pos"]
                 ).first()
 
                 # Same as above for the dependent in the relationship
-                dependent_data = parse.pos_tags[dep.dep_index]
                 dependent = Word.query.filter_by(
-                    word = dependent_data.word[0],
-                    lemma = dependent_data.lemma,
-                    tag = dependent_data.tag
+                    word = dep["dependent"],
+                    lemma = dep["dependent_lemma"],
+                    tag = dep["dependent_pos"]
                 ).first()
 
                 key = (relationship, governor, dependent)
@@ -108,10 +95,11 @@ class ReaderWriter:
                     dependencies[key] = dependency
 
                 # Add the dependency to the sentence
-                sentence.add_dependency(
+                dependency_in_sentence = DependencyInSentence(
+                    sentence_id = dep["sentence_id"],
                     dependency = dependency,
-                    governor_index = dep.gov_index,
-                    dependent_index = dep.dep_index
+                    governor_index = dep["governor_index"],
+                    dependent_index = dep["dependent_index"],
                 )
 
                 #  print("relationship", relationship)
@@ -119,13 +107,13 @@ class ReaderWriter:
                 #  print("dependent", dependent)
                 #  print("dependency", dependency)
 
+                dependency_in_sentence.save()
                 dependency.save()
-
-            sentence_index += 1
+                sentence_ids.append(dep["sentence_id"])
 
         db.session.commit()
 
-        return products.sentences
+        return [ Sentence.query.get(id) for id in sentence_ids ]
         # TODO: figure out what the output is really supposed to be
 
     def list_document_ids(self):
@@ -189,21 +177,21 @@ class ReaderWriter:
 
         # Find the sentence that this sequence belongs to
         for sequence in sequences:
-            sentence = Sentence.query.get(sequence.sentence_id)
+            sentence = Sentence.query.get(sequence["sentence_id"])
 
             new_sequence = Sequence(
-                sequence = sequence.sequence,
-                lemmatized = sequence.is_lemmatized,
-                has_function_words = sequence.has_function_words,
-                all_function_words = sequence.all_function_words,
-                length = len(sequence.words)
+                sequence = sequence["sequence"],
+                lemmatized = sequence["is_lemmatized"],
+                has_function_words = sequence["has_function_words"],
+                all_function_words = sequence["all_function_words"],
+                length = len(sequence["words"])
             )
 
             #print(new_sequence)
             #print("\n")
 
             new_sequence.save()
-            sentence.add_sequence(new_sequence, sequence.start_position)
+            sentence.add_sequence(new_sequence, sequence["start_position"])
 
 
     def write_sequences(self):
@@ -254,43 +242,44 @@ def _init_unit(unit, document):
 
     words = dict()
 
-    for sentence in unit.sentences:
+    for sentence_data in unit.sentence_data:
+        sentence = Sentence(text=sentence_data["text"])
         sentence.document = document
 
         position = 0
-        for word in sentence.tagged_words:
+        for word_data in sentence_data["words"]:
 
-            key = (word.word, word.lemma, word.tag)
+            key = (word_data["word"], word_data["lemma"], word_data["tag"])
 
             if key in words.keys():
-                new_word = words[key]
-                print("In dict " + str(new_word))
+                word = words[key]
+                print("In dict " + str(word))
             else:
 
                 try:
-                    new_word = Word.query.filter_by(
-                        word = key[0],
-                        lemma = key[1],
-                        tag = key[2]
+                    word = Word.query.filter_by(
+                        word = word_data["word"],
+                        lemma = word_data["lemma"],
+                        tag = word_data["tag"]
                     ).one()
-                    print("Found word " + str(new_word))
+                    print("Found word " + str(word))
                 except(MultipleResultsFound):
                     print("ERROR: duplicate records found for:")
                     print("\t" + str(key))
                 except(NoResultFound):
-                    new_word = Word(
+                    word = Word(
                         word = key[0],
                         lemma = key[1],
                         tag = key[2]
                     )
-                    print("New word " + str(new_word))
+                    print("New word " + str(word))
                     
-                words[key] = new_word
+                words[key] = word
 
             sentence.add_word(
-                word = new_word,
+                word = word,
                 position = position,
-                space_before = word.space_before,
+                space_before = "", # word["space_before"],
                 tag = word.tag
             )
 

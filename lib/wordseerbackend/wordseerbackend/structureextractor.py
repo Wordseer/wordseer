@@ -79,7 +79,7 @@ class StructureExtractor(object):
                             node)
                         )
                 else:
-                    current_unit.sentences = self.get_sentences(structure, node,
+                    current_unit.sentence_data = self.get_sentences(structure, node,
                         True)
 
                 current_unit.children = children
@@ -118,7 +118,7 @@ class StructureExtractor(object):
         if tokenize:
             sents = self.str_proc.tokenize(sentence_text)
             for sent in sents:
-                sent.properties = sentence_metadata
+                sent["properties"] = sentence_metadata
                 result_sentences.append(sent)
 
         else:
