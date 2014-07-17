@@ -221,6 +221,16 @@ var NodeModel = function() {
         self.attributes.titleId = id;
         self.attributes.titleXPaths = self.map[id].attributes.xpaths[0];
     };
+    self.resetTitleNode = function()
+    {
+        self.setTitleAsXPath('');
+        var tid = self.attributes.titleId;
+        self.map[tid].rename('');
+        self.map[tid].attributes.isTitle = false;
+        self.attributes.titleId = '';
+        self.attributes.titleXPaths = '';
+
+    };
     self.hasChildren = function() {
         return self.attributes.children.length > 0;
     };

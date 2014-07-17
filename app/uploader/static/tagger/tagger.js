@@ -16,7 +16,8 @@ var TEMPLATES = {
     TITLE_TREE_NODE: {filename: 'title_tree_node.html'},
     XML_PREVIEW: {filename: 'xml_preview.html'},
     OUTPUT_PREVIEW: {filename: 'output_preview.html'},
-    RENAME_FORM: {filename: 'rename_form.html'}
+    RENAME_FORM: {filename: 'rename_form.html'},
+    INTRO: {filename: 'intro.html'}
 };
 var buckets = {
     sentences: {id: 'sentence-bucket',
@@ -38,8 +39,9 @@ function init_tagger()
     loadNodeTreeEvents();
     loadTooltips();
     loadOutputPreview();
-    loadSubmit();
+    loadSubmitEvent();
     addRootNode();
+    loadIntro();
 }
 function test()
 {
@@ -65,13 +67,44 @@ function loadRequestParams()
     document_url = $('#document-url').val();
     templates_url = $('#templates-url').val();
 }
-function loadSubmit()
+function loadSubmitEvent()
 {
+//    $('#tagger').submit(function() {
+//        saveStructureFile();
+//        return false;
+//    });
     $('#tagger').submit(function() {
+        return false;
+    });
+    $('#save-structure-button').on('click', function() {
         saveStructureFile();
         return false;
     });
 }
+
+
+function loadIntro()
+{
+    renderTemplate('#tagger-intro-box', TEMPLATES.INTRO);
+    $('#tagger-intro-box').show()
+            .on('click', function() {
+                $(this).hide();
+            });
+    $('#show-intro').on('click', function() {
+        $('#tagger-intro-box').show();
+        return false;
+    });
+
+
+}
+
+/************************
+ *  SAVE STRUCTURE FILE *
+ ************************/
+/**
+ * Save the structure file back to the project
+ * @returns {undefined}
+ */
 function saveStructureFile()
 {
 //    alert('Saving structure file');
@@ -229,7 +262,7 @@ function addRootNode()
 {
     var root_node = $('.node-tag-document');
     var root_id = root_node.attr('data-id');
-    addElement(null, root_id, NODE_TYPES.PROPERTY, true);
+    addElement(null, root_id, NODE_TYPES.PROPERTY, false);
 }
 /********************
  *      EVENTS      *
@@ -239,11 +272,12 @@ function loadNodeTreeEvents()
     loadGenericNodeTreeEvents();
     $('.node-tag').on('click', function() {
         var self = $(this), id = self.attr('data-id');
-        $('.xml-preview-node .highlighted-nodes').removeClass('highlighted-nodes');
-        $('.xml-preview-node .' + id).addClass('highlighted-nodes');
-        $('#tagger-xml-preview-container .tagger-container-body').scrollTop(0);
-        var top = $('#tagger-xml-preview-container .' + id + ":first").offset().top - $('#tagger-xml-preview-container .tagger-container-body').position().top - 25;
-        $('#tagger-xml-preview-container .tagger-container-body').scrollTop(top);
+        enableHighlightNodes(id, false);
+        /* $('.xml-preview-node .highlighted-nodes').removeClass('highlighted-nodes');
+         $('.xml-preview-node .' + id).addClass('highlighted-nodes');
+         $('#tagger-xml-preview-container .tagger-container-body').scrollTop(0);
+         var top = $('#tagger-xml-preview-container .' + id + ":first").offset().top - $('#tagger-xml-preview-container .tagger-container-body').position().top - 25;
+         $('#tagger-xml-preview-container .tagger-container-body').scrollTop(top);*/
     });
     $('.node-tag-action-text').on('click', function()
     {
@@ -281,27 +315,54 @@ function loadGenericNodeTreeEvents()
 function addBucketTagEvents(id) {
     $('.bucket-body > .' + id).on('mouseover', function()
     {
-        console.log('hovering over '+id)
-        $('#tagger-node-preview .' + id).addClass('highlighted-tag');
-        $('#tagger-output-preview .' + id).addClass('highlighted-tag');
+        enableHighlightNodes(id, true);
+
     }).on('mouseout', function()
     {
-        $('#tagger-node-preview  .' + id).removeClass('highlighted-tag');
-        $('#tagger-output-preview  .' + id).removeClass('highlighted-tag');
+        disableHighlightNodes(id);
     });
     $('.bucket-body .bucket-tag-property.' + id).on('click', function()
     {
         var self = $(this), type = self.attr('data-type');
         showRenameDialogue(id);
     });
+    $('.bucket-tag-remove.' + id).on('click', function() {
+        var myId = $(this).attr('data-id'), type = $(this).attr('data-type');
+        removeElement(null, myId, type);
+        disableHighlightNodes(myId);
+    });
 }
 
+function enableHighlightNodes(id, highlightTreeNodes)
+{
+    if (highlightTreeNodes) {
+        $('#tagger-node-preview .' + id).addClass('highlighted-tag');
+    }
+    $('#tagger-output-preview .' + id).addClass('highlighted-tag');
+    $('.xml-preview-node .highlighted-nodes').removeClass('highlighted-nodes');
+    $('.xml-preview-node .' + id).addClass('highlighted-nodes');
+    $('#tagger-xml-preview-container .tagger-container-body').scrollTop(0);
+    var top = $('#tagger-xml-preview-container .' + id + ":first").offset().top - $('#tagger-xml-preview-container .tagger-container-body').position().top - 25;
+    $('#tagger-xml-preview-container .tagger-container-body').scrollTop(top);
+    var tid = nodes.map[id].attributes.titleId;
+    if (tid !== '')
+    {
+        enableHighlightNodes(tid, highlightTreeNodes);
+    }
+}
+function disableHighlightNodes(id)
+{
+    $('#tagger-node-preview  .' + id).removeClass('highlighted-tag');
+    $('#tagger-output-preview  .' + id).removeClass('highlighted-tag');
+    if (nodes.map[id].attributes.titleId !== '')
+        disableHighlightNodes(nodes.map[id].attributes.titleId);
 
+}
 function processElement(el)
 {
-    var tag = $(el), id = tag.attr('data-id'), nodeType = tag.attr('data-node-type');
+    var tag = $(el), id = tag.attr('data-id'), nodeType = tag.attr('data-node-type'), active = nodes.map[id].attributes.isActive;
 
-    if (tag.hasClass('added-node'))
+    if (active)
         removeElement(tag, id, nodeType);
     else
         addElement(tag, id, nodeType);
@@ -310,13 +371,14 @@ function removeElement(tag, id, nodeType)
 {
     if (!tag)
         tag = $('.node-tag-action.' + id);
-    tag.removeClass('added-node');
+//    tag.removeClass('added-node');
     if (nodeType === NODE_TYPES.TEXT)
         removeTextElement(id);
     else
         removePropertyElement(id);
+    refreshNodeTreeView();
 }
-function addElement(tag, id, nodeType, renameDialogue)
+function addElement(tag, id, nodeType, renameDialogue, preventRender)
 {
     var bucket = $('.bucket-tag-' + nodeType + '.' + id);
     if (bucket.length === 0)//check if bucket node already exists
@@ -325,15 +387,13 @@ function addElement(tag, id, nodeType, renameDialogue)
             tag = $('.node-tag-action-' + nodeType + '.' + id);
             tag.attr('data-added-auto', 'true');
         }
-        tag.toggleClass('added-node');
-        tag.siblings('.added-node').removeClass('added-node');
         if (nodeType === NODE_TYPES.TEXT)
         {
             addTextElement(id);
         }
         else
         {
-            addPropertyElement(id, renameDialogue);
+            addPropertyElement(id, renameDialogue, preventRender);
         }
         addBucketTagEvents(id);
     }
@@ -341,6 +401,7 @@ function addElement(tag, id, nodeType, renameDialogue)
     {
         console.log('tag alreeady exists ' + id);
     }
+    refreshNodeTreeView();
 }
 function addTextElement(id)
 {
@@ -350,12 +411,12 @@ function addTextElement(id)
     {
         node.activate();
         node.setAsSentence(true);
-        renderTemplate('#sentence-bucket .bucket-body', TEMPLATES.BUCKET_NODE, node.attributes);
+        renderTemplate('#sentence-bucket .bucket-body', TEMPLATES.BUCKET_NODE, node);
     } else {
         alert('node already added');
     }
 }
-function addPropertyElement(id, renameDialogue)
+function addPropertyElement(id, renameDialogue, preventRender)
 {
     removeTextElement(id);
     var node = nodes.map[id];
@@ -363,7 +424,8 @@ function addPropertyElement(id, renameDialogue)
     {
         node.activate();
         node.setAsProperty(true);
-        renderTemplate('#property-bucket .bucket-body', TEMPLATES.BUCKET_NODE, node.attributes);
+        if (!preventRender)
+            renderTemplate('#property-bucket .bucket-body', TEMPLATES.BUCKET_NODE, node);
     } else {
         alert('node already added');
     }
@@ -383,14 +445,35 @@ function removePropertyElement(id)
     var node = nodes.map[id];
     node.deactivate();
     removeNode('#property-bucket .bucket-body .' + id);
+    if (node.attributes.titleId !== '')
+    {
+        var titleNode = nodes.map[node.attributes.titleId];
+        titleNode.deactivate();
+    }
 }
 
 function refreshElement(id) {
 
-    var node = nodes.map[id], target = '.bucket-tag.' + id;
-    renderTemplate(target, TEMPLATES.BUCKET_NODE, node.attributes, true, id);
+    var node = nodes.map[id], target = '.bucket-tag-group.' + id;
+    renderTemplate(target, TEMPLATES.BUCKET_NODE, node, true, id);
     addBucketTagEvents(id);
 
+}
+function refreshNodeTreeView()
+{
+    $('.node-tag-action').removeClass('added-node');
+    _.each(nodes.map, function(node)
+    {
+        var id = node.attributes.id, type = node.attributes.type,
+                active = node.attributes.isActive;
+        if (active)
+        {
+            if (node.attributes.isSentence)
+                $('.node-tag-action-text.' + id).addClass('added-node');
+            if (node.attributes.isProperty)
+                $('.node-tag-action-property.' + id).addClass('added-node');
+        }
+    });
 }
 /****************************
  *      Rename dialogue     *
@@ -468,7 +551,16 @@ function saveRenameDialogue()
         node.setTitleAsXPath(nodes.map[new_target_id].attributes.xpaths[0]);
         node.setTitleNode(new_target_id);
         var tag;
-        addElement(tag, new_target_id, NODE_TYPES.PROPERTY, false);
+//        refreshElement(id);
+        addElement(tag, new_target_id, NODE_TYPES.PROPERTY, false, true);
+    }
+    else
+    {
+        var tid =node.attributes.titleId;
+        if(tid!=='')
+        {
+            node.resetTitleNode();
+        }
     }
     refreshElement(id);
     hideRenameDialogue();
@@ -484,8 +576,14 @@ function loadOutputPreview()
     {
         var data = nodes.getSample();
         $('#tagger-output-preview-container').empty();
-        for (var i = 0, j = data.length; i < j; i++)
-            renderTemplate('#tagger-output-preview-container', TEMPLATES.OUTPUT_PREVIEW, {data: data[i]});
+        if (data.length > 0) {
+            for (var i = 0, j = data.length; i < j; i++)
+                renderTemplate('#tagger-output-preview-container', TEMPLATES.OUTPUT_PREVIEW, {data: data[i]});
+        }
+        else
+        {
+            renderTemplate('#tagger-output-preview-container', TEMPLATES.OUTPUT_PREVIEW, {data: []});
+        }
     });
 }
 

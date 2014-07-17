@@ -387,7 +387,10 @@ def get_file(file_id):
     app.config["MAP_ROUTE"] + '<int:document_id>'+app.config["SAVE_MAP"], methods=['POST'])
 @login_required
 def upload_structure_file( project_id, document_id):
-    print 'saving structure file'
+    """
+    Retireve the JSON object from te request, write it to a json file and 
+    save it back to the project.
+    """
     json_data = request.json
     dest_path = ''
     filename=''

@@ -5,8 +5,6 @@
 <script src="{{ url_for('uploader.static',
         filename='upload-input-group.js') }}"></script>
 
-<script src="{{ url_for('uploader.static',
-        filename='show_tagger.js') }}">
 </script>
 {% endblock %}
 {% block title %}Document List{% endblock %}
@@ -55,27 +53,3 @@
 <p>There are no files in this project.</p>
 {% endif %}
 {% endblock %}
-<!--
-{% block xml_tagger %}
-
-<!--<link rel="stylesheet" href="{{ url_for('uploader.static',
-        filename='tagger/css/bootstrap.css') }}" type="text/css" />
-<link rel="stylesheet" href="{{ url_for('uploader.static',
-        filename='tagger/css/style.css') }}" type="text/css" />
-
-<script data-main="{{ url_for('uploader.static',
-        filename='tagger/js/main') }}" src="{{ url_for('uploader.static',
-        filename='tagger/js/contrib/require-jquery.js') }}"></script>
-<div id="tagger">
-    <input id="hidden-filename" type="hidden" value="/uploades/{{process_form.selection.data[0] }}"/>
-    <div class="header">
-        <span class="btn btn-success save">save</span>
-    </div>
-    <div class="box" id="tagContainer"></div>
-    <div class="box" id="tagHierarchy"></div>
-    <div class="box" id="content"></div>
-
-    <div id="modal"></div>
-</div>
-{% endblock %}
--->

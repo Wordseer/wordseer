@@ -143,8 +143,8 @@ and open the template in the editor.
 /**************
 *  BUCKETS    *
 **************/
-.bucket-tag{
-    margin:5px;
+.bucket-tag-group{
+    /*margin:5px;*/
 }
 .removed{
     background-color:red;
@@ -196,7 +196,7 @@ and open the template in the editor.
     left:0;
     background-color: rgba(0,0,0,.4);
 }
-#rename-form, #tagger-save-file-response{
+#rename-form, #tagger-save-file-response, #tagger-intro{
     width:70%;
     top:10%;
     left:15%;
