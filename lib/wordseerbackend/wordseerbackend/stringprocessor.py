@@ -1,28 +1,28 @@
-"""
-Methods to handle string parsing, tokenization, tagging, etc.
+"""Methods to handle string parsing, tokenization, tagging, etc.
 """
 
 from corenlp import StanfordCoreNLP
 
-from . import config
-from .document import taggedword, sentence
-from .parser.dependency import Dependency
-from .parser.parseproducts import ParseProducts
+from app import app
+from app.models.sentence import Sentence
+from app.models.word import Word
+from app.models.parseproducts import ParseProducts
 
 class StringProcessor(object):
-    """Tokenize or parse a string."""
+    """Tokenize or parse a string.
+    """
 
     def __init__(self):
         """Instantiate and ready the parser. Note that readying the parser takes
         some time.
         """
 
-        self.parser = StanfordCoreNLP(config.CORE_NLP_DIR)
+        self.parser = StanfordCoreNLP(app.config["CORE_NLP_DIR"])
 
     def tokenize(self, txt):
-        """Turn a string of one or more sentences into a list of Sentence
-        objects. This method will also tokenize each word in txt, find its PoS,
-        lemma, and space_before.
+        """Turn a string of one or more ``Sentence``\s into a list of
+        ``Sentence`` objects. This method will also tokenize each word in txt,
+        find its PoS, lemma, and space_before.
 
         :param str txt: One or more sentences, in a string format.
         :return list: A list of document.Sentence objects.
@@ -32,14 +32,14 @@ class StringProcessor(object):
         return tokenize_from_raw(parsed_text, txt)
 
     def parse(self, sent, max_length=30):
-        """Parse a sentence and extract dependencies, parse trees, etc.
+        """Parse a ``Sentence`` and extract dependencies, parse trees, etc.
 
         Note that for max_length, a "word" is defined as something with a space
         on at least one side. This is not the typical definition of "word".
         This is done so that length can be checked before resources are
         committed to processing a very long sentence.
 
-        :param str sent: The sentence as a string.
+        :param str sent: The ``Sentence`` as a string.
         :param int max_length: The most amount of words to process.
         """
 
@@ -62,13 +62,20 @@ class StringProcessor(object):
             if int(dependency[2]) > 0 and int(dependency[4]) > 0:
                 gov_index = int(dependency[2]) - 1
                 dep_index = int(dependency[4]) - 1
-                dependencies.append(Dependency(dependency[0],
-                    dependency[1],
-                    gov_index,
-                    parsed_sentence["words"][gov_index][1]["PartOfSpeech"],
-                    dependency[3],
-                    dep_index,
-                    parsed_sentence["words"][dep_index][1]["PartOfSpeech"]))
+                governor_pos = parsed_sentence["words"][gov_index][1]\
+                    ["PartOfSpeech"]
+
+                dependent_pos = parsed_sentence["words"][dep_index][1]\
+                    ["PartOfSpeech"]
+
+                dependencies.append({
+                    "grammatical_relationship": dependency[0],
+                    "governor": dependency[1],
+                    "governor_index": gov_index,
+                    "governor_pos": governor_pos,
+                    "dependent": dependency[3],
+                    "dependent_index": dep_index,
+                    "dependent_pos": dependent_pos})
 
         return ParseProducts(parsed["sentences"][0]["parsetree"],
             dependencies, tokenize_from_raw(parsed, sent)[0].tagged)
@@ -88,11 +95,12 @@ def tokenize_from_raw(parsed_text, txt):
 
     for s in parsed_text["sentences"]:
         word_list = [] # a list of words
-        tagged_words = [] # a list of TaggedWords
+        tagged_words = [] # a list of Words
         sent_text = s["text"]
 
         for w in s["words"]:
-            tw = taggedword.TaggedWord(word=w, tag=w[1]["PartOfSpeech"],
+            #FIXME not quite right
+            tw = Word(word=w[0], tag=w[1]["PartOfSpeech"],
                 lemma=w[1]["Lemma"])
 
             if txt[int(w[1]["CharacterOffsetBegin"])] != " ":
@@ -101,8 +109,8 @@ def tokenize_from_raw(parsed_text, txt):
             word_list.append(w[0])
             tagged_words.append(tw)
 
-        paragraph.append(sentence.Sentence(text=sent_text,
-            tagged=tagged_words, words=word_list))
+        paragraph.append(Sentence(text=sent_text,
+            words=tagged_words))
 
     return paragraph
 
