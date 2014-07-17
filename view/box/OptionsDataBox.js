@@ -87,7 +87,8 @@ Ext.define('WordSeer.view.box.OptionsDataBox', {
 		}
 		me.getEl().select('span.checkbox').each(function(el){
 			el.on('click', function(event, clicked_el) {
-				this.toggleCls('checked');
+				var checkbox = Ext.get(clicked_el); 
+				checkbox.toggleCls('checked');
 			});
 		});
 		this.callParent(arguments);
