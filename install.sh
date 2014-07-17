@@ -29,7 +29,7 @@ python database.py migrate
 # Download and move stanford-corenlp
 echo "Installing stanford-corenlp..."
 cd $CORENLP_DESTINATION
-wget -O $CORENLP_FINAL_NAME".zip" $CORENLP
+curl -o $CORENLP_FINAL_NAME".zip" $CORENLP
 unzip $CORENLP_FINAL_NAME".zip"
 mv ${FILENAME:0:-4} $CORENLP_FINAL_NAME
 
