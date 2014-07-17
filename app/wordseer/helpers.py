@@ -5,7 +5,9 @@ import pdb
 
 from flask import request
 
-from ..models import *
+from ..models.association_tables import sequences_in_sequencesets
+from ..models.sequence import Sequence
+from ..models.word import Word
 from app import app
 from app import db
 
@@ -70,7 +72,7 @@ def remove_spaces_around_punctuation(sentence):
 
 #TODO: needs clarification
 def get_words_in_sentence(sentence_id):
-    """Given a ``Sentence`` ID, return information about all ``Word``s in that
+    """Given a ``Sentence`` ID, return information about all ``Word``\s in that
     sentence in the form of a list.
 
     The structure of the list is like this::
@@ -259,7 +261,7 @@ def get_lemma_variant_ids(surface_word):
     """Get ``Word`` IDs for all words that have the same lemma as this one.
 
     That is, get the list of all lemmas whose surface word is ``surface_word``
-    and then return the IDs of all ``Word``s that have those lemmas.
+    and then return the IDs of all ``Word``\s that have those lemmas.
 
     Arguments:
         surface_word (str): The surface word to query.
@@ -283,7 +285,7 @@ def get_lemma_variant_ids(surface_word):
 
 #TODO: merge with above?
 def get_lemma_variants(surface_word):
-    """Get the ``word`` attributes of ``Word``s that all have the same lemma
+    """Get the ``word`` attributes of ``Word``\s that all have the same lemma
     as the given word.
 
     Arguments:
@@ -321,4 +323,23 @@ def get_number_of_sentences_in_slice():
 #TODO: filtered_sent_ids vs cached_filtered_sent_ids
 def get_number_of_documents_in_slice():
     pass
+
+def get_model_from_tablename(tablename):
+    """Given a tablename, retrieve the model that is associated with it.
+
+    Arguments:
+        tablename (str): The table whose model should be retrieved.
+
+    Returns:
+        The model that is associated with ``tablename``, ``None`` otherwise.
+    """
+
+    for model in db.Model._decl_class_registry_.values():
+        try:
+            if model.__tablename__ == tablename:
+                return model
+        except AttributeError:
+            pass
+
+    return None
 

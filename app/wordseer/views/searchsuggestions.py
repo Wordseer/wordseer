@@ -5,17 +5,18 @@ from flask import abort
 from flask import request
 from flask.json import jsonify
 from flask.views import View
-from sqlalchemy import _not
+from sqlalchemy import not_
 from sqlalchemy import func
 from sqlalchemy.sql.expression import asc
 from sqlalchemy.sql.expression import literal_column
 
 from .. import wordseer
-from ...models import PropertyMetadata, WorkingSet, Property, Sequence, SequenceInSentence
+from ...models import PropertyMetadata, Property, Sequence, SequenceInSentence
 from app import db
 
 class AutoSuggest(View):
-    """Retrieve a list of suggested ``Set``s, ``Sequence``s, and ``Property``s.
+    """Retrieve a list of suggested ``Set``\s, ``Sequence``\s, and
+    ``Property``\s.
     """
     def __init__(self):
         """Get necessary query variables and set filters.
@@ -48,8 +49,8 @@ class AutoSuggest(View):
     def dispatch_request(self):
         """Return a JSON list of suggestions.
 
-        The list has a maximum of three types of suggestions: ``Set``s,
-        ``Property``s, and ``Sequence``s. The response is formed like so::
+        The list has a maximum of three types of suggestions: ``Set``\s,
+        ``Property``\s, and ``Sequence``\s. The response is formed like so::
 
             {
                 "results": [
@@ -83,24 +84,25 @@ class AutoSuggest(View):
         return jsonify(results=suggestions)
 
     def get_suggested_sets(self):
-        """Return a list of dicts of suggestions of ``Set``s that may
+        """Return a list of dicts of suggestions of ``Set``\s that may
         match the query.
 
-        The query queries both ``Sets`` and ``Property``s.
+        The query queries both ``Sets`` and ``Property``\s.
 
-        ``Set``s are filtered on the following criteria:
+        ``Set``\s are filtered on the following criteria:
 
         * Have the same ``user`` as the one given in the request
         * Contain the ``query`` from the url, if applicable
 
-        ``Property``s are filtered by the following criteria:
+        ``Property``\s are filtered by the following criteria:
 
         * ``unit_name`` is equal to ``sentence``
         * ``value`` is equal to the ``id`` of the ``Set``
         * ``name`` is ``phrase_set``
 
         Returns:
-            list of dicts: A list containing dicts with the following info::
+            list of dicts: A list containing dicts with the following info:
+            ::
 
                 [
                     {
@@ -116,7 +118,7 @@ class AutoSuggest(View):
         #TODO: document_count
         sets = db.session.query(WorkingSet.id,
             Property.name.label("text"),
-            literal_column("'phrase-set'").label("class")
+            literal_column("'phrase-set'").label("class"),
             func.count(Property.unit_id.distinct()).label("unit_count")).\
                 filter(Property.unit_name == "sentence").\
                 filter(Property.value == WorkingSet.id).\
@@ -129,21 +131,22 @@ class AutoSuggest(View):
         return [set._asdict() for set in sets]
 
     def get_suggested_properties(self):
-        """Return a list of dicts of suggestions of ``Property``s that
+        """Return a list of dicts of suggestions of ``Property``\s that
         match the query.
 
         The query queries both ``Property`` and ``PropertyMetadata``.
 
-        ``Property``s are filtered by the following criteria:
+        ``Property``\s are filtered by the following criteria:
 
         * ``value`` contains the user's ``query``, if any
         * ``Property.name`` is equal to ``PropertyMetadata.property_name``
         * The ``Property`` is a category (``is_category`` is true for these
-            ``Property``s)
+            ``Property``\s)
         * ``Property.name`` does not contain ``_set``.
 
         Returns:
-            list of dicts: A list of dicts with the following info::
+            list of dicts: A list of dicts with the following info:
+            ::
 
                 [
                     {
@@ -183,15 +186,16 @@ class AutoSuggest(View):
         return suggested_metadata
 
     def get_suggested_sequences():
-        """Return a list of dicts of suggestions of ``Sequence``s that
+        """Return a list of dicts of suggestions of ``Sequence``\s that
         match the query.
 
-        ``Sequence``s are filtered by the following criteria:
+        ``Sequence``\s are filtered by the following criteria:
 
         * ``Sequence.sequence`` starts with ``query``
 
         Returns:
-            list of dicts: A list of dicts with the following info::
+            list of dicts: A list of dicts with the following info:
+            ::
 
                 [
                     {
@@ -203,6 +207,7 @@ class AutoSuggest(View):
                             is a part of
                     }
                 ]
+
         """
         #TODO: document_count
         suggested_sequences = []

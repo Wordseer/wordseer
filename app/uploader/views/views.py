@@ -92,8 +92,8 @@ class CLPDView(View):
 
         if os.path.isdir(obj.path):
             shutil.rmtree(obj.path)
-            for unit in obj.files:
-                db.session.delete(unit)
+            for document in obj.documents:
+                db.session.delete(document)
             db.session.commit()
         else:
             os.remove(obj.path)
@@ -182,8 +182,6 @@ class ProjectsCLPD(CLPDView):
         project = Project(
             name=self.create_form.name.data,
             user=current_user)
-#        db.session.add(project)
-#        db.session.flush()
         project.save()
         project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
         project.save()
@@ -233,8 +231,8 @@ class ProjectCLPD(CLPDView):
     def set_choices(self, **kwargs):
         """The template needs the choices in the form of (id, filename).
         """
-        file_objects = Unit.query.filter(Project.id == self.project.id).\
-            filter(Unit.path != None).all()
+        file_objects = Document.query.filter(Project.id == self.project.id).\
+            all()
         self.process_form.selection.choices = []
         for file_object in file_objects:
             self.process_form.selection.add_choice(file_object.id,
@@ -362,23 +360,17 @@ def document_map(project_id, document_id):
 def get_file(file_id):
     """If the user has permission to view this file, then return it.
     """
-    # Test if this user can see it
-#    if not document or not unit.path:
 
-#return app.login_manager.unauthorized()
-
+    document = Document.query.get(file_id)
     try:
-        access_granted = current_user.has_document(
-            Document.query.get(file_id))
+        access_granted = current_user.has_document(document)
     except TypeError:
         return app.login_manager.unauthorized()
 
     # Test if this user can see it
     if not access_granted:
         return app.login_manager.unauthorized()
-    
-    unit = Unit.query.filter(Unit.id == file_id).one()
-    directory, filename = os.path.split(unit.path)
+    directory, filename = os.path.split(document.path)
 
     return send_from_directory(directory, filename)
 
