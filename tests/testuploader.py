@@ -345,8 +345,6 @@ class ViewsTests(unittest.TestCase):
             })
         assert "At least one document must be selected" in result.data
 
-
-    @unittest.skip("Query not working")
     def test_get_file(self):
         """Run tests on the get_file view.
         """
