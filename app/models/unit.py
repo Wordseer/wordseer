@@ -19,8 +19,8 @@ class Unit(db.Model, Base):
         name (str): A name for this ``Unit``.
 
     Relationships:
-      has one: parent
-      has many: children (Unit), sentences, properties
+        has one: parent
+        has many: children (Unit), sentences, properties
     """
 
     # Attributes

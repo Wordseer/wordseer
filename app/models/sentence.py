@@ -28,6 +28,8 @@ class Sentence(db.Model, Base):
         properties (list of Propertys): ``Property``\s associated with this
             ``Sentence``.
         words (list of Words): ``Word``\s in this ``Sentence``.
+        parsed_paragraph (ParsedParagraph): The ``ParsedParagraph`` that
+            includes this ``Sentence``.
 
     Relationships:
         belongs to: unit, document
@@ -45,15 +47,13 @@ class Sentence(db.Model, Base):
     # Relationships
 
     words = association_proxy("word_in_sentence", "word",
-        creator=lambda word: WordInSentence(word=word)
-    )
+        creator=lambda word: WordInSentence(word=word))
 
     sequences = association_proxy("sequence_in_sentence", "sequence",
-        creator=lambda sequence: SequenceInSentence(sequence=sequence)
-    )
+        creator=lambda sequence: SequenceInSentence(sequence=sequence))
+
     dependencies = association_proxy("dependency_in_sentence", "dependency",
-        creator=lambda dependency: DependencyInSentence(dependency=dependency)
-    )
+        creator=lambda dependency: DependencyInSentence(dependency=dependency))
 
     document = db.relationship("Document", foreign_keys=[document_id],
         backref="all_sentences")

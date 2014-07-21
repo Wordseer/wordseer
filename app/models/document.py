@@ -15,6 +15,7 @@ class Document(Unit):
     Attributes:
         title (str): the title of the document
         path (str): the location of the file on the system
+        projects (list of Projects): ``Project``\s that this ``Document`` is in.
 
     Relationships:
         has one: unit
