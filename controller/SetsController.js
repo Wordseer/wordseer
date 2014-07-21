@@ -410,8 +410,8 @@ Ext.define('WordSeer.controller.SetsController', {
 	subsetTagClicked: function(id) {
 		var record = "";
 		var type = "";
-		if (Ext.getStore("CollectionsStore").getById(id)) {
-			record = Ext.getStore("CollectionsStore").getById(id);
+		if (Ext.getStore("DocumentSetStore").getById(id)) {
+			record = Ext.getStore("DocumentSetStore").getById(id);
 			type = "document";
 		} else if (Ext.getStore("SentenceSetStore").getById(id)) {
 			record = Ext.getStore("SentenceSetStore").getById(id);

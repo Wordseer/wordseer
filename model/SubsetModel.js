@@ -82,8 +82,8 @@ Ext.define('WordSeer.model.SubsetModel', {
         */
         getText: function(id) {
             var text = "";
-            if (Ext.getStore("CollectionsStore").getById(id)) {
-                text = Ext.getStore("CollectionsStore").getById(id)
+            if (Ext.getStore("DocumentSetStore").getById(id)) {
+                text = Ext.getStore("DocumentSetStore").getById(id)
                     .get("text");
             } else if (Ext.getStore("SentenceSetStore").getById(id)) {
                 text = Ext.getStore("SentenceSetStore").getById(id)
