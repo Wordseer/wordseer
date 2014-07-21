@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE PLAY SYSTEM "play.dtd">
+
+<PLAY>
+<TITLE>The Tragedy of Antony and Cleopatra</TITLE>
+
+<FM>
+<P>Text placed in the public domain by Moby Lexical Tools, 1992.</P>
+<P>SGML markup by Jon Bosak, 1992-1994.</P>
+<P>XML version by Jon Bosak, 1996-1998.</P>
+<P>This work may be freely copied and distributed worldwide.</P>
+</FM>
+
+
+<PERSONAE>
+<TITLE>Dramatis Personae</TITLE>
+
+
+<PGROUP>
+<PERSONA>MARK ANTONY</PERSONA>
+<PERSONA>OCTAVIUS CAESAR</PERSONA>
+<PERSONA>M. AEMILIUS LEPIDUS</PERSONA>
+<GRPDESCR>triumvirs.</GRPDESCR>
+</PGROUP>
+
+<PERSONA>SEXTUS POMPEIUS</PERSONA>
+</PERSONAE>
+
+<SCNDESCR>SCENE  In several parts of the Roman empire.</SCNDESCR>
+
+<PLAYSUBT>ANTONY AND CLEOPATRA</PLAYSUBT>
+
+<ACT><TITLE>ACT I</TITLE>
+
+<SCENE><TITLE>SCENE I.  Alexandria. A room in CLEOPATRA's palace.</TITLE>
+<STAGEDIR>Enter DEMETRIUS and PHILO</STAGEDIR>
+
+<SPEECH>
+<SPEAKER>PHILO</SPEAKER>
+<LINE>Nay, but this dotage of our general's</LINE>
+<LINE>O'erflows the measure: those his goodly eyes,</LINE>
+<LINE>That o'er the files and musters of the war</LINE>
+<LINE>Have glow'd like plated Mars, now bend, now turn,</LINE>
+<LINE>The office and devotion of their view</LINE>
+<LINE>Upon a tawny front: his captain's heart,</LINE>
+<LINE>Which in the scuffles of great fights hath burst</LINE>
+<LINE>The buckles on his breast, reneges all temper,</LINE>
+<LINE>And is become the bellows and the fan</LINE>
+<LINE>To cool a gipsy's lust.</LINE>
+<STAGEDIR>Flourish. Enter ANTONY, CLEOPATRA, her Ladies,
+the Train, with Eunuchs fanning her</STAGEDIR>
+<LINE>Look, where they come:</LINE>
+<LINE>Take but good note, and you shall see in him.</LINE>
+<LINE>The triple pillar of the world transform'd</LINE>
+<LINE>Into a strumpet's fool: behold and see.</LINE>
+</SPEECH>
+
+<SPEECH>
+<SPEAKER>CLEOPATRA</SPEAKER>
+<LINE>If it be love indeed, tell me how much.</LINE>
+</SPEECH>
+</SCENE>
+</ACT>
+</PLAY>
