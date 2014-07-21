@@ -41,11 +41,15 @@ class StructureExtractor(object):
         doc = etree.parse(infile)
         units = self.extract_unit_information(self.document_structure, doc)
 
+        doc_num = 0
         for extracted_unit in units:
             d = Document(properties=extracted_unit.properties,
                 sentences=extracted_unit.sentences,
                 title=extracted_unit.name,
-                children=extracted_unit.children)
+                children=extracted_unit.children,
+                number = doc_num)
+            assign_sentences(d)
+
             documents.append(d)
 
         return documents
@@ -79,10 +83,11 @@ class StructureExtractor(object):
                             node)
                         )
                 else:
-                    current_unit.sentence_data = self.get_sentences(structure, node,
+                    current_unit.sentences = self.get_sentences(structure, node,
                         True)
 
                 current_unit.children = children
+                current_unit.save()
                 units.append(current_unit)
 
         return units
@@ -116,10 +121,10 @@ class StructureExtractor(object):
                     sentence_node))
 
         if tokenize:
-            sents = self.str_proc.tokenize(sentence_text)
-            for sent in sents:
-                sent["properties"] = sentence_metadata
-                result_sentences.append(sent)
+            sentences = self.str_proc.tokenize(sentence_text)
+            for sentence in sentences:
+                # TODO: figure out sentence properties
+                result_sentences.append(sentence)
 
         else:
             result_sentences.append(Sentence(text=sentence_text,
@@ -241,3 +246,28 @@ def get_nodes_from_xpath(xpath, nodes):
         return [nodes]
     return nodes.xpath(xpath)
 
+def assign_sentences(document):
+    """Populates the all_sentences relationship for the document.
+
+    :param Document document: The document to use
+    """
+
+    document.all_sentences = _get_sentences(document)
+
+def _get_sentences(unit):
+    """Recursively traverse the unit tree for sentences.
+
+    :param Unit unit: The unt to use
+    :return list: A nested list of sentences
+    """
+
+    if not unit.children:
+        return unit.sentences
+
+    else:
+        sentences = list(unit.sentences)
+
+        for child in unit.children:
+            sentences.extend(_get_sentences(child))
+
+        return sentences

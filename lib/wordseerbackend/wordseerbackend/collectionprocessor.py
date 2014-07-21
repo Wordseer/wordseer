@@ -131,10 +131,6 @@ class CollectionProcessor(object):
                     logger.REPLACE)
                 docs = extractor.extract(os.path.join(collection_dir,
                     filename))
-                for doc in docs:
-                    # TODO: readerwriter
-                    self.reader_writer.create_new_document(doc,
-                       num_files_done)
 
                 print("\t" + str(num_files_done) + "/" + str(len(contents))
                     + "\t" + filename)

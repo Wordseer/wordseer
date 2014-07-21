@@ -7,6 +7,9 @@ from . import config
 from app.models.sentence import Sentence
 from app.models.word import Word
 from app.models.parseproducts import ParseProducts
+from app import db
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound
 
 class StringProcessor(object):
     """Tokenize or parse a string.
@@ -102,26 +105,58 @@ def tokenize_from_raw(parsed_text, txt):
     :return list: A list of document.Sentence objects.
     """
     paragraph = [] # a list of Sentences
+    words = dict()
 
-    for s in parsed_text["sentences"]:
-        word_list = [] # a list of words
-        tagged_words = [] # a list of Words
-        sent_text = s["text"]
-        sentence = { "text": sent_text }
+    for sentence_data in parsed_text["sentences"]:
+        sentence = Sentence(text = sentence_data["text"])
 
-        for w in s["words"]:
-            word = w[0]
-            tag = w[1]["PartOfSpeech"]
-            lemma = w[1]["Lemma"]
+        position = 0
+        for word_data in sentence_data["words"]:
+
+            word = word_data[0]
+            tag = word_data[1]["PartOfSpeech"]
+            lemma = word_data[1]["Lemma"]
+
+            key = (word, tag, lemma)
 
             # TODO: proper space_before implementation
 
-            tagged_word = { "word": word, "tag": tag, "lemma": lemma }
+            if key in words.keys():
+                word = words[key]
+                # print("In dict " + str(word))
+            else:
 
-            tagged_words.append(tagged_word)
+                try:
+                    word = Word.query.filter_by(
+                        word = word,
+                        lemma = lemma,
+                        tag = tag
+                    ).one()
+                    # print("Found word " + str(word))
+                except(MultipleResultsFound):
+                    print("ERROR: duplicate records found for:")
+                    print("\t" + str(key))
+                except(NoResultFound):
+                    word = Word(
+                        word = word,
+                        lemma = lemma,
+                        tag = tag
+                    )
+                    # print("New word " + str(word))
+                    
+                words[key] = word
 
-        sentence["words"] = tagged_words
+            sentence.add_word(
+                word = word,
+                position = position,
+                space_before = "", # word["space_before"],
+                tag = word.tag
+            )
+
+            position += 1
+
         paragraph.append(sentence)
 
+    db.session.commit()
     return paragraph
 
