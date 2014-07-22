@@ -27,7 +27,7 @@ class ParseProducts(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         :param list pos_tags: A list of TaggedWords that were present in the
         parsed sentence.
         """
-
+        #TODO: remove this
         self.syntactic_parse = syntactic_parse
         self.dependencies = dependencies
         self.words = pos_tags

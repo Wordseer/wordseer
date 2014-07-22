@@ -26,15 +26,11 @@ class WordInSentence(db.Model, Base):
 
     sentence = db.relationship("Sentence",
         backref=db.backref(
-            "word_in_sentence", cascade="all, delete-orphan"
-        )
-    )
+            "word_in_sentence", cascade="all, delete-orphan"))
 
     word = db.relationship("Word",
         backref=db.backref(
-            "word_in_sentence", cascade="all, delete-orphan"
-        )
-    )
+            "word_in_sentence", cascade="all, delete-orphan"))
 
 class SequenceInSentence(db.Model, Base):
     """Association object for sequences in sentences.
@@ -52,15 +48,11 @@ class SequenceInSentence(db.Model, Base):
 
     sequence = db.relationship("Sequence",
         backref=db.backref(
-            "sequence_in_sentence", cascade="all, delete-orphan"
-        )
-    )
+            "sequence_in_sentence", cascade="all, delete-orphan"))
 
     sentence = db.relationship("Sentence",
         backref=db.backref(
-            "sequence_in_sentence", cascade="all, delete-orphan"
-        )
-    )
+            "sequence_in_sentence", cascade="all, delete-orphan"))
 
 class WordInSequence(db.Model, Base):
     """Association object for words in sequences.
@@ -75,15 +67,11 @@ class WordInSequence(db.Model, Base):
 
     word = db.relationship("Word",
         backref=db.backref(
-            "word_in_sequence", cascade="all, delete-orphan"
-        )
-    )
+            "word_in_sequence", cascade="all, delete-orphan"))
 
     sequence = db.relationship("Sequence",
         backref=db.backref(
-            "word_in_sequence", cascade="all, delete-orphan"
-        )
-    )
+            "word_in_sequence", cascade="all, delete-orphan"))
 
 class DependencyInSentence(db.Model, Base):
     """Association object for dependencies in sentences.
@@ -109,13 +97,9 @@ class DependencyInSentence(db.Model, Base):
 
     dependency = db.relationship("Dependency",
         backref=db.backref(
-            "dependency_in_sentence", cascade="all, delete-orphan"
-        )
-    )
+            "dependency_in_sentence", cascade="all, delete-orphan"))
 
     sentence = db.relationship("Sentence",
         backref=db.backref(
-            "dependency_in_sentence", cascade="all, delete-orphan"
-        )
-    )
+            "dependency_in_sentence", cascade="all, delete-orphan"))
 

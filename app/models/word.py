@@ -21,6 +21,10 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
             in. This relationship is described by ``WordInSentence``.
         sequences (list of Sequences): The ``Sequences`` that this ``Word`` is
             in. This relationship is described by ``WordInSequence``.
+        governor_dependencies (list of Dependencies): The ``Dependency``\s in
+            which this ``Word`` is a governor.
+        dependent_dependencies (list of Dependencies): The ``Dependency``\s in
+            which this ``Word`` is a dependent.
 
     Relationships:
         has many: sentences
@@ -36,12 +40,10 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     # Relationships
 
     sentences = association_proxy("word_in_sentence", "sentence",
-        creator=lambda sentence: WordInSentence(sentence=sentence)
-    )
+        creator=lambda sentence: WordInSentence(sentence=sentence))
 
     sequences = association_proxy("word_in_sequence", "sequence",
-        creator=lambda sequence: WordInSequence(sequence=sequence)
-    )
+        creator=lambda sequence: WordInSequence(sequence=sequence))
 
     def __repr__(self):
         """Representation string for words, showing the word.
