@@ -43,7 +43,7 @@ Follow the directions in the "Installing" sections found below.
 
 2.  Run:
 
-        pip -r install requirements_win.txt
+        pip -r install requirements.txt
 
     to install the necessary packages.
 
