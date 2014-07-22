@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/wordseer/wordseer_flask.png?label=ready&title=Ready)](https://waffle.io/wordseer/wordseer_flask)
 # A Flask-based back end for WordSeer
 
 [WordSeer](http://wordseer.berkeley.edu/) is a tool for natural language
