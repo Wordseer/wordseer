@@ -11,6 +11,7 @@ from app.models.parsedparagraph import ParsedParagraph
 from .. import logger
 from app.models.parseproducts import ParseProducts
 from ..sequence.sequenceprocessor import SequenceProcessor
+from app import db
 
 LATEST_SENT_ID = "latest_parsed_sentence_id"
 LATEST_SEQ_SENT = "latest_sequence_sentence"
@@ -43,23 +44,25 @@ class DocumentParser(object):
             current_max = 0
             logger.log(LATEST_SENT_ID, str(current_max), logger.REPLACE)
 
+        relationships = dict()
+        dependencies = dict()
         for sentence in document.all_sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
-                parsed = self.parser.parse(sentence)
+                parsed = self.parser.parse(sentence, relationships, dependencies)
                 products.append(parsed)
                 count += 1
                 current_max = sentence.id
 
-                if count % 50 == 0:
+                if count % 50 == 0 or count == len(document.all_sentences):
                     average_time = (datetime.now() - start_time).total_seconds()
                     print("Average parse speed after " + str(count) +
                         " sentences: " + str(average_time / count) +
                         " seconds per sentence")
 
-                    self.write_and_parse(products, current_max)
-
                     products = []
-        self.write_and_parse(products, current_max)
+                    relationships = dict()
+                    dependencies = dict()
+                    db.session.commit()
 
     def write_and_parse(self, products, current_max):
         """Send a ParsedParagraph object to the ReaderWriter for writing, then

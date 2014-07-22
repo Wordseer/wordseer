@@ -101,7 +101,7 @@ class Development(BaseConfig):
     # Set database configurations
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BaseConfig.ROOT,
         BaseConfig.APP_NAME + "_dev.db")
-    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_ECHO = False
 
 class Testing(BaseConfig):
     """ This class has settings specific for the testing environment.

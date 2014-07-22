@@ -58,7 +58,6 @@ class Dependency(db.Model, Base):
         #gov = str(self.governor.word)
         #dep = str(self.dependent.word)
 
-        return ("<Dependency: " + str(self.grammatical_relationship) + "(" +
-            str(self.governor) + ", " +
-            str(self.grammatical_relationship) + ") >")
+        return "<Dependency: " + str(self.grammatical_relationship) + "(" + \
+            str(self.governor) + ", " + str(self.dependent) + ") >"
 

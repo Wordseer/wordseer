@@ -6,6 +6,8 @@ from corenlp import StanfordCoreNLP
 from . import config
 from app.models.sentence import Sentence
 from app.models.word import Word
+from app.models.dependency import Dependency
+from app.models.grammaticalrelationship import GrammaticalRelationship
 from app.models.parseproducts import ParseProducts
 from app import db
 from sqlalchemy.orm.exc import NoResultFound
@@ -34,7 +36,7 @@ class StringProcessor(object):
 
         return tokenize_from_raw(parsed_text, txt)
 
-    def parse(self, sent, max_length=30):
+    def parse(self, sentence, relationships=None, dependencies=None, max_length=30):
         """Parse a ``Sentence`` and extract dependencies, parse trees, etc.
 
         Note that for max_length, a "word" is defined as something with a space
@@ -42,19 +44,18 @@ class StringProcessor(object):
         This is done so that length can be checked before resources are
         committed to processing a very long sentence.
 
-        :param str sent: The ``Sentence`` as a string.
+        :param str sentence: The ``Sentence`` as a string.
         :param int max_length: The most amount of words to process.
         """
 
         # This isn't a perfect way to check how many words are in a sentence,
         # but it's not so bad.
-        if len(sent.text.split(" ")) > max_length:
+        if len(sentence.text.split(" ")) > max_length:
             raise ValueError("Sentence appears to be too long, max length " +
                 "is " + str(max_length))
 
-        parsed = self.parser.raw_parse(sent.text)
+        parsed = self.parser.raw_parse(sentence.text)
         parsed_sentence = parsed["sentences"][0]
-        dependencies = []
 
         if len(parsed["sentences"]) > 1:
             raise ValueError("More than one sentences passed in to"
@@ -63,35 +64,111 @@ class StringProcessor(object):
         for dependency in parsed_sentence["dependencies"]:
             # We don't want to make a dependency involving ROOT
             if int(dependency[2]) > 0 and int(dependency[4]) > 0:
-                gov_index = int(dependency[2]) - 1
-                dep_index = int(dependency[4]) - 1
-                governor_pos = parsed_sentence["words"][gov_index][1]\
+                governor = dependency[1]
+                dependent = dependency[3]
+                governor_index = int(dependency[2]) - 1
+                dependent_index = int(dependency[4]) - 1
+                governor_pos = parsed_sentence["words"][governor_index][1]\
                     ["PartOfSpeech"]
-                governor_lemma = parsed_sentence["words"][gov_index][1]\
+                governor_lemma = parsed_sentence["words"][governor_index][1]\
                     ["Lemma"]
-
-                dependent_pos = parsed_sentence["words"][dep_index][1]\
+                dependent_pos = parsed_sentence["words"][dependent_index][1]\
                     ["PartOfSpeech"]
-                dependent_lemma = parsed_sentence["words"][dep_index][1]\
+                dependent_lemma = parsed_sentence["words"][dependent_index][1]\
                     ["Lemma"]
+                grammatical_relationship = dependency[0]
 
-                dependencies.append({
-                    "grammatical_relationship": dependency[0],
-                    "governor": dependency[1],
-                    "governor_index": gov_index,
-                    "governor_pos": governor_pos,
-                    "governor_lemma": governor_lemma,
-                    "dependent": dependency[3],
-                    "dependent_index": dep_index,
-                    "dependent_pos": dependent_pos,
-                    "dependent_lemma": dependent_lemma,
-                    "sentence_id": sent.id,
-                })
+                # If dictionaries are present, run with duplication handling
+                if relationships != None and dependencies != None:
+                    key = grammatical_relationship
 
-        parse_product = { "dependencies": dependencies } # add other keys as needed
-        # return ParseProducts(parsed["sentences"][0]["parsetree"],
-        #     dependencies, tokenize_from_raw(parsed, sent)[0].tagged)
-        return parse_product
+                    if key in relationships.keys():
+                        relationship = relationships[key]
+                    else:
+
+                        try:
+                            relationship = GrammaticalRelationship.query.filter_by(
+                                name = grammatical_relationship
+                            ).one()
+                        except(MultipleResultsFound):
+                            print("ERROR: duplicate records found for:")
+                            print("\t" + str(key))
+                        except(NoResultFound):
+                            relationship = GrammaticalRelationship(
+                                name = grammatical_relationship
+                            )
+                            
+                        relationships[key] = relationship
+
+                    # NOTE: currently, because there is a mismatch in some cases
+                    # between the words in the sentences and the words in the
+                    # dependencies, the method looks up the word using only the
+                    # lemma and tag, which may not guarantee uniqueness.
+
+                    # Read the data for the governor, and find the corresponding word
+                    governor = Word.query.filter_by(
+                        lemma = governor_lemma,
+                        tag = governor_pos
+                    ).first()
+
+                    # Same as above for the dependent in the relationship
+                    dependent = Word.query.filter_by(
+                        lemma = dependent_lemma,
+                        tag = dependent_pos
+                    ).first()
+
+                    if not governor:
+                        print("WARNING: no results found for governor")
+                        governor = ""
+                        governor.id = 0
+                    if not dependent:
+                        print("WARNING: no results found for dependent")
+                        dependent = ""
+                        dependent.id = 0
+
+                    key = (relationship.name, governor.id, dependent.id)
+
+                    if key in dependencies.keys():
+                        dependency = dependencies[key]
+                    else:
+
+                        try:
+                            dependency = Dependency.query.filter_by(
+                                grammatical_relationship = relationship,
+                                governor = governor,
+                                dependent = dependent
+                            ).one()
+                        except(MultipleResultsFound):
+                            print("ERROR: duplicate records found for:")
+                            print("\t" + str(key))
+                        except(NoResultFound):
+                            dependency = Dependency(
+                                grammatical_relationship = relationship,
+                                governor = governor,
+                                dependent = dependent
+                            )
+                            
+                        dependencies[key] = dependency
+
+                    # Add the dependency to the sentence
+                    sentence.add_dependency(
+                        dependency = dependency,
+                        governor_index = governor_index,
+                        dependent_index = dependent_index,
+                    )
+
+                    #  print("relationship", relationship)
+                    #  print("governor", governor)
+                    #  print("dependent", dependent)
+                    #  print("dependency", dependency)
+
+                    dependency.save()
+
+                else:
+                    # TODO: fill
+                    pass
+
+        return sentence
 
 def tokenize_from_raw(parsed_text, txt):
     """Given the output of a call to raw_parse, produce a list of Sentences
@@ -107,6 +184,9 @@ def tokenize_from_raw(parsed_text, txt):
     paragraph = [] # a list of Sentences
     words = dict()
 
+    count = 0
+    sentence_count = len(parsed_text["sentences"])
+    
     for sentence_data in parsed_text["sentences"]:
         sentence = Sentence(text = sentence_data["text"])
 
@@ -156,6 +236,15 @@ def tokenize_from_raw(parsed_text, txt):
             position += 1
 
         paragraph.append(sentence)
+
+        count += 1
+
+        # NOTE: it seems the word dictionary can overload memory sometimes, so
+        # this is in place to prevent it.
+        # TODO: make the 50 here and in documentparser a config
+        if count % 50 == 0 or count == sentence_count:
+            db.session.commit()
+            words = dict()
 
     db.session.commit()
     return paragraph

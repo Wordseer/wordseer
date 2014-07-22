@@ -5,7 +5,7 @@ import os
 import database
 import pdb
 
-collection_dir = os.path.join("tests", "data", "r_and_j")
+collection_dir = os.path.join("tests", "data", "shakespeare_mini")
 extension = ".xml"
 structure_file = os.path.join(collection_dir, "structure.json")
 
