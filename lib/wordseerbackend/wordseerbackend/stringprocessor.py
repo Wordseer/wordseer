@@ -50,9 +50,10 @@ class StringProcessor(object):
 
         # This isn't a perfect way to check how many words are in a sentence,
         # but it's not so bad.
-        if len(sentence.text.split(" ")) > max_length:
-            raise ValueError("Sentence appears to be too long, max length " +
-                "is " + str(max_length))
+        #if len(sentence.text.split(" ")) > max_length:
+        #   raise ValueError("Sentence appears to be too long, max length " +
+        #        "is " + str(max_length))
+        # TODO: figure out the above
 
         parsed = self.parser.raw_parse(sentence.text)
         parsed_sentence = parsed["sentences"][0]
@@ -97,7 +98,7 @@ class StringProcessor(object):
                             relationship = GrammaticalRelationship(
                                 name = grammatical_relationship
                             )
-                            
+
                         relationships[key] = relationship
 
                     # NOTE: currently, because there is a mismatch in some cases
@@ -147,7 +148,7 @@ class StringProcessor(object):
                                 governor = governor,
                                 dependent = dependent
                             )
-                            
+
                         dependencies[key] = dependency
 
                     # Add the dependency to the sentence
@@ -186,7 +187,7 @@ def tokenize_from_raw(parsed_text, txt):
 
     count = 0
     sentence_count = len(parsed_text["sentences"])
-    
+
     for sentence_data in parsed_text["sentences"]:
         sentence = Sentence(text = sentence_data["text"])
 
@@ -223,7 +224,7 @@ def tokenize_from_raw(parsed_text, txt):
                         part_of_speech = part_of_speech
                     )
                     # print("New word " + str(word))
-                    
+
                 words[key] = word
 
             sentence.add_word(
