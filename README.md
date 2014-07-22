@@ -26,9 +26,13 @@ more maintainable python.
 
 ### Installing
 1.  Create a virtualenv
-2.  Run:
+2.  On linux, run:
 
         pip install -r requirements.txt
+
+    On windows, run:
+
+        pip -r install requirements_win.txt
 
     to install the necessary packages.
 3.  Run:
