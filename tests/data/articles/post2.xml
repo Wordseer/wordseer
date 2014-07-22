@@ -7,7 +7,9 @@
  <tag>Tag 3</tag>
 </tags>
 <number>2</number>
-<text>
-	This is the text of post 3. I love blogs.
-</text>
+<text>This is the text of post 3. I love blogs,</text>
+<text>but I also love debugging.</text>
+<foobar>yes</foobar>
+<text>Debugging is the best.</text>
 </article>
+

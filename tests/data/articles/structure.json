@@ -10,6 +10,7 @@
         {
             "belongsTo": "document",
             "structureName": "sentence",
+            "combine": true,
             "xpaths": [
                 "./text/text()"
             ]
@@ -78,3 +79,4 @@
         }
     ]
 }
+
