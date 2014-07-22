@@ -68,21 +68,7 @@ class Sentence(db.Model, Base):
 
         return "<Sentence: " + str(self.text) + ">"
 
-    @property
-    def tagged(self):
-        """Temporary compatibility method
-        """
-        #TODO: remove this method
-        return self.words
-
-    @property
-    def sentence(self):
-        """Temporary compatibility method
-        """
-
-        return self.text
-
-    def add_word(self, word, position=None, space_before="", tag=""):
+    def add_word(self, word, position=None, space_before="", part_of_speech=""):
         """Add a word to the sentence by explicitly creating the association
         object.
 
@@ -93,7 +79,7 @@ class Sentence(db.Model, Base):
             position (int): The position (0-indexed) of ``word`` in this
                 ``Sentence``.
             space_before (str): The space before ``word``, if any.
-            tage (str): The part of speech of ``word``.
+            part_of_speech (str): The part of speech of ``word``.
 
         Returns:
             WordInSentence: The association object that associates this
@@ -105,7 +91,7 @@ class Sentence(db.Model, Base):
             sentence=self,
             position=position,
             space_before=space_before,
-            tag=tag
+            part_of_speech=part_of_speech
         )
         word_in_sentence.save()
 

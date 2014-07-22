@@ -93,23 +93,24 @@ def tokenize_from_raw(parsed_text, txt):
     """
     paragraph = [] # a list of Sentences
 
-    for s in parsed_text["sentences"]:
+    for sentence in parsed_text["sentences"]:
         word_list = [] # a list of words
         tagged_words = [] # a list of Words
-        sent_text = s["text"]
+        sentence_text = sentence["text"]
 
-        for w in s["words"]:
+        for word in sentence["words"]:
             #FIXME not quite right
-            tw = Word(word=w[0], tag=w[1]["PartOfSpeech"],
-                lemma=w[1]["Lemma"])
+            word_object = Word(word=word[0],
+                part_of_speech=word[1]["PartOfSpeech"],
+                lemma=word[1]["Lemma"])
 
-            if txt[int(w[1]["CharacterOffsetBegin"])] != " ":
-                tw.space_before = ""
+            if txt[int(word[1]["CharacterOffsetBegin"])] != " ":
+                word_object.space_before = ""
 
-            word_list.append(w[0])
-            tagged_words.append(tw)
+            word_list.append(word[0])
+            tagged_words.append(word_object)
 
-        paragraph.append(Sentence(text=sent_text,
+        paragraph.append(Sentence(text=sentence_text,
             words=tagged_words))
 
     return paragraph

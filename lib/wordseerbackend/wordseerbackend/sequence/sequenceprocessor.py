@@ -96,10 +96,10 @@ class SequenceProcessor(object):
         """
 
         sequences = [] # a list of Sequences
-        for i in range(0, len(sentence.tagged)):
+        for i in range(0, len(sentence.words)):
             # Iterate through every word
             self.previously_indexed = []
-            for j in range(i+1, len(sentence.tagged) + 1):
+            for j in range(i+1, len(sentence.words) + 1):
                 # Check every word after the one at i
                 if j - i < 5:
                     # If this word is less than five words away from i,
@@ -123,7 +123,7 @@ class SequenceProcessor(object):
 
         sequences = []
 
-        wordlist = sentence.tagged[i:j] # all the words
+        wordlist = sentence.words[i:j] # all the words
         lemmatized_phrase = join_tws(wordlist, " ", "lemma") # only lemmas
         surface_phrase = join_tws(wordlist, " ", "word") # only words
 

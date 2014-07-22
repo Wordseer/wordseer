@@ -65,9 +65,9 @@ class PostTests(CommonTests, unittest.TestCase):
         # Should be one document, with the right sentences
         self.failUnless(len(documents[0].children) == 1)
 
-        extract_sentences = [sent.sentence for sent in
+        extract_sentences = [sent.text for sent in
             documents[0].children[0].sentences]
-        unit_sentences = [sent.sentence for sent in
+        unit_sentences = [sent.text for sent in
             self.extractor.extract_unit_information(self.json,
                 self.xml)[0].children[0].sentences]
 
