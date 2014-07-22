@@ -3,7 +3,7 @@
 
 from corenlp import StanfordCoreNLP
 
-from . import config
+from app import app
 from app.models.sentence import Sentence
 from app.models.word import Word
 from app.models.dependency import Dependency
@@ -22,7 +22,7 @@ class StringProcessor(object):
         some time.
         """
 
-        self.parser = StanfordCoreNLP(config.CORE_NLP_DIR)
+        self.parser = StanfordCoreNLP(app.config["CORE_NLP_DIR"])
 
     def tokenize(self, txt):
         """Turn a string of one or more ``Sentence``\s into a list of
@@ -108,13 +108,13 @@ class StringProcessor(object):
                     # Read the data for the governor, and find the corresponding word
                     governor = Word.query.filter_by(
                         lemma = governor_lemma,
-                        tag = governor_pos
+                        part_of_speech = governor_pos
                     ).first()
 
                     # Same as above for the dependent in the relationship
                     dependent = Word.query.filter_by(
                         lemma = dependent_lemma,
-                        tag = dependent_pos
+                        part_of_speech = dependent_pos
                     ).first()
 
                     if not governor:
@@ -194,10 +194,10 @@ def tokenize_from_raw(parsed_text, txt):
         for word_data in sentence_data["words"]:
 
             word = word_data[0]
-            tag = word_data[1]["PartOfSpeech"]
+            part_of_speech = word_data[1]["PartOfSpeech"]
             lemma = word_data[1]["Lemma"]
 
-            key = (word, tag, lemma)
+            key = (word, part_of_speech, lemma)
 
             # TODO: proper space_before implementation
 
@@ -210,7 +210,7 @@ def tokenize_from_raw(parsed_text, txt):
                     word = Word.query.filter_by(
                         word = word,
                         lemma = lemma,
-                        tag = tag
+                        part_of_speech = part_of_speech
                     ).one()
                     # print("Found word " + str(word))
                 except(MultipleResultsFound):
@@ -220,7 +220,7 @@ def tokenize_from_raw(parsed_text, txt):
                     word = Word(
                         word = word,
                         lemma = lemma,
-                        tag = tag
+                        part_of_speech = part_of_speech
                     )
                     # print("New word " + str(word))
                     
@@ -230,7 +230,7 @@ def tokenize_from_raw(parsed_text, txt):
                 word = word,
                 position = position,
                 space_before = "", # word["space_before"],
-                tag = word.tag
+                part_of_speech = word.part_of_speech
             )
 
             position += 1

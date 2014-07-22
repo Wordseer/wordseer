@@ -1,12 +1,12 @@
-"""
-This file has tools to process a collection of files. This is the interface
+"""This file has tools to process a collection of files. This is the interface
 between the input and the pipeline.
 """
 
 from datetime import datetime
 import os
 
-from . import config
+from app import app
+import database
 from . import logger
 from .parser.documentparser import DocumentParser
 from .sequence.sequenceprocessor import SequenceProcessor
@@ -42,8 +42,7 @@ class CollectionProcessor(object):
         """
 	# Set up database if necessary
         if start_from_scratch is True:
-            with Database() as database:
-                database.reset()
+            database.reset()
 
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
@@ -53,14 +52,14 @@ class CollectionProcessor(object):
                 docstruc_filename, filename_extension)
 
         # Parse the documents
-        if ((config.GRAMMATICAL_PROCESSING or
-            (config.WORD_TO_WORD_SIMILARITY and
-            config.PART_OF_SPEECH_TAGGING)) and not
+        if ((app.config["GRAMMATICAL_PROCESSING"] or
+            (app.config["WORD_TO_WORD_SIMILARITY"] and
+            app.config["PART_OF_SPEECH_TAGGING"])) and not
             "true" in logger.get("finished_grammatical_processing").lower()):
             print("Parsing documents")
             self.parse_documents()
 
-        if (config.SEQUENCE_INDEXING and
+        if (app.config["SEQUENCE_INDEXING"] and
             "true" in logger.get("finished_sequence_processing").lower()):
             print "finishing indexing sequences"
             self.calculate_index_sequences()
@@ -81,7 +80,7 @@ class CollectionProcessor(object):
             self.reader_writer.calculate_tfidfs()
 
         # Calculate word-to-word-similarities
-        if (config.WORD_TO_WORD_SIMILARITY and not
+        if (app.config["WORD_TO_WORD_SIMILARITY"] and not
             "true" in logger.get("word_similarity_calculations_done")):
             print("Calculating Lin Similarities")
             #TODO: reader_writer

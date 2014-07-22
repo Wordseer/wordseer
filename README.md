@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/wordseer/wordseer_flask.png?label=ready&title=Ready)](https://waffle.io/wordseer/wordseer_flask)
 # A Flask-based back end for WordSeer
 
 [WordSeer](http://wordseer.berkeley.edu/) is a tool for natural language
@@ -25,9 +26,13 @@ more maintainable python.
 
 ### Installing
 1.  Create a virtualenv
-2.  Run:
+2.  On linux, run:
 
         pip install -r requirements.txt
+
+    On windows, run:
+
+        pip -r install requirements_win.txt
 
     to install the necessary packages.
 3.  Run:
@@ -40,10 +45,6 @@ more maintainable python.
 
     to migrate the model schema into the database.
 
-### Testing
-1. Simply run `runtests.py`:
-
-        python runtests.py
 
 ### Documentation
 Documentation is
@@ -58,11 +59,7 @@ Or, on windows, simply run `make.bat`.
 ## Pipeline
 
 ### Installing
-1. In the `lib/wordseerbackend` directory, run:
-
-        pip install -r requirements.txt
-
-2. `corenlp` must be installed manually. Clone the repository:
+1. `corenlp` must be installed manually. Clone the repository:
 
         git clone https://github.com/silverasm/stanford-corenlp-python.git
         cd stanford-corenlp-python
@@ -91,20 +88,11 @@ Or, on windows, simply run `make.bat`.
         unzip stanford-corenlp-full-2013-06-20.zip
         mv stanford-corenlp-full-2013-06-20 stanford-corenlp
 
-3. Then run:
-
-        python createdb.py
-
-4. After installing the above dependencies, make sure you edit
+2. After installing the above dependencies, make sure you edit
 `lib/wordseerbackend/wordseerbackend/config.py` for your setup. Particularly
 make sure to point `CORE_NLP_DIR` to the Stanford NLP library. You should then
 be ready to parse files. Example XML and JSON files are included in
 `tests/data`.
-
-### Testing
-1. From `lib/wordseerbackend`, run the following:
-
-        python runtests.py
 
 ### Documentation
 Documentation is
@@ -115,4 +103,9 @@ build it yourself:
 	make html
 
 Or, on windows, simply run `make.bat` in the same directory.
+
+## Testing
+1. Simply run `runtests.py`:
+
+        python runtests.py
 

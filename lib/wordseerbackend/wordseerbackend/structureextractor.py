@@ -66,6 +66,8 @@ class StructureExtractor(object):
 
         units = []
         xpaths = structure["xpaths"]
+        combined_sentence = ""
+        combined_nodes = []
 
         for xpath in xpaths:
             nodes = get_nodes_from_xpath(xpath, parent_node)
@@ -80,17 +82,55 @@ class StructureExtractor(object):
                     for child_struc in structure["units"]:
                         children.extend(self.extract_unit_information(
                             child_struc,
-                            node)
-                        )
+                            node))
                 else:
-                    current_unit.sentences = self.get_sentences(structure, node,
-                        True)
+                    if structure.get("combine") == True:
+                        # This element contains text which must be combined
+                        # with the next sibling element of this type.
+                        combined_sentence += str(node) + " "
+                        combined_nodes.append(node)
+                    else:
+                        current_unit.sentences = self.get_sentences(structure,
+                            node, True)
 
-                current_unit.children = children
-                current_unit.save()
-                units.append(current_unit)
+                if not structure.get("combine") or len(combined_nodes) == 1:
+                    current_unit.children = children
+                    current_unit.save()
+                    units.append(current_unit)
+
+            # TODO: refactor, this code is similar in get_sentences
+            new_sentences = self.get_sentences_from_text(combined_sentence,
+                True)
+
+            for sentence in new_sentences:
+                sentence.properties = get_metadata(structure, combined_nodes[0])
+                units[-1].sentences.append(sentence)
+
+            combined_sentence = ""
+            combined_nodes = []
 
         return units
+
+    def get_sentences_from_text(self, text, tokenize):
+        """Given a string of text, either tokenize the sentences and return
+        the result or return the given string.
+
+        Arguments:
+            text (str): The text to get sentences from, at least one sentence.
+            tokenize (boolean): Whether or not to tokenize the sentence.
+
+        Returns:
+            If ``tokenize`` is ``True`` a list of ``Sentence`` objects with
+            ``Sentence.text`` set to the text of the sentence.
+
+            Otherwise, return a list of one ``Sentence`` object with
+            ``Sentence.text`` set to ``text``.
+        """
+        if not tokenize:
+            return [Sentence(text=text)]
+
+        else:
+            return self.str_proc.tokenize(text)
 
     def get_sentences(self, structure, parent_node, tokenize):
         """Return the sentences present in the parent_node and its children.
@@ -101,6 +141,7 @@ class StructureExtractor(object):
         :param boolean tokenize: if True, then the sentences will be tokenized
         :return list: A list of Sentences.
         """
+        #TODO: do we really need the tokenize argument?
 
         result_sentences = [] # a list of sentences
         sentence_text = ""
@@ -120,17 +161,23 @@ class StructureExtractor(object):
                 sentence_metadata.extend(get_metadata(structure,
                     sentence_node))
 
-        if tokenize:
-            sentences = self.str_proc.tokenize(sentence_text)
-            for sentence in sentences:
-                # TODO: figure out sentence properties
-                result_sentences.append(sentence)
+#        if tokenize:
+#            sents = self.str_proc.tokenize(sentence_text)
+#            for sent in sents:
+#                sent.properties = sentence_metadata
+#                result_sentences.append(sent)
+#
+#        else:
+#            result_sentences.append(Sentence(text=sentence_text,
+#                metadata=sentence_metadata))
+        sentences = self.get_sentences_from_text(sentence_text, tokenize)
 
-        else:
-            result_sentences.append(Sentence(text=sentence_text,
-                metadata=sentence_metadata))
+        for sentence in sentences:
+            # TODO: figure out sentence properties
+            # sentence.properties = sentence_metadata
+            result_sentences.append(sentence)
+
         return result_sentences
-
 
 def get_metadata(structure, node):
     """Return a list of Property objects of the metadata of the Tags in

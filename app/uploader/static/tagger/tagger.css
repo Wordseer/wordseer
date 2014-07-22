@@ -1,0 +1,213 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Jun 23, 2014, 1:44:09 PM
+    Author     : Hassan Jannah
+*/
+
+
+#tagger{
+    padding:0;
+}
+#tagger h1, #tagger h2{
+    font-size: 1.5em;
+    margin: 5px 0;
+}
+#tagger-node-preview , #tagger-xml-preview{
+    width:calc(50% - 5px);
+    /*margin:5px;*/ 
+    display:inline-block;
+    float:left;
+    /*max-height: 400px;*/
+    /*    overflow: auto;*/
+}
+#tagger-node-preview{
+    margin: 0 10px 10px 0;
+}
+#tagger-node-preview .tagger-container-body, #tagger-xml-preview .tagger-container-body{
+    overflow:auto;
+    max-height: 300px;
+}
+#title-tree-nodes, #title-tree-xml-preview{
+    overflow:auto;
+    max-height: 150px;
+    width: 50%;
+    float:left
+}
+#title-tree-node h3{
+    margin-top: 5px;
+}
+
+#tagger-previews{
+    width:100%;
+    display:inline-block;
+}
+
+.tagger-bucket{
+    /*width:calc(50% - 10px);*/
+    margin:5px; 
+    /*display:inline-block;*/
+    /*float:left;*/
+}
+.tagger-box{
+    /*border: 1px solid #CCC;*/
+}
+.bucket-header{
+    background-color: navy;
+    color:white;
+    border-radius: 5px 5px 0 0;
+    border: 1px solid #CCC;
+    padding: 5px;
+}
+.bucket-body{
+    border: 1px solid #CCC;
+    padding: 5px;
+}
+.bucket-helper{
+    float:right;
+}
+
+
+
+/****************
+*   NODE TAGS   *
+*****************/
+.tagger-node{
+    padding:2px;
+}
+.tagger-node-children{
+    padding-left:10px;
+}
+
+.node-tag{
+    background-color: yellow;
+}
+
+.node-tag-metadata{
+
+}
+
+.node-tag-units{
+
+}
+.node-tag-action{
+
+    /*width:20px;*/
+    height:20px;
+    border-radius: 10px;
+    padding:3px 5px;
+    opacity:.1;
+    color:#222;
+    cursor:pointer;
+}
+.node-tag-action:hover{
+    opacity:.8;
+}
+.node-tag-action-property
+{
+    background-color:rgb(241, 249, 0);
+    /*color:red;*/
+}
+.node-tag-action-text
+{
+    background-color:rgb(0, 249, 241);
+    /*color:green;*/
+}
+
+.expand-node , .collapse-node{
+    opacity: .2;
+    cursor: pointer;
+}
+.expand-node{
+    color: green;
+}
+.collapse-node{
+    color:coral;
+}
+.expand-node:hover , .collapse-node:hover{
+    opacity: 1;
+}
+.highlighted-nodes{
+    background-color: rgba(255, 210, 99, .4) !important;
+}
+.highlighted-tag{
+    background-color:orange !important;
+}
+.added-node{
+    opacity:1;
+}
+
+/**************
+*  BUCKETS    *
+**************/
+.bucket-tag-group{
+    /*margin:5px;*/
+}
+.removed{
+    background-color:red;
+}
+/**************
+* XML Preview *
+**************/
+
+.xml-preview-node{
+
+}
+.xml-preview-children{
+    padding-left:10px;
+}
+.xml-preview-tag{
+    color: #222;
+    font-weight: bold;
+}
+.xml-preview-attribute{
+    color: rgb(120,0,0);
+}
+.xml-preview-content{
+
+}
+/**************
+* OUTPUT Preview *
+**************/
+
+#tagger-output-preview{
+    width:100%;
+    float:none;
+    display: block;
+}
+#output-preview-table{
+    /*border: 1px solid #BBB;*/
+    width:100%;
+}
+#output-preview-table td{
+    /*padding: 2px;*/
+    /*border: 1px solid;*/
+}
+
+
+#tagger-rename-dialogue, .hidden-box{
+    width:100%;
+    height: 100%;
+    position: fixed;
+    top:0;
+    left:0;
+    background-color: rgba(0,0,0,.4);
+}
+#rename-form, #tagger-save-file-response, #tagger-intro{
+    width:70%;
+    top:10%;
+    left:15%;
+    position: fixed;
+    overflow: auto;
+    max-height: 80%
+
+}
+
+#save-structure-button{
+    float:right;
+    display:inline-block;
+    margin-bottom: 5px;
+}

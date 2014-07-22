@@ -18,7 +18,8 @@ class Dependency(db.Model, Base):
         dependent (Word): The dependent ``Word``.
         sentence_count (int): the number of sentences this appears in
         document_count (int): the number of documents this appears in
-        parse_products: ??? how is this related TODO
+        sentences (list of Sentences): ``Sentence``\s that this dependency is
+            in.
 
     Relationships:
         Has one: dependent (Word), governor (Word), grammatical relationship
@@ -37,18 +38,16 @@ class Dependency(db.Model, Base):
     # Relationships
 
     grammatical_relationship = db.relationship(
-        "GrammaticalRelationship", backref="dependency"
-    )
+        "GrammaticalRelationship", backref="dependency")
+
     governor = db.relationship(
-        "Word", foreign_keys=[governor_id], backref="governor_dependencies"
-    )
+        "Word", foreign_keys=[governor_id], backref="governor_dependencies")
+
     dependent = db.relationship(
-        "Word", foreign_keys=[dependent_id], backref="dependent_dependencies"
-    )
+        "Word", foreign_keys=[dependent_id], backref="dependent_dependencies")
 
     sentences = association_proxy("dependency_in_sentence", "sentence",
-        creator=lambda sentence: DependencyInSentence(sentence=sentence)
-    )
+        creator=lambda sentence: DependencyInSentence(sentence=sentence))
 
     def __repr__(self):
         """Representation string for the dependency
