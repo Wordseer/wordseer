@@ -39,10 +39,9 @@ Follow the directions in the "Installing" sections found below.
 ## Application
 
 ### Installing
-
 1.  Create a virtualenv
 
-2.  On windows, run:
+2.  Run:
 
         pip -r install requirements_win.txt
 
