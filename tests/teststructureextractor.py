@@ -25,6 +25,7 @@ class CommonTests(object):
         :param str input_file: The XML file to test.
 
         """
+        self.path = path
         self.structure_file = path + structure_file
         self.input_file = path + input_file
         with open(self.structure_file) as f:
@@ -111,6 +112,21 @@ class PostTests(CommonTests, unittest.TestCase):
         for sent in sent_info.sentences:
             self.failUnless(isinstance(sent, Sentence))
             self.failUnless(sent.text in self.sentence_contents)
+
+    def test_combine(self):
+        """Test that items are properly combined when processing.
+        """
+        fileinfo = self.extractor.extract_unit_information(self.json,
+            etree.parse(self.path + "post2.xml"))
+
+        sentences = fileinfo[0].children[0].sentences
+
+        expected_sentences = ["This is the text of post 3.",
+            "I love blogs, but I also love debugging.",
+            "Debugging is the best."]
+
+        actual_sentences = [sentence.text for sentence in sentences]
+        assert actual_sentences == expected_sentences
 
     def test_get_metadata(self):
         """Tests for get_metadata
