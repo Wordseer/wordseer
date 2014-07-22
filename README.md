@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/wordseer/wordseer_flask.png?label=ready&title=Ready)](https://waffle.io/wordseer/wordseer_flask)
 # A Flask-based back end for WordSeer
 
 [WordSeer](http://wordseer.berkeley.edu/) is a tool for natural language
@@ -41,9 +42,9 @@ Follow the directions in the "Installing" sections found below.
 
 1.  Create a virtualenv
 
-2.  Run:
+2.  On windows, run:
 
-        pip install -r requirements.txt
+        pip -r install requirements_win.txt
 
     to install the necessary packages.
 

@@ -27,17 +27,17 @@ class CommonTests(object):
             for w in range(0, len(self.result[s].words)):
                 word = self.result[s].words[w]
                 raw_word = self.raw["sentences"][s]["words"][w]
-                self.failUnless(word.word == raw_word[0])
-                self.failUnless(word.lemma == raw_word[1]["Lemma"])
-                self.failUnless(word.tag == raw_word[1]["PartOfSpeech"])
+                assert word.word == raw_word[0]
+                assert word.lemma == raw_word[1]["Lemma"]
+                assert word.part_of_speech == raw_word[1]["PartOfSpeech"]
 
     def test_tags(self):
         """Test to make sure the words are accurately tagged.
         """
         # Make sure the words are tagged.
-        for sent in self.result:
-            for tw in sent.tagged:
-                self.failIf(tw.tag == "")
+        for sentence in self.result:
+            for word in sentence.words:
+                self.failIf(word.part_of_speech == "")
 
 class TokenizeParagraphTests(CommonTests, unittest.TestCase):
     """Test tokenize() using a paragraph of text.
@@ -62,7 +62,7 @@ class TokenizeParagraphTests(CommonTests, unittest.TestCase):
         # Todo: Check without hardcoding the ends?
         for sent in self.result:
             self.failUnless(isinstance(sent, Sentence))
-            self.failUnless(sent.tagged[-2].word in ["word", "death",
+            self.failUnless(sent.words[-2].word in ["word", "death",
                 "candle", "more", "nothing"])
 
 class TokenizeSentenceTests(CommonTests, unittest.TestCase):
@@ -86,7 +86,7 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
         """
         for s in range(0, len(self.result)):
             for w in range(0, len(self.result[s].words)):
-                space = self.result[s].tagged[w].space_before
+                space = self.result[s].words[w].space_before
                 actual_char = self.example[int(self.raw["sentences"][s]["words"]
                     [w][1]["CharacterOffsetBegin"])]
                 if space == "":

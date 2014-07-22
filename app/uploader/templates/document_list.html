@@ -1,14 +1,15 @@
 {% import "macros.html" as macros %}
 {% extends "item_list.html" %}
 {% block scripts %}
-    {{ super() }}
-	<script src="{{ url_for('uploader.static',
-        filename='upload-input-group.js') }}">
-	</script>
+{{ super() }}
+<script src="{{ url_for('uploader.static',
+        filename='upload-input-group.js') }}"></script>
+
+</script>
 {% endblock %}
 {% block title %}Document List{% endblock %}
 {% block page_header %}
-    {{ macros.breadcrumbs([
+{{ macros.breadcrumbs([
         (url_for('uploader.projects'), "Projects"),
         ("", project.name)
         ])}}
@@ -16,10 +17,10 @@
 
 {% block creation_header %}Upload new document{% endblock %}
 {% block creation_form %}
-    <form method="POST" enctype="multipart/form-data"
-        class="form-inline clearfix" role="form">
-        {{ create_form.hidden_tag() }}
-        {{ macros.render_field(create_form.uploaded_file,
+<form method="POST" enctype="multipart/form-data"
+      class="form-inline clearfix" role="form">
+    {{ create_form.hidden_tag() }}
+    {{ macros.render_field(create_form.uploaded_file,
                 multiple="multiple",
                 accept=allowed_extensions|join(", "),
                 button=create_form.upload_button(
@@ -27,26 +28,28 @@
                     icon="glyphicon-cloud-upload"),
                 help=("Allowed extensions: " + allowed_extensions|join(", ") +
                     ".")) }}
-    </form>
+</form>
 {% endblock %}
 
 {% block list_header %}Existing documents{% endblock %}
 {% block list_form %}
-    {% if process_form.selection.choices %}
-        {{ macros.render_errors(process_form.selection.errors) }}
-        <form method="POST" role="form">
-            {{ process_form.hidden_tag() }}
-            {{ macros.selection_table(process_form.selection, "document",
+{% if process_form.selection.choices %}
+{{ macros.render_errors(process_form.selection.errors) }}
+<form method="POST" role="form">
+    {{ process_form.hidden_tag() }}
+    {{ macros.selection_table(process_form.selection, "document",
                 "table table-striped table-hover click-anywhere",
                 "File Name", "uploader.document_show", project_id=project.id) }}
 
-            <h3>Selected file actions:</h3>
-            {{ process_form.process_button(class="btn btn-primary",
+    <h3>Selected file actions:</h3>
+    {{ process_form.structure_button(class="btn btn-info",
+                icon="glyphicon-list", id='structure-button') }}
+    {{ process_form.process_button(class="btn btn-primary",
                 icon="glyphicon-tasks") }}
-            {{ process_form.delete_button(class="btn btn-danger",
+    {{ process_form.delete_button(class="btn btn-danger",
                 icon="glyphicon-remove") }}
-        </form>
-    {% else %}
-        <p>There are no files in this project.</p>
-    {% endif %}
+</form>
+{% else %}
+<p>There are no files in this project.</p>
+{% endif %}
 {% endblock %}

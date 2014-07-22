@@ -1,19 +1,14 @@
 # Virtual Environment
 venv
 
-# Vim
-*.sw[po]
-
 # Python
 *.py[cod]
 __pycache__
 
+
 # Database
-*.db
 db
+*.db
 
-# Documentation
-docs/build
-
-# line_profiler
-*.*prof
+# AWS
+.elasticbeanstalk/
