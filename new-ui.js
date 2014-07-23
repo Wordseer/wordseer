@@ -21,6 +21,7 @@ Ext.application({
         'WordSeer.view.windowing.viewport.Viewport',
         'WordSeer.view.table.Table',
         'WordSeer.view.user.SignIn',
+        'Ext.util.History',
     ],
     controllers: [
         'AutoSuggestController',
@@ -39,10 +40,12 @@ Ext.application({
         'PhraseSetsController',
         'WordTreeController',
         'WordFrequenciesController',
+        'UrlHistoryController',
         'UserController'
     ],
     launch: function() {
         sessionStorage['username'] =  'test';
+        var me = this;
         APP = {
             getSearchableWidgets: function() {
                 return [
@@ -136,11 +139,47 @@ Ext.application({
             }
         };
         var store_cfg = {fields:['word', 'count']};
-        Ext.create('Ext.container.Viewport', {
-            layout: 'fit',
-            items:{
-                    xtype: 'usersignin',
-            }
+
+        // set up Ext History utility
+        // required DOM events
+        me.historyForm = Ext.getBody().createChild({
+            tag: 'form',
+            action: '#',
+            cls: 'x-hidden',
+            id: 'history-form',
+            children: [{
+                tag: 'div',
+                children: [{
+                    tag: 'input',
+                    id: Ext.History.fieldId,
+                    type: 'hidden'
+                }, {
+                    tag: 'iframe',
+                    id: Ext.History.iframeId
+                }]
+            }]
         });
+
+        // initialize
+        Ext.History.init(function(){
+            console.log("history initiated");
+            // if there's a hash in URL, get it
+            var hash = document.location.hash;
+            console.log("init  hash: " + hash);
+            // hand off to url history controller
+            // this.getController('UrlHistoryController').fireEvent('tokenchange',
+                // hash.replace('#',''));
+        });
+
+        // handle history changes
+        Ext.History.on('change', function(token){
+            console.log("history hash changed: " + token);
+            // hand off to url history controller for dispatching
+            me.getController('UrlHistoryController').dispatch(token);
+        });
+
+//         user sign in 
+        Ext.History.add("usersignin");
+        
     }
 });
