@@ -162,7 +162,6 @@ Ext.application({
 
         // initialize
         Ext.History.init(function(){
-            console.log("history initiated");
             // if there's a hash in URL, get it
             var hash = document.location.hash;
             console.log("init  hash: " + hash);
@@ -173,12 +172,11 @@ Ext.application({
 
         // handle history changes
         Ext.History.on('change', function(token){
-            console.log("history hash changed: " + token);
             // hand off to url history controller for dispatching
             me.getController('UrlHistoryController').dispatch(token);
         });
 
-//         user sign in 
+//      redirect to user sign in 
         Ext.History.add("usersignin");
         
     }

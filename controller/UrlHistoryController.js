@@ -5,6 +5,7 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
 
     dispatch: function(token){
         console.log(token);
+        var windowing = this.getController('WindowingController');
         switch (token) {
             case 'usersignin':
                 Ext.create('Ext.container.Viewport', {
@@ -14,7 +15,8 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
                     }
                 });
                 break;
-            
+            case 'home': 
+                windowing.land();
         }
     }
 });

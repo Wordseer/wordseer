@@ -111,7 +111,7 @@ Ext.define('WordSeer.controller.UserController', {
 			xtype: 'windowing-viewport'
 		});
 		this.setStoreUsernames();
-		this.getController('WindowingController').land();
+		Ext.History.add("home");
 	},
 
 	/**
