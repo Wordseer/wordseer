@@ -78,12 +78,6 @@
             {% block body %}{% endblock %}
         </div>
         {% block toplevel %}{% endblock %}
-        <!--  <script
-              src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js">
-          </script>
-          <script
-              src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js">
-          </script>-->
         <script src="{{ url_for('uploader.static', filename='external_lib/jquery-1.11.1.min.js') }}"></script>
         <script src="{{ url_for('uploader.static', filename='external_lib/bootstrap.min.js') }}"></script>
         {% block scripts %}{% endblock %}

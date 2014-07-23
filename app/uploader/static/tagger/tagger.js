@@ -1,11 +1,18 @@
 /* 
  * @Author = Hassan Jannah
- */
-
-
+ *//*
+  $(window).load(function() {
+  $('#tagger-loading-box').fadeOut("slow");
+  })*/
 $(document).ready(function() {
+    console.log('ready');
     init_tagger();
-});
+})/*.ajaxStart(function() {
+ console.log('ajax start');
+ $('#tagger-loading-box').show();
+ }).ajaxStop(function() {
+ $('#tagger-loading-box').hide();
+ })*/;
 var project_id, document_id, document_url, filename, kwargs, templates_url;
 var BODY_CHANGE_EVENT = 'bodyChange';
 var TEMPLATES = {
@@ -17,6 +24,7 @@ var TEMPLATES = {
     XML_PREVIEW: {filename: 'xml_preview.html'},
     OUTPUT_PREVIEW: {filename: 'output_preview.html'},
     RENAME_FORM: {filename: 'rename_form.html'},
+    COMBINE_FORM: {filename: 'combine_form.html'},
     INTRO: {filename: 'intro.html'}
 };
 var buckets = {
@@ -26,14 +34,14 @@ var buckets = {
     properties: {id: 'property-bucket',
         header: 'Selected analysis properties',
         help: 'Properties are additional information that help perform multi-propertyal analysis on the text.'}};
-var NODE_TYPES = {TEXT: 'text', PROPERTY: 'property'};
+
 var nodes;
 function init_tagger()
 {
+//     
     loadRequestParams();
     nodes = new NodeModel();
     nodes.loadFromXMLURL(document_url, filename);
-//    console.log(nodes);
     loadTemplates();
     render();
     loadNodeTreeEvents();
@@ -85,6 +93,7 @@ function loadSubmitEvent()
 
 function loadIntro()
 {
+    $('#tagger-loading-box').hide();
     renderTemplate('#tagger-intro-box', TEMPLATES.INTRO);
     $('#tagger-intro-box').show()
             .on('click', function() {
@@ -109,7 +118,8 @@ function saveStructureFile()
 {
 //    alert('Saving structure file');
     var data = nodes.toActiveJSON(), token = $('#csrf_token').val();
-    var url = window.location.href + '/save/';
+    var url = S(window.location.href).chompRight('#').s + '/save/';
+    console.log(url);
     $.ajax({
         type: "POST",
         url: url,
@@ -321,13 +331,18 @@ function addBucketTagEvents(id) {
     {
         disableHighlightNodes(id);
     });
-    $('.bucket-body .bucket-tag-property.' + id).on('click', function()
+    $('.bucket-body .bucket-tag-property.' + id).unbind('click').on('click', function()
     {
-        var self = $(this), type = self.attr('data-type');
+        var self = $(this), type = self.attr('data-type'), id = self.attr('data-id');
         showRenameDialogue(id);
     });
+    $('.bucket-body .bucket-tag-sentence.' + id).unbind('click').on('click', function()
+    {
+        var self = $(this), type = self.attr('data-type'), id = self.attr('data-id');
+        showCombineForm(id);
+    });
     $('.bucket-tag-remove.' + id).on('click', function() {
-        var myId = $(this).attr('data-id'), type = $(this).attr('data-type');
+        var myId = $(this).attr('data-id'), type = $(this).attr('data-node-type');
         removeElement(null, myId, type);
         disableHighlightNodes(myId);
     });
@@ -371,7 +386,6 @@ function removeElement(tag, id, nodeType)
 {
     if (!tag)
         tag = $('.node-tag-action.' + id);
-//    tag.removeClass('added-node');
     if (nodeType === NODE_TYPES.TEXT)
         removeTextElement(id);
     else
@@ -412,6 +426,8 @@ function addTextElement(id)
         node.activate();
         node.setAsSentence(true);
         renderTemplate('#sentence-bucket .bucket-body', TEMPLATES.BUCKET_NODE, node);
+        showCombineForm(id);
+
     } else {
         alert('node already added');
     }
@@ -435,6 +451,7 @@ function addPropertyElement(id, renameDialogue, preventRender)
 }
 function removeTextElement(id)
 {
+
     var node = nodes.map[id];
     node.deactivate();
     node.setAsSentence(false);
@@ -485,6 +502,8 @@ function refreshNodeTreeView()
  */
 function showRenameDialogue(id)
 {
+//    showLoading();
+    hideRenameDialogue();
     var node = nodes.map[id];
     renderTemplate('#tagger-rename-dialogue', TEMPLATES.RENAME_FORM, node.attributes);
     if (node.attributes.type !== METADATA_TAG)
@@ -499,6 +518,7 @@ function showRenameDialogue(id)
 //        console.log('has title ' + node.attributes.titleId);
         $('.title-node-tag.' + node.attributes.titleId).trigger('click');
     }
+//    hideLoading();
 }
 function loadRenameDialogueEvents()
 {
@@ -529,13 +549,36 @@ function loadRenameDialogueEvents()
         $('#selected-property-title').val('').attr('data-id', '');
         $('.title-node-tag.highlighted-tag').removeClass('highlighted-tag');
     });
+    $('#selected-property-data-type').dropdown();
+    $('#selected-property-data-type-list li a').on('click', function() {
+        var type = $(this).attr('data-type');
+        $('#selected-property-data-type').attr('data-type', type).html(S(type).capitalize().s + ' <span class="caret">');
+        if (type === DATA_TYPES.DATE) {
+            $('#selected-property-date-format').show();
+            $('#selected-property-date-format-help').show();
+
+        }
+        else
+        {
+            $('#selected-property-date-format').hide();
+            $('#selected-property-date-format-help').hide();
+
+        }
+
+    });
+
 
 }
-function hideRenameDialogue()
+function hideRenameDialogue(remove, id, nodeType)
 {
     $('#tagger-rename-dialogue').hide();
     $('#tagger-rename-dialogue').empty();
-    loadRenameDialogueEvents();
+    if (remove && id)
+    {
+      /* if (nodes.map[id].attributes.type !== DOCUMENT_TAG)
+            removeElement(null, id, nodeType);*/
+    }
+//    loadRenameDialogueEvents();
 
 }
 function saveRenameDialogue()
@@ -543,24 +586,36 @@ function saveRenameDialogue()
     var id = $('#title-tree-node-target').val(),
             new_name = $('#selected-display-title').val(),
             new_target_id = $('#selected-property-title').attr('data-id'),
+            data_type = $('#selected-property-data-type').attr('data-type'),
+            date_format = $('#selected-property-date-format').val(),
             node = nodes.map[id];
     if (new_name.length > 0)
         node.rename(new_name);
+
     if (nodes.map[new_target_id])
     {
         node.setTitleAsXPath(nodes.map[new_target_id].attributes.xpaths[0]);
         node.setTitleNode(new_target_id);
+
+        nodes.map[new_target_id].setDataType(data_type);
         var tag;
 //        refreshElement(id);
         addElement(tag, new_target_id, NODE_TYPES.PROPERTY, false, true);
     }
     else
     {
-        var tid =node.attributes.titleId;
-        if(tid!=='')
+        var tid = node.attributes.titleId;
+        if (tid !== '')
         {
             node.resetTitleNode();
         }
+    }
+    node.setDataType(data_type);
+
+//    console.log(data_type + '\t' + date_format);
+    if (data_type === DATA_TYPES.DATE) {
+        node.setDateFormat(date_format);
+//        console.log(date_format);
     }
     refreshElement(id);
     hideRenameDialogue();
@@ -569,12 +624,14 @@ function saveRenameDialogue()
 /****************************
  *      OUTPUT PREVIEW      *
  ****************************/
+
+var sampleSize = DEFAULT_SAMPLE_SIZE, defaultIncrease = DEFAULT_SAMPLE_SIZE;
 function loadOutputPreview()
 {
     //"DOMSubtreeModified"
-    $('.bucket-body').on(BODY_CHANGE_EVENT, function()
+    $('.bucket-body').unbind(BODY_CHANGE_EVENT).on(BODY_CHANGE_EVENT, function()
     {
-        var data = nodes.getSample();
+        var data = nodes.getSample(sampleSize);
         $('#tagger-output-preview-container').empty();
         if (data.length > 0) {
             for (var i = 0, j = data.length; i < j; i++)
@@ -587,4 +644,64 @@ function loadOutputPreview()
     });
 }
 
+function showMoreOutput()
+{
+    sampleSize += defaultIncrease;
+    $('.bucket-body').trigger(BODY_CHANGE_EVENT);
 
+}
+
+function showLessOutput()
+{
+    sampleSize -= (sampleSize > defaultIncrease) ? defaultIncrease : 0;
+    $('.bucket-body').trigger(BODY_CHANGE_EVENT);
+
+}
+/****************************
+ *      COMBINE FORM         *
+ ****************************/
+/**
+ * 
+ * @param {type} id
+ * @returns {undefined}
+ */
+function showCombineForm(id)
+{
+    hideCombineForm();
+    var node = nodes.map[id];
+    var sample1 = nodes.getTextSample(id, 5, false), sample2 = nodes.getTextSample(id, 5, true);
+    renderTemplate("#tagger-combine-dialogue", TEMPLATES.COMBINE_FORM, {node: node, sample1: sample1, sample2: sample2});
+    loadCombineFormEvents();
+    $('#tagger-combine-dialogue').show();
+}
+function hideCombineForm(remove, id, nodeType)
+{
+    $('#tagger-combine-dialogue').empty();
+    $('#tagger-combine-dialogue').hide();
+    if (remove && id)
+    {
+        removeElement(null, id, nodeType);
+    }
+}
+
+function loadCombineFormEvents()
+{
+
+
+}
+function saveCombineForm()
+{
+    var id = $('#combine-form').attr('data-id'), node = nodes.map[id], combine = $('#select-text-display-modes>.active').attr('data-combine') === 'true';
+//    console.log(combine);
+    node.setCombine(combine);
+    refreshElement(id);
+    hideCombineForm();
+
+}
+
+function showLoading() {
+    $('#tagger-loading-box').show();
+}
+function hideLoading() {
+    $('#tagger-loading-box').fadeOut(200);
+}

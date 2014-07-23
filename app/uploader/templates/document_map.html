@@ -18,9 +18,6 @@
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/node_model.js') }}"></script>
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/tagger.js') }}"></script>
 
-
-<!--<link rel="stylesheet" href="{{ url_for('uploader.static',
-        filename='tagger/bootstrap.min.css') }}" type="text/css" />-->
 {% endblock %}
 {% block title %}Document Details{% endblock %}
 {% block body %}
@@ -34,6 +31,11 @@
 </h1>
 
 {% block tagger %}
+<div id="tagger-loading-box" class='hidden-box'>
+    <div id='tagger-loading' class=''>
+        <img src="{{ url_for('uploader.static',filename='images/loadingGif.gif') }}" alt="Loading"/>
+    </div>
+</div>
 <form id='tagger'>
     {{map_document.hidden_tag()}}
     <input type="hidden" id="project-id" value="{{project.id}}"/>
@@ -49,7 +51,8 @@
     </div>
     <div id="tagger-buckets" class="tagger-box"></div>
     <div id="tagger-output-preview" class="tagger-box"></div>
-    <div id="tagger-rename-dialogue" style="display:none"></div>
+    <div id="tagger-rename-dialogue" style="display:none" class="hidden-box"></div>
+    <div id="tagger-combine-dialogue" style="display:none" class="hidden-box"></div>
     <div id="tagger-save-file-result" class='hidden-box' style="display:none">
         <div id='tagger-save-file-response' class='panel panel-info'>
             <div class='panel-heading'><div class='panel-title'>Save Response</div></div>
@@ -57,8 +60,8 @@
         </div>
     </div>
     <div id="tagger-intro-box" class='hidden-box' style="display:none">
-
     </div>
+
 </form>
 {% endblock %}
 

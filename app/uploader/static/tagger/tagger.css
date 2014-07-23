@@ -130,7 +130,7 @@ and open the template in the editor.
 .expand-node:hover , .collapse-node:hover{
     opacity: 1;
 }
-.highlighted-nodes{
+.highlighted-nodes, .text-display-mode.active{
     background-color: rgba(255, 210, 99, .4) !important;
 }
 .highlighted-tag{
@@ -188,24 +188,52 @@ and open the template in the editor.
 }
 
 
-#tagger-rename-dialogue, .hidden-box{
+.hidden-box{
     width:100%;
     height: 100%;
     position: fixed;
     top:0;
     left:0;
     background-color: rgba(0,0,0,.4);
+    z-index:100;
 }
-#rename-form, #tagger-save-file-response, #tagger-intro{
+#rename-form, #tagger-save-file-response, #tagger-intro, #combine-form{
     width:70%;
     top:10%;
     left:15%;
     position: fixed;
     overflow: auto;
-    max-height: 80%
+    max-height: 80%;
+    min-height:35%;
+    z-index: 200;
 
 }
+#select-text-display-modes{
+    width:100%;
+    /*padding:0 5%;*/
+}
+.text-display-mode{
+    width:50%;
+    max-height: 80%;
+    overflow: auto;
+    text-align: left;
+    white-space: normal !important;
+}
 
+.text-display-mode table{
+    width:100%;
+    text-align: left;
+}
+#tagger-loading{
+    width:20%;
+    top:40%;
+    left:40%;
+    position: fixed;
+    /*overflow: auto;*/
+}
+#tagger-loading img{
+    width:100%;
+}
 #save-structure-button{
     float:right;
     display:inline-block;

@@ -1,5 +1,6 @@
+<!--<div id='rename-form-background' class='fadeout-background hidden-box'></div>-->
 <div id='rename-form' class='panel panel-default'>
-    <div id='rename-form-backgroun' class='fadeout-background'></div>
+
     <div class='panel-heading tagger-tooltip' title='Edit the title and display text for a property'>
         <h4 class='panel-title'>Edit property title and display</h4>
     </div>
@@ -10,6 +11,22 @@
         <div class="input-group">
             <span class="input-group-addon">Display Name</span>
             <input type="text" id='selected-display-title' data-id='' class="form-control" value="<%=displayName%>">
+            <span class="input-group-addon">Data Type</span>
+            <div class="input-group-btn">
+                <button type="button" id='selected-property-data-type' class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-type="<%=dataType%>"><%=dataType%> <span class="caret"></span></button>
+                <ul id='selected-property-data-type-list' class="dropdown-menu" role="menu">
+                    <li><a href="#" data-type='string'>String</a></li>
+                    <li><a href="#" data-type='date'>Date</a></li>
+                    <li><a href="#" data-type='number'>Number</a></li>
+                </ul>
+            </div> 
+            <input type="text" id="selected-property-date-format" class='form-control' placeholder='D3 Date Format'
+                   <% if(dataType!=='date'){%>style="display:none"<%}%> >
+
+                   <a id='selected-property-date-format-help' href='https://github.com/mbostock/d3/wiki/Time-Formatting' target='_blank' class='input-group-addon tagger-tooltip' 
+                      title='Enter the date format according to d3 standards. Click to view'
+                   <% if(dataType!=='date'){%>style="display:none"<%}%>>?</a>
+
         </div>
         <% if(type!==METADATA_TAG){%>
         <h4>Assign title to <%=tag%></h4>
@@ -20,11 +37,12 @@
         <div class="input-group">
             <span class="input-group-addon">Title Element</span>
             <input type="text" id='selected-property-title' data-id='<%=titleId%>' class="form-control" placeholder="Title Element" value='<%+displayName%>'>
-            <span id='rename-form-clear-title' class="input-group-addon btn btn-info" >Clear</span>
+
         </div>
         <%}%>
         <br/>
-        <button id='rename-form-cancel-btn' class='btn btn-danger' onclick="hideRenameDialogue()">Cancel</button>
+        <button id='rename-form-clear-title' class="btn btn-info" >Clear</button>
+        <button id='rename-form-cancel-btn' class='btn btn-danger' onclick="hideRenameDialogue(true, '<%=id%>', '<%=nodeType%>')">Cancel</button>
         <button id='rename-form-save-btn' class='btn btn-success' onclick="saveRenameDialogue()">Save</button>
 
 
