@@ -70,6 +70,12 @@ Ext.define('WordSeer.controller.WindowingController', {
 		} else {
 			Ext.getCmp('windowing-viewport').add({xtype:'landing-page'});
 		}
+//      remove any lingering tabs
+		var tabs = Ext.getCmp("windowing-viewport").query("layout-panel");
+		for (var i = 0; tabs[i]; i++){
+			tabs[i].destroy();
+		}
+
 	},
 
 	/** Creates a fresh layout and plays the empty history
@@ -126,7 +132,7 @@ Ext.define('WordSeer.controller.WindowingController', {
 	refresh.
 	*/
 	refreshPanel: function(panel) {
-		console.time('refreshPanel');
+		// console.time('refreshPanel');
 		var panel_model = panel.getLayoutPanelModel();
 		var history_item_id = panel_model.get('history_item_id');
 		var history_item = Ext.getStore('HistoryItemStore')
@@ -157,7 +163,7 @@ Ext.define('WordSeer.controller.WindowingController', {
 		try {
 			windows.forEach(function(w) {w.toFront()});
 		} catch (e) {};
-		console.timeEnd('refreshPanel');
+		// console.timeEnd('refreshPanel');
 	},
 
 	/** Activates or deactivates back or forward buttons on the given panel
@@ -198,13 +204,13 @@ Ext.define('WordSeer.controller.WindowingController', {
 		panel.
 	*/
 	addPanel: function() {
-		console.time('addPanel');
+		// console.time('addPanel');
 		var current_layout = Ext.getStore('LayoutStore').getCurrent();
 		var view = Ext.getCmp('windowing-viewport').getComponent(
 			current_layout.get('id'));
 		var panel =  view.addPanel();
 		this.layoutPanelActivated(panel);
-		console.timeEnd('addPanel');
+		// console.timeEnd('addPanel');
 		Ext.resumeLayouts();
 		return panel;
 	},
@@ -220,10 +226,10 @@ Ext.define('WordSeer.controller.WindowingController', {
 		remove.
 	*/
 	removePanel: function(panel) {
-		console.time('removePanel');
+		// console.time('removePanel');
 		var view = panel.up('layout');
 		view.removePanel(panel);
-		console.timeEnd('removePanel');
+		// console.timeEnd('removePanel');
 		this.layoutPanelActivated(view.getCurrentPanel());
 		if (Ext.ComponentQuery.query('layout-panel').length === 0) {
 			this.land();
@@ -430,7 +436,8 @@ Ext.define('WordSeer.controller.WindowingController', {
 
 	@return {WordSeer.view.windowing.viewport.LayoutPanel} The new layout panel.
 	*/
-	playHistoryItemInNewPanel: function(history_item_id) {
+// 	TODO: pass tab ID to layout controller where it is created
+	playHistoryItemInNewPanel: function(history_item_id, tab_id) {
 		var panel = this.addPanel();
 		Ext.defer(function(history_item_id, panel){
 			var current_layout_model = Ext.getStore('LayoutStore').getCurrent();
@@ -440,6 +447,9 @@ Ext.define('WordSeer.controller.WindowingController', {
 				panel.itemId);
 			this.playHistoryItem(panel, panel.getLayoutPanelModel(),
 				history_item_id);
+// 			add to URL after completion
+			this.getController("UrlHistoryController").newTab(panel.id, history_item_id);
+			console.log(panel.id, history_item_id);
 		},
 		1000,
 		this,

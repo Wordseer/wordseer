@@ -37,6 +37,7 @@ Ext.define('WordSeer.controller.SearchController', {
 
 	init: function() {
 //		console.log("Initialized search controller");
+		var history = this.getController("UrlHistoryController");
 		Ext.Ajax.request({
 			url:'../../src/php/document/get-metadata-fields.php',
 			method:'GET',
@@ -92,13 +93,16 @@ Ext.define('WordSeer.controller.SearchController', {
 			},
 		});
 	},
-
+	
 	/**
 	The user has clicked on a tag in the landing page. Create a new search based
 	on that tag.
 	*/
 	tagClicked: function(tag_list_overview, record) {
-		this.getController('WindowingController').start();
+		if (!this.getController('WindowingController').initialized) {
+			this.getController('WindowingController').start();
+		}
+		
 		var formValues = Ext.create('WordSeer.model.FormValues');
 		formValues.widget_xtype = 'sentence-list-widget';
 		if (record instanceof WordSeer.model.PhraseModel ||
@@ -109,6 +113,8 @@ Ext.define('WordSeer.controller.SearchController', {
 		}
 		var history_item = this.getController('HistoryController')
 			.newHistoryItem(formValues);
+// 		this.getController('UrlHistoryController')
+// 			.newTab(history_item.get('id'));
 		this.getController('WindowingController')
 			.playHistoryItemInNewPanel(history_item.get('id'));
 	},
