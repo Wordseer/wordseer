@@ -1,5 +1,6 @@
 """Tests for the StringProcessor.
 """
+import pdb
 import mock
 import unittest
 
@@ -84,9 +85,11 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
     def test_space_before(self):
         """Make sure space_before has been properly done
         """
+        pdb.set_trace()
         for s in range(0, len(self.result)):
-            for w in range(0, len(self.result[s].words)):
-                space = self.result[s].words[w].space_before
+            for w in range(0, len(self.result[s].word_in_sentence)):
+                pdb.set_trace()
+                space = self.result[s].word_in_sentence[w].space_before
                 actual_char = self.example[int(self.raw["sentences"][s]["words"]
                     [w][1]["CharacterOffsetBegin"])]
                 if space == "":
@@ -108,7 +111,7 @@ class ParseTests(unittest.TestCase):
     def test_parse(self, mock_parser, mock_tokenizer):
         """Test the parse method.
         """
-        sent = "The fox is brown."
+        sent = Sentence(text="The fox is brown.")
         parsed_dict = {"sentences":
             [
                 {'dependencies':
@@ -157,7 +160,7 @@ class ParseTests(unittest.TestCase):
         """Check to make sure that parse() will only parse a single sentence.
         """
 
-        sent = "The fox is brown."
+        sent = Sentence(text="The fox is brown.")
         parsed_dict = {"sentences": [mock.MagicMock(name="Sentence1"),
             mock.MagicMock(name="Sentence2")]}
 
@@ -168,6 +171,7 @@ class ParseTests(unittest.TestCase):
 
         self.assertRaises(ValueError, t.parse, sent)
 
+    @unittest.skip("Feature in limbo")
     def test_parse_maxlength(self, mock_parser, mock_tokenizer):
         """Check to make sure that parse() uses a rudimentary sentence length
         check.

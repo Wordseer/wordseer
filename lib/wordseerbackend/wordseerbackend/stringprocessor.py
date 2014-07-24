@@ -190,10 +190,9 @@ def tokenize_from_raw(parsed_text, txt):
 
     for sentence_data in parsed_text["sentences"]:
         sentence = Sentence(text = sentence_data["text"])
-
         position = 0
-        for word_data in sentence_data["words"]:
 
+        for word_data in sentence_data["words"]:
             word = word_data[0]
             part_of_speech = word_data[1]["PartOfSpeech"]
             lemma = word_data[1]["Lemma"]
@@ -201,12 +200,14 @@ def tokenize_from_raw(parsed_text, txt):
             key = (word, part_of_speech, lemma)
 
             # TODO: proper space_before implementation
+            if txt[int(word_data[1]["CharacterOffsetBegin"])] != " ":
+                space_before = ""
 
             if key in words.keys():
                 word = words[key]
                 # print("In dict " + str(word))
-            else:
 
+            else:
                 try:
                     word = Word.query.filter_by(
                         word = word,
