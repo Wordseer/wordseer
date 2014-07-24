@@ -88,15 +88,6 @@ class TestCollectionProcessor(unittest.TestCase):
             self.failUnless(call in mock_strucex_instance.extract.\
                 call_args_list)
 
-        # The reader writer should be called on every extracted doc
-        createdoc_calls = []
-        num_done = 1
-        for entry in extracted_docs:
-            for doc in entry[1]:
-                createdoc_calls.append(mock.call(doc, num_done))
-            num_done += 1
-        mock_writer.create_new_document.assert_has_calls(createdoc_calls)
-
     @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.DocumentParser",
         autospec=documentparser.DocumentParser)
     def test_parse_documents(self, mock_dp, mock_logger):
