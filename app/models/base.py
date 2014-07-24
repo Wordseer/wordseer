@@ -35,10 +35,10 @@ class Base(object):
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', cls.__name__)
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
-    def save(self, force=False):
+    def save(self, force=True):
         """Commits this model instance to the database
         """
-
+        #TODO: make sure pipeline uses force=False
         db.session.add(self)
 
         if Base.commit_on_save or force:
