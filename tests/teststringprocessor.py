@@ -85,17 +85,15 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
     def test_space_before(self):
         """Make sure space_before has been properly done
         """
-        pdb.set_trace()
         for s in range(0, len(self.result)):
             for w in range(0, len(self.result[s].word_in_sentence)):
-                pdb.set_trace()
                 space = self.result[s].word_in_sentence[w].space_before
                 actual_char = self.example[int(self.raw["sentences"][s]["words"]
                     [w][1]["CharacterOffsetBegin"])]
-                if space == "":
-                    self.failUnless(actual_char != " ")
+                if actual_char == " ":
+                    assert space == " "
                 else:
-                    self.failUnless(actual_char == " ")
+                    assert space == ""
 
 @mock.patch.object(stringprocessor, "tokenize_from_raw")
 @mock.patch("lib.wordseerbackend.wordseerbackend.stringprocessor.StanfordCoreNLP.raw_parse")
@@ -154,6 +152,8 @@ class ParseTests(unittest.TestCase):
 
         expected_result = ParseProducts(parsetree,
             expected_deps, mock_tokenizer(parsed_dict, sent)[0].tagged)
+
+        pdb.set_trace()
         self.failUnless(expected_result == result)
 
     def test_parse_twosentences(self, mock_parser, mock_tokenizer):
