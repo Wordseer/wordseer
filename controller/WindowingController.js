@@ -70,10 +70,10 @@ Ext.define('WordSeer.controller.WindowingController', {
 		} else {
 			Ext.getCmp('windowing-viewport').add({xtype:'landing-page'});
 		}
-//      remove any lingering tabs
-		var tabs = Ext.getCmp("windowing-viewport").query("layout-panel");
-		for (var i = 0; tabs[i]; i++){
-			tabs[i].destroy();
+//      remove any lingering panels
+		var panels = Ext.getCmp("windowing-viewport").query("layout-panel");
+		for (var i = 0; panels[i]; i++){
+			panels[i].destroy();
 		}
 
 	},
@@ -436,9 +436,9 @@ Ext.define('WordSeer.controller.WindowingController', {
 
 	@return {WordSeer.view.windowing.viewport.LayoutPanel} The new layout panel.
 	*/
-// 	TODO: pass tab ID to layout controller where it is created
-	playHistoryItemInNewPanel: function(history_item_id, tab_id) {
-		var panel = this.addPanel();
+// 	TODO: pass panel ID to layout controller where it is created
+	playHistoryItemInNewPanel: function(history_item_id, panel_id) {
+		var panel = this.addPanel(panel_id);
 		Ext.defer(function(history_item_id, panel){
 			var current_layout_model = Ext.getStore('LayoutStore').getCurrent();
 			var history_item = Ext.getStore('HistoryItemStore')
@@ -448,7 +448,7 @@ Ext.define('WordSeer.controller.WindowingController', {
 			this.playHistoryItem(panel, panel.getLayoutPanelModel(),
 				history_item_id);
 // 			add to URL after completion
-			this.getController("UrlHistoryController").newTab(panel.id, history_item_id);
+			this.getController("UrlHistoryController").newPanel(panel.id, history_item_id);
 			console.log(panel.id, history_item_id);
 		},
 		1000,
