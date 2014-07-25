@@ -25,6 +25,7 @@ class DocumentParserTests(unittest.TestCase):
                 self.mock_reader_writer,
                 self.mock_str_proc)
 
+    @unittest.skip("Horrible resource use, FIXME")
     @patch("lib.wordseerbackend.wordseerbackend.parser.documentparser.db", autospec=True)
     def test_parse_document(self, mock_db, mock_logger):
         """Test the parse_document method.
