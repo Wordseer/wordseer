@@ -30,8 +30,8 @@ Ext.define('WordSeer.view.windowing.viewport.HboxLayout', {
 	},
 
 // 	option to pass in an ID from url hash
-	addPanel: function() {
-		var new_id = Ext.id();
+	addPanel: function(panel_id) {
+		var new_id = panel_id || Ext.id();
 		var new_panel = Ext.create('WordSeer.model.LayoutPanelModel', {
 			id: new_id,
 			layout_id: this.getLayoutModel().get('id'),

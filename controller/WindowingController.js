@@ -203,12 +203,12 @@ Ext.define('WordSeer.controller.WindowingController', {
 	@return {WordSeer.view.windowing.viewport.LayoutPanel} The newly added
 		panel.
 	*/
-	addPanel: function() {
+	addPanel: function(panel_id) {
 		// console.time('addPanel');
 		var current_layout = Ext.getStore('LayoutStore').getCurrent();
 		var view = Ext.getCmp('windowing-viewport').getComponent(
 			current_layout.get('id'));
-		var panel =  view.addPanel();
+		var panel =  view.addPanel(panel_id);
 		this.layoutPanelActivated(panel);
 		// console.timeEnd('addPanel');
 		Ext.resumeLayouts();
@@ -447,9 +447,12 @@ Ext.define('WordSeer.controller.WindowingController', {
 				panel.itemId);
 			this.playHistoryItem(panel, panel.getLayoutPanelModel(),
 				history_item_id);
-// 			add to URL after completion
-			this.getController("UrlHistoryController").newPanel(panel.id, history_item_id);
-			console.log(panel.id, history_item_id);
+
+			if (!panel_id) {
+				// add to URL after completion
+				this.getController("UrlHistoryController").newPanel(panel.itemId,
+					history_item_id);
+			}
 		},
 		1000,
 		this,
