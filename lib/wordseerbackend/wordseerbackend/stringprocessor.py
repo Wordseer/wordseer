@@ -44,7 +44,7 @@ class StringProcessor(object):
         This is done so that length can be checked before resources are
         committed to processing a very long sentence.
 
-        :param str sentence: The ``Sentence`` as a string.
+        :param Sentence sentence: The ``Sentence`` object.
         :param int max_length: The most amount of words to process.
         """
 
