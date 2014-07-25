@@ -95,7 +95,7 @@ class StructureExtractor(object):
 
                 if not structure.get("combine") or len(combined_nodes) == 1:
                     current_unit.children = children
-                    current_unit.save()
+                    current_unit.save(False)
                     units.append(current_unit)
 
             # TODO: refactor, this code is similar in get_sentences
@@ -318,3 +318,4 @@ def _get_sentences(unit):
             sentences.extend(_get_sentences(child))
 
         return sentences
+

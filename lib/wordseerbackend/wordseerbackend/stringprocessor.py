@@ -163,7 +163,7 @@ class StringProcessor(object):
                     #  print("dependent", dependent)
                     #  print("dependency", dependency)
 
-                    dependency.save()
+                    dependency.save(False)
 
                 else:
                     # TODO: fill

@@ -53,7 +53,7 @@ class ReaderWriter:
                         relationship = GrammaticalRelationship(
                             name = key
                         )
-                        
+
                     relationships[key] = relationship
 
                 # Read the data for the governor, and find the corresponding word
@@ -91,7 +91,7 @@ class ReaderWriter:
                             governor = governor,
                             dependent = dependent
                         )
-                        
+
                     dependencies[key] = dependency
 
                 # Add the dependency to the sentence
@@ -107,8 +107,8 @@ class ReaderWriter:
                 #  print("dependent", dependent)
                 #  print("dependency", dependency)
 
-                dependency_in_sentence.save()
-                dependency.save()
+                dependency_in_sentence.save(False)
+                dependency.save(False)
                 sentence_ids.append(dep["sentence_id"])
 
         db.session.commit()
@@ -130,7 +130,7 @@ class ReaderWriter:
 
         return Document.query.get(doc_id)
 
-    
+
     def create_new_document(self, document, num_files):
         """Initialize the document and its subunits and save it to the database.
 
@@ -140,9 +140,9 @@ class ReaderWriter:
 
         document.number = num_files
 
-        [ _init_unit(child, document) for child in document.children ]            
+        [ _init_unit(child, document) for child in document.children ]
 
-        document.save()
+        document.save(False)
         db.session.commit()
         return document
 
@@ -168,7 +168,7 @@ class ReaderWriter:
         #print(new_sequence)
         #print("\n")
 
-        new_sequence.save()
+        new_sequence.save(False)
         sentence.add_sequence(new_sequence, sequence.start_position)
 
     def index_sequences(self, sequences):
@@ -190,7 +190,7 @@ class ReaderWriter:
             #print(new_sequence)
             #print("\n")
 
-            new_sequence.save()
+            new_sequence.save(False)
             sentence.add_sequence(new_sequence, sequence["start_position"])
 
 
@@ -205,13 +205,13 @@ class ReaderWriter:
         # Calculate counts for documents
         for document in Document.query.all():
             document.sentence_count = len(document.all_sentences)
-            document.save()
+            document.save(False)
 
         # Calculate counts for dependencies
         for dependency in Dependency.query.all():
             dependency.sentence_count = len(dependency.sentences)
             dependency.document_count = len(set([sentence.document for sentence in dependency.sentences]))
-            dependency.save()
+            dependency.save(False)
 
         db.session.commit()
 
@@ -273,7 +273,7 @@ def _init_unit(unit, document):
                         tag = key[2]
                     )
                     print("New word " + str(word))
-                    
+
                 words[key] = word
 
             sentence.add_word(
@@ -290,7 +290,7 @@ def _init_unit(unit, document):
         new_subunit = _init_unit(subunit, document)
         new_subunit.number = subunit_number
 
-    unit.save()
+    unit.save(False)
     return unit
 
 def _get_title(doc):

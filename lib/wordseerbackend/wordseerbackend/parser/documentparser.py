@@ -64,3 +64,4 @@ class DocumentParser(object):
                     dependencies = dict()
                     db.session.commit()
         db.session.commit()
+
