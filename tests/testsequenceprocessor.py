@@ -6,10 +6,10 @@ import mock
 import unittest
 
 from app.models.document import Document
-from lib.wordseerbackend.wordseerbackend.database.readerwriter import ReaderWriter
+from app.pipeline.database.readerwriter import ReaderWriter
 from app.models.word import Word
 from app.models.sentence import Sentence
-from lib.wordseerbackend.wordseerbackend.sequence.sequenceprocessor import (SequenceProcessor,
+from app.pipeline.sequence.sequenceprocessor import (SequenceProcessor,
     join_tws, LEMMA, WORD)
 
 class SequenceProcessorTests(unittest.TestCase):

@@ -7,7 +7,7 @@ import unittest
 from app.models.sentence import Sentence
 from app.models.dependency import Dependency
 from app.models.parseproducts import ParseProducts
-from lib.wordseerbackend.wordseerbackend import stringprocessor
+from app.pipeline import stringprocessor
 
 t = stringprocessor.StringProcessor()
 
@@ -101,7 +101,7 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
                     assert space == ""
 
 @mock.patch.object(stringprocessor, "tokenize_from_raw")
-@mock.patch("lib.wordseerbackend.wordseerbackend.stringprocessor.StanfordCoreNLP.raw_parse")
+@mock.patch("app.pipeline.stringprocessor.StanfordCoreNLP.raw_parse")
 class ParseTests(unittest.TestCase):
     """Tests for the parse() method.
     """
