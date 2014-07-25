@@ -11,8 +11,8 @@ from app.pipeline import collectionprocessor
 from app.pipeline import stringprocessor
 from app.pipeline import structureextractor
 from app.pipeline import logger
-from app.pipeline.parser import documentparser
-from app.pipeline.sequence import sequenceprocessor
+from app.pipeline import documentparser
+from app.pipeline import sequenceprocessor
 
 def setUpModule():
     global mock_writer

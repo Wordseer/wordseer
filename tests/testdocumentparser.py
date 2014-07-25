@@ -7,10 +7,10 @@ import pdb
 from app.models.document import Document
 from app.models.sentence import Sentence
 from app.models.parsedparagraph import ParsedParagraph
-from app.pipeline.parser import documentparser
+from app.pipeline import documentparser
 from app.pipeline.stringprocessor import StringProcessor
 
-@patch("app.pipeline.parser.documentparser.logger", autospec=True)
+@patch("app.pipeline.documentparser.logger", autospec=True)
 class DocumentParserTests(unittest.TestCase):
     """Run tests on the DocumentParser.
     """
@@ -19,12 +19,12 @@ class DocumentParserTests(unittest.TestCase):
         """
         self.mock_reader_writer = MagicMock()
         self.mock_str_proc = MagicMock()
-        with patch("app.pipeline.parser.documentparser.SequenceProcessor"):
+        with patch("app.pipeline.documentparser.SequenceProcessor"):
             self.docparser = documentparser.DocumentParser(
                 self.mock_reader_writer,
                 self.mock_str_proc)
 
-    @patch("app.pipeline.parser.documentparser.db", autospec=True)
+    @patch("app.pipeline.documentparser.db", autospec=True)
     def test_parse_document(self, mock_db, mock_logger):
         """Test the parse_document method.
 
