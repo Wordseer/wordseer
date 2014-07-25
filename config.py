@@ -75,6 +75,8 @@ class BaseConfig(object):
     PART_OF_SPEECH_TAGGING = True
     WORD_TO_WORD_SIMILARITY = True
     SEQUENCE_INDEXING = True
+    SKIP_SENTENCE_ON_ERROR = False
+    SENTENCE_MAX_LENGTH = 40
 
     # Database options
     #DB_URL = "sqlite:///" + os.path.join(ROOT, 'wordseer.db')
