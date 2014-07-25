@@ -44,7 +44,7 @@ class StringProcessor(object):
         This is done so that length can be checked before resources are
         committed to processing a very long sentence.
 
-        :param str sentence: The ``Sentence`` as a string.
+        :param Sentence sentence: The ``Sentence`` object.
         :param int max_length: The most amount of words to process.
         """
 
@@ -271,9 +271,13 @@ def tokenize_from_raw(parsed_text, txt):
 
             key = (word, part_of_speech, lemma)
 
-            # TODO: proper space_before implementation
-            if txt[int(word_data[1]["CharacterOffsetBegin"])] != " ":
-                space_before = ""
+            space_before = " "
+
+            try:
+                if txt[int(word_data[1]["CharacterOffsetBegin"]) - 1] != " ":
+                    space_before = ""
+            except IndexError:
+                pass
 
             if key in words.keys():
                 word = words[key]
@@ -303,7 +307,7 @@ def tokenize_from_raw(parsed_text, txt):
             sentence.add_word(
                 word = word,
                 position = position,
-                space_before = "", # word["space_before"],
+                space_before = space_before, # word["space_before"],
                 part_of_speech = word.part_of_speech
             )
 
