@@ -183,3 +183,17 @@ class ParseTests(unittest.TestCase):
 
         self.assertRaises(ValueError, t.parse, sent)
 
+class ParseWithErrorHandlingTest(unittest.TestCase):
+    """Test the parse_with_error_handling method.
+    """
+
+    def test_sanity(self):
+        """Method should output the same result as running raw_parse directly
+        when run on a normal sentence text.
+        """
+
+        text = "The fox is brown."
+        result = t.parse_with_error_handling(text)
+        expected_result = t.parser.raw_parse(text)
+
+        self.failUnless(result == expected_result)

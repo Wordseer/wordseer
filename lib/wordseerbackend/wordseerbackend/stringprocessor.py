@@ -1,7 +1,7 @@
 """Methods to handle string parsing, tokenization, tagging, etc.
 """
 
-from corenlp import StanfordCoreNLP
+from corenlp import StanfordCoreNLP, ProcessError, TimeoutError
 
 from app import app
 from app.models.sentence import Sentence
@@ -172,6 +172,77 @@ class StringProcessor(object):
 
         return sentence
 
+    def parse_with_error_handling(self, text):
+        """Run the parser and handle errors properly.
+
+        Also checks the sentence text for irregularities that may break the
+        parser and handles it before proceeding.
+
+        :param str text: The text of the sentence to check
+        """
+
+        # Check for non-string
+        if not isinstance(text, str) and not isinstance(text, unicode):
+            print("ERROR: parser got a non-string argument")
+            return None
+
+        # Check for non-unicode
+        if not isinstance(text, unicode):
+
+            # Try to convert the string to unicode if possible
+            # Unit test: should fail with this example:
+            # http://stackoverflow.com/questions/6257647/convert-string-to-unicode
+
+            try:
+                text = unicode(text)
+            except(UnicodeDecodeError):
+                print("ERROR: the following sentence text is not unicode; " +
+                    "convertion failed.")
+                print(text)
+
+                # Skip sentence if flag is True
+                if app.config["SKIP_SENTENCE_ON_ERROR"]:
+                    return None
+                else:
+                    # Try to parse the sentence anyway
+                    print("WARNING: attempting to parse non-unicode sentence.")
+
+        # Check for empty or nonexistent text
+        if text == "" or text == None:
+            print("ERROR: parser got an empty text")
+            return None
+
+        # Check length of sentence
+        max_length = app.config["SENTENCE_MAX_LENGTH"]
+        if len(text.split(" ")) > max_length:
+            print("Sentence appears to be too long, max length " +
+                "is " + str(max_length))
+            # TODO: attempt to split on a comma
+
+            # TODO: force split at max length if comma split will not work
+            
+        # Check for irregular characters
+        # TODO: what are considered irregular characters?
+
+        # Try to parse, catch errors
+        parsed_text = None
+        try:
+            parsed_text = self.parser.raw_parse(text)
+        # TODO: handle all errors properly
+        # ProcessError, TimeoutError, OutOfMemoryError
+        except TimeoutError as e:
+            print(e)
+            return None
+        except ProcessError as e:
+            print(e)
+            return None
+        except:
+            print("Unknown error")
+            return None
+
+        # Parse successful, return parsed text
+        return parsed_text
+        
 def tokenize_from_raw(parsed_text, txt):
     """Given the output of a call to raw_parse, produce a list of Sentences
     and find the PoS, lemmas, and space_befores of each word in each sentence.
@@ -251,53 +322,3 @@ def tokenize_from_raw(parsed_text, txt):
 
     db.session.commit()
     return paragraph
-
-    def parse_with_error_handling(text):
-        """Run the parser and handle errors properly.
-
-        Also checks the sentence text for irregularities that may break the
-        parser and handles it before proceeding.
-
-        :param str text: The text of the sentence to check
-        """
-
-        # Check for non-unicode
-        if not isinstance(text, unicode):
-
-            # Try to convert the string to unicode if possible
-            # Unit test: should fail with this example:
-            # http://stackoverflow.com/questions/6257647/convert-string-to-unicode
-
-            try:
-                text = unicode(text)
-            except(UnicodeDecodeError):
-                print("ERROR: the following sentence text is not unicode; " +
-                    "convertion failed.")
-                print(text)
-
-                # Skip sentence if flag is True
-                if app.config["SKIP_SENTENCE_ON_ERROR"]:
-                    return None
-                else:
-                    # Try to parse the sentence anyway
-                    print("WARNING: attempting to parse non-unicode sentence.")
-
-        # Check length of sentence
-        max_length = app.config["SENTENCE_MAX_LENGTH"]
-        if len(sentence.text.split(" ")) > max_length:
-            print("Sentence appears to be too long, max length " +
-                "is " + str(max_length))
-            # TODO: attempt to split on a comma
-
-            # TODO: force split at max length if comma split will not work
-            
-        # Check for irregular characters
-
-        # Try to parse, catch errors
-        parsed_text = None
-        try:
-            parsed_text = self.parser.raw_parse(text)
-        # TODO: handle all errors
-        except:
-            pass
-        
