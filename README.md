@@ -57,15 +57,6 @@ Follow the directions in the "Installing" sections found below.
 
     to migrate the model schema into the database.
 
-### Documentation
-Documentation is
-[available on readthedocs](http://wordseer-flask.readthedocs.org). You can also
-build it yourself:
-
-	cd docs/
-	make html
-
-Or, on windows, simply run `make.bat`.
 
 ## Pipeline
 
@@ -105,18 +96,18 @@ make sure to point `CORE_NLP_DIR` to the Stanford NLP library. You should then
 be ready to parse files. Example XML and JSON files are included in
 `tests/data`.
 
-### Documentation
+## Documentation
 Documentation is
-[available on readthedocs](http://wordseerbackend.readthedocs.org). You can also
+[available on readthedocs](http://wordseer-flask.readthedocs.org). You can also
 build it yourself:
 
-	cd lib/wordseerbackend/docs/
+	cd docs/
 	make html
 
 Or, on windows, simply run `make.bat` in the same directory.
 
 ## Testing
-1. Simply run `runtests.py`:
+Simply run `runtests.py`:
 
         python runtests.py
 
