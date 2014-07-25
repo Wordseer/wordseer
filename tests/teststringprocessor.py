@@ -1,6 +1,6 @@
 """Tests for the StringProcessor.
 """
-import pdb
+
 import mock
 import unittest
 
@@ -88,8 +88,13 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
         for s in range(0, len(self.result)):
             for w in range(0, len(self.result[s].word_in_sentence)):
                 space = self.result[s].word_in_sentence[w].space_before
-                actual_char = self.example[int(self.raw["sentences"][s]["words"]
-                    [w][1]["CharacterOffsetBegin"])]
+
+                try:
+                    actual_char = self.example[int(self.raw["sentences"][s]\
+                        ["words"][w][1]["CharacterOffsetBegin"]) - 1]
+                except IndexError:
+                    actual_char = " "
+
                 if actual_char == " ":
                     assert space == " "
                 else:
@@ -153,7 +158,6 @@ class ParseTests(unittest.TestCase):
         expected_result = ParseProducts(parsetree,
             expected_deps, mock_tokenizer(parsed_dict, sent)[0].tagged)
 
-        pdb.set_trace()
         self.failUnless(expected_result == result)
 
     def test_parse_twosentences(self, mock_parser, mock_tokenizer):
