@@ -46,7 +46,7 @@ class DocumentParserTests(unittest.TestCase):
         for i in range(0, runs):
             mock_sents.append(MagicMock(id=i, name="Sentence " + str(i)))
 
-        mock_doc = create_autospec(Document, sentences=mock_sents)
+        mock_doc = create_autospec(Document, all_sentences=mock_sents)
 
         # Configure the mock parser
         mock_products = MagicMock(name="Mock products")
@@ -61,8 +61,10 @@ class DocumentParserTests(unittest.TestCase):
 
         # The parser should have only been called on sentences with an id > 5
         parse_calls = []
+
         for i in range(latest_sent + 1, runs):
-            parse_calls.append(call(mock_sents[i].text, {}, {}))
+            parse_calls.append(call(mock_sents[i], {}, {}))
+
         self.mock_str_proc.parse.assert_has_calls(parse_calls, any_order=True)
 
         # Every 50 sentences we commit to the database

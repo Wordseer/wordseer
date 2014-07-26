@@ -46,9 +46,9 @@ class DocumentParser(object):
 
         relationships = dict()
         dependencies = dict()
-        for sentence in document.sentences:
+        for sentence in document.all_sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
-                parsed = self.parser.parse(sentence.text, relationships, dependencies)
+                parsed = self.parser.parse(sentence, relationships, dependencies)
                 products.append(parsed)
                 count += 1
                 current_max = sentence.id

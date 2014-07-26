@@ -12,6 +12,7 @@ from .documentparser import DocumentParser
 from .sequenceprocessor import SequenceProcessor
 from . import structureextractor
 from .stringprocessor import StringProcessor
+from . import counter
 
 class CollectionProcessor(object):
     """Process a collection of files.
@@ -182,8 +183,7 @@ class CollectionProcessor(object):
 
             documents_parsed += 1
 
-        #TODO: reader_writer
-        self.reader_writer.finish_grammatical_processing()
+        counter.count()
 
     def calculate_index_sequences(self):
         """Calculate and index sequences, if not already done during grammatical
