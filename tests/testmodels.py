@@ -113,13 +113,14 @@ class TestSentenceModel(unittest.TestCase):
         sentence.save()
         word.save()
 
-        rel = sentence.add_word(word, position=4, space_before=" ", tag="ADF")
+        rel = sentence.add_word(word, position=4, space_before=" ",
+            part_of_speech="ADF")
 
         assert rel.word == word
         assert rel.sentence == sentence
         assert rel.position == 4
         assert rel.space_before == " "
-        assert rel.tag == "ADF"
+        assert rel.part_of_speech == "ADF"
 
     def test_add_dependency(self):
         """Test the ``add_dependency()`` method of ``Sentence``.
@@ -348,6 +349,7 @@ class TestSetsModels(unittest.TestCase):
 
         assert len(sets) == 1
         assert self.sequenceset in sets
+        assert sets[0].get_items() == []
 
     def test_sentenceset(self):
         """Test the ``SentenceSet`` model.
@@ -357,6 +359,7 @@ class TestSetsModels(unittest.TestCase):
 
         assert len(sets) == 1
         assert self.sentenceset in sets
+        assert sets[0].get_items() == []
 
     def test_documentset(self):
         """Test the ``DocumentSet`` model.
@@ -366,4 +369,5 @@ class TestSetsModels(unittest.TestCase):
 
         assert len(sets) == 1
         assert self.documentset in sets
+        assert sets[0].get_items() == []
 

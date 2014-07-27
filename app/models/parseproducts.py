@@ -18,31 +18,17 @@ class ParseProducts(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     dependencies = db.Column(db.PickleType)
     words = db.relationship("Word")
 
-    def __init__(self, syntactic_parse, dependencies, pos_tags):
+    def __init__(self, syntactic_parse, dependencies, words):
         """Instantiate a ParseProducts instance.
 
         :param string syntactic_parse: A string that describes the parse tree.
         :param list dependencies: A list of Dependencies that were present
         in the parsed sentence.
-        :param list pos_tags: A list of TaggedWords that were present in the
+        :param list wods: A list of ``Word``\s that were present in the
         parsed sentence.
         """
-
+        #TODO: remove this
         self.syntactic_parse = syntactic_parse
         self.dependencies = dependencies
-        self.words = pos_tags
-
-    def __str__(self):
-        output = ("+++ Syntactic parse:\n" + self.syntactic_parse + "\n" +
-            "+++ Typed dependencies:\n")
-
-        for dep in self.dependencies:
-            output += str(dep) + "\n"
-
-        output += "+++ Part-of-speech tags:\n"
-
-        for word in self.pos_tags:
-            output += str(word) + "\n"
-
-        return output
+        self.words = words
 

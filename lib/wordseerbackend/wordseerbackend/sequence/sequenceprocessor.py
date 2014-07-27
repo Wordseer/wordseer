@@ -9,6 +9,7 @@ expects a single Sentence object, and it will extract all Sequences from
 this sentence and record them in the database.
 """
 
+from app import app
 from app.models.sequence import Sequence
 
 LEMMA = "lemma"
@@ -29,47 +30,7 @@ class SequenceProcessor(object):
         # TODO: handle reader_writer once it's finished
         self.reader_writer = reader_writer
 
-        self.stop_words = []
         self.previously_indexed = []
-
-        prepositions = ("about away across against along around at behind"
-            " beside besides by despite down during for from in inside into"
-            " near of off on onto over through to toward with within whence"
-            " until without upon hither thither unto up").split(" ")
-
-        pronouns = ("i its it you your thou thine thee we he they me us her"
-            " them him my mine her hers his our thy thine ours their theirs"
-            " myself itself mimself ourselves herself themselves anything"
-            " something everything nothing anyone someone everyone ones"
-            " such").split(" ")
-
-        determiners = ("the a an some any this these each that no every all"
-            " half both twice one two first second other another next last"
-            " many few much little more less most least several no"
-            " own").split(" ")
-
-        conjunctions = ("and or but so when as while because although if"
-            " though what who where whom when why whose which how than nor "
-            " not").split(" ")
-
-        modal_verbs = ("can can't don't won't shan't shouldn't ca canst might"
-            " may would wouldst will willst should shall must could").split(" ")
-
-        primary_verbs = ("is are am be been being went go do did doth has have"
-            " hath was were had").split(" ")
-
-        adverbs = ("again very here there today tomorrow now then always never"
-            " sometimes usually often therefore however besides moreover though"
-            " otherwise else instead anyway incidentally meanwhile").split(" ")
-
-        punctuation = (". ! @ # $ % ^ & * ( ) _ - -- --- + = ` ~ � { } [ ] | \\"
-            " : ; \" ' < > ? , . / ").split(" ")
-
-        contractions = (" 's 'nt 'm n't th 'll o s 't 'rt ").split(" ")
-
-        self.stop_words.extend(pronouns + prepositions + determiners +
-            conjunctions + modal_verbs + primary_verbs + adverbs +
-            punctuation + contractions)
 
     def remove_stops(self, words):
         """Remove every sort of stop from the sentences.
@@ -80,7 +41,7 @@ class SequenceProcessor(object):
 
         without_stops = []
         for word in words:
-            if word.word.lower() not in self.stop_words:
+            if word.word.lower() not in app.config["STOPWORDS"]:
                 without_stops.append(word)
 
         return without_stops
@@ -96,10 +57,10 @@ class SequenceProcessor(object):
         """
 
         sequences = [] # a list of Sequences
-        for i in range(0, len(sentence.tagged)):
+        for i in range(0, len(sentence.words)):
             # Iterate through every word
             self.previously_indexed = []
-            for j in range(i+1, len(sentence.tagged) + 1):
+            for j in range(i+1, len(sentence.words) + 1):
                 # Check every word after the one at i
                 if j - i < 5:
                     # If this word is less than five words away from i,
@@ -123,7 +84,7 @@ class SequenceProcessor(object):
 
         sequences = []
 
-        wordlist = sentence.tagged[i:j] # all the words
+        wordlist = sentence.words[i:j] # all the words
         lemmatized_phrase = join_tws(wordlist, " ", "lemma") # only lemmas
         surface_phrase = join_tws(wordlist, " ", "word") # only words
 

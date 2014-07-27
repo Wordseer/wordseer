@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/wordseer/wordseer_flask.png?label=ready&title=Ready)](https://waffle.io/wordseer/wordseer_flask)
 # A Flask-based back end for WordSeer
 
 [WordSeer](http://wordseer.berkeley.edu/) is a tool for natural language
@@ -21,19 +22,31 @@ more maintainable python.
     This is located in `lib/wordseerbackend/`. It is the pipeline or
     preprocessing code for uploaded data sets.
 
+## Installation
+
+### Linux/OSX quick install
+
+1. Run `install.sh`:
+
+        ./install.sh
+
+    That's it.
+
+### Windows
+
+Follow the directions in the "Installing" sections found below.
+
 ## Application
 
 ### Installing
 1.  Create a virtualenv
-2.  On linux, run:
 
-        pip install -r requirements.txt
+2.  Run:
 
-    On windows, run:
-
-        pip -r install requirements_win.txt
+        pip -r install requirements.txt
 
     to install the necessary packages.
+
 3.  Run:
 
         python database.py create
@@ -43,7 +56,6 @@ more maintainable python.
         python database.py migrate
 
     to migrate the model schema into the database.
-
 
 ### Documentation
 Documentation is
