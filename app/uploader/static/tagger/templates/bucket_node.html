@@ -1,0 +1,48 @@
+
+<div class='btn-group bucket-tag-group btn-sm <%=attributes.id%>'>
+    <% var btn_type='btn-success';
+    if(attributes.type==='subunit') 
+    { btn_type = 'btn-primary';}
+    else if(attributes.type==='metadata') 
+    {btn_type ='btn-info'; }
+    %>
+    <button type='button' class="btn bucket-tag bucket-tag-<%=attributes.type%> tagger-tooltip <%=attributes.id%> 
+            <%=btn_type%> 
+            <% if (attributes.isProperty){%> bucket-tag-property<%}%>
+            <% if (attributes.isSentence){%> bucket-tag-sentence<%}%>" 
+            data-id='<%= attributes.id %>' data-xpaths='<%= attributes.xpaths[0] %>' 
+            data-type='<%=attributes.type%>'
+            data-node-type='<%=attributes.nodeType%>' 
+            data-isattribute='<%if(attributes.isAttribute){%>1<% }else{ %>0<%}%>'
+            title="belongs to <%=attributes.belongsTo%><%if(attributes.isProperty){%>. Click to rename<%}%>">
+       <% if(attributes.combine){%>Combined <%}%> 
+       <%=attributes.name%> (<%=attributes.tag%>)  <span class='glyphicon glyphicon-edit'></span>
+    </button>
+
+    <% if(attributes.titleId!==''){%>
+    <% var sub_node = map[attributes.titleId].attributes%>
+
+    <button type='button' class="btn  bucket-tag bucket-tag-<%=sub_node.type%> tagger-tooltip <%=sub_node.id%> <% if(sub_node.type==='subunit') 
+            {%> btn-primary <%} 
+            else if(sub_node.type==='metadata') 
+            {%> btn-info <% }
+            else
+            { %> btn-success <%}%> 
+            <% if (sub_node.isProperty){%> bucket-tag-property<%}%>
+            <% if (sub_node.isSentence){%> bucket-tag-sentence<%}%>" 
+            data-id='<%= sub_node.id %>'  
+            data-type='<%=sub_node.type%>'
+            
+            data-isattribute='<%if(sub_node.isAttribute){%>1<% }else{ %>0<%}%>'
+            title="belongs to <%=sub_node.belongsTo%>">
+        <%=sub_node.name%> (<%=sub_node.tag%>)
+    </button>
+    <%}%>
+    <%if(attributes.type!=='document'){%>
+    <button class='bucket-tag-remove attributes.id btn <%=btn_type%> <%=attributes.id%>' 
+            data-id='<%=attributes.id%>' 
+            data-type='<%=attributes.type%>'
+            data-node-type='<%=attributes.nodeType%>' 
+            ><span class='glyphicon glyphicon-remove'></span></button>
+    <%}%>
+</div>
