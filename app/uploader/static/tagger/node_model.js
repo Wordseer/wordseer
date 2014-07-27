@@ -634,6 +634,17 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, secondaryXPat
 //        return result;
 
     }
+//    console.log(typeof(result));
+    if(typeof(result)==='object')
+    {
+//        console.log(result);
+//        console.log(result.iterateNext());
+////                console.log(result.snapshotItem());
+//
+//        console.log($(result));
+//        console.log(nodes);
+        result = null;
+    }
     return result;
 }
 
