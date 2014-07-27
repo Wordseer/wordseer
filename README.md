@@ -19,7 +19,7 @@ of wordseer into python from PHP.
 [wordseerbackend](https://bitbucket.org/silverasm/wordseerbackend/overview) in
 more maintainable python.
 
-    This is located in `lib/wordseerbackend/`. It is the pipeline or
+    This is located in `app/pipeline/`. It is the pipeline or
     preprocessing code for uploaded data sets.
 
 ## Installation
@@ -84,7 +84,7 @@ Follow the directions in the "Installing" sections found below.
 
     In order to complete the setup, version *3.2.0* of Stanford's CoreNLP
     library must simply be in a directory accessible to the backend. From the
-    root directory of `wordseerbackend`:
+    root directory of this repository:
 
         wget http://nlp.stanford.edu/software/stanford-corenlp-full-2013-06-20.zip
         unzip stanford-corenlp-full-2013-06-20.zip
