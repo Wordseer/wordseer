@@ -110,8 +110,8 @@ class ParseTests(unittest.TestCase):
         """
         #t.parser = mock.MagicMock()
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.stringprocessor.Word.query", autospec=True)
-    @mock.patch("lib.wordseerbackend.wordseerbackend.stringprocessor.Dependency.query", autospec=True)
+    @mock.patch("app.pipeline.stringprocessor.Word.query", autospec=True)
+    @mock.patch("app.pipeline.stringprocessor.Dependency.query", autospec=True)
     def test_parse(self, mock_dependency_query, mock_word_query, mock_parser, mock_tokenizer):
         """Test the parse method.
         """
