@@ -1,6 +1,6 @@
 """Methods to handle string parsing, tokenization, tagging, etc.
 """
-
+from nltk.tokenize import sent_tokenize
 from corenlp import StanfordCoreNLP, ProcessError, TimeoutError
 
 from app import app
@@ -214,13 +214,15 @@ class StringProcessor(object):
 
         # Check length of sentence
         max_length = app.config["SENTENCE_MAX_LENGTH"]
-        if any([ len(sentence.split(" ")) > max_length for sentence in text.split(".") ]):
-            print("Sentence appears to be too long, max length " +
-                "is " + str(max_length))
-            # TODO: attempt to split on a comma
+        sentences = sent_tokenize(text)
+        for sentence in sentences:
+            if len(sentence.split(" ")) > max_length:
+                print("Sentence appears to be too long, max length " +
+                    "is " + str(max_length))
+                # TODO: attempt to split on a comma
 
-            # TODO: force split at max length if comma split will not work
-            
+                # TODO: force split at max length if comma split will not work
+
         # Check for irregular characters
         # TODO: what are considered irregular characters?
 
@@ -242,7 +244,7 @@ class StringProcessor(object):
 
         # Parse successful, return parsed text
         return parsed_text
-        
+
 def tokenize_from_raw(parsed_text, txt):
     """Given the output of a call to raw_parse, produce a list of Sentences
     and find the PoS, lemmas, and space_befores of each word in each sentence.
@@ -331,3 +333,4 @@ def tokenize_from_raw(parsed_text, txt):
 
     db.session.commit()
     return paragraph
+
