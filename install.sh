@@ -20,6 +20,7 @@ CORENLP_FINAL_PATH=$CORENLP_DESTINATION"/"$CORENLP_FINAL_NAME
 # Install python requirements
 echo "Installing dependencies..."
 pip install -r $REQUIREMENTS
+python -m nltk.downloader punkt
 
 # Set up the database
 echo "Setting up database..."
