@@ -1,6 +1,5 @@
 """Methods to handle string parsing, tokenization, tagging, etc.
 """
-
 from corenlp import StanfordCoreNLP
 
 from app import app
@@ -54,7 +53,6 @@ class StringProcessor(object):
         #   raise ValueError("Sentence appears to be too long, max length " +
         #        "is " + str(max_length))
         # TODO: figure out the above
-
         parsed = self.parser.raw_parse(sentence.text)
         parsed_sentence = parsed["sentences"][0]
 
@@ -100,11 +98,6 @@ class StringProcessor(object):
                             )
 
                         relationships[key] = relationship
-
-                    # NOTE: currently, because there is a mismatch in some cases
-                    # between the words in the sentences and the words in the
-                    # dependencies, the method looks up the word using only the
-                    # lemma and tag, which may not guarantee uniqueness.
 
                     # Read the data for the governor, and find the corresponding word
                     governor = Word.query.filter_by(
