@@ -204,14 +204,10 @@ def get_metadata(structure, node):
     metadata_list = [] # A list of Property
 
     for spec in metadata_structure:
-        try:
-            xpaths = spec["xpaths"]
-        except KeyError:
-            xpaths = []
-        try:
-            attribute = spec["attr"]
-        except KeyError:
-            attribute = None
+        xpaths = spec.get("xpaths", [])
+        attribute = spec.get("attr")
+        data_type = spec.get("dataType")
+        date_format = spec.get("dateFormat")
 
         extracted = [] # A list of strings
 
@@ -225,7 +221,9 @@ def get_metadata(structure, node):
                 metadata_list.append(Property(
                     value=val,
                     name=spec["propertyName"],
-                ))
+                    data_type=data_type,
+                    date_format=date_format))
+
     return metadata_list
 
 def get_xpath_attribute(xpath_pattern, attribute, node):

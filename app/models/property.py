@@ -30,6 +30,8 @@ class Property(db.Model, Base):
     name = db.Column(db.String, index=True)
     value = db.Column(db.String, index=True)
     specification = db.Column(db.String)
+    data_type = db.Column(db.String)
+    date_format = db.Column(db.String)
 
     def __repr__(self):
         """Representation string for properties, showing the property name
