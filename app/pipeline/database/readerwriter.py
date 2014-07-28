@@ -1,6 +1,4 @@
-"""This is the ORM implementation of the reader writer. It has performance issues
-and is left here mostly for reference.
-"""
+import logging
 
 from app.models import *
 import pdb
@@ -11,6 +9,9 @@ from app import db
 class ReaderWriter:
 
     Base.commit_on_save = False
+
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
 
     def write_parse_products(self, products):
         """Converts ParseProducts into the corresponding models and writes them
@@ -47,8 +48,8 @@ class ReaderWriter:
                             name = key
                         ).one()
                     except(MultipleResultsFound):
-                        print("ERROR: duplicate records found for:")
-                        print("\t" + str(key))
+                        self.logger.error("duplicate records found for: %s",
+                            str(key))
                     except(NoResultFound):
                         relationship = GrammaticalRelationship(
                             name = key
@@ -83,8 +84,8 @@ class ReaderWriter:
                             dependent = dependent
                         ).one()
                     except(MultipleResultsFound):
-                        print("ERROR: duplicate records found for:")
-                        print("\t" + str(key))
+                        self.logger.error("duplicate records found for:i %s",
+                            str(key))
                     except(NoResultFound):
                         dependency = Dependency(
                             grammatical_relationship = relationship,
@@ -239,6 +240,7 @@ Helpers
 def _init_unit(unit, document):
     """Helper to recursively initialize subunits
     """
+    logger = logger.getLogger(__name__)
 
     words = dict()
 
@@ -253,7 +255,7 @@ def _init_unit(unit, document):
 
             if key in words.keys():
                 word = words[key]
-                print("In dict " + str(word))
+                logger.info("In dict %s", str(word))
             else:
 
                 try:
@@ -262,17 +264,16 @@ def _init_unit(unit, document):
                         lemma = word_data["lemma"],
                         tag = word_data["tag"]
                     ).one()
-                    print("Found word " + str(word))
+                    logger.info("Found word %s", str(word))
                 except(MultipleResultsFound):
-                    print("ERROR: duplicate records found for:")
-                    print("\t" + str(key))
+                    logger.error("duplicate records found for: %s", str(key))
                 except(NoResultFound):
                     word = Word(
                         word = key[0],
                         lemma = key[1],
                         tag = key[2]
                     )
-                    print("New word " + str(word))
+                    logger.info("New word %s", str(word))
 
                 words[key] = word
 

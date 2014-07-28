@@ -6,6 +6,7 @@ returned from the write_parse_products method will be passed to
 SequenceProcessor.process().
 """
 from datetime import datetime
+import logging
 
 from app.models.parsedparagraph import ParsedParagraph
 from . import logger
@@ -20,6 +21,7 @@ class DocumentParser(object):
     """Handle parsing a document.
     """
     def __init__(self, reader_writer, parser):
+        self.pylogger = logging.getLogger(__name__)
         self.reader_writer = reader_writer
         self.parser = parser
         self.sequence_processor = SequenceProcessor(reader_writer)
@@ -56,9 +58,9 @@ class DocumentParser(object):
 
                 if count % 50 == 0 or count == sentence_count:
                     average_time = (datetime.now() - start_time).total_seconds()
-                    print("Average parse speed after " + str(count) +
-                        " sentences: " + str(average_time / count) +
-                        " seconds per sentence")
+                    self.pylogger.info("Average parse speed after %s sentences:"
+                        " %s seconds per sentence", str(count),
+                        str(average_time / count))
 
                     products = []
                     relationships = dict()

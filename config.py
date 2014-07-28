@@ -106,9 +106,6 @@ class BaseConfig(object):
     WORD_TO_WORD_SIMILARITY = True
     SEQUENCE_INDEXING = True
 
-    # Database options
-    #DB_URL = "sqlite:///" + os.path.join(ROOT, 'wordseer.db')
-
 
 class Production(BaseConfig):
     """Config for the production server.

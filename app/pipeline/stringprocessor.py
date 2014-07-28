@@ -1,5 +1,7 @@
 """Methods to handle string parsing, tokenization, tagging, etc.
 """
+import logging
+
 from corenlp import StanfordCoreNLP
 
 from app import app
@@ -20,7 +22,7 @@ class StringProcessor(object):
         """Instantiate and ready the parser. Note that readying the parser takes
         some time.
         """
-
+        self.logger = logging.getLogger(__name__)
         self.parser = StanfordCoreNLP(app.config["CORE_NLP_DIR"])
 
     def tokenize(self, txt):
@@ -90,8 +92,8 @@ class StringProcessor(object):
                                 name = grammatical_relationship
                             ).one()
                         except(MultipleResultsFound):
-                            print("ERROR: duplicate records found for:")
-                            print("\t" + str(key))
+                            self.logger.error("duplicate records found for: %s",
+                                str(key))
                         except(NoResultFound):
                             relationship = GrammaticalRelationship(
                                 name = grammatical_relationship
@@ -126,8 +128,8 @@ class StringProcessor(object):
                                 dependent = dependent
                             ).one()
                         except(MultipleResultsFound):
-                            print("ERROR: duplicate records found for:")
-                            print("\t" + str(key))
+                            self.logger.error("duplicate records found for: %s",
+                                str(key))
                         except(NoResultFound):
                             dependency = Dependency(
                                 grammatical_relationship = relationship,
@@ -143,11 +145,6 @@ class StringProcessor(object):
                         governor_index = governor_index,
                         dependent_index = dependent_index,
                     )
-
-                    #  print("relationship", relationship)
-                    #  print("governor", governor)
-                    #  print("dependent", dependent)
-                    #  print("dependency", dependency)
 
                     dependency.save(False)
 
@@ -168,6 +165,7 @@ def tokenize_from_raw(parsed_text, txt):
     :param str txt: The original text.
     :return list: A list of document.Sentence objects.
     """
+    logger = logging.getLogger(__name__)
     paragraph = [] # a list of Sentences
     words = dict()
 
@@ -195,7 +193,6 @@ def tokenize_from_raw(parsed_text, txt):
 
             if key in words.keys():
                 word = words[key]
-                # print("In dict " + str(word))
 
             else:
                 try:
@@ -204,10 +201,8 @@ def tokenize_from_raw(parsed_text, txt):
                         lemma = lemma,
                         part_of_speech = part_of_speech
                     ).one()
-                    # print("Found word " + str(word))
                 except(MultipleResultsFound):
-                    print("ERROR: duplicate records found for:")
-                    print("\t" + str(key))
+                    logger.warning("Duplicate records found for: %s", str(key))
                 except(NoResultFound):
                     word = Word(
                         word = word,
