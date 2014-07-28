@@ -131,8 +131,14 @@ class CollectionProcessor(object):
                 filename[0] == "."):
                 logger.log("finished_recording_text_and_metadata", "false",
                     logger.REPLACE)
+
+                start_time = datetime.now()
                 docs = extractor.extract(os.path.join(collection_dir,
                     filename))
+                seconds_elapsed = (datetime.now() - start_time).total_seconds()
+
+                self.pylogger.info("Time to extract and record metadata: %ss",
+                    seconds_elapsed)
 
                 self.pylogger.info("%s/%s %s", str(num_files_done),
                     str(len(contents)), filename)
@@ -210,6 +216,8 @@ class CollectionProcessor(object):
         seq_proc = SequenceProcessor(self.reader_writer)
         #TODO: readerwriter
         self.reader_writer.load_sequence_counts()
+        start_time = datetime.now()
+
         for i in range(latest_id, max_sentence_id):
             if i > latest_id:
                 #TODO: readerwriter
@@ -222,9 +230,13 @@ class CollectionProcessor(object):
                             logger.REPLACE)
                         logger.log("latest_sequence_sentence", str(i),
                             logger.REPLACE)
+
                 if sentences_processed % 1000 == 0:
                     self.pylogger.info("Sequence-processing sentence %s/%s",
                         str(i), str(max_sentence_id))
+                    self.pylogger.info("Average processing speed: %ss",
+                        (start_time - datetime.now()).total_seconds() / 1000)
+                    start_time = datetime.now()
 
             sentences_processed += 1
 
