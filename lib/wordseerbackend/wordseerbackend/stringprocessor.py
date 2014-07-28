@@ -108,24 +108,17 @@ class StringProcessor(object):
 
                     # Read the data for the governor, and find the corresponding word
                     governor = Word.query.filter_by(
+                        word = governor,
                         lemma = governor_lemma,
                         part_of_speech = governor_pos
                     ).first()
 
                     # Same as above for the dependent in the relationship
                     dependent = Word.query.filter_by(
+                        word = dependent,
                         lemma = dependent_lemma,
                         part_of_speech = dependent_pos
                     ).first()
-
-                    if not governor:
-                        print("WARNING: no results found for governor")
-                        governor = ""
-                        governor.id = 0
-                    if not dependent:
-                        print("WARNING: no results found for dependent")
-                        dependent = ""
-                        dependent.id = 0
 
                     key = (relationship.name, governor.id, dependent.id)
 

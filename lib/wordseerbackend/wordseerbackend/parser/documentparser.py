@@ -46,6 +46,7 @@ class DocumentParser(object):
 
         relationships = dict()
         dependencies = dict()
+        sentence_count = len(document.all_sentences)
         for sentence in document.all_sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
                 parsed = self.parser.parse(sentence, relationships, dependencies)
@@ -53,7 +54,7 @@ class DocumentParser(object):
                 count += 1
                 current_max = sentence.id
 
-                if count % 50 == 0:
+                if count % 50 == 0 or count == sentence_count:
                     average_time = (datetime.now() - start_time).total_seconds()
                     print("Average parse speed after " + str(count) +
                         " sentences: " + str(average_time / count) +
