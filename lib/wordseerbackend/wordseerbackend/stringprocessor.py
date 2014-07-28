@@ -32,7 +32,7 @@ class StringProcessor(object):
         :param str txt: One or more sentences, in a string format.
         :return list: A list of document.Sentence objects.
         """
-        parsed_text = self.parser.raw_parse(txt)
+        parsed_text = self.parse_with_error_handling(txt)
 
         return tokenize_from_raw(parsed_text, txt)
 
@@ -56,7 +56,13 @@ class StringProcessor(object):
         # TODO: figure out the above
         # NOTE: moved to check_sentence_text
 
-        parsed = self.parser.raw_parse(sentence.text)
+        parsed = self.parse_with_error_handling(sentence.text)
+
+        # If the parse was unsuccessful, exit
+        if not parsed:
+            print("ERROR: dependencies could not be extracted.")
+            return
+
         parsed_sentence = parsed["sentences"][0]
 
         if len(parsed["sentences"]) > 1:
@@ -247,6 +253,12 @@ def tokenize_from_raw(parsed_text, txt):
     :param str txt: The original text.
     :return list: A list of document.Sentence objects.
     """
+
+    # If parsed_text is the result of a failed parse, return with an empty list
+    if not parsed_text:
+        print("ERROR: failed parse on sentence")
+        return []
+
     paragraph = [] # a list of Sentences
     words = dict()
 
