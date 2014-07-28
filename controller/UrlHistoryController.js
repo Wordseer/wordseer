@@ -1,4 +1,13 @@
 /** controls dispatch of url history tokens to/from the windowing controller
+url history relies on the query history in localstorage (see HistoryItem )
+to record windowing state in the URL hash.
+
+This enables standard browser back/forward actions but does not make URLs
+shareable or truly persistent, since query history is not reliably or centrally
+stored.
+
+How it works (in theory): Layout and Search controllers route panel and query
+CRUD through the UrlHistoryController, which records state and then dispatches the appropriate windowing actions.
 */
 Ext.define('WordSeer.controller.UrlHistoryController', {
     extend: 'Ext.app.Controller',
