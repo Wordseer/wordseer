@@ -50,6 +50,7 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
         } else if (token == 'home'){
 //             show landing page
             windowing.land();
+            // TODO: panel splitters are left hanging around after return home
 
         } else if (/^panels:/.test(token)) {
             // make sure controller is ready to display windows
@@ -77,6 +78,7 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
             // if panel isn't in token list, close it
             for (var i = 0; active_panels[i]; i++) {
                 if (panel_itemids.indexOf(active_panels[i]) == -1) {
+
                     windowing.closeToolClicked(Ext.getCmp(active_panels[i]));
                 }
             }
@@ -151,7 +153,7 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
                 token.splice(i, 1);
             }
         }
-        if (token.length == 2) {
+        if (token.length == 1) {
             // no more tabs open
             token = "home";
         } else {
