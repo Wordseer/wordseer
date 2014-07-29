@@ -122,6 +122,7 @@ class ProjectProcessForm(ProcessForm):
         if form.process_button.data == form.PROCESS:
             for project_id in form.selection.data:
                 project = Project.query.filter(Project.id == project_id).one()
+                # TODO: change to Project.query.get(project_id)
                 is_processable(units=project.documents)
 
 class ConfirmDeleteForm(Form, HiddenSubmitted):

@@ -79,6 +79,8 @@ class CLPDView(View):
         self.confirm_delete_form = confirm_delete_form(prefix="confirm_delete")
         self.template_kwargs = {}
 
+    # TODO: this method does more than delete the object so its name should
+    # reflect that
     def delete_object(self, obj, data):
         """Given a Unit or Project object, delete their files,
         database records, and entries in the process form's choices.
@@ -91,12 +93,16 @@ class CLPDView(View):
             shutil.rmtree(obj.path)
             for document in obj.documents:
                 db.session.delete(document)
+                # TODO: change to document.delete
             db.session.commit()
+            # TODO: remove
         else:
             os.remove(obj.path)
         self.process_form.selection.delete_choice(obj.id, data)
         db.session.delete(obj)
+        # TODO: change to obj.delete
         db.session.commit()
+        # TODO: remove
 
     def set_choices(self, **kwargs):
         """Set the appropriate choices for the list view.
@@ -165,6 +171,7 @@ class ProjectsCLPD(CLPDView):
         self.process_form.selection.choices = []
         for project in Project.query.filter(User.id ==
             current_user.id).all():
+            # TODO: change to current_user.projects
             self.process_form.selection.add_choice(project.id, project.name)
 
     def handle_create(self, **kwargs):
@@ -188,6 +195,7 @@ class ProjectsCLPD(CLPDView):
         if request.form["action"] == self.process_form.DELETE:
             for project_id in selected_projects:
                 project = Project.query.filter(Project.id == project_id).one()
+                # TODO: change to Project.query.get(project_id)
                 self.delete_object(project, project.name)
         if request.form["action"] == self.process_form.PROCESS:
             #TODO: process the projects
@@ -197,6 +205,9 @@ uploader.add_url_rule(app.config["PROJECT_ROUTE"],
     view_func=ProjectsCLPD.as_view("projects"))
 
 #TODO: rename this?
+# NOTE: Is this not basically document handling? DocumentCLPD would be fine
+# although I really don't like CLPD at the end; can we just call these views
+# ProjectsView and DocumentsView? (plural because they handle multiple objects)
 class ProjectCLPD(CLPDView):
     """CLPD view for listing files in a project.
     """
@@ -214,6 +225,7 @@ class ProjectCLPD(CLPDView):
         self.project = helpers.get_object_or_exception(Project,
             Project.id == kwargs["project_id"],
             exceptions.ProjectNotFoundException)
+            # NOTE: handle access to nonexistent objects globally
 
         self.template_kwargs["project"] = self.project
 
@@ -225,6 +237,7 @@ class ProjectCLPD(CLPDView):
         """
         file_objects = Document.query.filter(Project.id == self.project.id).\
             all()
+        # TODO: change to self.project.documents
         self.process_form.selection.choices = []
         for file_object in file_objects:
             self.process_form.selection.add_choice(file_object.id,
@@ -263,6 +276,7 @@ class ProjectCLPD(CLPDView):
             # the listing
             for file_id in files:
                 file_model = Unit.query.filter(Unit.id == file_id).one()
+                # NOTE: why are the file_ids not document IDs?
                 file_name = os.path.split(file_model.path)[1]
                 self.delete_object(file_model, file_name)
         elif request.form["action"] == self.process_form.PROCESS:
@@ -271,6 +285,10 @@ class ProjectCLPD(CLPDView):
 uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
     view_func=ProjectCLPD.as_view("project_show"))
 
+# NOTE: It should not be necessary to include the project_id in the URL if this
+# just shows information about a document. The only reason it might need it is
+# if it's a page that shows information about the relationship between the
+# document and the project, which should probably be on a separate page anyway.
 @uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" +
     app.config["DOCUMENT_ROUTE"] + '<int:document_id>')
 @login_required
@@ -289,6 +307,7 @@ def document_show(project_id, document_id):
         return app.login_manager.unauthorized()
 
     access_granted = current_user.has_document(Document.query.get(document_id))
+    # TODO: move document outside of the try-catch so we don't need to re-get
 
     # Test if this user can see it
     if not access_granted:
@@ -298,12 +317,16 @@ def document_show(project_id, document_id):
     #TODO: move to objects
     project = Project.query.join(User).filter(User.id == current_user.id).\
         filter(Document.id == document_id).one()
+    # NOTE: do you mean projects? why do you only load one project when
+    # documents can be part of more than one project? This should likely
+    # just be document.projects
 
     return render_template("document_show.html",
         document=document,
         project=project,
         filename=filename)
 
+# TODO: change file_id to document_id
 @uploader.route(app.config["UPLOAD_ROUTE"] + "<int:file_id>")
 @login_required
 def get_file(file_id):
@@ -315,10 +338,12 @@ def get_file(file_id):
         access_granted = current_user.has_document(document)
     except TypeError:
         return app.login_manager.unauthorized()
+    # TODO: clearer error handling
 
     # Test if this user can see it
     if not access_granted:
         return app.login_manager.unauthorized()
+
     directory, filename = os.path.split(document.path)
 
     return send_from_directory(directory, filename)
