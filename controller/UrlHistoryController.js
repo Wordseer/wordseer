@@ -11,8 +11,27 @@ CRUD through the UrlHistoryController, which records state and then dispatches t
 */
 Ext.define('WordSeer.controller.UrlHistoryController', {
     extend: 'Ext.app.Controller',
+    // flag for internal URL manipulation vs back/fwd clicks
+    IGNORE_CHANGE: false,
+
+    views: [
+        'windowing.viewport.LayoutPanel'
+    ],
+
+    // listen for layout events and add them to url
+    init: function(){
+        this.control({
+            'layout-panel': {
+                navButtonClicked: this.navButton,
+                initSearch: this.newSearch
+            }
+
+        });
+    },
 
     dispatch: function(token){
+        if (this.IGNORE_CHANGE) { return; }
+
         var windowing = this.getController('WindowingController');
 
         if (token == 'usersignin') {
@@ -57,7 +76,8 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
                 }
             }
 
-// if token isn't in window, play history item in new panel with the requested id
+            // if token isn't in window, play history item in new panel
+            // with the requested id
             for (var i = 0; panel_itemids[i]; i++) {
                 if (active_panels.indexOf(panel_itemids[i]) == -1) {
                     windowing.playHistoryItemInNewPanel(history_ids[i],
@@ -68,6 +88,40 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
 
     },
 
+
+    navButton: function(panel, buttonClicked){
+        this.IGNORE_CHANGE = true;
+        switch (buttonClicked){
+            case 'close':
+                var id = panel.itemId;
+                this.removePanel(id);
+                break;
+            default:
+                break;
+        }
+        this.IGNORE_CHANGE = false;
+    },
+
+    newSearch: function(panel, formValues, history_item_id){
+        this.IGNORE_CHANGE = true;
+        var new_search = panel.itemId + "_" + "history_item_id";
+        var token = Ext.History.getToken();
+        if (! /^panels:/.test(token)) {
+            token = "panels:" + new_search;
+        } else {
+            token = token.split(":");
+            for (var i=0; i<token.length; i++){
+                if (token[i].indexOf(panel.itemId) != -1) {
+                    token.splice[i, 1, new_search];
+                } else if (i == token.length - 1 && token[i] == "") {
+                    // ensure colon at end
+                    token.splice[i, 1, new_search];
+                }
+            }
+        }
+        this.IGNORE_CHANGE = false;
+    },
+
     newPanel: function(panel_itemid, history_item_id){
         var token = Ext.History.getToken();
         if (! /^panels:/.test(token)) {
@@ -76,4 +130,22 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
         token += panel_itemid + "_" + history_item_id + ":";
         Ext.History.add(token);
     },
+
+    removePanel: function(id){
+        var token = Ext.History.getToken();
+        token = token.split(":");
+        for (var i=0; i<token.length; i++){
+            if (token[i].indexOf(id) != -1) {
+                token.splice(i, 1);
+            }
+        }
+        if (token.length == 2) {
+            // no more tabs open
+            token = "home";
+        } else {
+            token = token.join(":");
+        }
+
+        Ext.History.add(token);
+    }
 });

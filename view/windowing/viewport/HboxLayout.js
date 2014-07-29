@@ -29,7 +29,6 @@ Ext.define('WordSeer.view.windowing.viewport.HboxLayout', {
 		this.callParent(arguments);
 	},
 
-// 	option to pass in an ID from url hash
 	addPanel: function(panel_id) {
 		var new_id = panel_id || Ext.id();
 		var new_panel = Ext.create('WordSeer.model.LayoutPanelModel', {
@@ -63,7 +62,6 @@ Ext.define('WordSeer.view.windowing.viewport.HboxLayout', {
 
 // 	TODO: panel is still in the DOM after it's removed
 	removePanel: function(panel) {
-		console.log(panel);
 		var id = panel.itemId;
 		var panel_model = this.getLayoutModel().panels().getById(id);
 		this.getLayoutModel().panels().remove(panel_model);

@@ -422,7 +422,8 @@ Ext.define('WordSeer.controller.WindowingController', {
 			.getById(history_item_id);
 		var formValues = WordSeer.model.FormValues.deserialize(
 			history_item.get('formValues'));
-		layout_panel.fireEvent('initSearch', layout_panel, formValues);
+		layout_panel.fireEvent('initSearch', layout_panel, formValues,
+			history_item_id);
 	},
 
 	/** Adds a new panel to the layout and displays the
@@ -447,12 +448,6 @@ Ext.define('WordSeer.controller.WindowingController', {
 				panel.itemId);
 			this.playHistoryItem(panel, panel.getLayoutPanelModel(),
 				history_item_id);
-
-			if (!panel_id) {
-				// add to URL after completion
-				this.getController("UrlHistoryController").newPanel(panel.itemId,
-					history_item_id);
-			}
 		},
 		1000,
 		this,
