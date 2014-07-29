@@ -23,7 +23,8 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
         this.control({
             'layout-panel': {
                 navButtonClicked: this.navButton,
-                initSearch: this.newSearch
+                initSearch: this.newSearch,
+                newSlice: this.newSlice
             }
 
         });
@@ -118,8 +119,15 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
                     token.splice[i, 1, new_search];
                 }
             }
+            token = token.join(":");
         }
+        Ext.History.add(token);
         this.IGNORE_CHANGE = false;
+    },
+
+    newSlice: function(){
+        console.log("newslice");
+        console.log(arguments);
     },
 
     newPanel: function(panel_itemid, history_item_id){
