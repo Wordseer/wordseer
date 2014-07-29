@@ -7,8 +7,8 @@ from lxml import etree
 
 from app.models.property import Property
 from app.models.sentence import Sentence
-from app.pipeline.structureextractor import *
-from app.pipeline.stringprocessor import StringProcessor
+from app.preprocessor.structureextractor import *
+from app.preprocessor.stringprocessor import StringProcessor
 
 t = StringProcessor()
 

@@ -6,10 +6,10 @@ import mock
 import unittest
 
 from app.models.document import Document
-from app.pipeline.database.readerwriter import ReaderWriter
+from app.preprocessor.database.readerwriter import ReaderWriter
 from app.models.word import Word
 from app.models.sentence import Sentence
-from app.pipeline.sequenceprocessor import (SequenceProcessor,
+from app.preprocessor.sequenceprocessor import (SequenceProcessor,
     join_tws, LEMMA, WORD)
 
 class SequenceProcessorTests(unittest.TestCase):

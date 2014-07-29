@@ -6,7 +6,7 @@ import unittest
 from app.models.sentence import Sentence
 from app.models.dependency import Dependency
 from app.models.parseproducts import ParseProducts
-from app.pipeline import stringprocessor
+from app.preprocessor import stringprocessor
 
 t = stringprocessor.StringProcessor()
 
@@ -100,7 +100,7 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
                     assert space == ""
 
 @mock.patch.object(stringprocessor, "tokenize_from_raw")
-@mock.patch("app.pipeline.stringprocessor.StanfordCoreNLP.raw_parse")
+@mock.patch("app.preprocessor.stringprocessor.StanfordCoreNLP.raw_parse")
 class ParseTests(unittest.TestCase):
     """Tests for the parse() method.
     """
@@ -110,8 +110,8 @@ class ParseTests(unittest.TestCase):
         """
         #t.parser = mock.MagicMock()
 
-    @mock.patch("app.pipeline.stringprocessor.Word.query", autospec=True)
-    @mock.patch("app.pipeline.stringprocessor.Dependency.query", autospec=True)
+    @mock.patch("app.preprocessor.stringprocessor.Word.query", autospec=True)
+    @mock.patch("app.preprocessor.stringprocessor.Dependency.query", autospec=True)
     def test_parse(self, mock_dependency_query, mock_word_query, mock_parser, mock_tokenizer):
         """Test the parse method.
         """

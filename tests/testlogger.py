@@ -6,7 +6,7 @@ import unittest
 import database
 from app import db
 from app.models.log import Log
-from app.pipeline import logger
+from app.preprocessor import logger
 
 class LoggerTests(unittest.TestCase):
     """Run tests on the Logger class.
