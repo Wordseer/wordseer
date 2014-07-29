@@ -6,8 +6,11 @@ This enables standard browser back/forward actions but does not make URLs
 shareable or truly persistent, since query history is not reliably or centrally
 stored.
 
-How it works (in theory): Layout and Search controllers route panel and query
-CRUD through the UrlHistoryController, which records state and then dispatches the appropriate windowing actions.
+How it works:
+- Listens for events indicating new searches or widget selections, updates URLs
+accordingly (reflects app state rather than controlling it)
+- Listens for URL changes (eg, from back/forward buttons) and hands them off to
+the WindowingController for dispatching (keep windowing logic out of this controller)
 */
 Ext.define('WordSeer.controller.UrlHistoryController', {
     extend: 'Ext.app.Controller',
@@ -30,6 +33,7 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
         });
     },
 
+    // TODO: update this so it doesn't call windowing functions directly
     dispatch: function(token){
         if (this.IGNORE_CHANGE) { return; }
 
@@ -105,7 +109,7 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
 
     newSearch: function(panel, formValues, history_item_id){
         this.IGNORE_CHANGE = true;
-        var new_search = panel.itemId + "_" + "history_item_id";
+        var new_search = panel.itemId + "_" + history_item_id;
         var token = Ext.History.getToken();
         if (! /^panels:/.test(token)) {
             token = "panels:" + new_search;
@@ -113,10 +117,10 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
             token = token.split(":");
             for (var i=0; i<token.length; i++){
                 if (token[i].indexOf(panel.itemId) != -1) {
-                    token.splice[i, 1, new_search];
-                } else if (i == token.length - 1 && token[i] == "") {
-                    // ensure colon at end
-                    token.splice[i, 1, new_search];
+                    token.splice(i, 1, new_search);
+                } else if (i == token.length - 1 ) {
+                    // add to end
+                    token.push(new_search);
                 }
             }
             token = token.join(":");
@@ -126,8 +130,8 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
     },
 
     newSlice: function(){
-        console.log("newslice");
-        console.log(arguments);
+        // console.log("newslice");
+        // console.log(arguments);
     },
 
     newPanel: function(panel_itemid, history_item_id){
