@@ -1,0 +1,82 @@
+{
+    "structureName": "document",
+    "xpaths": [
+        "/article"
+    ],
+    "titleXpaths": [
+        "./title/text()"
+    ],
+    "units": [
+        {
+            "belongsTo": "document",
+            "structureName": "sentence",
+            "combine": true,
+            "xpaths": [
+                "./text/text()"
+            ]
+        }
+    ],
+    "metadata": [
+        {
+            "belongsTo": "document",
+            "propertyName": "Author",
+            "xpaths": [
+                "./author/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "string",
+            "displayName": "Author",
+            "isCategory": true
+        },
+        {
+            "belongsTo": "document",
+            "propertyName": "Title",
+            "xpaths": [
+                "./title/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "string",
+            "displayName": "Title",
+            "isCategory": true
+        },
+        {
+            "belongsTo": "document",
+            "propertyName": "Time",
+            "xpaths": [
+                "./time/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "date_%Y-%m-%d",
+            "displayName": "Time",
+            "isCategory": true
+        },
+        {
+            "belongsTo": "document",
+            "propertyName": "Number",
+            "xpaths": [
+                "./number/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "number",
+            "displayName": "Number",
+            "isCategory": true
+        },
+        {
+            "belongsTo": "document",
+            "propertyName": "Tag",
+            "xpaths": [
+                "./tags/tag/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "string",
+            "displayName": "Tag",
+            "isCategory": true
+        }
+    ]
+}
+

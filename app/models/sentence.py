@@ -25,6 +25,11 @@ class Sentence(db.Model, Base):
         dependencies (list of Dependencies): ``Dependency``\s present in this
             sentence. This relationship is described with
             ``DependencyInSentence``.
+        properties (list of Propertys): ``Property``\s associated with this
+            ``Sentence``.
+        words (list of Words): ``Word``\s in this ``Sentence``.
+        parsed_paragraph (ParsedParagraph): The ``ParsedParagraph`` that
+            includes this ``Sentence``.
 
     Relationships:
         belongs to: unit, document
@@ -35,23 +40,25 @@ class Sentence(db.Model, Base):
 
     unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
     document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
+    parsed_paragraph_id = db.Column(db.Integer,
+        db.ForeignKey("parsed_paragraph.id"))
     text = db.Column(db.Text, index=True)
 
     # Relationships
 
     words = association_proxy("word_in_sentence", "word",
-        creator=lambda word: WordInSentence(word=word)
-    )
+        creator=lambda word: WordInSentence(word=word))
 
     sequences = association_proxy("sequence_in_sentence", "sequence",
-        creator=lambda sequence: SequenceInSentence(sequence=sequence)
-    )
+        creator=lambda sequence: SequenceInSentence(sequence=sequence))
+
     dependencies = association_proxy("dependency_in_sentence", "dependency",
-        creator=lambda dependency: DependencyInSentence(dependency=dependency)
-    )
+        creator=lambda dependency: DependencyInSentence(dependency=dependency))
 
     document = db.relationship("Document", foreign_keys=[document_id],
         backref="all_sentences")
+
+    properties = db.relationship("Property", backref="sentence")
 
     def __repr__(self):
         """Representation of the sentence, showing its text.
@@ -59,16 +66,9 @@ class Sentence(db.Model, Base):
         NOTE: could be trucated to save print space
         """
 
-        return "<Sentence: " + self.text + ">"
+        return "<Sentence: " + str(self.text) + ">"
 
-    @property
-    def tagged(self):
-        """Temporary compatibility method
-        """
-
-        return self.words
-
-    def add_word(self, word, position=None, space_before="", tag=""):
+    def add_word(self, word, position=None, space_before="", part_of_speech=""):
         """Add a word to the sentence by explicitly creating the association
         object.
 
@@ -79,7 +79,7 @@ class Sentence(db.Model, Base):
             position (int): The position (0-indexed) of ``word`` in this
                 ``Sentence``.
             space_before (str): The space before ``word``, if any.
-            tage (str): The part of speech of ``word``.
+            part_of_speech (str): The part of speech of ``word``.
 
         Returns:
             WordInSentence: The association object that associates this
@@ -91,7 +91,7 @@ class Sentence(db.Model, Base):
             sentence=self,
             position=position,
             space_before=space_before,
-            tag=tag
+            part_of_speech=part_of_speech
         )
         word_in_sentence.save()
 

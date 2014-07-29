@@ -11,13 +11,21 @@ class GrammaticalRelationship(db.Model, Base):
     dependent in the dependency model.
 
     Attributes:
-      name (str): the name of the relationship
+        name (str): the name of the relationship
+        dependency (Dependency): The ``Dependency`` this
+            ``GrammaticalRelationship`` belongs to.
 
     Relationships:
-      belongs to: dependency
+        belongs to: dependency
     """
 
     # Attributes
 
     name = db.Column(db.String, index=True)
+
+    def __repr__(self):
+        """Return a string representation of this ``GrammaticalRelationship``.
+        """
+
+        return str(self.name)
 

@@ -8,12 +8,26 @@ from .base import Base
 
 class Role(db.Model, Base, RoleMixin):
     """Represents a flask-security user role.
+
+    Attributes:
+        name (str): Name of this role.
+        description (str): Description of this role.
+        users (list of Users): ``User``\s who have this role.
     """
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
 class User(db.Model, Base, UserMixin):
     """Represents a flask-security user.
+
+    Attributes:
+        email (str): The user's email.
+        password (str): The user's email.
+        active (boolean): If the user is active.
+        confirmed_at (datetime): When the user confirmed their account.
+        roles (list of Roles): ``Role``\s that this ``User`` has.
+        sets (list of Sets): ``Set``\s that this ``User`` has.
+        projects (list of Projects): ``Project``\s that this ``User`` has.
     """
 
     email = db.Column(db.String(255), unique=True)

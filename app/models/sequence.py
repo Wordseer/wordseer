@@ -10,16 +10,20 @@ class Sequence(db.Model, Base):
     original sentence.
 
     Attributes:
-      sequence (str): the sequence text
-      lemmatized (bool): whether or not it is lemmatized
-      has_function_words (bool): whether or not it has function words
-      all_function_words (bool): whether or not it is made of all function words
-      length (int): the length of the sequence
-      sentence_count (int): the number of sentences this sequence appears in
-      document_count (int): the number of documents this sequence appears in
+        sequence (str): the sequence text
+        lemmatized (bool): whether or not it is lemmatized
+        has_function_words (bool): whether or not it has function words
+        all_function_words (bool): whether or not it is made of all function
+            words.
+        length (int): the length of the sequence
+        sentences (list of Sentences): ``Sentence``\s that this document appears
+            in.
+        words (list of Words): ``Word``\s that appear in this ``Sequence``.
+        sentence_count (int): the number of sentences this sequence appears in
+        document_count (int): the number of documents this sequence appears in
 
     Relationships:
-      belongs to: sentence
+        belongs to: sentence
     """
 
     # Attributes
@@ -35,8 +39,8 @@ class Sequence(db.Model, Base):
     # Relationships
 
     sentences = association_proxy("sequence_in_sentence", "sentence",
-        creator=lambda sentence: SequenceInSentence(sentence=sentence)
-    )
+        creator=lambda sentence: SequenceInSentence(sentence=sentence))
+
     words = association_proxy("word_in_sequence", "word",
-        creator=lambda word: WordInSequence(word=word)
-    )
+        creator=lambda word: WordInSequence(word=word))
+

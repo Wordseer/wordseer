@@ -42,7 +42,6 @@ class BaseConfig(object):
     SECURITY_REGISTERABLE = True
     SECURITY_CHANGEABLE = True
     SECURITY_RECOVERABLE = True
-
     SECRET_KEY = "secret"
 
     #Email settings
@@ -50,19 +49,66 @@ class BaseConfig(object):
     SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
     SECURITY_SEND_REGISTER_EMAIL = False
 
-    #TODO: unify these options with the pipeline
+    PREPOSITIONS = (u"about away across against along around at behind"
+        " beside besides by despite down during for from in inside into"
+        " near of off on onto over through to toward with within whence"
+        " until without upon hither thither unto up").split(" ")
 
-    STOPWORDS = (u"'ve ’s ’ 're does o t went was is had be were did are have "
-        "do has being am 's been go 'm the and so are for be but this what 's "
-        "did had they doth a to is that was as are at an of with . , ; ? ' \" "
-        ": `").split();
+    PRONOUNS = (u"i its it you your thou thine thee we he they me us her"
+        " them him my mine her hers his our thy thine ours their theirs"
+        " myself itself mimself ourselves herself themselves anything"
+        " something everything nothing anyone someone everyone ones"
+        " such").split(" ")
+
+    DETERMINERS = (u"the a an some any this these each that no every all"
+        " half both twice one two first second other another next last"
+        " many few much little more less most least several no"
+        " own").split(" ")
+
+    CONJUNCTIONS = (u"and or but so when as while because although if"
+        " though what who where whom when why whose which how than nor "
+        " not").split(" ")
+
+    MODAL_VERBS = (u"can can't don't won't shan't shouldn't ca canst might"
+        " may would wouldst will willst should shall must could").split(" ")
+
+    PRIMARY_VERBS = (u"is are am be been being went go do did does doth has have"
+        " hath was were had").split(" ")
+
+    ADVERBS = (u"again very here there today tomorrow now then always never"
+        " sometimes usually often therefore however besides moreover though"
+        " otherwise else instead anyway incidentally meanwhile").split(" ")
+
+    PUNCTUATION_ALL = (u". ! @ # $ % ^ & * ( ) _ - -- --- + = ` ’ ~ � { } [ ] | \\"
+        " : ; \" ' < > ? , . / ").split(" ")
+
+    CONTRACTIONS = (u"'re 've 's ’s'nt 'm n't th 'll o s 't 'rt t").split(" ")
+
+    STOPWORDS = (PRONOUNS + PREPOSITIONS + DETERMINERS +
+        CONJUNCTIONS + MODAL_VERBS + PRIMARY_VERBS + ADVERBS +
+        PUNCTUATION_ALL + CONTRACTIONS)
 
     PUNCTUATION_NO_SPACE_BEFORE = list(u".,!`\\?';):—")
     PUNCTUATION_NO_SPACE_AFTER = list(u"`'\"(—")
-    PUNCTUATION_ALL = list(u"!@#$%^&*()_+-=~`,./;;\"'{}[]|’\\");
 
     # Number of rows to return for paginated queries
     PAGE_SIZE = 100
+
+    # Pipeline options
+    #WORDSEER_DIR = os.path.dirname(os.path.realpath(__file__))
+
+    # NLP locations. Paths should be absolute.
+    CORE_NLP_DIR = os.path.join(ROOT, "lib/wordseerbackend/stanford-corenlp/")
+
+    # Processing options
+    GRAMMATICAL_PROCESSING = True
+    PART_OF_SPEECH_TAGGING = True
+    WORD_TO_WORD_SIMILARITY = True
+    SEQUENCE_INDEXING = True
+
+    # Database options
+    #DB_URL = "sqlite:///" + os.path.join(ROOT, 'wordseer.db')
+
 
 class Production(BaseConfig):
     """Config for the production server.

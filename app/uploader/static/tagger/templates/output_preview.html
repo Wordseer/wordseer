@@ -1,0 +1,33 @@
+<div id='output-preview-header' class='panel-heading'>Output Preview - Display Name (XML Name)</div>
+<div class='panel-body'>
+    <% if(data.length>0) {%> <table id='output-preview-table' class='table'>
+
+        <thead>
+            <tr>
+                <% _.each(data[0], function(value, key){%>
+                <th title='<%=value.help%>' class="<%=value.id%>"><%=value.name%> (<%=value.tag%>)</th>
+                <%});%>
+            </tr>
+        </thead>
+        <tbody>
+            <% _.each(data, function(row){%>
+            <tr>
+                <% _.each(row, function(value, key){%>
+                <td title='<%=value.help%>' class="<%=value.id%>"><%=value.value%></td>
+                <%});%>
+            </tr>
+            <%});%>
+
+        </tbody>
+    </table> 
+    <div class='btn-group'>
+        <button id='output-preview-show-more' class='btn btn-default' onclick="showMoreOutput()"><span class='glyphicon glyphicon-plus'></span> Show More</button>
+        <button id='output-preview-show-less' class='btn btn-default' onclick="showLessOutput()">Show Less <span class='glyphicon glyphicon-minus'></span></button>
+    </div>
+    <%}
+    else {%>
+    <p>Add one text node to see output preview</p>
+    <%}%>
+
+
+</div>
