@@ -60,7 +60,6 @@ class StringProcessor(object):
 
         # If the parse was unsuccessful, exit
         if not parsed:
-            print("ERROR: dependencies could not be extracted.")
             return
 
         parsed_sentence = parsed["sentences"][0]
@@ -177,12 +176,14 @@ class StringProcessor(object):
         Also checks the sentence text for irregularities that may break the
         parser and handles it before proceeding.
 
+        Any failure will cause this method to return None
+
         :param str text: The text of the sentence to check
         """
 
         # Check for non-string
         if not isinstance(text, str) and not isinstance(text, unicode):
-            print("ERROR: parser got a non-string argument")
+            print("WARNING: parser got a non-string argument")
             return None
 
         # Check for non-unicode
@@ -213,7 +214,7 @@ class StringProcessor(object):
 
         # Check length of sentence
         max_length = app.config["SENTENCE_MAX_LENGTH"]
-        if len(text.split(" ")) > max_length:
+        if any([ len(sentence.split(" ")) > max_length for sentence in text.split(".") ]):
             print("Sentence appears to be too long, max length " +
                 "is " + str(max_length))
             # TODO: attempt to split on a comma
@@ -256,7 +257,6 @@ def tokenize_from_raw(parsed_text, txt):
 
     # If parsed_text is the result of a failed parse, return with an empty list
     if not parsed_text:
-        print("ERROR: failed parse on sentence")
         return []
 
     paragraph = [] # a list of Sentences
