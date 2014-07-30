@@ -8,7 +8,7 @@ CORENLP="http://nlp.stanford.edu/software/stanford-corenlp-full-2013-06-20.zip"
 # Path to requirements file
 REQUIREMENTS="requirements.txt"
 # Directory to save corenlp to
-CORENLP_DESTINATION="lib/wordseerbackend"
+CORENLP_DESTINATION="."
 # Directory name for the corenlp tree
 CORENLP_FINAL_NAME="stanford-corenlp"
 

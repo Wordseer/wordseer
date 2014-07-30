@@ -1,13 +1,12 @@
-"""
-Tests for the Logger class.
+"""Tests for the Logger class.
 """
 
 import unittest
 
-from app import db
 import database
-from lib.wordseerbackend.wordseerbackend import logger
+from app import db
 from app.models.log import Log
+from app.preprocessor import logger
 
 class LoggerTests(unittest.TestCase):
     """Run tests on the Logger class.

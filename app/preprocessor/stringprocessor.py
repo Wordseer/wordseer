@@ -1,7 +1,13 @@
 """Methods to handle string parsing, tokenization, tagging, etc.
 """
+<<<<<<< HEAD:lib/wordseerbackend/wordseerbackend/stringprocessor.py
 from nltk.tokenize import sent_tokenize
 from corenlp import StanfordCoreNLP, ProcessError, TimeoutError
+=======
+import logging
+
+from corenlp import StanfordCoreNLP
+>>>>>>> removing-readerwriter:app/preprocessor/stringprocessor.py
 
 from app import app
 from app.models.sentence import Sentence
@@ -21,7 +27,7 @@ class StringProcessor(object):
         """Instantiate and ready the parser. Note that readying the parser takes
         some time.
         """
-
+        self.logger = logging.getLogger(__name__)
         self.parser = StanfordCoreNLP(app.config["CORE_NLP_DIR"])
 
     def tokenize(self, txt):
@@ -51,14 +57,6 @@ class StringProcessor(object):
         :param Sentence sentence: The ``Sentence`` object.
         :param int max_length: The most amount of words to process.
         """
-
-        # This isn't a perfect way to check how many words are in a sentence,
-        # but it's not so bad.
-        #if len(sentence.text.split(" ")) > max_length:
-        #   raise ValueError("Sentence appears to be too long, max length " +
-        #        "is " + str(max_length))
-        # TODO: figure out the above
-        # NOTE: moved to check_sentence_text
 
         parsed = self.parse_with_error_handling(sentence.text)
 
@@ -102,19 +100,14 @@ class StringProcessor(object):
                                 name = grammatical_relationship
                             ).one()
                         except(MultipleResultsFound):
-                            print("ERROR: duplicate records found for:")
-                            print("\t" + str(key))
+                            self.logger.error("duplicate records found for: %s",
+                                str(key))
                         except(NoResultFound):
                             relationship = GrammaticalRelationship(
                                 name = grammatical_relationship
                             )
 
                         relationships[key] = relationship
-
-                    # NOTE: currently, because there is a mismatch in some cases
-                    # between the words in the sentences and the words in the
-                    # dependencies, the method looks up the word using only the
-                    # lemma and tag, which may not guarantee uniqueness.
 
                     # Read the data for the governor, and find the corresponding word
                     governor = Word.query.filter_by(
@@ -143,8 +136,8 @@ class StringProcessor(object):
                                 dependent = dependent
                             ).one()
                         except(MultipleResultsFound):
-                            print("ERROR: duplicate records found for:")
-                            print("\t" + str(key))
+                            self.logger.error("duplicate records found for: %s",
+                                str(key))
                         except(NoResultFound):
                             dependency = Dependency(
                                 grammatical_relationship = relationship,
@@ -160,11 +153,6 @@ class StringProcessor(object):
                         governor_index = governor_index,
                         dependent_index = dependent_index,
                     )
-
-                    #  print("relationship", relationship)
-                    #  print("governor", governor)
-                    #  print("dependent", dependent)
-                    #  print("dependency", dependency)
 
                     dependency.save(False)
 
@@ -303,9 +291,6 @@ def split_sentences(text):
 
     return sentences
 
-
-
-
 def tokenize_from_raw(parsed_text, txt):
     """Given the output of a call to raw_parse, produce a list of Sentences
     and find the PoS, lemmas, and space_befores of each word in each sentence.
@@ -321,6 +306,8 @@ def tokenize_from_raw(parsed_text, txt):
     # If parsed_text is the result of a failed parse, return with an empty list
     if not parsed_text:
         return []
+
+    logger = logging.getLogger(__name__)
 
     paragraph = [] # a list of Sentences
     words = dict()
@@ -349,7 +336,6 @@ def tokenize_from_raw(parsed_text, txt):
 
             if key in words.keys():
                 word = words[key]
-                # print("In dict " + str(word))
 
             else:
                 try:
@@ -358,10 +344,8 @@ def tokenize_from_raw(parsed_text, txt):
                         lemma = lemma,
                         part_of_speech = part_of_speech
                     ).one()
-                    # print("Found word " + str(word))
                 except(MultipleResultsFound):
-                    print("Duplicate records found for:")
-                    print("\t" + str(key))
+                    logger.warning("Duplicate records found for: %s", str(key))
                 except(NoResultFound):
                     word = Word(
                         word = word,

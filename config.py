@@ -100,7 +100,7 @@ class BaseConfig(object):
     #WORDSEER_DIR = os.path.dirname(os.path.realpath(__file__))
 
     # NLP locations. Paths should be absolute.
-    CORE_NLP_DIR = os.path.join(ROOT, "lib/wordseerbackend/stanford-corenlp/")
+    CORE_NLP_DIR = os.path.join(ROOT, "stanford-corenlp/")
 
     # Processing options
     GRAMMATICAL_PROCESSING = True
@@ -109,9 +109,6 @@ class BaseConfig(object):
     SEQUENCE_INDEXING = True
     SKIP_SENTENCE_ON_ERROR = False
     SENTENCE_MAX_LENGTH = 40
-
-    # Database options
-    #DB_URL = "sqlite:///" + os.path.join(ROOT, 'wordseer.db')
 
 
 class Production(BaseConfig):
