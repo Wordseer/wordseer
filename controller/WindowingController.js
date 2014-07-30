@@ -37,7 +37,7 @@ Ext.define('WordSeer.controller.WindowingController', {
 //					console.log("Nav button of type " + type + " clicked");
 					switch (type) {
 						case 'close':
-							this.closeToolClicked(panel);
+							this.closePanel(panel);
 							break;
 						case 'back':
 							this.backButton(panel);
@@ -216,7 +216,7 @@ Ext.define('WordSeer.controller.WindowingController', {
 	},
 
 	/** Removes the given panel from the layout, and un-links the history item
-	being viewed from the layout panel. Called by {#closeToolClicked} when the
+	being viewed from the layout panel. Called by {#closePanel} when the
 	user clicks the 'close' tool on a
 	{@WordSeer.view.windowing.viewport.LayoutPanel}, or by
 	{@link WordSeer.controller.HistoryController#hideHistoryItem} when the user
@@ -529,7 +529,7 @@ Ext.define('WordSeer.controller.WindowingController', {
 	@param {WordSeer.view.windowing.viewport.LayoutPanel} panel The layout panel
 	to close.
 	*/
-	closeToolClicked: function(panel){
+	closePanel: function(panel){
 		var history_item_id = panel.getLayoutPanelModel()
 			.get('history_item_id');
 		if (history_item_id !== '') {
@@ -612,6 +612,68 @@ Ext.define('WordSeer.controller.WindowingController', {
 	destroyResultMenu: function(view, record, selected) {
 		var candidates = Ext.ComponentQuery.query('result-list-menu');
 		candidates.forEach(function(c) { c.close(10); });
+	},
+
+	dispatchUrlToken: function(token){
+		if (token == 'usersignin') {
+            // initial sign-in
+			Ext.create('Ext.container.Viewport', {
+				layout: 'fit',
+				items:{
+						xtype: 'usersignin',
+				}
+			});
+		} else if (token == 'home'){
+			// show landing page
+			this.land();
+			// TODO: panel splitters are left hanging around after return home
+
+		} else if (/^panels:/.test(token)) {
+			// make sure controller is ready to display windows
+			if (!this.initialized) {
+				this.start();
+			}
+			// parse the token
+			var parts = token.split(":");
+			var panel_itemids = [];
+			var history_ids = [];
+
+			for (var i = 1; parts[i]; i++) {
+				var panel_parts = parts[i].split("_");
+				panel_itemids.push(panel_parts[0]);
+				history_ids.push(panel_parts[1]);
+			}
+
+			// get current panels
+			var panels = Ext.getCmp("windowing-viewport").query("layout-panel");
+			var active_panels = [];
+			for (var i = 0; panels[i]; i++){
+				active_panels.push(panels[i].itemId)
+			}
+
+			for (var i = 0; active_panels[i]; i++) {
+				if (panel_itemids.indexOf(active_panels[i]) == -1) {
+					// if panel isn't in token list, close it
+					this.closePanel(panels[i]);
+				} else if (history_ids[i] !=
+						   Ext.getStore("HistoryItemStore")
+						       .findRecord("layout_panel_id", active_panels[i])
+							       .internalId
+						  ) {
+					// if there's a history change for a panel, update it
+					this.playHistoryItemInCurrentPanel(history_ids[i], panels[i]);
+				}
+			}
+
+			// if token isn't in window, play history item in new panel
+			// with the requested id
+			for (var i = 0; panel_itemids[i]; i++) {
+				if (active_panels.indexOf(panel_itemids[i]) == -1) {
+					this.playHistoryItemInNewPanel(history_ids[i],
+						panel_itemids[i]);
+				}
+			}
+		}
 	},
 
 });

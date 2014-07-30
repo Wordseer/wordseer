@@ -14,11 +14,13 @@ the WindowingController for dispatching (keep windowing logic out of this contro
 */
 Ext.define('WordSeer.controller.UrlHistoryController', {
     extend: 'Ext.app.Controller',
-    // flag for internal URL manipulation vs back/fwd clicks
+    // flags for internal URL manipulation vs back/fwd clicks
     IGNORE_CHANGE: false,
+    IGNORE_EVENTS: false,
 
     views: [
-        'windowing.viewport.LayoutPanel'
+        'windowing.viewport.LayoutPanel',
+        'windowing.viewport.LandingPage',
     ],
 
     // listen for layout events and add them to url
@@ -26,7 +28,10 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
         this.control({
             'layout-panel': {
                 navButtonClicked: this.navButton,
-                newSlice: this.newSlice
+                newSlice: this.newSlice,
+            },
+            'landing-page': {
+                render: this.landingPage,
             }
 
         });
@@ -35,65 +40,10 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
     // TODO: update this so it doesn't call windowing functions directly
     dispatch: function(token){
         if (this.IGNORE_CHANGE) { return; }
-
-        var windowing = this.getController('WindowingController');
-
-        if (token == 'usersignin') {
-//             initial sign-in
-            Ext.create('Ext.container.Viewport', {
-                layout: 'fit',
-                items:{
-                        xtype: 'usersignin',
-                }
-            });
-        } else if (token == 'home'){
-//             show landing page
-            windowing.land();
-            // TODO: panel splitters are left hanging around after return home
-
-        } else if (/^panels:/.test(token)) {
-            // make sure controller is ready to display windows
-            if (!this.getController('WindowingController').initialized) {
-                this.getController('WindowingController').start();
-            }
-//          parse the token
-            var parts = token.split(":");
-            var panel_itemids = [];
-            var history_ids = [];
-
-            for (var i = 1; parts[i]; i++) {
-                var panel_parts = parts[i].split("_");
-                panel_itemids.push(panel_parts[0]);
-                history_ids.push(panel_parts[1]);
-            }
-
-//          get current panels
-            var panels = Ext.getCmp("windowing-viewport").query("layout-panel");
-            var active_panels = [];
-            for (var i = 0; panels[i]; i++){
-                active_panels.push(panels[i].itemId)
-            }
-
-            // if panel isn't in token list, close it
-            for (var i = 0; active_panels[i]; i++) {
-                if (panel_itemids.indexOf(active_panels[i]) == -1) {
-
-                    windowing.closeToolClicked(Ext.getCmp(active_panels[i]));
-                }
-            }
-
-            // if token isn't in window, play history item in new panel
-            // with the requested id
-            for (var i = 0; panel_itemids[i]; i++) {
-                if (active_panels.indexOf(panel_itemids[i]) == -1) {
-                    windowing.playHistoryItemInNewPanel(history_ids[i],
-                        panel_itemids[i]);
-                }
-            }
-        }
-
+        this.IGNORE_EVENTS = true;
+        this.getController('WindowingController').dispatchUrlToken(token);
+        this.IGNORE_EVENTS = false;
     },
-
 
     navButton: function(panel, buttonClicked){
         this.IGNORE_CHANGE = true;
@@ -109,6 +59,8 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
     },
 
     newSlice: function(panel, formValues){
+        if (this.IGNORE_EVENTS) { return; }
+
         this.IGNORE_CHANGE = true;
         // get associated HistoryItem
         var history_item_id = Ext.getStore("HistoryItemStore")
@@ -159,5 +111,11 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
         }
 
         Ext.History.add(token);
-    }
+    },
+
+    landingPage: function(){
+        this.IGNORE_CHANGE = true;
+        Ext.History.add("home");
+        this.IGNORE_CHANGE = false;
+    },
 });
