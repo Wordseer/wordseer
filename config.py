@@ -91,6 +91,8 @@ class BaseConfig(object):
     PUNCTUATION_NO_SPACE_BEFORE = list(u".,!`\\?';):—")
     PUNCTUATION_NO_SPACE_AFTER = list(u"`'\"(—")
 
+    SPLIT_CHARACTERS = [";", "--", ":", ","]
+
     # Number of rows to return for paginated queries
     PAGE_SIZE = 100
 

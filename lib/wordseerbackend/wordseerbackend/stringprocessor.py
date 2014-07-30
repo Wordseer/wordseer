@@ -32,9 +32,13 @@ class StringProcessor(object):
         :param str txt: One or more sentences, in a string format.
         :return list: A list of document.Sentence objects.
         """
-        parsed_text = self.parse_with_error_handling(txt)
+        sentences = []
 
-        return tokenize_from_raw(parsed_text, txt)
+        for sentence_text in split_sentences(txt):
+            sentence = self.parse_with_error_handling(sentence_text)
+            sentences.extend(tokenize_from_raw(sentence, sentence_text))
+
+        return sentences
 
     def parse(self, sentence, relationships=None, dependencies=None, max_length=30):
         """Parse a ``Sentence`` and extract dependencies, parse trees, etc.
@@ -183,7 +187,7 @@ class StringProcessor(object):
 
         # Check for non-string
         if not isinstance(text, str) and not isinstance(text, unicode):
-            print("WARNING: parser got a non-string argument")
+            print("Parser got a non-string argument")
             return None
 
         # Check for non-unicode
@@ -196,7 +200,7 @@ class StringProcessor(object):
             try:
                 text = unicode(text)
             except(UnicodeDecodeError):
-                print("ERROR: the following sentence text is not unicode; " +
+                print("The following sentence text is not unicode; " +
                     "convertion failed.")
                 print(text)
 
@@ -205,23 +209,11 @@ class StringProcessor(object):
                     return None
                 else:
                     # Try to parse the sentence anyway
-                    print("WARNING: attempting to parse non-unicode sentence.")
+                    print("Attempting to parse non-unicode sentence.")
 
         # Check for empty or nonexistent text
         if text == "" or text == None:
-            print("ERROR: parser got an empty text")
             return None
-
-        # Check length of sentence
-        max_length = app.config["SENTENCE_MAX_LENGTH"]
-        sentences = sent_tokenize(text)
-        for sentence in sentences:
-            if len(sentence.split(" ")) > max_length:
-                print("Sentence appears to be too long, max length " +
-                    "is " + str(max_length))
-                # TODO: attempt to split on a comma
-
-                # TODO: force split at max length if comma split will not work
 
         # Check for irregular characters
         # TODO: what are considered irregular characters?
@@ -233,10 +225,10 @@ class StringProcessor(object):
         # TODO: handle all errors properly
         # ProcessError, TimeoutError, OutOfMemoryError
         except TimeoutError as e:
-            print(e)
+            print("Got a TimeoutError: " + str(e))
             return None
         except ProcessError as e:
-            print(e)
+            print("Got a ProcessError: " + str(e))
             return None
         except:
             print("Unknown error")
@@ -244,6 +236,75 @@ class StringProcessor(object):
 
         # Parse successful, return parsed text
         return parsed_text
+
+def split_sentences(text):
+    """Split the string into sentences.
+
+    Also runs a length check and splits sentences that are too long on
+    reasonable punctuation marks.
+
+    :param str text: The text to split
+    """
+
+    sentences = []
+
+    # Split sentences using NLTK
+    sentence_texts = sent_tokenize(text)
+
+    for sentence_text in sentence_texts:
+
+        # Check length of sentence
+        max_length = app.config["SENTENCE_MAX_LENGTH"]
+        approx_sentence_length = len(sentence_text.split(" "))
+
+        if approx_sentence_length > max_length:
+            print("Sentence appears to be too long, max length " +
+                "is " + str(max_length))
+
+            # Attempt to split on a suitable punctuation mark
+            # Order (tentative): semicolon, double-dash, colon, comma
+
+            # Mini helper function to get indices of punctuation marks
+
+            split_characters = app.config["SPLIT_CHARACTERS"]
+            subsentences = None
+
+            for character in split_characters:
+                subsentences = sentence_text.split(character)
+
+                # If all subsentences fit the length limit, exit the loop
+                if all([len(subsentence.split(" ")) <= max_length
+                    for subsentence in subsentences]):
+
+                    print("Splitting sentence around " + character + " to fit length limit.")
+                    break
+
+                # Otherwise, reset subsentences and try again
+                else:
+                    subsentences = None
+
+            # If none of the split characters worked, force split on max_length
+            if not subsentences:
+                print("No suitable punctuation for splitting; " +
+                    "forcing split on max_length number of words")
+                subsentences = []
+                split_sentence = sentence_text.split(" ")
+
+                index = 0
+                # Join every max_length number of words
+                while index < approx_sentence_length:
+                    subsentences.append(split_sentence[index:index+max_length])
+                    index += max_length
+
+            sentences.extend(subsentences)
+
+        else:
+            sentences.append(sentence_text)
+
+    return sentences
+
+
+
 
 def tokenize_from_raw(parsed_text, txt):
     """Given the output of a call to raw_parse, produce a list of Sentences
@@ -299,7 +360,7 @@ def tokenize_from_raw(parsed_text, txt):
                     ).one()
                     # print("Found word " + str(word))
                 except(MultipleResultsFound):
-                    print("ERROR: duplicate records found for:")
+                    print("Duplicate records found for:")
                     print("\t" + str(key))
                 except(NoResultFound):
                     word = Word(
