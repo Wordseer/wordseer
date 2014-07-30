@@ -26,7 +26,6 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
         this.control({
             'layout-panel': {
                 navButtonClicked: this.navButton,
-                initSearch: this.newSearch,
                 newSlice: this.newSlice
             }
 
@@ -109,8 +108,12 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
         this.IGNORE_CHANGE = false;
     },
 
-    newSearch: function(panel, formValues, history_item_id){
+    newSlice: function(panel, formValues){
         this.IGNORE_CHANGE = true;
+        // get associated HistoryItem
+        var history_item_id = Ext.getStore("HistoryItemStore")
+            .findRecord("layout_panel_id", panel.itemId)
+                .internalId;
         var new_search = panel.itemId + "_" + history_item_id;
         var token = Ext.History.getToken();
         if (! /^panels:/.test(token)) {
@@ -129,11 +132,6 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
         }
         Ext.History.add(token);
         this.IGNORE_CHANGE = false;
-    },
-
-    newSlice: function(){
-        // console.log("newslice");
-        // console.log(arguments);
     },
 
     newPanel: function(panel_itemid, history_item_id){
