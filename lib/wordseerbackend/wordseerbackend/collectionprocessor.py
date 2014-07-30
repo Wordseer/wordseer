@@ -6,6 +6,7 @@ from datetime import datetime
 import logging
 import os
 
+import pdb
 from app import app
 import database
 from . import logger
@@ -14,6 +15,7 @@ from .sequence.sequenceprocessor import SequenceProcessor
 from . import structureextractor
 from .stringprocessor import StringProcessor
 from . import counter
+from .database.readerwriter import ReaderWriter
 
 class CollectionProcessor(object):
     """Process a collection of files.
@@ -227,4 +229,10 @@ class CollectionProcessor(object):
                         str(i), str(max_sentence_id))
 
             sentences_processed += 1
+
+def cp_run(collection_dir, structure_file, extension):
+    reader_writer = ReaderWriter()
+    collection_processor = CollectionProcessor(reader_writer)
+    collection_processor.process(collection_dir, structure_file, extension,
+       False)
 

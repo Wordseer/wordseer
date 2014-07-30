@@ -3,6 +3,7 @@ These are all the view functions for the app.
 """
 
 import os
+import threading
 import shutil
 import random
 from string import ascii_letters, digits
@@ -30,6 +31,7 @@ from ...models import User
 from app import app
 from app import db
 from app.models import User
+from lib.wordseerbackend.wordseerbackend.collectionprocessor import cp_run
 
 def generate_form_token():
     """Sets a token to prevent double posts."""
@@ -185,13 +187,15 @@ class ProjectsCLPD(CLPDView):
         its path. For processing, send the project to the processor.
         """
         selected_projects = request.form.getlist("process-selection")
+        project_objects = [Project.query.get(id) for id in selected_projects]
         if request.form["action"] == self.process_form.DELETE:
-            for project_id in selected_projects:
-                project = Project.query.filter(Project.id == project_id).one()
+            for project in project_objects:
                 self.delete_object(project, project.name)
         if request.form["action"] == self.process_form.PROCESS:
-            #TODO: process the projects
-            pass
+            for project in project_objects:
+                files = [document for document in project.documents]
+                structure_file = helpers.get_structure_file(files)
+                process_files(project.path, structure_file)
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"],
     view_func=ProjectsCLPD.as_view("projects"))
@@ -258,15 +262,16 @@ class ProjectCLPD(CLPDView):
         then send files to the processor.
         """
         files = request.form.getlist("process-selection")
+        file_objects = [Document.query.get(id) for id in files]
         if request.form["action"] == self.process_form.DELETE:
             # Delete every selected file, its database record, and item in
             # the listing
-            for file_id in files:
-                file_model = Unit.query.filter(Unit.id == file_id).one()
-                file_name = os.path.split(file_model.path)[1]
-                self.delete_object(file_model, file_name)
+            for file_object in file_objects:
+                file_name = os.path.split(file_object.path)[1]
+                self.delete_object(file_object, file_name)
         elif request.form["action"] == self.process_form.PROCESS:
-            pass
+            structure_file = helpers.get_structure_file(file_objects)
+            process_files(self.project.path, structure_file)
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
     view_func=ProjectCLPD.as_view("project_show"))
@@ -322,4 +327,13 @@ def get_file(file_id):
     directory, filename = os.path.split(document.path)
 
     return send_from_directory(directory, filename)
+
+def process_files(collection_dir, structure_file):
+    """Process a list of files using the preprocessor. This must be a valid list
+    of files or bad things will happen - exactly one structure file, several
+    document files.
+    """
+    args = (collection_dir, structure_file, app.config["DOCUMENT_EXTENSION"])
+    preprocessing_process = threading.Thread(target=cp_run, args=args)
+    preprocessing_process.start()
 
