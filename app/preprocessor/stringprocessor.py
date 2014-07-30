@@ -1,13 +1,8 @@
 """Methods to handle string parsing, tokenization, tagging, etc.
 """
-<<<<<<< HEAD:lib/wordseerbackend/wordseerbackend/stringprocessor.py
 from nltk.tokenize import sent_tokenize
 from corenlp import StanfordCoreNLP, ProcessError, TimeoutError
-=======
 import logging
-
-from corenlp import StanfordCoreNLP
->>>>>>> removing-readerwriter:app/preprocessor/stringprocessor.py
 
 from app import app
 from app.models.sentence import Sentence
