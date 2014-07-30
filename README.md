@@ -1,5 +1,8 @@
-[![Stories in Ready](https://badge.waffle.io/wordseer/wordseer_flask.png?label=ready&title=Ready)](https://waffle.io/wordseer/wordseer_flask)
 # A Flask-based back end for WordSeer
+
+[![Stories in Ready](https://badge.waffle.io/wordseer/wordseer_flask.png?label=ready&title=Ready)](https://waffle.io/wordseer/wordseer_flask)
+[![Build Status](https://travis-ci.org/Wordseer/wordseer_flask.svg?branch=master)](https://travis-ci.org/Wordseer/wordseer_flask)
+[![Documentation](https://readthedocs.org/projects/wordseer-flask/badge/?version=latest)](http://wordseerbackend.readthedocs.org/en/latest/)
 
 [WordSeer](http://wordseer.berkeley.edu/) is a tool for natural language
 analysis of digital corpora.
@@ -99,11 +102,13 @@ Or, on windows, simply run `make.bat`.
         unzip stanford-corenlp-full-2013-06-20.zip
         mv stanford-corenlp-full-2013-06-20 stanford-corenlp
 
-2. After installing the above dependencies, make sure you edit
-`lib/wordseerbackend/wordseerbackend/config.py` for your setup. Particularly
-make sure to point `CORE_NLP_DIR` to the Stanford NLP library. You should then
-be ready to parse files. Example XML and JSON files are included in
-`tests/data`.
+2. If you followed the above directions, then you shouldn't need to worry about
+any configuration. If you installed Stanford's CoreNLP elsewhere, then make sure
+you edit `lib/wordseerbackend/wordseerbackend/config.py` for your setup.
+Particularly make sure to point `CORE_NLP_DIR` to the Stanford NLP library.
+
+    You should then be ready to parse files. Example XML and JSON files are
+    included in `tests/data`.
 
 ### Documentation
 Documentation is
