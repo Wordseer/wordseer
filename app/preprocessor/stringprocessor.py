@@ -170,8 +170,8 @@ class StringProcessor(object):
 
         # Check for non-string
         if not isinstance(text, str) and not isinstance(text, unicode):
-            logger.warning("Parser got a non-string argument")
-            logger.info(text)
+            self.logger.warning("Parser got a non-string argument")
+            self.logger.info(text)
             return None
 
         # Check for non-unicode
@@ -184,16 +184,16 @@ class StringProcessor(object):
             try:
                 text = unicode(text)
             except(UnicodeDecodeError):
-                logger.warning("The following sentence text is not unicode; " +
+                self.logger.warning("The following sentence text is not unicode; " +
                     "convertion failed.")
-                logger.info(text)
+                self.logger.info(text)
 
                 # Skip sentence if flag is True
                 if app.config["SKIP_SENTENCE_ON_ERROR"]:
                     return None
                 else:
                     # Try to parse the sentence anyway
-                    logger.warning("Attempting to parse non-unicode sentence.")
+                    self.logger.warning("Attempting to parse non-unicode sentence.")
 
         # Check for empty or nonexistent text
         if text == "" or text == None:
@@ -209,13 +209,13 @@ class StringProcessor(object):
         # TODO: handle all errors properly
         # ProcessError, TimeoutError, OutOfMemoryError
         except TimeoutError as e:
-            logger.error("Got a TimeoutError: " + str(e))
+            self.logger.error("Got a TimeoutError: " + str(e))
             return None
         except ProcessError as e:
-            logger.error("Got a ProcessError: " + str(e))
+            self.logger.error("Got a ProcessError: " + str(e))
             return None
         except:
-            logger.error("Unknown error")
+            self.logger.error("Unknown error")
             return None
 
         # Parse successful, return parsed text
@@ -242,7 +242,7 @@ def split_sentences(text):
         approx_sentence_length = len(sentence_text.split(" "))
 
         if approx_sentence_length > max_length:
-            logger.warning("Sentence appears to be too long, max length " +
+            self.logger.warning("Sentence appears to be too long, max length " +
                 "is " + str(max_length))
 
             # Attempt to split on a suitable punctuation mark
@@ -260,7 +260,7 @@ def split_sentences(text):
                 if all([len(subsentence.split(" ")) <= max_length
                     for subsentence in subsentences]):
 
-                    logger.info("Splitting sentence around " + character + " to fit length limit.")
+                    self.logger.info("Splitting sentence around " + character + " to fit length limit.")
                     break
 
                 # Otherwise, reset subsentences and try again
@@ -269,7 +269,7 @@ def split_sentences(text):
 
             # If none of the split characters worked, force split on max_length
             if not subsentences:
-                logger.warning("No suitable punctuation for splitting; " +
+                self.logger.warning("No suitable punctuation for splitting; " +
                     "forcing split on max_length number of words")
                 subsentences = []
                 split_sentence = sentence_text.split(" ")
