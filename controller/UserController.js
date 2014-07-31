@@ -21,6 +21,9 @@ Ext.define('WordSeer.controller.UserController', {
 			'button[action=signin-submit]': {
 				click: this.send
 			},
+			'textfield[inputType=password]': {
+				specialkey: this.enterSubmit
+			},
 			'button[action=signup]': {
 				click: function(button) {
 					var form = button.up('form');
@@ -40,6 +43,12 @@ Ext.define('WordSeer.controller.UserController', {
 				}
 			}
 		});
+	},
+
+	enterSubmit: function(field, event){
+		if (event.getKey() == event.ENTER){
+			this.send(field);
+		}
 	},
 
 	/** Tries to sign the user in
