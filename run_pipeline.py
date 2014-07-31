@@ -1,18 +1,20 @@
-from lib.wordseerbackend.wordseerbackend.collectionprocessor import CollectionProcessor
-from lib.wordseerbackend.wordseerbackend.database.readerwriter import ReaderWriter
+from app.models.project import Project
+import lib.wordseerbackend.wordseerbackend.collectionprocessor as colproc
+#from lib.wordseerbackend.wordseerbackend.database.readerwriter import ReaderWriter
 
 import os
 import database
 import pdb
 
-collection_dir = os.path.join("tests", "data", "r_and_j")
+collection_dir = os.path.join("tests", "data", "articles")
 extension = ".xml"
 structure_file = os.path.join(collection_dir, "structure.json")
 
 database.reset()
 
-reader_writer = ReaderWriter()
-collection_processor = CollectionProcessor(reader_writer)
-
 # pdb.set_trace()
-collection_processor.process(collection_dir, structure_file, extension, False)
+
+project = Project()
+project.save()
+colproc.cp_run(collection_dir, structure_file, extension, project)
+
