@@ -75,6 +75,7 @@ class StructureExtractor(object):
                 # If there are child units, retrieve them and put them in a
                 # list, otherwise get the sentences
                 children = []
+                
                 if "units" in structure.keys():
                     for child_struc in structure["units"]:
                         children.extend(self.extract_unit_information(
@@ -297,6 +298,7 @@ def get_nodes_from_xpath(xpath, nodes):
     :param etree nodes: LXML etree object of nodes to search.
     :return list: The matched nodes, as ElementStringResult objects.
     """
+
     if len(xpath.strip()) == 0 or nodes in nodes.xpath("../" + xpath):
         return [nodes]
     return nodes.xpath(xpath)
