@@ -237,9 +237,9 @@ class CollectionProcessor(object):
 
             sentences_processed += 1
 
-def cp_run(collection_dir, structure_file, extension):
+def cp_run(collection_dir, structure_file, extension, project):
     reader_writer = ReaderWriter()
-    collection_processor = CollectionProcessor(reader_writer)
+    collection_processor = CollectionProcessor(reader_writer, project)
     collection_processor.process(collection_dir, structure_file, extension,
        False)
 
