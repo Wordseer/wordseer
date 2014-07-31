@@ -129,7 +129,8 @@ class ViewsTests(unittest.TestCase):
         assert "/projects/1" in result.data
         assert "/projects/2" in result.data
 
-    def test_projects_bad_process(self):
+    @mock.patch("app.uploader.views.process_files", autospec=True)
+    def test_projects_bad_process(self, mock_process_files):
         """Test processing an unprocessable project.
         """
 
@@ -144,7 +145,8 @@ class ViewsTests(unittest.TestCase):
 
         assert "include exactly one json file" in result.data
 
-    def test_projects_process(self):
+    @mock.patch("app.uploader.views.process_files", autospec=True)
+    def test_projects_process(self, mock_process_files):
         """Test processing a processable project.
         """
         project = Project(name="test", user=self.user)
@@ -297,7 +299,8 @@ class ViewsTests(unittest.TestCase):
         assert "/projects/1/documents/1" in result.data
         assert "/projects/1/documents/2" in result.data
 
-    def test_project_show_process(self):
+    @mock.patch("app.uploader.views.process_files", autospec=True)
+    def test_project_show_process(self, mock_process_files):
         """Test processing a processable group of files.
         """
         project = Project(name="test", user=self.user)
@@ -316,7 +319,8 @@ class ViewsTests(unittest.TestCase):
 
         assert "Errors have occurred" not in result.data
 
-    def test_project_show_bad_process(self):
+    @mock.patch("app.uploader.views.process_files", autospec=True)
+    def test_project_show_bad_process(self, mock_process_files):
         """Test processing an unprocessable group of files.
         """
         project = Project(name="test", user=self.user)
