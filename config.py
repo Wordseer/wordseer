@@ -91,8 +91,6 @@ class BaseConfig(object):
     PUNCTUATION_NO_SPACE_BEFORE = list(u".,!`\\?';):—")
     PUNCTUATION_NO_SPACE_AFTER = list(u"`'\"(—")
 
-    SPLIT_CHARACTERS = [";", "--", ":", ","]
-
     # Number of rows to return for paginated queries
     PAGE_SIZE = 100
 
@@ -100,15 +98,16 @@ class BaseConfig(object):
     #WORDSEER_DIR = os.path.dirname(os.path.realpath(__file__))
 
     # NLP locations. Paths should be absolute.
-    CORE_NLP_DIR = os.path.join(ROOT, "stanford-corenlp/")
+    CORE_NLP_DIR = os.path.join(ROOT, "lib/wordseerbackend/stanford-corenlp/")
 
     # Processing options
     GRAMMATICAL_PROCESSING = True
     PART_OF_SPEECH_TAGGING = True
     WORD_TO_WORD_SIMILARITY = True
     SEQUENCE_INDEXING = True
-    SKIP_SENTENCE_ON_ERROR = False
-    SENTENCE_MAX_LENGTH = 40
+
+    # Database options
+    #DB_URL = "sqlite:///" + os.path.join(ROOT, 'wordseer.db')
 
 
 class Production(BaseConfig):
@@ -148,7 +147,7 @@ class Development(BaseConfig):
     # Set database configurations
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BaseConfig.ROOT,
         BaseConfig.APP_NAME + "_dev.db")
-    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_ECHO = True
 
 class Testing(BaseConfig):
     """ This class has settings specific for the testing environment.

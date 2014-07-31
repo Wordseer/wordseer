@@ -31,7 +31,6 @@
                                 {
                                     "belongsTo": "speech",
                                     "structureName": "sentence",
-                                    "combine": true,
                                     "xpaths": [
                                         "./LINE/text()"
                                     ]
@@ -140,4 +139,3 @@
         }
     ]
 }
-

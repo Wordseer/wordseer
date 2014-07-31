@@ -9,10 +9,8 @@ Welcome to wordseer_flask's documentation!
 Contents:
 
 .. toctree::
-    :maxdepth: 2
+   :maxdepth: 2
 
-    pipeline
-    modules
 
 
 Indices and tables

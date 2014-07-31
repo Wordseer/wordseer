@@ -6,7 +6,7 @@ import unittest
 from app.models.sentence import Sentence
 from app.models.dependency import Dependency
 from app.models.parseproducts import ParseProducts
-from app.preprocessor import stringprocessor
+from lib.wordseerbackend.wordseerbackend import stringprocessor
 
 t = stringprocessor.StringProcessor()
 
@@ -85,22 +85,17 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
         """Make sure space_before has been properly done
         """
         for s in range(0, len(self.result)):
-            for w in range(0, len(self.result[s].word_in_sentence)):
-                space = self.result[s].word_in_sentence[w].space_before
-
-                try:
-                    actual_char = self.example[int(self.raw["sentences"][s]\
-                        ["words"][w][1]["CharacterOffsetBegin"]) - 1]
-                except IndexError:
-                    actual_char = " "
-
-                if actual_char == " ":
-                    assert space == " "
+            for w in range(0, len(self.result[s].words)):
+                space = self.result[s].words[w].space_before
+                actual_char = self.example[int(self.raw["sentences"][s]["words"]
+                    [w][1]["CharacterOffsetBegin"])]
+                if space == "":
+                    self.failUnless(actual_char != " ")
                 else:
-                    assert space == ""
+                    self.failUnless(actual_char == " ")
 
 @mock.patch.object(stringprocessor, "tokenize_from_raw")
-@mock.patch("app.preprocessor.stringprocessor.StanfordCoreNLP.raw_parse")
+@mock.patch("lib.wordseerbackend.wordseerbackend.stringprocessor.StanfordCoreNLP.raw_parse")
 class ParseTests(unittest.TestCase):
     """Tests for the parse() method.
     """
@@ -110,12 +105,10 @@ class ParseTests(unittest.TestCase):
         """
         #t.parser = mock.MagicMock()
 
-    @mock.patch("app.preprocessor.stringprocessor.Word.query", autospec=True)
-    @mock.patch("app.preprocessor.stringprocessor.Dependency.query", autospec=True)
-    def test_parse(self, mock_dependency_query, mock_word_query, mock_parser, mock_tokenizer):
+    def test_parse(self, mock_parser, mock_tokenizer):
         """Test the parse method.
         """
-        sent = mock.create_autospec(Sentence, text="The fox is brown.")
+        sent = "The fox is brown."
         parsed_dict = {"sentences":
             [
                 {'dependencies':
@@ -140,25 +133,31 @@ class ParseTests(unittest.TestCase):
         mock_parser.return_value = mock_result
 
         # Run the method
-        result = t.parse(sent, {}, {})
+        result = t.parse(sent)
 
         # The result should not contain the dependency containing ROOT
-        expected_added_deps = []
+        expected_deps = []
         for dep in deps[0:3]:
             dep_index = int(dep[4]) - 1
             gov_index = int(dep[2]) - 1
-            expected_added_deps.append(mock.call(
-                dependency=mock_dependency_query.filter_by.return_value.one.return_value,
-                governor_index=gov_index,
-                dependent_index=dep_index))
+            expected_deps.append({
+                "grammatical_relationship": dep[0],
+                "governor": dep[1],
+                "governor_index": gov_index,
+                "governor_pos": words[gov_index][1]["PartOfSpeech"],
+                "dependent": dep[3],
+                "dependent_index": dep_index,
+                "dependent_pos": words[dep_index][1]["PartOfSpeech"]})
 
-        sent.add_dependency.assert_has_calls(expected_added_deps)
+        expected_result = ParseProducts(parsetree,
+            expected_deps, mock_tokenizer(parsed_dict, sent)[0].tagged)
+        self.failUnless(expected_result == result)
 
     def test_parse_twosentences(self, mock_parser, mock_tokenizer):
         """Check to make sure that parse() will only parse a single sentence.
         """
 
-        sent = Sentence(text="The fox is brown.")
+        sent = "The fox is brown."
         parsed_dict = {"sentences": [mock.MagicMock(name="Sentence1"),
             mock.MagicMock(name="Sentence2")]}
 
@@ -169,7 +168,6 @@ class ParseTests(unittest.TestCase):
 
         self.assertRaises(ValueError, t.parse, sent)
 
-    @unittest.skip("Feature in limbo")
     def test_parse_maxlength(self, mock_parser, mock_tokenizer):
         """Check to make sure that parse() uses a rudimentary sentence length
         check.
@@ -181,17 +179,3 @@ class ParseTests(unittest.TestCase):
 
         self.assertRaises(ValueError, t.parse, sent)
 
-class ParseWithErrorHandlingTest(unittest.TestCase):
-    """Test the parse_with_error_handling method.
-    """
-
-    def test_sanity(self):
-        """Method should output the same result as running raw_parse directly
-        when run on a normal sentence text.
-        """
-
-        text = "The fox is brown."
-        result = t.parse_with_error_handling(text)
-        expected_result = t.parser.raw_parse(text)
-
-        self.failUnless(result == expected_result)

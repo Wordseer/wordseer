@@ -7,8 +7,8 @@ from lxml import etree
 
 from app.models.property import Property
 from app.models.sentence import Sentence
-from app.preprocessor.structureextractor import *
-from app.preprocessor.stringprocessor import StringProcessor
+from lib.wordseerbackend.wordseerbackend.structureextractor import *
+from lib.wordseerbackend.wordseerbackend.stringprocessor import StringProcessor
 
 t = StringProcessor()
 

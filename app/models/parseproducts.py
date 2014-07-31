@@ -31,3 +31,4 @@ class ParseProducts(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         self.syntactic_parse = syntactic_parse
         self.dependencies = dependencies
         self.words = words
+

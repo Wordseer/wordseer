@@ -1,5 +1,5 @@
-from app.preprocessor.collectionprocessor import CollectionProcessor
-from app.preprocessor.database.readerwriter import ReaderWriter
+from lib.wordseerbackend.wordseerbackend.collectionprocessor import CollectionProcessor
+from lib.wordseerbackend.wordseerbackend.database.readerwriter import ReaderWriter
 
 import os
 import database
@@ -16,3 +16,4 @@ collection_processor = CollectionProcessor(reader_writer)
 
 # pdb.set_trace()
 collection_processor.process(collection_dir, structure_file, extension, False)
+

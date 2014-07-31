@@ -1,5 +1,6 @@
 """Tests for the ``app.wordseer.models`` module.
 """
+
 import unittest
 
 from app import db

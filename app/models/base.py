@@ -21,8 +21,8 @@ class Base(object):
     # Define the primary key
     id = db.Column(db.Integer, primary_key=True)
 
-    # Flag for commit on save
-    commit_on_save = False
+    # Initialize holding area for mass-commits
+    holds = dict()
 
     @declared_attr
     def __tablename__(cls):
@@ -35,14 +35,12 @@ class Base(object):
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', cls.__name__)
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
-    def save(self, force=True):
+    def save(self):
         """Commits this model instance to the database
         """
-        #TODO: make sure pipeline uses force=False
-        db.session.add(self)
 
-        if Base.commit_on_save or force:
-            db.session.commit()
+        db.session.add(self)
+        db.session.commit()
 
     def delete(self):
         """Deletes this model instance and commits.
@@ -50,6 +48,29 @@ class Base(object):
 
         db.session.delete(self)
         db.session.commit()
+
+    def hold(self):
+        """Holds the object in a list mapped to its model class for committing
+        later.
+        """
+
+        class_name = self.__class__.__name__
+
+        if class_name in Base.holds.keys():
+            Base.holds[class_name].add(self)
+        else:
+            Base.holds[class_name] = set([self])
+
+    @classmethod
+    def save_holds(cls):
+        """Commits all objects from the class in the hold area to the database
+        and clears the hold list
+        """
+
+        class_name = cls.__name__
+        db.session.add_all(Base.holds[class_name])
+        db.session.commit()
+        Base.holds[class_name] = set()
 
     @classmethod
     def find_or_create(cls, **kwargs):
@@ -69,7 +90,7 @@ class Base(object):
             match = cls.query.filter_by(**kwargs).one()
         except NoResultFound:
             new_record = cls(**kwargs)
-            new_record.save(force=True)
+            new_record.save()
             return new_record
         except MultipleResultsFound:
             return False

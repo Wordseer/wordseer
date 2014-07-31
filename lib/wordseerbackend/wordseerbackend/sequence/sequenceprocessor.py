@@ -106,7 +106,7 @@ class SequenceProcessor(object):
 
         # Definitely make a Sequence of the surface_phrase
         sequences.append({"start_position": i,
-            "sentence_id": sentence.id,
+            "sentences": [sentence],
             "document_id": sentence.document_id,
             "sequence": surface_phrase,
             "is_lemmatized": False,

@@ -15,12 +15,5 @@ db
 # Documentation
 docs/build
 
-# Stanford
-stanford-corenlp
-
-# AWS
-.elasticbeanstalk/
-
 # line_profiler
 *.*prof
-

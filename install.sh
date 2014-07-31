@@ -8,7 +8,7 @@ CORENLP="http://nlp.stanford.edu/software/stanford-corenlp-full-2013-06-20.zip"
 # Path to requirements file
 REQUIREMENTS="requirements.txt"
 # Directory to save corenlp to
-CORENLP_DESTINATION="."
+CORENLP_DESTINATION="lib/wordseerbackend"
 # Directory name for the corenlp tree
 CORENLP_FINAL_NAME="stanford-corenlp"
 
@@ -20,7 +20,6 @@ CORENLP_FINAL_PATH=$CORENLP_DESTINATION"/"$CORENLP_FINAL_NAME
 # Install python requirements
 echo "Installing dependencies..."
 pip install -r $REQUIREMENTS
-python -m nltk.downloader punkt
 
 # Set up the database
 echo "Setting up database..."

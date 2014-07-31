@@ -60,42 +60,10 @@ app.models.flask_security module
     :undoc-members:
     :show-inheritance:
 
-app.models.grammaticalrelationship module
------------------------------------------
+app.models.grammatical_relationship module
+------------------------------------------
 
-.. automodule:: app.models.grammaticalrelationship
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-app.models.log module
----------------------
-
-.. automodule:: app.models.log
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-app.models.mixins module
-------------------------
-
-.. automodule:: app.models.mixins
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-app.models.parsedparagraph module
----------------------------------
-
-.. automodule:: app.models.parsedparagraph
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-app.models.parseproducts module
--------------------------------
-
-.. automodule:: app.models.parseproducts
+.. automodule:: app.models.grammatical_relationship
     :members:
     :undoc-members:
     :show-inheritance:
