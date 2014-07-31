@@ -22,6 +22,7 @@ def setUpModule():
     project = Project()
     with mock.patch("app.preprocessor.collectionprocessor.StringProcessor",
             autospec=True):
+        global colproc
         colproc = collectionprocessor.CollectionProcessor(mock_writer, project)
 
 @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=logger)

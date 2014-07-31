@@ -1,7 +1,7 @@
 """
 These are all the view functions for the app.
 """
-import pdb
+
 import os
 import threading
 import shutil
@@ -228,7 +228,6 @@ class ProjectCLPD(CLPDView):
         """The template needs the choices in the form of (id, filename).
         """
         file_objects = self.project.documents
-        pdb.set_trace()
         self.process_form.selection.choices = []
         for file_object in file_objects:
             self.process_form.selection.add_choice(file_object.id,
