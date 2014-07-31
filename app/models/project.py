@@ -21,5 +21,5 @@ class Project(db.Model, Base):
     # Relationships
     documents = db.relationship("Document", secondary="documents_in_projects",
             backref="projects")
-    logs = db.relationship("Log")
+    logs = db.relationship("Log", backref="project")
 
