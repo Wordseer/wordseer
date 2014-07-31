@@ -437,7 +437,6 @@ Ext.define('WordSeer.controller.WindowingController', {
 
 	@return {WordSeer.view.windowing.viewport.LayoutPanel} The new layout panel.
 	*/
-// 	TODO: pass panel ID to layout controller where it is created
 	playHistoryItemInNewPanel: function(history_item_id, panel_id) {
 		var panel = this.addPanel(panel_id);
 		Ext.defer(function(history_item_id, panel){
@@ -626,7 +625,6 @@ Ext.define('WordSeer.controller.WindowingController', {
 		} else if (token == 'home'){
 			// show landing page
 			this.land();
-			// TODO: panel splitters are left hanging around after return home
 
 		} else if (/^panels:/.test(token)) {
 			// make sure controller is ready to display windows
