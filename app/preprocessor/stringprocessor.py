@@ -56,7 +56,7 @@ class StringProcessor(object):
         parsed = self.parse_with_error_handling(sentence.text)
 
         # If the parse was unsuccessful, exit
-        if not parsed:
+        if parsed == None:
             return
 
         parsed_sentence = parsed["sentences"][0]
