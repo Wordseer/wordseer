@@ -1,4 +1,6 @@
 import os
+import logging.config
+import json
 
 from flask import Flask
 from flask.ext.security import Security, SQLAlchemyUserDatastore
@@ -41,3 +43,7 @@ from app.wordseer import wordseer as wordseer_bp
 app.register_blueprint(uploader_bp)
 app.register_blueprint(wordseer_bp)
 
+# Logging setup
+
+logfile = os.path.join(app.config["ROOT"], "logging.json")
+logging.config.dictConfig(json.load(open(logfile)))
