@@ -1,5 +1,5 @@
 from app.models.project import Project
-import lib.wordseerbackend.wordseerbackend.collectionprocessor as colproc
+from app.preprocessor.collectionprocessor import cp_run
 #from lib.wordseerbackend.wordseerbackend.database.readerwriter import ReaderWriter
 
 import os
@@ -16,5 +16,5 @@ database.reset()
 
 project = Project()
 project.save()
-colproc.cp_run(collection_dir, structure_file, extension, project)
+cp_run(collection_dir, structure_file, extension, project)
 
