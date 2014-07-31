@@ -15,4 +15,5 @@ class Log(db.Model, Base):
     id = None # Log entries don't have IDs
     log_item = db.Column(db.String(100), nullable=False, primary_key=True)
     item_value = db.Column(db.Text, nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
