@@ -31,7 +31,7 @@ from ...models import User
 from app import app
 from app import db
 from app.models import User
-from lib.wordseerbackend.wordseerbackend.collectionprocessor import cp_run
+from app.preprocessor.collectionprocessor import cp_run
 
 def generate_form_token():
     """Sets a token to prevent double posts."""
