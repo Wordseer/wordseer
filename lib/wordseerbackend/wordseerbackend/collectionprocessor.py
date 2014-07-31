@@ -20,10 +20,11 @@ from .database.readerwriter import ReaderWriter
 class CollectionProcessor(object):
     """Process a collection of files.
     """
-    def __init__(self, reader_writer):
+    def __init__(self, reader_writer, project):
         self.reader_writer = reader_writer
         self.str_proc = StringProcessor()
         self.pylogger = logging.getLogger(__name__)
+        self.project = project
 
     def process(self, collection_dir, docstruc_filename,
         filename_extension, start_from_scratch):
@@ -51,42 +52,47 @@ class CollectionProcessor(object):
 
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
-        if not "true" in logger.get("finished_recording_text_and_metadata"):
+        if not "true" in logger.get(self.project,
+                "finished_recording_text_and_metadata"):
             self.pylogger.info("Extracting document text and metadata")
             self.extract_record_metadata(collection_dir,
                 docstruc_filename, filename_extension)
 
         # Parse the documents
         if ((app.config["GRAMMATICAL_PROCESSING"] or
-            (app.config["WORD_TO_WORD_SIMILARITY"] and
-            app.config["PART_OF_SPEECH_TAGGING"])) and not
-            "true" in logger.get("finished_grammatical_processing").lower()):
+                (app.config["WORD_TO_WORD_SIMILARITY"] and
+                app.config["PART_OF_SPEECH_TAGGING"])) and not
+                "true" in logger.get(self.project,
+                    "finished_grammatical_processing").lower()):
             self.pylogger.info("Parsing documents")
             self.parse_documents()
             self.pylogger.info("Parsing documents")
+
         if (app.config["SEQUENCE_INDEXING"] and
-            "true" in logger.get("finished_sequence_processing").lower()):
-            print "finishing indexing sequences"
+                "true" in logger.get(self.project,
+                    "finished_sequence_processing").lower()):
+            self.pylogger.info("finishing indexing sequences")
             self.calculate_index_sequences()
             #TODO: reader_writer
             self.reader_writer.finish_indexing_sequences()
 
         # Calculate word-in-sentence counts and TF-IDFs
-        if not "true" in logger.get("word_counts_done").lower():
+        if not "true" in logger.get(self.project, "word_counts_done").lower():
             self.pylogger.info("Calculating word counts")
             #TODO: reader_writer
             self.reader_writer.calculate_word_counts()
-            logger.log("word_counts_done", "true", logger.REPLACE)
+            logger.log(self.project, "word_counts_done", "true", logger.REPLACE)
 
         # Calculate word TFIDFs
-        if not "true" in logger.get("tfidf_done").lower():
+        if not "true" in logger.get(self.project, "tfidf_done").lower():
             self.pylogger.info("Calculating TF IDF's")
             #TODO: reader_writer
             self.reader_writer.calculate_tfidfs()
 
         # Calculate word-to-word-similarities
         if (app.config["WORD_TO_WORD_SIMILARITY"] and not
-            "true" in logger.get("word_similarity_calculations_done")):
+                "true" in logger.get(self.project,
+                    "word_similarity_calculations_done")):
             self.pylogger.info("Calculating Lin Similarities")
             #TODO: reader_writer
             self.reader_writer.calculate_lin_similarities()
@@ -129,22 +135,22 @@ class CollectionProcessor(object):
 
         for filename in contents:
             if (not "[" + str(num_files_done) + "]" in
-                logger.get("text_and_metadata_recorded") and not
+                logger.get(self.project, "text_and_metadata_recorded") and not
                 filename[0] == "."):
-                logger.log("finished_recording_text_and_metadata", "false",
-                    logger.REPLACE)
+                logger.log(self.project, "finished_recording_text_and_metadata",
+                    "false", logger.REPLACE)
                 docs = extractor.extract(os.path.join(collection_dir,
                     filename))
 
                 self.pylogger.info("%s/%s %s", str(num_files_done),
                     str(len(contents)), filename)
-                logger.log("text_and_metadata_recorded",
+                logger.log(self.project, "text_and_metadata_recorded",
                     str(num_files_done), logger.UPDATE)
 
 
             num_files_done += 1
 
-        logger.log("finished_recording_text_and_metadata", "true",
+        logger.log(self.project, "finished_recording_text_and_metadata", "true",
             logger.REPLACE)
 
     def parse_documents(self):
@@ -160,9 +166,10 @@ class CollectionProcessor(object):
 
         # TODO: readerwriter
         document_ids = self.reader_writer.list_document_ids()
-        document_parser = DocumentParser(self.reader_writer, self.str_proc)
+        document_parser = DocumentParser(self.reader_writer, self.str_proc,
+            self.project)
         documents_parsed = 0
-        latest = logger.get("latest_parsed_document_id")
+        latest = logger.get(self.project, "latest_parsed_document_id")
 
         if len(latest) == 0:
             latest = "0"
@@ -180,10 +187,10 @@ class CollectionProcessor(object):
                 seconds_elapsed = (datetime.now() - start_time).total_seconds()
                 self.pylogger.info("Time to parse document: %ss",
                     str(seconds_elapsed))
-                logger.log("finished_grammatical_processing", "false",
-                    logger.REPLACE)
-                logger.log("latest_parsed_document_id", str(doc_id),
-                    logger.REPLACE)
+                logger.log(self.project, "finished_grammatical_processing",
+                    "false", logger.REPLACE)
+                logger.log(self.project, "latest_parsed_document_id",
+                    str(doc_id), logger.REPLACE)
 
             documents_parsed += 1
 
@@ -200,7 +207,7 @@ class CollectionProcessor(object):
         on it.
         """
 
-        latest_sentence = logger.get("latest_sequence_sentence")
+        latest_sentence = logger.get(self.project, "latest_sequence_sentence")
 
         if len(latest_sentence) == 0:
             latest_sentence = "0"
@@ -220,10 +227,10 @@ class CollectionProcessor(object):
                     latest_id = sentence.id
                     processed_sequences = seq_proc.process(sentence)
                     if processed_sequences:
-                        logger.log("finished_sequence_processing", "false",
-                            logger.REPLACE)
-                        logger.log("latest_sequence_sentence", str(i),
-                            logger.REPLACE)
+                        logger.log(self.project, "finished_sequence_processing",
+                            "false", logger.REPLACE)
+                        logger.log(self.project, "latest_sequence_sentence",
+                            str(i), logger.REPLACE)
                 if sentences_processed % 1000 == 0:
                     self.pylogger.info("Sequence-processing sentence %s/%s",
                         str(i), str(max_sentence_id))

@@ -8,6 +8,7 @@ import unittest
 from lib.wordseerbackend.wordseerbackend import collectionprocessor
 from app import app
 from app.models.document import Document
+from app.models.project import Project
 from lib.wordseerbackend.wordseerbackend.parser import documentparser
 from lib.wordseerbackend.wordseerbackend.sequence import sequenceprocessor
 from lib.wordseerbackend.wordseerbackend import stringprocessor
@@ -17,11 +18,13 @@ from lib.wordseerbackend.wordseerbackend import logger
 def setUpModule():
     global mock_writer
     mock_writer = mock.MagicMock(name="Mock Reader Writer")
+    global project
+    project = Project()
     with mock.patch(
         "lib.wordseerbackend.wordseerbackend.collectionprocessor.StringProcessor",
         autospec=stringprocessor.StringProcessor):
         global colproc
-        colproc = collectionprocessor.CollectionProcessor(mock_writer)
+        colproc = collectionprocessor.CollectionProcessor(mock_writer, project)
 
 @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)
 class TestCollectionProcessor(unittest.TestCase):
@@ -71,13 +74,15 @@ class TestCollectionProcessor(unittest.TestCase):
         log_calls = []
 
         for i in range(0, 2):
-            log_calls.append(mock.call("finished_recording_text_and_metadata",
-                "false", mock_logger.REPLACE))
-            log_calls.append(mock.call("text_and_metadata_recorded", str(i + 1),
-                mock_logger.UPDATE))
+            log_calls.append(mock.call(colproc.project,
+                "finished_recording_text_and_metadata", "false",
+                mock_logger.REPLACE))
+            log_calls.append(mock.call(colproc.project,
+                "text_and_metadata_recorded", str(i + 1), mock_logger.UPDATE))
 
-        log_calls.append(mock.call("finished_recording_text_and_metadata",
-                "true", mock_logger.REPLACE))
+        log_calls.append(mock.call(colproc.project,
+            "finished_recording_text_and_metadata", "true",
+            mock_logger.REPLACE))
         mock_logger.log.assert_has_calls(log_calls)
 
         # The extractor should have been called on each file
@@ -96,7 +101,7 @@ class TestCollectionProcessor(unittest.TestCase):
         # Set up the mocks
         max_doc = 20
         mock_writer.list_document_ids.return_value = range(max_doc)
-        mock_dp_instance = mock_dp("", "")
+        mock_dp_instance = mock_dp("", "", colproc.project)
 
         mock_gotten_doc = mock.create_autospec(Document)
         mock_writer.get_document.return_value = mock_gotten_doc
@@ -121,10 +126,11 @@ class TestCollectionProcessor(unittest.TestCase):
         # Logger should be called twice per doc
         logger_calls = []
         for i in range(latest + 1, max_doc):
-            logger_calls.append(mock.call("finished_grammatical_processing",
-                "false", mock_logger.REPLACE))
-            logger_calls.append(mock.call("latest_parsed_document_id",
-                str(i), mock_logger.REPLACE))
+            logger_calls.append(mock.call(colproc.project,
+                "finished_grammatical_processing", "false",
+                mock_logger.REPLACE))
+            logger_calls.append(mock.call(colproc.project,
+                "latest_parsed_document_id", str(i), mock_logger.REPLACE))
         mock_logger.log.assert_has_calls(logger_calls)
 
     @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.SequenceProcessor",
@@ -164,10 +170,11 @@ class TestCollectionProcessor(unittest.TestCase):
         # Logger should be called twice a sentence
         logger_calls = []
         for i in range(latest + 1, max_id):
-            logger_calls.append(mock.call("finished_sequence_processing",
-                "false", mock_logger.REPLACE))
-            logger_calls.append(mock.call("latest_sequence_sentence",
-                str(i), mock_logger.REPLACE))
+            logger_calls.append(mock.call(colproc.project,
+                "finished_sequence_processing", "false", mock_logger.REPLACE))
+            logger_calls.append(mock.call(colproc.project,
+                "latest_sequence_sentence", str(i), mock_logger.REPLACE))
+
         mock_logger.log.assert_has_calls(logger_calls)
 
 class TestCollectionProcessorProcess(unittest.TestCase):
@@ -203,7 +210,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
     def test_process_e_r_m(self, mock_logger):
         """Test that extract_record_metadata() is called properly.
         """
-        mock_logger.get.side_effect = self.log_dict.__getitem__
+        mock_logger.get.side_effect = lambda proj, query: self.log_dict[query]
         # Should just extract_record_metadata
         self.log_dict["finished_recording_text_and_metadata"] = "false"
 
@@ -225,7 +232,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
     def test_process_parse_documents(self, mock_logger):
         """Test that parse_documents is called properly
         """
-        mock_logger.get.side_effect = self.log_dict.__getitem__
+        mock_logger.get.side_effect = lambda proj, query: self.log_dict[query]
 
         # Should only run parse_documents
         self.log_dict["finished_grammatical_processing"] = "false"
@@ -247,7 +254,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         """Test that calculate_index_sequences() is called along with
         the reader_writer.
         """
-        mock_logger.get.side_effect = self.log_dict.__getitem__
+        mock_logger.get.side_effect = lambda proj, query: self.log_dict[query]
 
         # Should run calculate_index_sequences() and run the reader_writer
         colproc.process(*self.args)
@@ -263,7 +270,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         """Test that ReaderWriter.calculate_word_counts() is called along with
         the logs being updated.
         """
-        mock_logger.get.side_effect = self.log_dict.__getitem__
+        mock_logger.get.side_effect = lambda proj, query: self.log_dict[query]
 
         self.log_dict["word_counts_done"] = "false"
         self.log_dict["finished_sequence_processing"] = "false"
@@ -274,14 +281,14 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.calculate_index_sequences.called == False
         assert colproc.parse_documents.called == False
         assert colproc.extract_record_metadata.called == False
-        mock_logger.log.assert_called_once_with("word_counts_done", "true",
-            mock_logger.REPLACE)
+        mock_logger.log.assert_called_once_with(colproc.project,
+            "word_counts_done", "true", mock_logger.REPLACE)
 
     @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)
     def test_process_tfidfs(self, mock_logger):
         """Test that ReaderWriter.calculate_tfidfs() is called.
         """
-        mock_logger.get.side_effect = self.log_dict.__getitem__
+        mock_logger.get.side_effect = lambda proj, query: self.log_dict[query]
 
         self.log_dict["tfidf_done"] = "false"
         self.log_dict["finished_sequence_processing"] = "false"
@@ -297,7 +304,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
     def test_process_w2w(self, mock_logger):
         """Test that calculate_lin_similarities() is run.
         """
-        mock_logger.get.side_effect = self.log_dict.__getitem__
+        mock_logger.get.side_effect = lambda proj, query: self.log_dict[query]
 
         self.log_dict["word_similarity_calculations_done"] = "false"
         self.log_dict["finished_sequence_processing"] = "false"
