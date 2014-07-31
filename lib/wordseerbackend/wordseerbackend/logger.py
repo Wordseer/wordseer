@@ -23,24 +23,20 @@ def log(project, item, value, replace_value):
     :return None: None.
     """
 
-    entry = Log(log_item=item, item_value=value)
+    try:
+        entry = Log.query.\
+            filter(Log.log_item == item).\
+            filter(Log.project == project).one()
+    except NoResultFound:
+        entry = Log(project=project, log_item=item, item_value="")
 
     if REPLACE == replace_value:
-        entry = db.session.merge(entry)
+        entry.item_value = value
+        entry.save()
 
     elif UPDATE == replace_value:
-        try:
-            existing_entry = Log.query.\
-                filter(Log.log_item == item).\
-                filter(Log.project == project).one()
-        except NoResultFound:
-            existing_entry = Log(log_item=item, item_value="")
-
-        entry.item_value = existing_entry.item_value + " [" +\
-            entry.item_value + "] "
-        db.session.merge(entry)
-
-    db.session.commit()
+        entry.item_value = entry.item_value + " [" + value + "] "
+        entry.save()
 
 def get(project, item):
     """Get the value for a specific log item.
