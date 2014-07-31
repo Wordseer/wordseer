@@ -20,11 +20,12 @@ LATEST_SEQ_SENT = "latest_sequence_sentence"
 class DocumentParser(object):
     """Handle parsing a document.
     """
-    def __init__(self, reader_writer, parser):
+    def __init__(self, reader_writer, parser, project):
         self.pylogger = logging.getLogger(__name__)
         self.reader_writer = reader_writer
         self.parser = parser
         self.sequence_processor = SequenceProcessor(reader_writer)
+        self.project = project
 
     def parse_document(self, document):
         """Parse a document and write it to the database.
@@ -41,17 +42,19 @@ class DocumentParser(object):
         products = []
 
         try:
-            current_max = int(logger.get(LATEST_SENT_ID))
+            current_max = int(logger.get(self.project, LATEST_SENT_ID))
         except ValueError:
             current_max = 0
-            logger.log(LATEST_SENT_ID, str(current_max), logger.REPLACE)
+            logger.log(self.project, LATEST_SENT_ID, str(current_max),
+                logger.REPLACE)
 
         relationships = dict()
         dependencies = dict()
         sentence_count = len(document.all_sentences)
         for sentence in document.all_sentences:
-            if sentence.id > int(logger.get(LATEST_SENT_ID)):
-                parsed = self.parser.parse(sentence, relationships, dependencies)
+            if sentence.id > int(logger.get(self.project, LATEST_SENT_ID)):
+                parsed = self.parser.parse(sentence, relationships,
+                    dependencies)
                 products.append(parsed)
                 count += 1
                 current_max = sentence.id

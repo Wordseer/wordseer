@@ -6,6 +6,7 @@ import pdb
 
 from app.models.document import Document
 from app.models.sentence import Sentence
+from app.models.project import Project
 from app.models.parsedparagraph import ParsedParagraph
 from lib.wordseerbackend.wordseerbackend.parser import documentparser
 from lib.wordseerbackend.wordseerbackend.stringprocessor import StringProcessor
@@ -18,12 +19,16 @@ class DocumentParserTests(unittest.TestCase):
     def setUp(self):
         """Get the documentparser instance.
         """
+        self.project = Project()
+        self.project.save()
+
         self.mock_reader_writer = MagicMock()
         self.mock_str_proc = MagicMock()
         with patch("lib.wordseerbackend.wordseerbackend.parser.documentparser.SequenceProcessor"):
             self.docparser = documentparser.DocumentParser(
                 self.mock_reader_writer,
-                self.mock_str_proc)
+                self.mock_str_proc,
+                self.project)
 
     @patch("lib.wordseerbackend.wordseerbackend.parser.documentparser.db", autospec=True)
     def test_parse_document(self, mock_db, mock_logger):
