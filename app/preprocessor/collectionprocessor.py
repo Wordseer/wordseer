@@ -10,8 +10,8 @@ import pdb
 from app import app
 import database
 from . import logger
-from .parser.documentparser import DocumentParser
-from .sequence.sequenceprocessor import SequenceProcessor
+from .documentparser import DocumentParser
+from .sequenceprocessor import SequenceProcessor
 from . import structureextractor
 from .stringprocessor import StringProcessor
 from . import counter

@@ -9,9 +9,9 @@ from datetime import datetime
 import logging
 
 from app.models.parsedparagraph import ParsedParagraph
-from .. import logger
+from . import logger
 from app.models.parseproducts import ParseProducts
-from ..sequence.sequenceprocessor import SequenceProcessor
+from .sequenceprocessor import SequenceProcessor
 from app import db
 
 LATEST_SENT_ID = "latest_parsed_sentence_id"

@@ -5,34 +5,32 @@ import mock
 import os
 import unittest
 
-from lib.wordseerbackend.wordseerbackend import collectionprocessor
 from app import app
 from app.models.document import Document
 from app.models.project import Project
-from lib.wordseerbackend.wordseerbackend.parser import documentparser
-from lib.wordseerbackend.wordseerbackend.sequence import sequenceprocessor
-from lib.wordseerbackend.wordseerbackend import stringprocessor
-from lib.wordseerbackend.wordseerbackend import structureextractor
-from lib.wordseerbackend.wordseerbackend import logger
+from app.preprocessor import collectionprocessor
+from app.preprocessor import stringprocessor
+from app.preprocessor import structureextractor
+from app.preprocessor import logger
+from app.preprocessor import documentparser
+from app.preprocessor import sequenceprocessor
 
 def setUpModule():
     global mock_writer
     mock_writer = mock.MagicMock(name="Mock Reader Writer")
     global project
     project = Project()
-    with mock.patch(
-        "lib.wordseerbackend.wordseerbackend.collectionprocessor.StringProcessor",
-        autospec=stringprocessor.StringProcessor):
-        global colproc
+    with mock.patch("app.preprocessor.collectionprocessor.StringProcessor",
+            autospec=True):
         colproc = collectionprocessor.CollectionProcessor(mock_writer, project)
 
-@mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)
+@mock.patch("app.preprocessor.collectionprocessor.logger", autospec=logger)
 class TestCollectionProcessor(unittest.TestCase):
     """Test the CollectionProcessor class.
     """
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.structureextractor",
-        autospec=structureextractor)
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.os", autospec=os)
+    @mock.patch("app.preprocessor.collectionprocessor.structureextractor",
+        autospec=True)
+    @mock.patch("app.preprocessor.collectionprocessor.os", autospec=True)
     def test_extract_record_metadata(self, mock_os, mock_strucex, mock_logger):
         """Test the extract_record_metadata method.
         """
@@ -93,8 +91,8 @@ class TestCollectionProcessor(unittest.TestCase):
             self.failUnless(call in mock_strucex_instance.extract.\
                 call_args_list)
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.DocumentParser",
-        autospec=documentparser.DocumentParser)
+    @mock.patch("app.preprocessor.collectionprocessor.DocumentParser",
+        autospec=True)
     def test_parse_documents(self, mock_dp, mock_logger):
         """Tests for the test_parse_documents method.
         """
@@ -133,8 +131,8 @@ class TestCollectionProcessor(unittest.TestCase):
                 "latest_parsed_document_id", str(i), mock_logger.REPLACE))
         mock_logger.log.assert_has_calls(logger_calls)
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.SequenceProcessor",
-        autospec=sequenceprocessor.SequenceProcessor)
+    @mock.patch("app.preprocessor.collectionprocessor.SequenceProcessor",
+        autospec=True)
     def test_calculate_index_sequences(self, mock_seq_proc, mock_logger):
         """Tests for the calculate_index_sequences method.
         """
@@ -206,7 +204,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         # Reset the previously used mocks
         mock_writer.reset_mock()
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)
+    @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=True)
     def test_process_e_r_m(self, mock_logger):
         """Test that extract_record_metadata() is called properly.
         """
@@ -228,7 +226,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.parse_documents.called == False
         assert len(colproc.reader_writer.method_calls) == 0
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)
+    @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=True)
     def test_process_parse_documents(self, mock_logger):
         """Test that parse_documents is called properly
         """
@@ -249,7 +247,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.extract_record_metadata.called == False
         assert len(colproc.reader_writer.method_calls) == 0
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)
+    @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=True)
     def test_process_calc_index_sequences(self, mock_logger):
         """Test that calculate_index_sequences() is called along with
         the reader_writer.
@@ -265,7 +263,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.parse_documents.called == False
         assert colproc.extract_record_metadata.called == False
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)
+    @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=True)
     def test_process_calc_word_counts(self, mock_logger):
         """Test that ReaderWriter.calculate_word_counts() is called along with
         the logs being updated.
@@ -284,7 +282,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         mock_logger.log.assert_called_once_with(colproc.project,
             "word_counts_done", "true", mock_logger.REPLACE)
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)
+    @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=True)
     def test_process_tfidfs(self, mock_logger):
         """Test that ReaderWriter.calculate_tfidfs() is called.
         """
@@ -300,7 +298,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.parse_documents.called == False
         assert colproc.extract_record_metadata.called == False
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.collectionprocessor.logger", autospec=logger)
+    @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=True)
     def test_process_w2w(self, mock_logger):
         """Test that calculate_lin_similarities() is run.
         """

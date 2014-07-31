@@ -1,7 +1,7 @@
 """
 These are all the view functions for the app.
 """
-
+import pdb
 import os
 import threading
 import shutil
@@ -195,7 +195,7 @@ class ProjectsCLPD(CLPDView):
             for project in project_objects:
                 files = [document for document in project.documents]
                 structure_file = helpers.get_structure_file(files)
-                process_files(project.path, structure_file)
+                process_files(project.path, structure_file.path, project)
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"],
     view_func=ProjectsCLPD.as_view("projects"))
@@ -227,8 +227,8 @@ class ProjectCLPD(CLPDView):
     def set_choices(self, **kwargs):
         """The template needs the choices in the form of (id, filename).
         """
-        file_objects = Document.query.filter(Project.id == self.project.id).\
-            all()
+        file_objects = self.project.documents
+        pdb.set_trace()
         self.process_form.selection.choices = []
         for file_object in file_objects:
             self.process_form.selection.add_choice(file_object.id,
@@ -271,7 +271,7 @@ class ProjectCLPD(CLPDView):
                 self.delete_object(file_object, file_name)
         elif request.form["action"] == self.process_form.PROCESS:
             structure_file = helpers.get_structure_file(file_objects)
-            process_files(self.project.path, structure_file)
+            process_files(self.project.path, structure_file.path, self.project)
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
     view_func=ProjectCLPD.as_view("project_show"))
@@ -328,12 +328,13 @@ def get_file(file_id):
 
     return send_from_directory(directory, filename)
 
-def process_files(collection_dir, structure_file):
+def process_files(collection_dir, structure_file, project):
     """Process a list of files using the preprocessor. This must be a valid list
     of files or bad things will happen - exactly one structure file, several
     document files.
     """
-    args = (collection_dir, structure_file, app.config["DOCUMENT_EXTENSION"])
+    args = (collection_dir, structure_file, app.config["DOCUMENT_EXTENSION"],
+        project)
     preprocessing_process = threading.Thread(target=cp_run, args=args)
     preprocessing_process.start()
 
