@@ -1,7 +1,4 @@
-"""
-.. module:: StuctureExtractor
-    :synopsis: Methods to parse XML files and generate python classes from their
-    contents.
+"""Methods to parse XML files and generate python classes from their contents.
 """
 
 import json

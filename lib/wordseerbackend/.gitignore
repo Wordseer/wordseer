@@ -1,6 +1,0 @@
-*.java
-*.pyc
-*.db
-*corenlp*
-_build
-venv
