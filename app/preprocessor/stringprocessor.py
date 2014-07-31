@@ -242,7 +242,7 @@ def split_sentences(text):
         approx_sentence_length = len(sentence_text.split(" "))
 
         if approx_sentence_length > max_length:
-            self.logger.warning("Sentence appears to be too long, max length " +
+            logger.warning("Sentence appears to be too long, max length " +
                 "is " + str(max_length))
 
             # Attempt to split on a suitable punctuation mark
@@ -260,7 +260,8 @@ def split_sentences(text):
                 if all([len(subsentence.split(" ")) <= max_length
                     for subsentence in subsentences]):
 
-                    self.logger.info("Splitting sentence around " + character + " to fit length limit.")
+                    logger.info("Splitting sentence around %s to fit length "
+                        "limit.", character)
                     break
 
                 # Otherwise, reset subsentences and try again
@@ -269,7 +270,7 @@ def split_sentences(text):
 
             # If none of the split characters worked, force split on max_length
             if not subsentences:
-                self.logger.warning("No suitable punctuation for splitting; " +
+                logger.warning("No suitable punctuation for splitting; " +
                     "forcing split on max_length number of words")
                 subsentences = []
                 split_sentence = sentence_text.split(" ")
