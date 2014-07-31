@@ -45,12 +45,6 @@ Ext.define('WordSeer.controller.UserController', {
 		});
 	},
 
-	enterSubmit: function(field, event){
-		if (event.getKey() == event.ENTER){
-			this.send(field);
-		}
-	},
-
 	/** Tries to sign the user in
 	@param {Ext.button.Button} button The sign-in button that was clicked.
 	*/
@@ -120,7 +114,7 @@ Ext.define('WordSeer.controller.UserController', {
 			xtype: 'windowing-viewport'
 		});
 		this.setStoreUsernames();
-		this.getController("WindowingController").land();
+		// this.getController("WindowingController").land();
 	},
 
 	/**
@@ -195,5 +189,11 @@ Ext.define('WordSeer.controller.UserController', {
     		    Ext.Msg.alert({title:"Invalid characters", msg:"Either your username or your password contains invalid characters. Please try again with something different."});
     		}
     	}
-    }
+    },
+
+	enterSubmit: function(field, event){
+		if (event.getKey() == event.ENTER){
+			this.send(field);
+		}
+	},
 });

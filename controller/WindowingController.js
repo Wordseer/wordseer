@@ -613,16 +613,10 @@ Ext.define('WordSeer.controller.WindowingController', {
 		candidates.forEach(function(c) { c.close(10); });
 	},
 
+
+
 	dispatchUrlToken: function(token){
-		if (token == 'usersignin') {
-            // initial sign-in
-			Ext.create('Ext.container.Viewport', {
-				layout: 'fit',
-				items:{
-						xtype: 'usersignin',
-				}
-			});
-		} else if (token == 'home'){
+		if (token == 'home'){
 			// show landing page
 			this.land();
 

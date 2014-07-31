@@ -140,8 +140,15 @@ Ext.application({
         };
         var store_cfg = {fields:['word', 'count']};
 
+        Ext.create('Ext.container.Viewport', {
+            layout: 'fit',
+            items: {
+
+            }
+        });
+
         // set up Ext History utility
-        // required DOM events
+        // required DOM elements
         me.historyForm = Ext.getBody().createChild({
             tag: 'form',
             action: '#',
@@ -160,24 +167,27 @@ Ext.application({
             }]
         });
 
-        // initialize
+        // initialize history
         Ext.History.init(function(){
-            // if there's a hash in URL, get it
-            var hash = document.location.hash;
-            console.log("init  hash: " + hash);
-            // hand off to url history controller
-            // this.getController('UrlHistoryController').fireEvent('tokenchange',
-                // hash.replace('#',''));
+            // if user is signed in, look for URL token
+            if (me.getController("UserController").isSignedIn()) {
+                me.getController("UserController").signUserIn();
+                // if there's a hash in URL, get it
+                var token = document.location.hash.slice(1);
+                // it no token, just send to landing page
+                if (token == "") {
+                    token = "home"
+                }
+                me.getController("UrlHistoryController").dispatch(token);
+            } else {
+                // go to sign-in page
+                console.log("not signed in");
+            }
         });
 
         // handle history changes
         Ext.History.on('change', function(token){
-            // hand off to url history controller for dispatching
-            me.getController('UrlHistoryController').dispatch(token);
+            me.getController("UrlHistoryController").dispatch(token);
         });
-
-//      redirect to user sign in
-        Ext.History.add("usersignin");
-
     }
 });

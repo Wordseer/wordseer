@@ -41,6 +41,7 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
     // TODO: update this so it doesn't call windowing functions directly
     dispatch: function(token){
         if (this.IGNORE_CHANGE) { return; }
+            
         this.IGNORE_EVENTS = true;
         this.getController('WindowingController').dispatchUrlToken(token);
         this.IGNORE_EVENTS = false;
