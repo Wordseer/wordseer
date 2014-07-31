@@ -272,7 +272,18 @@ def get_xpath_text(xpath_pattern, node):
     else:
         nodes = node.xpath(xpath_pattern)
         for node in nodes:
-            value = str(etree.tostring(node.getparent(), method="text")).strip()
+
+            # Adding temporary unicode check for now, could do something else later
+            value = None
+
+            try:
+                value = unicode(etree.tostring(node.getparent(), encoding="utf-8", method="text")).strip()
+                # NOTE: should we maybe get the encoding from the document somehow?
+            except UnicodeDecodeError:
+                # print("Text of this element could not be converted to unicode.")
+                # TODO: log the above
+                continue
+
             if len(value) > 0:
                 values.append(value)
 
