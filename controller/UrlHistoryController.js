@@ -29,6 +29,7 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
             'layout-panel': {
                 navButtonClicked: this.navButton,
                 newSlice: this.newSlice,
+                switchWidgets: this.switchWidget,
             },
             'landing-page': {
                 render: this.landingPage,
@@ -62,37 +63,8 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
         if (this.IGNORE_EVENTS) { return; }
 
         this.IGNORE_CHANGE = true;
-        // get associated HistoryItem
-        var history_item_id = Ext.getStore("HistoryItemStore")
-            .findRecord("layout_panel_id", panel.itemId)
-                .internalId;
-        var new_search = panel.itemId + "_" + history_item_id;
-        var token = Ext.History.getToken();
-        if (! /^panels:/.test(token)) {
-            token = "panels:" + new_search;
-        } else {
-            token = token.split(":");
-            for (var i=0; i<token.length; i++){
-                if (token[i].indexOf(panel.itemId) != -1) {
-                    token.splice(i, 1, new_search);
-                } else if (i == token.length - 1 ) {
-                    // add to end
-                    token.push(new_search);
-                }
-            }
-            token = token.join(":");
-        }
-        Ext.History.add(token);
+        this.addOrUpdatePanel(panel);
         this.IGNORE_CHANGE = false;
-    },
-
-    newPanel: function(panel_itemid, history_item_id){
-        var token = Ext.History.getToken();
-        if (! /^panels:/.test(token)) {
-            token = "panels:";
-        }
-        token += panel_itemid + "_" + history_item_id + ":";
-        Ext.History.add(token);
     },
 
     removePanel: function(id){
@@ -118,4 +90,35 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
         Ext.History.add("home");
         this.IGNORE_CHANGE = false;
     },
+
+    switchWidget: function(panel, widget_xtype){
+        this.IGNORE_CHANGE = true;
+        this.addOrUpdatePanel(panel);
+        this.IGNORE_CHANGE = false;
+    },
+
+    addOrUpdatePanel: function(panel){
+        // get associated HistoryItem
+        var history_item_id = Ext.getStore("HistoryItemStore")
+            .findRecord("layout_panel_id", panel.itemId)
+                .internalId;
+        var new_search = panel.itemId + "_" + history_item_id;
+        var token = Ext.History.getToken();
+        if (! /^panels:/.test(token)) {
+            token = "panels:" + new_search;
+        } else {
+            token = token.split(":");
+            for (var i=0; i<token.length; i++){
+                if (token[i].indexOf(panel.itemId) != -1) {
+                    token.splice(i, 1, new_search);
+                } else if (i == token.length - 1 ) {
+                    // add to end
+                    token.push(new_search);
+                }
+            }
+            token = token.join(":");
+        }
+        Ext.History.add(token);
+    },
+
 });
