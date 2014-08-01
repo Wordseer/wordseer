@@ -230,6 +230,8 @@ def split_sentences(text):
     :param str text: The text to split
     """
 
+    logger = logging.getLogger(__name__)
+
     sentences = []
 
     # Split sentences using NLTK
