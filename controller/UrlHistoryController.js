@@ -54,12 +54,6 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
                 var id = panel.itemId;
                 this.removePanel(id);
                 break;
-            // case 'back':
-            //     this.addOrUpdatePanel(panel);
-            //     break;
-            // case 'forward':
-            //     this.addOrUpdatePanel(panel);
-            //     break;
             default:
                 break;
         }

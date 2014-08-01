@@ -39,11 +39,7 @@ Ext.define('WordSeer.controller.WindowingController', {
 						case 'close':
 							this.closePanel(panel);
 							break;
-						case 'back':
-							this.backButton(panel);
-							break;
-						case 'forward':
-							this.forwardButton(panel);
+						default:
 							break;
 					}
 				},
@@ -155,7 +151,6 @@ Ext.define('WordSeer.controller.WindowingController', {
 			widget.setFormValues(formValues);
 		}
 		this.setWidgetCombobox(panel, widget_xtype);
-		this.setHistoryButtons(panel);
 		this.layoutPanelActivated(panel);
 
 		// bring any floating windows to the front.
@@ -164,35 +159,6 @@ Ext.define('WordSeer.controller.WindowingController', {
 			windows.forEach(function(w) {w.toFront()});
 		} catch (e) {};
 		// console.timeEnd('refreshPanel');
-	},
-
-	/** Activates or deactivates back or forward buttons on the given panel
-	depending on whether there are previous or next history items available.
-
-	@param {WordSeer.view.windowing.viewport.LayoutPanel} panel The panel on
-	which to activate or deactivate history buttons.
-	*/
-	setHistoryButtons: function(panel) {
-		var model = panel.getLayoutPanelModel();
-		var index_from_last = model.get('index_from_last');
-		var back_enabled = (index_from_last <
-			(model.get('previous_history_items').length-1));
-		var forward_enabled = index_from_last != 0;
-		if (panel.rendered) {
-			if (panel.getEl()){
-				var back_button = panel.getEl().down('span.nav-button-back');
-				back_button.set({enabled: back_enabled});
-				var forward_button = panel.getEl().down('span.nav-button-forward');
-				forward_button.set({enabled: forward_enabled});
-			}
-		} else {
-			// Manipulate the autoEl config directly, as defined in
-			// {@link WordSeer.view.windowing.viewport.LayoutPanel}
-			var autoEl = panel.getElConfig();
-			var buttons = autoEl.children[0].children[0].children;
-			buttons[0].enabled = forward_enabled;
-			buttons[1].enabled = back_enabled;
-		}
 	},
 
 	/** Asks the current layout to add a panel to the layout.
@@ -245,7 +211,6 @@ Ext.define('WordSeer.controller.WindowingController', {
 	*/
 	layoutPanelActivated:function(layout_panel) {
 		if (layout_panel) {
-			this.setHistoryButtons(layout_panel);
 			Ext.ComponentQuery.query('layout-panel').forEach(function(item){
 				if (item.rendered) {
 					var el = item.getEl();
@@ -280,51 +245,8 @@ Ext.define('WordSeer.controller.WindowingController', {
 						history_item.get('widget_xtype'));
 				}
 			}
-		}
-	},
 
-	/** Looks up the previous history item that was displayed in this panel
-	and displays it using {@link #playHistoryItem} if it exists.
-	@param {WordSeer.view.windowing.viewport.LayoutPanel} layout_panel The panel
-	whose back button was clicked.
-	*/
-	backButton: function(layout_panel) {
-		var layout_panel_model = layout_panel.getLayoutPanelModel();
-		var history_item_index = layout_panel_model.get('index_from_last') + 1;
-		var history_items = layout_panel_model.get('previous_history_items');
-		if (history_item_index < history_items.length) {
-			layout_panel_model.set('index_from_last', history_item_index);
-			var history_item_id = history_items[history_items.length-1
-				- history_item_index];
-			var old_history_item_id = history_items[history_items.length-1 - (
-				history_item_index - 1)];
-			this.getController('HistoryController').deselectHistoryItem(
-				old_history_item_id);
-			this.playHistoryItem(layout_panel, layout_panel_model,
-				history_item_id);
 		}
-	},
-
-	/** Looks up the next history item that was displayed in this panel
-	and displays it using {@link #playHistoryItem} if it exists.
-	@param {WordSeer.view.windowing.viewport.LayoutPanel} layout_panel The panel
-	whose forward button was clicked.
-	*/
-	forwardButton: function(layout_panel) {
-		var layout_panel_model = layout_panel.getLayoutPanelModel();
-		var history_item_index = layout_panel_model.get('index_from_last') - 1;
-		var history_items = layout_panel_model.get('previous_history_items');
-		if (history_item_index >= 0) {
-			layout_panel_model.set('index_from_last', history_item_index);
-			var history_item_id = history_items[history_items.length-1
-					- history_item_index];
-			var old_history_item_id = history_items[history_items.length-1 -
-			(history_item_index + 1)];
-			this.getController('HistoryController').deselectHistoryItem(
-				old_history_item_id);
-			this.playHistoryItem(layout_panel, layout_panel_model,
-				history_item_id);
-		};
 	},
 
 	/** Alters the switch-widget combobox on the layout panel to reflect the
