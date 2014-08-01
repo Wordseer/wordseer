@@ -139,6 +139,8 @@ Ext.define('WordSeer.controller.WindowingController', {
 		// Switch the widget if necessary
 		if(!panel.down('widget') || panel.down('widget').xtype != widget_xtype) {
 			var inner = panel.getComponent('inner');
+			// die here if user has already hit back/fwd
+			if (!inner){ return false; }
 			inner.removeAll();
 			inner.add({
 				xtype: widget_xtype,

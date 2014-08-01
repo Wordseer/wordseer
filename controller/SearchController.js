@@ -346,7 +346,10 @@ Ext.define('WordSeer.controller.SearchController', {
 									this.current_query_id = query_id;
 									formValues.query_id = query_id;
 									panel.formValues.query_id = query_id;
-									panel.down('widget').formValues.query_id = query_id;
+									var widget = panel.down("widget");
+									// die here if user has already hit back/fwd
+									if (!widget) {return false;}
+									widget.formValues.query_id = query_id;
 								}
 								panel.fireEvent('newSlice', panel, formValues);
 								this.relaySearchToWidgetComponents(widget,
