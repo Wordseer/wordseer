@@ -229,7 +229,7 @@ var NodeModel = function() {
     };
     /**
      * Check if a another node is a sibling to this node in the XML
-     * @param {type} siblingId
+     * @param {string} siblingId
      * @returns {Boolean}
      */
     self.hasSibling = function(siblingId) {
@@ -351,7 +351,7 @@ var NodeModel = function() {
     };
     /**
      * Set date format
-     * @param {type} format D3 date format string
+     * @param {string} format D3 date format string
      * @returns {undefined}
      */
     self.setDateFormat = function(format) {
@@ -373,7 +373,7 @@ var NodeModel = function() {
     };
     /**
      * Set whether to combine text nodes or not
-     * @param {type} enable boolean
+     * @param {boolean} enable enable combining text
      * @returns {undefined}
      */
     self.setCombine = function(enable) {
@@ -625,9 +625,9 @@ var NodeModel = function() {
     /**
      * Get a sample of normal or combined text from XML. 
      * Must only be called from root node
-     * @param {type} id node id
-     * @param {type} size size of the sample
-     * @param {type} combine boolean to conbine text or now
+     * @param {string} id node id
+     * @param {int} size size of the sample
+     * @param {boolean} combine boolean to conbine text or not
      * @returns {Array|NodeModel.self.getTextSample.result}
      */
     self.getTextSample = function(id, size, combine)
