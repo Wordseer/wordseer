@@ -28,7 +28,7 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
         this.control({
             'layout-panel': {
                 navButtonClicked: this.navButton,
-                newSlice: this.newSlice,
+                initSearch: this.initSearch,
                 switchWidgets: this.switchWidget,
             },
             'landing-page': {
@@ -41,7 +41,7 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
     // TODO: update this so it doesn't call windowing functions directly
     dispatch: function(token){
         if (this.IGNORE_CHANGE) { return; }
-            
+
         this.IGNORE_EVENTS = true;
         this.getController('WindowingController').dispatchUrlToken(token);
         this.IGNORE_EVENTS = false;
@@ -54,13 +54,19 @@ Ext.define('WordSeer.controller.UrlHistoryController', {
                 var id = panel.itemId;
                 this.removePanel(id);
                 break;
+            // case 'back':
+            //     this.addOrUpdatePanel(panel);
+            //     break;
+            // case 'forward':
+            //     this.addOrUpdatePanel(panel);
+            //     break;
             default:
                 break;
         }
         this.IGNORE_CHANGE = false;
     },
 
-    newSlice: function(panel, formValues){
+    initSearch: function(panel, formValues){
         if (this.IGNORE_EVENTS) { return; }
 
         this.IGNORE_CHANGE = true;
