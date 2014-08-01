@@ -13,12 +13,19 @@ var DOCUMENT_TAG = 'document',
 var NODE_TYPES = {TEXT: 'text', PROPERTY: 'property'};
 var DATA_TYPES = {'STRING': 'string', 'NUMBER': 'number', 'DATE': 'date'};
 var DEFAULT_SAMPLE_SIZE = 10;
+/**
+ * Recursively created node model object
+ * @returns {NodeModel.self}
+ */
 var NodeModel = function() {
     var self = {}, xml, xmlns, url, filename, xml_raw;
-    var primaryKeys = ['id', 'tag', 'type', 'xpaths', 'name', 'isActive','dataType', 'dateFormat'],
-            document_keys = ['titleXPaths', 'filename'],
+    //main keys to included in structure file for each node type. Primary is included for all
+    var primaryKeys = ['id', 'tag', 'type', 'xpaths', 'name', 'isActive', 'dataType', 'dateFormat'],
+            document_keys = ['structureName', 'titleXPaths', 'filename'],
             subunit_keys = ['structureName', 'titleXPaths', 'combine'],
-            metadata_keys = ['attr', 'propertyName', 'displayName', 'dataType', 'dateFormat', 'nameIsDisplayed', 'valueIsDisplayed', 'isCategory'];
+            metadata_keys = ['attr', 'propertyName', 'displayName', 'dataType',
+                'dateFormat', 'nameIsDisplayed', 'valueIsDisplayed',
+                'isCategory']//main keys to included in structure file for document node types;
     self.attributes = {filename: '', url: '', xml: {}, id: '', paretnId: '', tag: '', type: '',
         xpaths: [], name: '', titleXpaths: [], titleId: '',
         units: [], metadata: [], children: [], sub_xpaths: [], attrs: {}, attr: '',
@@ -32,6 +39,12 @@ var NodeModel = function() {
     self.init = function() {
 
     };
+    /*
+     * Inital call to generate internal node model from XML
+     * @param {string} xml_filepath full XML file path
+     * @param {string} fn filename
+     * @returns {undefined}
+     */
     self.loadFromXMLURL = function(xml_filepath, fn)
     {
         var jqxhr = $.ajax({url: xml_filepath, async: false});
@@ -43,11 +56,18 @@ var NodeModel = function() {
         self.createFromXML($(xml).children()[0]);
         //TODO: Fix slave narratives
     };
+    /**
+     * Recursive funciton to generate internal node model from XML
+     * @param {XML} inXML raw XML data
+     * @param {string} path recursively passed xpath
+     * @param {string} id recursively passed id
+     * @returns {undefined}
+     */
     self.createFromXML = function(inXML, path, id)
     {
         xml = inXML;
         path = (path) ? path : '/';
-        id = (id) ? id : NODE_ID_PREFIX;
+        id = (id) ? id : NODE_ID_PREFIX;//for root node
         //setup basic attributes
         self.attributes.isRoot = (path === '/') ? true : false;
         if (!self.attributes.isRoot)
@@ -55,11 +75,12 @@ var NodeModel = function() {
         var children = $(xml).children(), attrs = xml.attributes;
         self.attributes.tag = $(xml).prop('tagName');
         self.attributes.name = $(xml).prop('tagName');
+        //To render XML as HTML and use JQuery, element tags must not contain '.'. All '.' are changed to '_'.
         self.attributes.id = id + S(self.attributes.tag).replace('.', '_').s;
-        self.attributes.xpaths.push(path + self.attributes.tag + "/");
+        self.attributes.xpaths.push(((self.attributes.isRoot) ? "" : path) + "/" + self.attributes.tag);//setup initial XPath
         self.attributes.structureName = self.attributes.tag;
         self.attributes.displayName = self.attributes.structureName;
-        self.attributes.dataType = DATA_TYPES.STRING;
+        self.attributes.dataType = DATA_TYPES.STRING;//default node type is String
         var paths = path.split('/');
         if (paths.length > 1)
             self.attributes.belongsTo = paths[paths.length - 2];
@@ -71,8 +92,9 @@ var NodeModel = function() {
             {
                 xmlns = attr.nodeValue;
             }
-            var node = new NodeModel();
+            var node = new NodeModel();//create child node model
             node.createAsAttribute(self.attributes.id, attr.nodeName, attr.nodeValue, self.attributes.xpaths);
+            //if this element tag was not processed before, process it. this will create a tree of uniqu structure elements
             if (!_.contains(self.attributes.sub_xpaths, node.attributes.xpaths[0]))
             {
                 self.attributes.sub_xpaths.push(node.attributes.xpaths[0]);
@@ -81,19 +103,21 @@ var NodeModel = function() {
             }
         });
         //process child nodes
+        //IF this child has child nodes
         if (children.length > 0)
         {
             if (!self.attributes.isRoot)
                 self.attributes.type = SUBUNIT_TAG;
+            //process each child
             _.each(children, function(child)
             {
                 var node = new NodeModel();
                 node.createFromXML(child, self.attributes.xpaths[0], self.attributes.id);
-                if (!self.hasChild(node.attributes.id))//if node type is new
+                if (!self.hasChild(node.attributes.id))//if element type is new
                 {
                     self.addChild(node);
                 }
-                else//node type processed before: compare children
+                else//node type processed before: compare children to include any new children
                 {
                     var myChild = self.map[node.attributes.id];
                     _.each(node.attributes.children, function(nodeChild)
@@ -111,14 +135,16 @@ var NodeModel = function() {
                 }
             });
         }
+        //If this element has no child nodes but has attributes
         else if (attrs.length > 0)
         {
             self.attributes.type = SUBUNIT_TAG;
-            self.attributes.xpaths[0] += 'text()';
+            self.attributes.xpaths[0] += '/text()';
         }
+        //if this element is a leaf node with no attributes
         else {
             self.attributes.type = METADATA_TAG;
-            self.attributes.xpaths[0] += 'text()';
+            self.attributes.xpaths[0] += '/text()';
         }
         if (self.attributes.isRoot)
         {
@@ -129,6 +155,11 @@ var NodeModel = function() {
             self.map[self.attributes.id] = self;
         }
     };
+    /*
+     * Check if node has a direct child with id
+     * @param {string} id
+     * @returns {Boolean}
+     */
     self.hasChild = function(id)
     {
 
@@ -140,9 +171,13 @@ var NodeModel = function() {
                 return true;
             }
         }
-
         return false;
     };
+    /**
+     * Add a child to this node (either unit or metadata based on node type)
+     * @param {NodeModel} node
+     * @returns {undefined}
+     */
     self.addChild = function(node)
     {
         self.attributes.sub_xpaths.push(node.attributes.xpaths[0]);
@@ -159,6 +194,10 @@ var NodeModel = function() {
                 self.map[key] = item;
         });
     };
+    /**
+     * If if this node has any unit or metadata childrent
+     * @returns {Boolean}
+     */
     self.hasChildElements = function()
     {
         if (self.attributes.units.length > 0)
@@ -173,6 +212,11 @@ var NodeModel = function() {
 
         return false;
     };
+    /**
+     * Check if another node ID is a descendant of this node
+     * @param {string} childId
+     * @returns {Boolean}
+     */
     self.hasDescendant = function(childId)
     {
         if (self.map[childId])
@@ -183,24 +227,11 @@ var NodeModel = function() {
         else
             return false;
     };
-    /*
-    self.hasParent = function(parentId)
-    {
-        var node = self;
-//        console.log('is ' + parentId + ' a parent of ' + self.attributes.id + '?');
-        do {
-            if (node.attributes.parentId === parentId)
-            {
-                console.log(parentId + ' is a parent of ' + self.attributes.id);
-                return true;
-            }
-            console.log('failed on ' + node.attributes.parentId);
-            node = self.map[node.attributes.parentId];
-            if (node)
-                console.log('going up ' + node.attributes.id);
-        } while (node && !node.attributes.isRoot)
-        return false;
-    };*/
+    /**
+     * Check if a another node is a sibling to this node in the XML
+     * @param {string} siblingId
+     * @returns {Boolean}
+     */
     self.hasSibling = function(siblingId) {
 //        console.log('is ' + siblingId + ' a sibling of ' + self.attributes.id + '?');
         if (self.map[siblingId]) {
@@ -211,6 +242,14 @@ var NodeModel = function() {
         }
         return false;
     };
+    /**
+     * Create the node as an attribute of an XML node
+     * @param {string} id
+     * @param {string} name
+     * @param {string} value
+     * @param {string} xpaths
+     * @returns {undefined}
+     */
     self.createAsAttribute = function(id, name, value, xpaths)
     {
         self.attributes.id = id + 'attr' + name;
@@ -219,42 +258,79 @@ var NodeModel = function() {
         self.attributes.type = METADATA_TAG;
         self.attributes.dataType = DATA_TYPES.STRING;
         self.attributes.attr = name;
-        self.attributes.xpaths.push(xpaths + '@' + name);
+        self.attributes.xpaths.push(xpaths + '/@' + name);//XPath for attributes
         self.attributes.displayName = name;
         self.attributes.isAttribute = true;
     };
     self.loadFromJSON = function(json) {
 
     };
+    /**
+     * Activate the node (include it in structure file)
+     * @returns {undefined}
+     */
     self.activate = function() {
         self.attributes.isActive = self.attributes.valueIsDisplayed = self.attributes.nameIsDisplayed = true;
     };
+    /**
+     * Deactivate the node and reset its values
+     * @returns {undefined}
+     */
     self.deactivate = function() {
         self.attributes.isActive = self.attributes.valueIsDisplayed
                 = self.attributes.nameIsDisplayed = self.attributes.isSentence
                 = self.attributes.isProperty = false;
         self.updateNodeType();
     };
+    /**
+     * Rename this node
+     * @param {string} newName
+     * @returns {undefined}
+     */
     self.rename = function(newName) {
         var oldName = self.attributes.name + '';
         self.attributes.displayName = self.attributes.name = self.attributes.propertyName = newName;
     };
+    /**
+     * Change the display node of this node
+     * @param {string} name
+     * @returns {undefined}
+     */
     self.setDisplayName = function(name)
     {
         self.attributes.displayName = name;
     };
+    /**
+     * Change the title of this node
+     * @param {string} title
+     * @returns {undefined}
+     */
     self.setTitleAsText = function(title) {
         self.rename(title);
     };
+    /**
+     * Set the titleXPath of this node to another node's XPath
+     * @param {string} titleXPath
+     * @returns {undefined}
+     */
     self.setTitleAsXPath = function(titleXPath) {
         self.attributes.titleXpaths = [titleXPath];
     };
+    /**
+     * Assign another node as a title for this node
+     * @param {string} id of title node
+     * @returns {undefined}
+     */
     self.setTitleNode = function(id) {
         self.map[id].rename(TITLE_NODE_TAG);
         self.map[id].attributes.isTitle = true;
         self.attributes.titleId = id;
         self.attributes.titleXPaths = self.map[id].attributes.xpaths[0];
     };
+    /**
+     * Reset the tile node as empty
+     * @returns {undefined}
+     */
     self.resetTitleNode = function()
     {
         self.setTitleAsXPath('');
@@ -265,14 +341,28 @@ var NodeModel = function() {
         self.attributes.titleXPaths = '';
 
     };
+    /**
+     * set data type
+     * @param {string} dataType from DATA_TYPES
+     * @returns {undefined}
+     */
     self.setDataType = function(dataType) {
         self.attributes.dataType = dataType;
     };
+    /**
+     * Set date format
+     * @param {string} format D3 date format string
+     * @returns {undefined}
+     */
     self.setDateFormat = function(format) {
         self.attributes.dateFormat = format;
-        if(self.attributes.titleId!=='')
+        if (self.attributes.titleId !== '')
             self.map[self.attributes.titleId].setDateFormat(format);
     };
+    /*
+     * Update the node type based on attributes
+     * @returns {undefined}
+     */
     self.updateNodeType = function() {
         if (self.attributes.isProperty)
             self.attributes.nodeType = NODE_TYPES.PROPERTY;
@@ -281,12 +371,26 @@ var NodeModel = function() {
         else
             self.attributes.nodeType = null;
     };
+    /**
+     * Set whether to combine text nodes or not
+     * @param {boolean} enable enable combining text
+     * @returns {undefined}
+     */
     self.setCombine = function(enable) {
         self.attributes.combine = (enable) ? true : false;
     };
+    /**
+     * Check if nodes has children
+     * @returns {Boolean}
+     */
     self.hasChildren = function() {
         return self.attributes.children.length > 0;
     };
+    /**
+     * Set this node as a sentence node
+     * @param {boolean} flag boolean
+     * @returns {undefined}
+     */
     self.setAsSentence = function(flag) {
         if (flag)
         {
@@ -295,11 +399,8 @@ var NodeModel = function() {
             self.attributes.isProperty = false;
             self.attributes.type = SUBUNIT_TAG;
             self.attributes.isCategory = false;
-
-//console.log(self.attributes.xpaths[0]);
-            if (!S(self.attributes.xpaths[0]).endsWith('text()') && !self.attributes.isAttribute)
-                self.attributes.xpaths[0] += 'text()';
-//console.log(self.attributes.xpaths[0]);
+            if (!S(self.attributes.xpaths[0]).endsWith('/text()') && !self.attributes.isAttribute)
+                self.attributes.xpaths[0] += '/text()';
         }
         else
         {
@@ -308,6 +409,11 @@ var NodeModel = function() {
         }
         self.updateNodeType();
     };
+    /**
+     * Set this node as a property node
+     * @param {boolean} flag boolean
+     * @returns {undefined}
+     */
     self.setAsProperty = function(flag)
     {
         if (flag)
@@ -315,12 +421,9 @@ var NodeModel = function() {
             self.rename(self.attributes.tag);
             self.attributes.isSentence = false;
             self.attributes.isProperty = true;
-//self.attributes.type = METADATA_TAG;
             self.attributes.isCategory = true;
-
-            if (S(self.attributes.xpaths[0]).endsWith('text()'))
-                self.attributes.xpaths[0] = S(self.attributes.xpaths[0]).chompRight('text()').s;
-//console.log(self.attributes.xpaths[0]);
+            if (S(self.attributes.xpaths[0]).endsWith('/text()'))
+                self.attributes.xpaths[0] = S(self.attributes.xpaths[0]).chompRight('/text()').s;
         }
         else
         {
@@ -329,7 +432,11 @@ var NodeModel = function() {
         }
         self.updateNodeType();
     };
-    self.toJSONAll = function(activeOnly) {
+    /**
+     * Retrieve a full structure file of all the nodes on the XML
+     * @returns {NodeModel.self.toJSONAll.json|Window.attributes|self.attributes}
+     */
+    self.toJSONAll = function() {
         var json = {};
         // put the primary keys in the json file
         _.each(primaryKeys, function(key) {
@@ -357,16 +464,16 @@ var NodeModel = function() {
         {
             json['metadata'] = [];
             _.each(self.attributes.metadata, function(unit) {
-                json.metadata.push(unit.toJSONAll(activeOnly));
-                json.children.push(unit.toJSONAll(activeOnly));
+                json.metadata.push(unit.toJSONAll());
+                json.children.push(unit.toJSONAll());
             });
         }
         if (self.attributes.units.length > 0)
         {
             json['units'] = [];
             _.each(self.attributes.units, function(unit) {
-                json.units.push(unit.toJSONAll(activeOnly));
-                json.children.push(unit.toJSONAll(activeOnly));
+                json.units.push(unit.toJSONAll());
+                json.children.push(unit.toJSONAll());
             });
         }
         //create metadata child objects
@@ -374,6 +481,10 @@ var NodeModel = function() {
             delete json['children'];
         return json;
     };
+    /**
+     * Retrieve the wordseer valid structure file of selected nodes (active).
+     * @returns {Array}
+     */
     self.toActiveJSON = function() {
         var jsonIn = self.toJSONAll(), json;
         console.log(jsonIn);
@@ -412,6 +523,12 @@ var NodeModel = function() {
             {
                 node.metadata = tempMeta;
                 node.units = tempUnits;
+                if (node.units && node.units.length === 0)
+                    delete node['units'];
+                if (node.metadata && node.metadata.length === 0)
+                    delete node['metadata'];
+                if (node.attr && node.attr === '')
+                    delete node['attr'];
                 delete node['children'];
                 delete node['isActive'];
                 out = node;
@@ -429,6 +546,12 @@ var NodeModel = function() {
         console.log(json);
         return json;
     };
+    /**
+     * Get an XML sample based on the chosing structure file nodes
+     * Must only be called from root node
+     * @param {int|null} size
+     * @returns {NodeModel.self.getSample.sample|Array}
+     */
     self.getSample = function(size)
     {
         size = (size) ? size : DEFAULT_SAMPLE_SIZE;
@@ -480,24 +603,13 @@ var NodeModel = function() {
                         }
                         else
                             xpath2Title = self.map[titleId].attributes.xpaths[0];
-
-//                        console.log(' title for ' + propertyId + ':\t' + xpath2Title)
-//                        var titleNode = self.map[titleId];
-                        /* var ancestor = (property.hasSibling(nodeId)
-                         || titleNode.hasSibling(nodeId)
-                         || property.hasDescendant(nodeId)
-                         || titleNode.hasDescendant(nodeId)) ? null : xpath2Title;
-                         */
                         if (combine)
                         {
-//                            console.log(xpath + ' ' + property.attributes.id + ' combined ' + ancestor);
                             dim_col.value = getTextXPathNode(xml_raw, xmlns, xpath, i, xpath2Title, combine);
                         } else
                         {
-//                            console.log(xpath + ' ' + property.attributes.id + ' normal ' + ancestor);
                             dim_col.value = getXPathNode(xml_raw, xmlns, xpath, i, xpath2Title, null);
                         }
-                        //console.log(typeof (dim_col.value));
                         dim_col.xpath = xpath2;
                         dim_col.id = property.attributes.id;
                         if (!property.attributes.isTitle)
@@ -510,6 +622,14 @@ var NodeModel = function() {
         });
         return sample;
     };
+    /**
+     * Get a sample of normal or combined text from XML. 
+     * Must only be called from root node
+     * @param {string} id node id
+     * @param {int} size size of the sample
+     * @param {boolean} combine boolean to conbine text or not
+     * @returns {Array|NodeModel.self.getTextSample.result}
+     */
     self.getTextSample = function(id, size, combine)
     {
         size = (size) ? size : DEFAULT_SAMPLE_SIZE;
@@ -523,17 +643,30 @@ var NodeModel = function() {
     };
     return self;
 };
-
+/*
+ * Retrieve normal or combined text node values from xml based on primary XPath
+ * @param {XML} xml raw xml data
+ * @param {string} xmlns 
+ * @param {string} nodeXPath xpath of primary node to retrieve
+ * @param {int} index item index of primary noe
+ * @param {string} ancestorXPath xpath of the ancestor of the primary node
+ * @param {boolean} combine boolean to combine text or not
+ * @returns {getXPathNode.nodes|String}
+ */
 function getTextXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, combine)
 {
     var output;
     if (combine)
     {
+        /*
+         to combine text, the last XPath node is removed from the XPath so that indeces are applied to the its parent. 
+         The actual node xpath is then passed as a secondary XPath which will be appended later. 
+         The output will be a concatenation of the list of retrieved XPath results.
+         */
         var xpaths = nodeXPath.replace('/text()', '').split('/'),
                 secondaryXPath = _.last(xpaths);
         xpaths = xpaths.slice(0, xpaths.length - 1);
         xpaths = xpaths.join('/');
-//        console.log(xpaths + '\t' + secondaryXPath + '\t' + ancestorXPath);
         output = getXPathNode(xml, xmlns, xpaths, index, ancestorXPath, secondaryXPath);
     }
     else
@@ -544,27 +677,27 @@ function getTextXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, combine)
 }
 
 /**
+ * Retrieve the XML value of an XPath expression
+ * The xpath is evaluated as "(<nodeXPath>)[<index>]/<secondaryXPath>/ancestor::<ancestorXPath>
  * 
- * @param {type} xml XML DOM
- * @param {type} xmlns XML Name space
- * @param {type} nodeXPath the xpath to the primary node to evaluate
- * @param {type} index (optional) retrieve a specific element from the primary node
- * @param {type} ancestorXPath retrieve the andestors of the specific primary node
- * @param {type} secondaryXPath a secondaryXPath for combined text
- * @returns {unresolved} results
+ * @param {XML} xml XML DOM
+ * @param {string} xmlns XML Name space
+ * @param {string} nodeXPath the xpath to the primary node to evaluate
+ * @param {int} index (optional) retrieve a specific element from the primary node
+ * @param {string} ancestorXPath retrieve the andestors of the specific primary node
+ * @param {string} secondaryXPath a secondaryXPath for combined text
+ * @returns {string} results
  */
 function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, secondaryXPath)
 {
     var result,
-            xpathExpression = '(' + nodeXPath + ')', 
+            xpathExpression = '(' + nodeXPath + ')',
             fullNodeXPath = (secondaryXPath) ? nodeXPath + '/' + secondaryXPath : nodeXPath,
             isChild = false;
     xpathExpression = (index) ? xpathExpression + '[' + index + ']' : xpathExpression;
     if (secondaryXPath)
     {
         xpathExpression += '/' + secondaryXPath;
-//        console.log(xpathExpression);
-
     }
     if (ancestorXPath)
     {
@@ -606,17 +739,9 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, secondaryXPat
     var node = nodes.iterateNext();
     if (node === null)
         result = nodes;
+    //concatenate ouptut values into a single string
     while (node)
     {
-//
-//        if (node === null)
-//        {
-//            //TODO: FIx Slave narratives
-//            //console.log('null detected');
-//            node = nodes.iterateNext();
-//        }
-
-
         if (node.childNodes && node.childNodes[0] && node.childNodes.length > 0)
         {
             result += ' ' + node.childNodes[0].nodeValue;
@@ -631,23 +756,10 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, secondaryXPat
                 result += ' ' + node;
         }
         node = nodes.iterateNext();
-//        return result;
-
     }
-//    console.log(typeof(result));
-    if(typeof(result)==='object')
+    if (typeof (result) === 'object')//if result is still null, return null
     {
-//        console.log(result);
-//        console.log(result.iterateNext());
-////                console.log(result.snapshotItem());
-//
-//        console.log($(result));
-//        console.log(nodes);
         result = null;
     }
     return result;
 }
-
-
-
-
