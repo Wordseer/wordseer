@@ -36,6 +36,7 @@ class DocumentParser(object):
 
         :param Document document: The document to parse and record.
         """
+        pdb.set_trace()
 
         start_time = datetime.now()
         count = 0
