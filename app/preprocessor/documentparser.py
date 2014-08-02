@@ -1,7 +1,7 @@
 """The DocumentParser takes in a Document object and parses it by sending
 every sentence to the `StringProcessor`, which writes it to the database.
 """
-
+import pdb
 from datetime import datetime
 import logging
 
@@ -31,7 +31,7 @@ class DocumentParser(object):
 
         :param Document document: The document to parse and record.
         """
-        pdb.set_trace()
+        #pdb.set_trace()
 
         start_time = datetime.now()
         count = 0

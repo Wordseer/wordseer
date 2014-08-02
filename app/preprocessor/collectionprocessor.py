@@ -7,7 +7,6 @@ from datetime import datetime
 import logging
 import os
 
-import pdb
 from app import app
 import database
 from . import logger
@@ -121,7 +120,7 @@ class CollectionProcessor(object):
         :param str filename_extension: The extension of the files that contain
             documents.
         """
-        pdb.set_trace()
+        #pdb.set_trace()
         extractor = structureextractor.StructureExtractor(self.str_proc,
             docstruc_filename)
 
