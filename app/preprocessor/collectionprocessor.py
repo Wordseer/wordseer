@@ -2,6 +2,7 @@
 between the input and the pipeline.
 """
 
+import pdb
 from datetime import datetime
 import logging
 import os
@@ -120,6 +121,7 @@ class CollectionProcessor(object):
         :param str filename_extension: The extension of the files that contain
             documents.
         """
+        pdb.set_trace()
         extractor = structureextractor.StructureExtractor(self.str_proc,
             docstruc_filename)
 
@@ -250,6 +252,18 @@ class CollectionProcessor(object):
             sentences_processed += 1
 
 def cp_run(collection_dir, structure_file, extension, project):
+    """Run the collection processor.
+
+    Arguments:
+        collection_dir (str): Where to get files from.
+        structure_file (str): The path to the structure file.
+        extension (str): Extension of the document files.
+        project (Project): Which project to use for this processing.
+    """
+    #pdb.set_trace()
+    if extension[0] != ".":
+        extension = "." + extension
+
     reader_writer = ReaderWriter()
     collection_processor = CollectionProcessor(reader_writer, project)
     collection_processor.process(collection_dir, structure_file, extension,
