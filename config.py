@@ -91,6 +91,8 @@ class BaseConfig(object):
     PUNCTUATION_NO_SPACE_BEFORE = list(u".,!`\\?';):—")
     PUNCTUATION_NO_SPACE_AFTER = list(u"`'\"(—")
 
+    SPLIT_CHARACTERS = [";", "--", ":", ","]
+
     # Number of rows to return for paginated queries
     PAGE_SIZE = 100
 
@@ -105,6 +107,11 @@ class BaseConfig(object):
     PART_OF_SPEECH_TAGGING = True
     WORD_TO_WORD_SIMILARITY = True
     SEQUENCE_INDEXING = True
+    SKIP_SENTENCE_ON_ERROR = False
+    SENTENCE_MAX_LENGTH = 40
+
+    # Logging config
+    LOG_SENTENCE_TRUNCATE_LENGTH = 140
 
 
 class Production(BaseConfig):

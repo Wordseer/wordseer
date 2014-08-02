@@ -230,7 +230,7 @@ class TestUnitModels(unittest.TestCase):
         unit.properties.append(prop)
 
         assert unit.sentences == [sentence]
-        assert unit.properties == [unit_type, prop]
+        assert unit.properties.all() == [unit_type, prop]
 
         unit.save()
         prop.save()

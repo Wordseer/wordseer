@@ -20,11 +20,11 @@ CORENLP_FINAL_PATH=$CORENLP_DESTINATION"/"$CORENLP_FINAL_NAME
 # Install python requirements
 echo "Installing dependencies..."
 pip install -r $REQUIREMENTS
+python -m nltk.downloader punkt
 
 # Set up the database
 echo "Setting up database..."
-python database.py create
-python database.py migrate
+python database.py reset
 
 # Download and move stanford-corenlp
 echo "Installing stanford-corenlp..."

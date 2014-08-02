@@ -35,12 +35,20 @@ class Unit(db.Model, Base):
     children = db.relationship("Unit", backref=db.backref("parent",
         remote_side=[id]))
     sentences = db.relationship("Sentence", backref="unit")
-    properties = db.relationship("Property", backref="unit")
+    properties = db.relationship("Property", backref="unit", lazy="dynamic")
 
     __mapper_args__ = {
         "polymorphic_identity": "unit",
         "polymorphic_on": type
     }
+
+    def property(self, name):
+        """Look up a property by its name.
+
+        :param str name: The name of the property
+        """
+
+        return self.properties.filter_by(name=name).first()
 
     def __repr__(self):
         """Return a string representation of a unit, which is its type followed

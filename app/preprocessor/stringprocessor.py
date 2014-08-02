@@ -1,8 +1,8 @@
 """Methods to handle string parsing, tokenization, tagging, etc.
 """
+from nltk.tokenize import sent_tokenize
+from corenlp import StanfordCoreNLP, ProcessError, TimeoutError
 import logging
-
-from corenlp import StanfordCoreNLP
 
 from app import app
 from app.models.sentence import Sentence
@@ -32,9 +32,13 @@ class StringProcessor(object):
         :param str txt: One or more sentences, in a string format.
         :return list: A list of document.Sentence objects.
         """
-        parsed_text = self.parser.raw_parse(txt)
+        sentences = []
 
-        return tokenize_from_raw(parsed_text, txt)
+        for sentence_text in split_sentences(txt):
+            sentence = self.parse_with_error_handling(sentence_text)
+            sentences.extend(tokenize_from_raw(sentence, sentence_text))
+
+        return sentences
 
     def parse(self, sentence, relationships=None, dependencies=None, max_length=30):
         """Parse a ``Sentence`` and extract dependencies, parse trees, etc.
@@ -48,13 +52,12 @@ class StringProcessor(object):
         :param int max_length: The most amount of words to process.
         """
 
-        # This isn't a perfect way to check how many words are in a sentence,
-        # but it's not so bad.
-        #if len(sentence.text.split(" ")) > max_length:
-        #   raise ValueError("Sentence appears to be too long, max length " +
-        #        "is " + str(max_length))
-        # TODO: figure out the above
-        parsed = self.parser.raw_parse(sentence.text)
+        parsed = self.parse_with_error_handling(sentence.text)
+
+        # If the parse was unsuccessful, exit
+        if parsed == None:
+            return
+
         parsed_sentence = parsed["sentences"][0]
 
         if len(parsed["sentences"]) > 1:
@@ -114,6 +117,17 @@ class StringProcessor(object):
                         part_of_speech = dependent_pos
                     ).first()
 
+                    # Temporary skip if one of the words is not found;
+                    # see issue #128 on Github.
+                    # TODO: remove
+                    try:
+                        governor.id
+                        dependent.id
+                    except:
+                        self.logger.error("Governor or dependent not found; giving up on parse.")
+                        self.logger.info(sentence)
+                        return sentence
+
                     key = (relationship.name, governor.id, dependent.id)
 
                     if key in dependencies.keys():
@@ -153,6 +167,140 @@ class StringProcessor(object):
 
         return sentence
 
+    def parse_with_error_handling(self, text):
+        """Run the parser and handle errors properly.
+
+        Also checks the sentence text for irregularities that may break the
+        parser and handles it before proceeding.
+
+        Any failure will cause this method to return None
+
+        :param str text: The text of the sentence to check
+        """
+
+        # Check for non-string
+        if not isinstance(text, str) and not isinstance(text, unicode):
+            self.logger.warning("Parser got a non-string argument")
+            self.logger.info(text)
+            return None
+
+        # Check for non-unicode
+        if not isinstance(text, unicode):
+
+            # Try to convert the string to unicode if possible
+            # Unit test: should fail with this example:
+            # http://stackoverflow.com/questions/6257647/convert-string-to-unicode
+
+            try:
+                text = unicode(text)
+            except(UnicodeDecodeError):
+                self.logger.warning("The following sentence text is not unicode; " +
+                    "convertion failed.")
+                self.logger.info(text)
+
+                # Skip sentence if flag is True
+                if app.config["SKIP_SENTENCE_ON_ERROR"]:
+                    return None
+                else:
+                    # Try to parse the sentence anyway
+                    self.logger.warning("Attempting to parse non-unicode sentence.")
+
+        # Check for empty or nonexistent text
+        if text == "" or text == None:
+            return None
+
+        # Check for irregular characters
+        # TODO: what are considered irregular characters?
+
+        # Try to parse, catch errors
+        parsed_text = None
+        try:
+            parsed_text = self.parser.raw_parse(text)
+        # TODO: handle all errors properly
+        # ProcessError, TimeoutError, OutOfMemoryError
+        except TimeoutError as e:
+            self.logger.error("Got a TimeoutError: " + str(e))
+            return None
+        except ProcessError as e:
+            self.logger.error("Got a ProcessError: " + str(e))
+            return None
+        except:
+            self.logger.error("Unknown error")
+            return None
+
+        # Parse successful, return parsed text
+        return parsed_text
+
+def split_sentences(text):
+    """Split the string into sentences.
+
+    Also runs a length check and splits sentences that are too long on
+    reasonable punctuation marks.
+
+    :param str text: The text to split
+    """
+
+    logger = logging.getLogger(__name__)
+
+    sentences = []
+
+    # Split sentences using NLTK
+    sentence_texts = sent_tokenize(text)
+
+    for sentence_text in sentence_texts:
+
+        # Check length of sentence
+        max_length = app.config["SENTENCE_MAX_LENGTH"]
+        approx_sentence_length = len(sentence_text.split(" "))
+
+        if approx_sentence_length > max_length:
+            logger.warning("Sentence appears to be too long, max length " +
+                "is " + str(max_length))
+            logger.info(sentence_text[:app.config["LOG_SENTENCE_TRUNCATE_LENGTH"]] + "...")
+
+            # Attempt to split on a suitable punctuation mark
+            # Order (tentative): semicolon, double-dash, colon, comma
+
+            # Mini helper function to get indices of punctuation marks
+
+            split_characters = app.config["SPLIT_CHARACTERS"]
+            subsentences = None
+
+            for character in split_characters:
+                subsentences = sentence_text.split(character)
+
+                # If all subsentences fit the length limit, exit the loop
+                if all([len(subsentence.split(" ")) <= max_length
+                    for subsentence in subsentences]):
+
+                    logger.info("Splitting sentence around %s to fit length "
+                        "limit.", character)
+                    break
+
+                # Otherwise, reset subsentences and try again
+                else:
+                    subsentences = None
+
+            # If none of the split characters worked, force split on max_length
+            if not subsentences:
+                logger.warning("No suitable punctuation for splitting; " +
+                    "forcing split on max_length number of words")
+                subsentences = []
+                split_sentence = sentence_text.split(" ")
+
+                index = 0
+                # Join every max_length number of words
+                while index < approx_sentence_length:
+                    subsentences.append(" ".join(split_sentence[index:index+max_length]))
+                    index += max_length
+
+            sentences.extend(subsentences)
+
+        else:
+            sentences.append(sentence_text)
+
+    return sentences
+
 def tokenize_from_raw(parsed_text, txt):
     """Given the output of a call to raw_parse, produce a list of Sentences
     and find the PoS, lemmas, and space_befores of each word in each sentence.
@@ -164,7 +312,13 @@ def tokenize_from_raw(parsed_text, txt):
     :param str txt: The original text.
     :return list: A list of document.Sentence objects.
     """
+
+    # If parsed_text is the result of a failed parse, return with an empty list
+    if not parsed_text:
+        return []
+
     logger = logging.getLogger(__name__)
+
     paragraph = [] # a list of Sentences
     words = dict()
 
