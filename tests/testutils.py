@@ -18,7 +18,7 @@ class TestUtils(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        # database.restore_cache()
+        database.restore_cache()
         cls.word1 = Word(word="foo", lemma="bar")
         cls.word2 = Word(word="foo", lemma="baz")
         cls.word3 = Word(word="bar", lemma="bar")

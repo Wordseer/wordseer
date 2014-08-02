@@ -18,8 +18,7 @@ from . import counter
 class CollectionProcessor(object):
     """Process a collection of files.
     """
-    def __init__(self, reader_writer):
-        self.reader_writer = reader_writer
+    def __init__(self):
         self.str_proc = StringProcessor()
         self.pylogger = logging.getLogger(__name__)
 
