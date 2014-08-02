@@ -35,7 +35,28 @@ class StructureExtractor(object):
         :return list: A list of Document objects
         """
         documents = []
-        doc = etree.parse(infile)
+
+        # Check for unescaped special characters (tentative)
+        doc = None
+
+        print(infile)
+
+        try:
+            doc = etree.parse(infile)
+        except(etree.XMLSyntaxError):
+            file_string = None
+            with open(infile) as file:
+                file_string = "".join([line for line in file])
+
+            file_string = file_string.replace("&", "&amp;")
+
+            # If parsing still doesn't work, skip it
+            try:
+                doc = etree.fromstring(file_string)
+            except(etree.XMLSyntaxError) as e:
+                print("XML Error: " + str(e))
+                return documents
+
         units = self.extract_unit_information(self.document_structure, doc)
 
         doc_num = 0
@@ -154,10 +175,12 @@ class StructureExtractor(object):
                 sentence_nodes = parent_node.getparent().iter()
 
             for sentence_node in sentence_nodes:
-                sentence_text += etree.tostring(sentence_node,
-                    method="text").strip() + "\n"
-                sentence_metadata.extend(get_metadata(structure,
-                    sentence_node))
+                node_text = get_xml_text(sentence_node)
+
+                if node_text != None:
+                    sentence_text += node_text.strip() + "\n"
+                    sentence_metadata.extend(get_metadata(structure,
+                        sentence_node))
 
 #        if tokenize:
 #            sents = self.str_proc.tokenize(sentence_text)
@@ -275,20 +298,22 @@ def get_xpath_text(xpath_pattern, node):
         for node in nodes:
 
             # Adding temporary unicode check for now, could do something else later
-            value = None
+            value = get_xml_text(node.getparent())
 
-            try:
-                value = unicode(etree.tostring(node.getparent(), encoding="utf-8", method="text")).strip()
-                # NOTE: should we maybe get the encoding from the document somehow?
-            except UnicodeDecodeError:
-                # print("Text of this element could not be converted to unicode.")
-                # TODO: log the above
+            # If parse failed, skip
+            if value == None:
                 continue
 
             if len(value) > 0:
                 values.append(value)
 
     return values
+
+def get_xml_text(node, encoding="utf-8", method="text"):
+    try:
+        return unicode(etree.tostring(node, encoding=encoding, method=method)).strip()
+    except UnicodeDecodeError:
+        return None
 
 def get_nodes_from_xpath(xpath, nodes):
     """If the selector is longer than 0 chars, then return the children
