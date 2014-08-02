@@ -208,10 +208,8 @@ def get_metadata(structure, node):
     If the Tags have attributes, then the value fields of the metadata
     objects will be those attributes. Otherwise, the text in the Tags
     will be the values. property_name is set according to PropertyName in
-    metadata_strcuture. specification is set as the object in the JSON
-    file that describes the xpath and propertyName of that Property object.
-    This function iterates over every child of metadata in the structure
-    file.
+    metadata_strcuture. This function iterates over every child of metadata in
+    the structure file.
 
     :param list structure: A JSON description of the structure
     :param etree node: An lxml element tree to get metadata from.

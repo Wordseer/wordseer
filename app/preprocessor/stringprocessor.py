@@ -9,7 +9,6 @@ from app.models.sentence import Sentence
 from app.models.word import Word
 from app.models.dependency import Dependency
 from app.models.grammaticalrelationship import GrammaticalRelationship
-from app.models.parseproducts import ParseProducts
 from app import db
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound

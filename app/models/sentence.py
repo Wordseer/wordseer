@@ -28,8 +28,6 @@ class Sentence(db.Model, Base):
         properties (list of Propertys): ``Property``\s associated with this
             ``Sentence``.
         words (list of Words): ``Word``\s in this ``Sentence``.
-        parsed_paragraph (ParsedParagraph): The ``ParsedParagraph`` that
-            includes this ``Sentence``.
 
     Relationships:
         belongs to: unit, document
@@ -40,8 +38,6 @@ class Sentence(db.Model, Base):
 
     unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
     document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
-    parsed_paragraph_id = db.Column(db.Integer,
-        db.ForeignKey("parsed_paragraph.id"))
     text = db.Column(db.Text, index=True)
 
     # Relationships

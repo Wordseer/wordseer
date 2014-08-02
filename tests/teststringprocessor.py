@@ -5,7 +5,6 @@ import unittest
 
 from app.models.sentence import Sentence
 from app.models.dependency import Dependency
-from app.models.parseproducts import ParseProducts
 from app.preprocessor import stringprocessor
 
 t = stringprocessor.StringProcessor()
