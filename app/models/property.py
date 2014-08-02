@@ -25,7 +25,6 @@ class Property(db.Model, Base):
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     name = db.Column(db.String, index=True)
     value = db.Column(db.String, index=True)
-    specification = db.Column(db.String)
 
     def __repr__(self):
         """Representation string for properties, showing the property name
