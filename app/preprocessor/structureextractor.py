@@ -8,6 +8,7 @@ from app.models.document import Document
 from app.models.sentence import Sentence
 from app.models.unit import Unit
 from app.models.property import Property
+from app import db
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
@@ -70,6 +71,8 @@ class StructureExtractor(object):
             assign_sentences(d)
 
             documents.append(d)
+
+        db.session.commit()
 
         return documents
 
