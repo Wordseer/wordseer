@@ -118,6 +118,17 @@ class StringProcessor(object):
                         part_of_speech = dependent_pos
                     ).first()
 
+                    # Temporary skip if one of the words is not found;
+                    # see issue #128 on Github.
+                    # TODO: remove
+                    try:
+                        governor.id
+                        dependent.id
+                    except:
+                        self.logger.error("Governor or dependent not found; giving up on parse.")
+                        self.logger.info(sentence)
+                        return sentence
+
                     key = (relationship.name, governor.id, dependent.id)
 
                     if key in dependencies.keys():
@@ -246,6 +257,7 @@ def split_sentences(text):
         if approx_sentence_length > max_length:
             logger.warning("Sentence appears to be too long, max length " +
                 "is " + str(max_length))
+            logger.info(sentence_text[:app.config["LOG_SENTENCE_TRUNCATE_LENGTH"] + "..."])
 
             # Attempt to split on a suitable punctuation mark
             # Order (tentative): semicolon, double-dash, colon, comma
@@ -280,7 +292,7 @@ def split_sentences(text):
                 index = 0
                 # Join every max_length number of words
                 while index < approx_sentence_length:
-                    subsentences.append(split_sentence[index:index+max_length])
+                    subsentences.append(" ".join(split_sentence[index:index+max_length]))
                     index += max_length
 
             sentences.extend(subsentences)

@@ -63,7 +63,7 @@ class StructureExtractor(object):
         for extracted_unit in units:
             d = Document(properties=extracted_unit.properties,
                 sentences=extracted_unit.sentences,
-                title=extracted_unit.name,
+                name=extracted_unit.name,
                 children=extracted_unit.children,
                 number = doc_num)
             assign_sentences(d)
@@ -310,6 +310,11 @@ def get_xpath_text(xpath_pattern, node):
     return values
 
 def get_xml_text(node, encoding="utf-8", method="text"):
+    """Get the text from a etree node.
+
+    Skips the node if there is a decode error.
+    """
+
     try:
         return unicode(etree.tostring(node, encoding=encoding, method=method)).strip()
     except UnicodeDecodeError:
