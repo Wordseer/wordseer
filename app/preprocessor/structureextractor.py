@@ -64,6 +64,7 @@ class StructureExtractor(object):
             d = Document(properties=extracted_unit.properties,
                 sentences=extracted_unit.sentences,
                 name=extracted_unit.name,
+                title=extracted_unit.name,    # TODO: should be the actual title
                 children=extracted_unit.children,
                 number = doc_num)
             assign_sentences(d)
