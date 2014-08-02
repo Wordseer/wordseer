@@ -23,8 +23,6 @@ class Property(db.Model, Base):
     # Attributes
     unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
-    parsed_paragraph_id = db.Column(db.Integer,
-        db.ForeignKey("parsed_paragraph.id"))
     name = db.Column(db.String, index=True)
     value = db.Column(db.String, index=True)
     specification = db.Column(db.String)
