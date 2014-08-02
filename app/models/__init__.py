@@ -5,8 +5,6 @@ from .document import Document
 from .flask_security import User, Role
 from .grammaticalrelationship import GrammaticalRelationship
 from .log import Log
-from .parsedparagraph import ParsedParagraph
-from .parseproducts import ParseProducts
 from .project import Project
 from .property import Property
 from .property_metadata import PropertyMetadata

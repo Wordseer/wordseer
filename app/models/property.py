@@ -14,8 +14,6 @@ class Property(db.Model, Base):
         value (str): The value of the property.
         specification (str): The JSON description of this type of property.
         sentence (Sentence): The ``Sentence`` this ``Property`` belongs to.
-        parsed_paragraph (ParsedParagraph): The ``ParsedParagraph`` this
-            ``Property`` belongs to.
 
     Relationships:
       belongs to: unit

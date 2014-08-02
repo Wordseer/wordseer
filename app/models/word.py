@@ -35,7 +35,6 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     word = db.Column(db.String, index=True)
     lemma = db.Column(db.String, index=True)
     part_of_speech = db.Column(db.String, index=True)
-    parse_id = db.Column(db.Integer, db.ForeignKey("parse_products.id"))
 
     # Relationships
 

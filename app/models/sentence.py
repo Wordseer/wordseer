@@ -28,8 +28,6 @@ class Sentence(db.Model, Base):
         properties (list of Propertys): ``Property``\s associated with this
             ``Sentence``.
         words (list of Words): ``Word``\s in this ``Sentence``.
-        parsed_paragraph (ParsedParagraph): The ``ParsedParagraph`` that
-            includes this ``Sentence``.
 
     Relationships:
         belongs to: unit, document
