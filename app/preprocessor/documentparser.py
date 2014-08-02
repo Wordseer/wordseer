@@ -1,16 +1,11 @@
-"""The DocumentParser takes in a Document object and parses it by creating a
-ParsedParagraph object for every sentence in the Document.
-
-The ParsedParagraph will then be written to the database, and each sentence
-returned from the write_parse_products method will be passed to
-SequenceProcessor.process().
+"""The DocumentParser takes in a Document object and parses it by sending
+every sentence to the `StringProcessor`, which writes it to the database.
 """
+
 from datetime import datetime
 import logging
 
-from app.models.parsedparagraph import ParsedParagraph
 from . import logger
-from app.models.parseproducts import ParseProducts
 from .sequenceprocessor import SequenceProcessor
 from app import db
 
@@ -31,8 +26,8 @@ class DocumentParser(object):
         """Parse a document and write it to the database.
 
         Given a certain document, this method will parse every sentence in
-        it to a ParsedParagraph object. Ater every 50th sentence it will call
-        write_and_parse and supply the ParseProducts and the latest sentence ID.
+        it. Ater every 50th sentence it will call write_and_parse and supply the
+        ParseProducts and the latest sentence ID.
 
         :param Document document: The document to parse and record.
         """

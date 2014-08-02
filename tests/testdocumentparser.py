@@ -7,7 +7,6 @@ import pdb
 from app.models.document import Document
 from app.models.sentence import Sentence
 from app.models.project import Project
-from app.models.parsedparagraph import ParsedParagraph
 from app.preprocessor import documentparser
 from app.preprocessor.stringprocessor import StringProcessor
 
