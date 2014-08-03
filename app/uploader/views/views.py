@@ -26,6 +26,7 @@ from .. import helpers
 from .. import uploader
 from ...models import Document
 from ...models import Project
+from ...models import StructureFile
 from ...models import Unit
 from ...models import User
 from app import app
@@ -88,7 +89,6 @@ class CLPDView(View):
         :arg data: The second part of the tuple in the process form, the first
         item being the object's id.
         """
-
         if os.path.isdir(obj.path):
             shutil.rmtree(obj.path)
             for document in obj.documents:
@@ -96,7 +96,14 @@ class CLPDView(View):
             db.session.commit()
         else:
             os.remove(obj.path)
-        self.process_form.selection.delete_choice(obj.id, data)
+
+        if isinstance(obj, StructureFile):
+            self.process_form.structure_file.delete_choice(obj.id, data)
+
+        else:
+            self.process_form.selection.delete_choice(obj.id, data)
+
+
         db.session.delete(obj)
         db.session.commit()
 
@@ -130,6 +137,7 @@ class CLPDView(View):
         """Render the template with the required data. kwargs are data
         passed to the URL.
         """
+
         self.pre_tests(**kwargs)
 
         self.set_choices(**kwargs)
@@ -229,9 +237,15 @@ class ProjectCLPD(CLPDView):
         """
         file_objects = self.project.documents
         self.process_form.selection.choices = []
+        self.process_form.structure_file.choices = []
+
         for file_object in file_objects:
             self.process_form.selection.add_choice(file_object.id,
                 os.path.split(file_object.path)[1])
+
+        for structure_file in self.project.structure_files:
+            self.process_form.structure_file.add_choice(structure_file.id,
+                os.path.split(structure_file.path)[1])
 
     def handle_create(self, **kwargs):
         """For every file, check if it exists and if not then upload it to
@@ -246,31 +260,56 @@ class ProjectCLPD(CLPDView):
             # TODO: this checks if the file exists, but can we do this
             # inside the form?
             if not os.path.isfile(dest_path):
-                uploaded_file.save(dest_path)
-                document = Document(path=dest_path, projects=[self.project])
-                document.save()
-                self.process_form.selection.add_choice(document.id,
-                    os.path.split(dest_path)[1])
+                self.upload_file(uploaded_file, dest_path)
             else:
-                self.create_form.uploaded_file.errors.\
-                    append("A file with name " + os.path.split(dest_path)[1] +
-                    " already exists")
+                self.create_form.uploaded_file.errors.append("A file with "
+                    "name " + os.path.split(dest_path)[1] + " already exists")
+
+    def upload_file(self, uploaded_file, dest_path):
+        """Tell whether the uploaded file is a document file or a structure
+        file, and create a Document or StructureFile instance accordingly.
+
+        This does not validate anything.
+
+        Arguments:
+            uploaded_file (file): The file that's been uploaded.
+            dest_path (str): The destination for uploading.
+        """
+        uploaded_file.save(dest_path)
+        ext = os.path.splitext(dest_path)[1][1:]
+
+        if ext == app.config["STRUCTURE_EXTENSION"]:
+            file_model = StructureFile(path=dest_path, project=self.project)
+            file_model.save()
+            self.process_form.structure_file.add_choice(file_model.id,
+                os.path.split(dest_path)[1])
+
+        else:
+            file_model = Document(path=dest_path, projects=[self.project])
+            file_model.save()
+            self.process_form.selection.add_choice(file_model.id,
+                os.path.split(dest_path)[1])
 
     def handle_process(self, **kwargs):
         """If deleting, delete every database record and file. If processing,
         then send files to the processor.
         """
         files = request.form.getlist("process-selection")
+        structure_file_ids = request.form.getlist("process-structure_file")
+
         file_objects = [Document.query.get(id) for id in files]
+        structure_files = [StructureFile.query.get(id) for id in structure_file_ids]
+
         if request.form["action"] == self.process_form.DELETE:
             # Delete every selected file, its database record, and item in
             # the listing
-            for file_object in file_objects:
+            delete = file_objects + structure_files
+            for file_object in delete:
                 file_name = os.path.split(file_object.path)[1]
                 self.delete_object(file_object, file_name)
+
         elif request.form["action"] == self.process_form.PROCESS:
-            structure_file = helpers.get_structure_file(file_objects)
-            process_files(self.project.path, structure_file.path, self.project)
+            process_files(self.project.path, structure_files[0].path, self.project)
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
     view_func=ProjectCLPD.as_view("project_show"))

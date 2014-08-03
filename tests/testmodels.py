@@ -13,6 +13,7 @@ from app.models import Set
 from app.models import Sequence
 from app.models import SequenceSet
 from app.models import SentenceSet
+from app.models import StructureFile
 from app.models import Unit
 from app.models import User
 from app.models import Word
@@ -369,4 +370,25 @@ class TestSetsModels(unittest.TestCase):
         assert len(sets) == 1
         assert self.documentset in sets
         assert sets[0].get_items() == []
+
+class TestStructureFileModel(unittest.TestCase):
+    """Test the StructureFile model.
+    """
+
+    def setUp(self):
+        database.restore_cache()
+
+    def test_model_structure_file(self):
+        """Test to make sure that StructureFile is working properly.
+        """
+
+        structure_file1 = StructureFile(path="foo")
+        structure_file2 = StructureFile(path="bar")
+
+        project = Project()
+        project.structure_files = [structure_file1, structure_file2]
+        project.save()
+
+        assert Project.query.all()[0].structure_files == [structure_file1,
+            structure_file2]
 

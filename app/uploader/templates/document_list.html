@@ -35,6 +35,36 @@
     {% if process_form.selection.choices %}
         {{ macros.render_errors(process_form.selection.errors) }}
         <form method="POST" role="form">
+            <table class="table table-striped table-hover click-anywhere">
+                <thead>
+                    <tr>
+                        <th class="select">
+                            Select
+                        </th>
+                        <th>
+                            {{ heading }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for choice in process_form.structure_file %}
+                        <tr>
+                            <td>
+                                {{ choice }}
+                            </td>
+                            <td>
+                                <label for="{{ choice.id }}">
+
+                                    <a href="{{ url_for("uploader.document_show",
+                                        project_id=project.id,
+                                        document_id=choice.data) }}">
+                                     {{ choice.label.text }}
+                                </label>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             {{ process_form.hidden_tag() }}
             {{ macros.selection_table(process_form.selection, "document",
                 "table table-striped table-hover click-anywhere",
@@ -50,3 +80,4 @@
         <p>There are no files in this project.</p>
     {% endif %}
 {% endblock %}
+

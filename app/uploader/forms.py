@@ -10,7 +10,7 @@ from wtforms.fields import StringField, HiddenField
 from wtforms.validators import Required, ValidationError
 
 from app import app
-from .fields import ButtonField, MultiCheckboxField
+from .fields import ButtonField, MultiCheckboxField, MultiRadioField
 from ..models import Unit, Project
 
 class HiddenSubmitted(object):
@@ -20,13 +20,13 @@ class HiddenSubmitted(object):
 
     submitted = HiddenField(default="true")
 
-def is_processable(ids=None, units=None):
-    """Given a list of file IDs or Unit objects, determine if this collection of
-    files can be processed (no more than one struc file, at least one xml file).
-    You should provide either ids or units.
+def is_processable(docs=None, structure_files=None, project=None):
+    """Given a list of file IDs or a Project object, determine if this
+    collection of files can be processed (no more than one struc file, at least
+    one xml file). You should provide either ids or units.
 
     :param list files: A list of file IDs to check.
-    :param list units: A list of Unit objects to check.
+    :param Project project: A Project object to check.
     :returns boolean: True if processable, raises an exception otherwise.
     """
 
@@ -35,19 +35,13 @@ def is_processable(ids=None, units=None):
     struc_count = 0
     doc_count = 0
 
-    if ids:
-        # Turn ids into units
-        units = []
-        for file_id in ids:
-            units.append(Unit.query.filter(Unit.id == file_id).one())
+    if docs or structure_files:
+        doc_count = len(docs)
+        struc_count = len(structure_files)
 
-    for unit in units:
-        # Then process the units
-        ext = os.path.splitext(unit.path)[1][1:]
-        if ext in app.config["STRUCTURE_EXTENSION"]:
-            struc_count += 1
-        else:
-            doc_count += 1
+    else:
+        doc_count = len(project.documents)
+        struc_count = len(project.structure_files)
 
     if struc_count is not 1:
         raise ValidationError("Selection must include exactly one " +
@@ -66,10 +60,8 @@ class ProcessForm(Form, HiddenSubmitted):
 
     selection = MultiCheckboxField("Select",
         coerce=int,
-        validators=[
-            Required("You must select at least one item from the table.")
-        ],
         choices=[])
+
     process_button = ButtonField("Process", name="action", value=PROCESS)
     delete_button = ButtonField("Delete", name="action", value=DELETE)
 
@@ -88,12 +80,19 @@ class DocumentUploadForm(Form, HiddenSubmitted):
 class DocumentProcessForm(ProcessForm):
     """A ProcessForm configured to validate selections of documents.
     """
+    structure_file = MultiCheckboxField("Select",
+        coerce=int,
+        choices=[])
     def validate_selection(form, field):
         """If the selection is for processing, then run is_processable on the
         selected files.
         """
         if form.process_button.data == form.PROCESS:
-            is_processable(ids=form.selection.data)
+            is_processable(docs=form.selection.data,
+                structure_files=form.structure_file.data)
+        else:
+            if not form.selection.data and not form.structure_file.data:
+                raise ValidationError("You must select at least one file.")
 
 class ProjectCreateForm(Form, HiddenSubmitted):
     """Create new projects. This is simply a one-field form, requiring the
@@ -122,7 +121,10 @@ class ProjectProcessForm(ProcessForm):
         if form.process_button.data == form.PROCESS:
             for project_id in form.selection.data:
                 project = Project.query.filter(Project.id == project_id).one()
-                is_processable(units=project.documents)
+                is_processable(project=project)
+        else:
+            if not form.selection.data:
+                raise ValidationError("You must select a project to delete.")
 
 class ConfirmDeleteForm(Form, HiddenSubmitted):
     """A form that will ask users to confirm their deletions.

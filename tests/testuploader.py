@@ -1,5 +1,4 @@
-"""
-Unit tests for the components of the wordseer web interface.
+"""Unit tests for the components of the wordseer web interface.
 """
 
 from cStringIO import StringIO
@@ -16,6 +15,7 @@ from app import user_datastore
 from app.models.document import Document
 from app.models.flask_security import User
 from app.models.project import Project
+from app.models.structurefile import StructureFile
 import database
 
 class ViewsTests(unittest.TestCase):
@@ -252,7 +252,7 @@ class ViewsTests(unittest.TestCase):
             "process-submitted": "true"
             })
 
-        assert "At least one document must be selected"
+        assert "You must select at least one document file"
 
     @mock.patch("app.uploader.views.os", autospec=os)
     def test_project_show_delete(self, mock_os):
@@ -273,7 +273,6 @@ class ViewsTests(unittest.TestCase):
             "action": "-1",
             "process-selection": ["1", "2"]
             })
-
         assert "no files in this project" in result.data
         mock_os.remove.assert_any_call(document1.path)
         mock_os.remove.assert_any_call(document2.path)
@@ -323,7 +322,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_bad_process(self, mock_process_files):
         """Test processing an unprocessable group of files.
         """
-        project = Project(name="test", user=self.user)
+        project = Project(name="test", user=self.user, path="/foo")
         project.save()
 
         unit1 = Document(projects=[project], path="/test-path/1.xml")
@@ -339,15 +338,15 @@ class ViewsTests(unittest.TestCase):
 
         assert "must include exactly one" in result.data
 
-        unit1.path = "/test-path/1.json"
-        unit1.save()
+        structure_file = StructureFile(project=project, path="/foo/bar.json")
+        structure_file.save()
 
         result = self.client.post("/projects/1", data={
             "process-submitted": "true",
             "action": "0",
-            "process-selection": ["1"]
+            "process-structure_file": [str(structure_file.id)]
             })
-        assert "At least one document must be selected" in result.data
+        assert "at least one document" in result.data.lower()
 
     def test_get_file(self):
         """Run tests on the get_file view.
