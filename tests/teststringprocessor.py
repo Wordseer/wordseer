@@ -150,7 +150,7 @@ class ParseTests(unittest.TestCase):
                 dependency=mock_dependency_query.filter_by.return_value.one.return_value,
                 governor_index=gov_index,
                 dependent_index=dep_index,
-                forced=False))
+                force=False))
 
         sent.add_dependency.assert_has_calls(expected_added_deps)
 
