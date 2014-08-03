@@ -95,12 +95,14 @@ Ext.define('WordSeer.controller.BreadCrumbsController', {
         panel.getEl().down('div.breadcrumbs').update('');
         panel.getLayoutPanelModel().breadcrumbs = [];
         var breadcrumbs = [];
+		var color_index = 0;
         // Add the search breadcrumbs.
-        if (formValues.search) {
+		if (formValues.search) {
             for (var i = 0; i < formValues.search.length; i++) {
                 breadcrumbs.push(
-                    this.addSearchBreadCrumb(formValues.search[i], i,
+                    this.addSearchBreadCrumb(formValues.search[i], color_index,
                         formValues.widget_xtype));
+				color_index = colorLoop(color_index); // in util.js
             }
         }
         // Add the phrase breadcrumbs.
@@ -108,7 +110,8 @@ Ext.define('WordSeer.controller.BreadCrumbsController', {
             var phrases = formValues.phrases;
             for (var i = 0; i < phrases.length; i++) {
                 breadcrumbs.push(
-                    this.addPhraseBreadCrumb(phrases[i]));
+                    this.addPhraseBreadCrumb(phrases[i], color_index));
+				color_index = colorLoop(color_index); // in util.js
             }
         }
        if (formValues.metadata) {
@@ -157,15 +160,11 @@ Ext.define('WordSeer.controller.BreadCrumbsController', {
         }
         var id = (values.gov + " " + values.dep + " " + values.relation + " " +
             values.all_word_forms);
-        if (widget_xtype == "column-vis-widget" ||
-            widget_xtype == "word-frequencies-widget") {
-            //color the item appropriately
-            var color = COLOR_SCALE(index);
-            var rgb = d3.rgb(color);
-            style = ("color:" + color + ";" +
-                "background-color:" +
-                "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ",0.2);");
-        }
+
+		//color the item appropriately
+        var color = COLOR_SCALE[index];
+        style = ("background-color:" + color + ";");
+
         var crumb = values;
         crumb.breadcrumb_class = type;
         crumb.style = style;
@@ -201,18 +200,24 @@ Ext.define('WordSeer.controller.BreadCrumbsController', {
        return this.makeCrumb(crumb);
     },
 
-    addPhraseBreadCrumb:function(model_instance){
+    addPhraseBreadCrumb:function(model_instance, index){
        var phrase = model_instance.get('sequence');
        var cls = "phrase";
        if (model_instance.get('class') == 'word') {
          phrase = model_instance.get('word');
        }
+
+		//color the item appropriately
+		var color = COLOR_SCALE[index];
+		var style = ("background-color:" + color + ";");
+
        var crumb = {
            breadcrumb_class: cls,
            phrase: phrase,
            word: phrase,
            phraseId: model_instance.get('id'),
            record: model_instance,
+		   style: style,
        };
        return this.makeCrumb(crumb);
     },

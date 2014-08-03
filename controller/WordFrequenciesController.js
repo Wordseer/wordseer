@@ -280,9 +280,9 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		function chart(div) {
 			//try {
 
-					color = d3.scale.category10();
+					color = COLOR_SCALE;
 					bg_color = function(i) {
-						var c = d3.rgb(color(i));
+						var c = d3.rgb(color[i]);
 						var average = (0.21*c.r + 0.71*c.g + 0.07*c.b);
 						return d3.rgb(average, average, average);
 					};
@@ -438,7 +438,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 									.enter().append("g")
 									.attr("class", "layer")
 									.style("fill", function(d, i) {
-										return color(i);
+										return color[i];
 									});
 
 							foreground = foreground_layers.selectAll("g")

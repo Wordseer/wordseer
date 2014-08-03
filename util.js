@@ -9,7 +9,8 @@ var COLLECTIONS_STORE;
 var COLLECTIONS_LIST_STORE;
 var SENTENCE_COLLECTIONS_STORE;
 var SENTENCE_COLLECTIONS_LIST_STORE;
-var COLOR_SCALE = d3.scale.category10();
+// colorbrewer Set3
+var COLOR_SCALE = ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69","#fccde5","#d9d9d9","#bc80bd","#ccebc5","#ffed6f"];
 var SUBSETS_COLOR_SCALE = d3.scale.category20();
 var timing = 0;
 
@@ -203,6 +204,12 @@ function setupWordSeer() {
 	}
 }
 
-
-
-
+/* continuous cycle through color palette */
+function colorLoop(index) {
+	index++;
+	if (index >= COLOR_SCALE.length) {
+		return 0;
+	} else {
+		return index;
+	}
+}
