@@ -21,5 +21,6 @@ class Project(db.Model, Base):
     # Relationships
     documents = db.relationship("Document", secondary="documents_in_projects",
             backref="projects")
+    structure_files = db.relationship("StructureFile", backref="project")
     logs = db.relationship("Log", backref="project")
 
