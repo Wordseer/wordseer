@@ -6,7 +6,6 @@ import mock
 import unittest
 
 from app.models.document import Document
-from app.preprocessor.database.readerwriter import ReaderWriter
 from app.models.word import Word
 from app.models.sentence import Sentence
 from app.preprocessor.sequenceprocessor import (SequenceProcessor,
