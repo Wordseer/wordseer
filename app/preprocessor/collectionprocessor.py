@@ -15,6 +15,8 @@ from . import structureextractor
 from .stringprocessor import StringProcessor
 from . import counter
 
+from app.models import Document, Base
+
 class CollectionProcessor(object):
     """Process a collection of files.
     """
@@ -42,7 +44,10 @@ class CollectionProcessor(object):
         :param boolean start_from_scratch: If true, then the tables in the
             database will be recreated.
         """
-	# Set up database if necessary
+
+        Base.commit_on_save = False
+
+	    # Set up database if necessary
         if start_from_scratch is True:
             database.reset()
 
@@ -65,28 +70,26 @@ class CollectionProcessor(object):
             "true" in logger.get("finished_sequence_processing").lower()):
             print "finishing indexing sequences"
             self.calculate_index_sequences()
-            #TODO: reader_writer
-            self.reader_writer.finish_indexing_sequences()
+            # self.reader_writer.finish_indexing_sequences()
+            # NOTE: this part never gets called; what is even supposed to
+            # happen here?
 
         # Calculate word-in-sentence counts and TF-IDFs
         if not "true" in logger.get("word_counts_done").lower():
             self.pylogger.info("Calculating word counts")
-            #TODO: reader_writer
-            self.reader_writer.calculate_word_counts()
+            # TODO: implement a method to do word counts for sentences
             logger.log("word_counts_done", "true", logger.REPLACE)
 
         # Calculate word TFIDFs
         if not "true" in logger.get("tfidf_done").lower():
             self.pylogger.info("Calculating TF IDF's")
-            #TODO: reader_writer
-            self.reader_writer.calculate_tfidfs()
+            # TODO: implement tfidf method in document
 
         # Calculate word-to-word-similarities
         if (app.config["WORD_TO_WORD_SIMILARITY"] and not
             "true" in logger.get("word_similarity_calculations_done")):
             self.pylogger.info("Calculating Lin Similarities")
-            #TODO: reader_writer
-            self.reader_writer.calculate_lin_similarities()
+            # TODO: implement similarities
 
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):
@@ -161,10 +164,9 @@ class CollectionProcessor(object):
         Afterwards, call ``finish_grammatical_processing`` on the reader/writer.
         """
 
-        # TODO: readerwriter
-        document_ids = self.reader_writer.list_document_ids()
-        document_parser = DocumentParser(self.reader_writer, self.str_proc)
+        document_parser = DocumentParser(self.str_proc)
         documents_parsed = 0
+        document_count = len(Document.query.all())
         latest = logger.get("latest_parsed_document_id")
 
         if len(latest) == 0:
@@ -172,20 +174,18 @@ class CollectionProcessor(object):
 
         latest_id = int(latest)
 
-        for doc_id in document_ids:
-            if doc_id > latest_id:
-                #TODO: readerwriter
-                doc = self.reader_writer.get_document(doc_id)
+        for document in Document.query.all():
+            if document.id > latest_id:
                 self.pylogger.info("Parsing document %s/%s",
-                    str(documents_parsed), str(len(document_ids)))
+                    str(documents_parsed), str(document_count))
                 start_time = datetime.now()
-                document_parser.parse_document(doc)
+                document_parser.parse_document(document)
                 seconds_elapsed = (datetime.now() - start_time).total_seconds()
                 self.pylogger.info("Time to parse document: %ss",
                     str(seconds_elapsed))
                 logger.log("finished_grammatical_processing", "false",
                     logger.REPLACE)
-                logger.log("latest_parsed_document_id", str(doc_id),
+                logger.log("latest_parsed_document_id", str(document.id),
                     logger.REPLACE)
 
             documents_parsed += 1

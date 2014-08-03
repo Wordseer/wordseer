@@ -29,9 +29,9 @@ class Sequence(db.Model, Base):
     # Attributes
 
     sequence = db.Column(db.String, index=True)
-    lemmatized = db.Column(db.Boolean)
-    has_function_words = db.Column(db.Boolean)
-    all_function_words = db.Column(db.Boolean)
+    lemmatized = db.Column(db.Boolean, index=True)
+    has_function_words = db.Column(db.Boolean, index=True)
+    all_function_words = db.Column(db.Boolean, index=True)
     length = db.Column(db.Integer, index=True)
     sentence_count = db.Column(db.Integer, index=True)
     document_count = db.Column(db.Integer, index=True)

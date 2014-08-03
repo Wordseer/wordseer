@@ -64,7 +64,8 @@ class Sentence(db.Model, Base):
 
         return "<Sentence: " + str(self.text) + ">"
 
-    def add_word(self, word, position=None, space_before="", part_of_speech=""):
+    def add_word(self, word, position=None, space_before="",
+        part_of_speech="", force=True):
         """Add a word to the sentence by explicitly creating the association
         object.
 
@@ -89,12 +90,12 @@ class Sentence(db.Model, Base):
             space_before=space_before,
             part_of_speech=part_of_speech
         )
-        word_in_sentence.save()
+        word_in_sentence.save(force=force)
 
         return word_in_sentence
 
     def add_dependency(self, dependency, governor_index=None,
-        dependent_index=None):
+        dependent_index=None, force=True):
         """Add a dependency to the sentence by explicitly creating the
         association object.
 
@@ -119,11 +120,11 @@ class Sentence(db.Model, Base):
             dependent_index=dependent_index
         )
 
-        dependency_in_sentence.save()
+        dependency_in_sentence.save(force=force)
 
         return dependency_in_sentence
 
-    def add_sequence(self, sequence, position=None):
+    def add_sequence(self, sequence, position=None, force=True):
         """Add a ``Sequence`` to the ``Sentence`` by explicitly creating the
         association object.
 
@@ -146,7 +147,7 @@ class Sentence(db.Model, Base):
             position=position
         )
 
-        sequence_in_sentence.save()
+        sequence_in_sentence.save(force=force)
 
         return sequence_in_sentence
 

@@ -18,8 +18,7 @@ class SequenceProcessorTests(unittest.TestCase):
     def setUp(self):
         """Obtain a SequenceProcessor.
         """
-        mock_reader_writer = mock.create_autospec(ReaderWriter)
-        self.seq_proc = SequenceProcessor(mock_reader_writer)
+        self.seq_proc = SequenceProcessor()
 
         self.words = [Word(lemma="first", word="first"),
             Word(lemma="second", word="second"),

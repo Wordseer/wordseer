@@ -16,11 +16,9 @@ class DocumentParserTests(unittest.TestCase):
     def setUp(self):
         """Get the documentparser instance.
         """
-        self.mock_reader_writer = MagicMock()
         self.mock_str_proc = MagicMock()
         with patch("app.preprocessor.documentparser.SequenceProcessor"):
             self.docparser = documentparser.DocumentParser(
-                self.mock_reader_writer,
                 self.mock_str_proc)
 
     @patch("app.preprocessor.documentparser.db", autospec=True)

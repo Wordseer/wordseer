@@ -157,6 +157,7 @@ class StringProcessor(object):
                         dependency = dependency,
                         governor_index = governor_index,
                         dependent_index = dependent_index,
+                        force = False
                     )
 
                     dependency.save(False)
@@ -370,7 +371,8 @@ def tokenize_from_raw(parsed_text, txt):
                 word = word,
                 position = position,
                 space_before = space_before, # word["space_before"],
-                part_of_speech = word.part_of_speech
+                part_of_speech = word.part_of_speech,
+                force=False
             )
 
             position += 1
