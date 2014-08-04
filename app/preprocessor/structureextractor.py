@@ -2,8 +2,14 @@
 """
 
 import json
-from lxml import etree
+import logging
+import pdb
 
+from lxml import etree
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound
+
+from app.models.project import Project
 from app.models.document import Document
 from app.models.sentence import Sentence
 from app.models.unit import Unit
@@ -25,31 +31,45 @@ class StructureExtractor(object):
         self.str_proc = str_proc
         self.structure_file = open(structure_file, "r")
         self.document_structure = json.load(self.structure_file)
+        self.logger = logging.getLogger(__name__)
 
     def extract(self, infile):
-        """Extract a list of Documents from a file. This method uses the
+        """Extract a Document from a file. This method uses the
         structure_file given in the constructor for rules to identify documents.
 
-        :param file/str infile: The file to extract; readable objects or paths
-            as strings are acceptable.
-        :return list: A list of Document objects
+        :param str infile: The path to the file to extract.
+        :return Document: The Document that this file represents
         """
-        documents = []
         doc = etree.parse(infile)
         units = self.extract_unit_information(self.document_structure, doc)
-
+        extracted_unit = units[0]
+        #TODO: this doc_num isn't very helpful
         doc_num = 0
-        for extracted_unit in units:
-            d = Document(properties=extracted_unit.properties,
-                sentences=extracted_unit.sentences,
-                title=extracted_unit.name,
-                children=extracted_unit.children,
-                number = doc_num)
-            assign_sentences(d)
 
-            documents.append(d)
+        try:
+            document = Document.query.filter(Document.path == infile).one()
+        except NoResultFound:
+            self.logger.warning("Could not find document with path %s, making "
+                "new one", infile)
+            document = Document()
+        except MultipleResultsFound:
+            self.logger.error("Found multiple documents with path %s, "
+                "skipping.", infile)
+            return Document()
 
-        return documents
+        # Hopefully we only get one unit per file
+        document.properties = extracted_unit.properties
+        document.sentences = extracted_unit.sentences
+        document.title = extracted_unit.name
+        document.children = extracted_unit.children
+        document.number = doc_num
+
+        assign_sentences(document)
+        document.save()
+        #for extracted_unit in units:
+        #    pdb.set_trace()
+
+        return document
 
 
     def extract_unit_information(self, structure, parent_node):
