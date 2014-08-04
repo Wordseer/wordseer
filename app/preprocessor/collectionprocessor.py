@@ -2,7 +2,6 @@
 between the input and the pipeline.
 """
 
-import pdb
 from datetime import datetime
 import logging
 import os
@@ -119,7 +118,6 @@ class CollectionProcessor(object):
         :param str filename_extension: The extension of the files that contain
             documents.
         """
-        #pdb.set_trace()
         extractor = structureextractor.StructureExtractor(self.str_proc,
             docstruc_filename)
 
@@ -171,7 +169,7 @@ class CollectionProcessor(object):
         """
 
         # TODO: readerwriter
-        document_ids = self.reader_writer.list_document_ids()
+        documents = self.project.documents
         document_parser = DocumentParser(self.reader_writer, self.str_proc,
             self.project)
         documents_parsed = 0
@@ -182,26 +180,27 @@ class CollectionProcessor(object):
 
         latest_id = int(latest)
 
-        for doc_id in document_ids:
-            if doc_id > latest_id:
-                #TODO: readerwriter
-                doc = self.reader_writer.get_document(doc_id)
+        for document in documents:
+            if document.id > latest_id:
                 self.pylogger.info("Parsing document %s/%s (#%s)",
-                    str(documents_parsed + 1), str(len(document_ids)),
-                    str(doc_id))
+                    str(documents_parsed + 1), str(len(documents)),
+                    str(document.id))
+
                 start_time = datetime.now()
-                document_parser.parse_document(doc)
+                document_parser.parse_document(document)
                 seconds_elapsed = (datetime.now() - start_time).total_seconds()
+
                 self.pylogger.info("Time to parse document: %ss",
                     str(seconds_elapsed))
                 logger.log(self.project, "finished_grammatical_processing",
                     "false", logger.REPLACE)
                 logger.log(self.project, "latest_parsed_document_id",
-                    str(doc_id), logger.REPLACE)
+                    str(document.id), logger.REPLACE)
+
             else:
                 self.pylogger.info("Skipping document %s/%s (#%s)",
                     str(documents_parsed + 1), str(len(document_ids)),
-                    str(doc_id))
+                    str(document.id))
 
             documents_parsed += 1
 
@@ -263,7 +262,6 @@ def cp_run(collection_dir, structure_file, extension, project):
         extension (str): Extension of the document files.
         project (Project): Which project to use for this processing.
     """
-    #pdb.set_trace()
     if extension[0] != ".":
         extension = "." + extension
 
