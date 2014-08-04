@@ -199,7 +199,7 @@ class CollectionProcessor(object):
 
             else:
                 self.pylogger.info("Skipping document %s/%s (#%s)",
-                    str(documents_parsed + 1), str(len(document_ids)),
+                    str(documents_parsed + 1), str(len(documents)),
                     str(document.id))
 
             documents_parsed += 1

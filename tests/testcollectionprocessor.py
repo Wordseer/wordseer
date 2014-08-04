@@ -94,7 +94,8 @@ class TestCollectionProcessor(unittest.TestCase):
 
     @mock.patch("app.preprocessor.collectionprocessor.DocumentParser",
         autospec=True)
-    def test_parse_documents(self, mock_dp, mock_logger):
+    @mock.patch("app.preprocessor.collectionprocessor.counter", autospec=True)
+    def test_parse_documents(self, mock_counter, mock_dp, mock_logger):
         """Tests for the test_parse_documents method.
         """
         # Set up the mocks
@@ -102,8 +103,12 @@ class TestCollectionProcessor(unittest.TestCase):
         mock_writer.list_document_ids.return_value = range(max_doc)
         mock_dp_instance = mock_dp("", "", colproc.project)
 
-        mock_gotten_doc = mock.create_autospec(Document)
-        mock_writer.get_document.return_value = mock_gotten_doc
+        colproc.project = mock.create_autospec(Project)
+
+        mock_documents = [mock.create_autospec(Document, id=i)
+            for i in range(max_doc)]
+
+        colproc.project.documents = mock_documents
 
         latest = 5
         mock_logger.get.return_value = str(latest)
@@ -113,13 +118,12 @@ class TestCollectionProcessor(unittest.TestCase):
 
         # Reader writer should have been called for every id greater than
         # what the logger returned and once at the end
-        get_doc_calls = [mock.call(x) for x in range(latest + 1, max_doc)]
-        mock_writer.get_document.assert_has_calls(get_doc_calls)
         mock_writer.finish_grammatical_processing.assert_called_once()
 
         # Document parser should have been called on every doc
-        parse_calls = [mock.call(mock_gotten_doc)
-            for x in range(latest + 1, max_doc)]
+        parse_calls = [mock.call(mock_documents[i])
+            for i in range(latest + 1, max_doc)]
+
         mock_dp_instance.parse_document.assert_has_calls(parse_calls)
 
         # Logger should be called twice per doc
@@ -131,6 +135,9 @@ class TestCollectionProcessor(unittest.TestCase):
             logger_calls.append(mock.call(colproc.project,
                 "latest_parsed_document_id", str(i), mock_logger.REPLACE))
         mock_logger.log.assert_has_calls(logger_calls)
+
+        # Make sure the counter has been called
+        mock_counter.count.assert_called_once_with(colproc.project)
 
     @mock.patch("app.preprocessor.collectionprocessor.SequenceProcessor",
         autospec=True)
