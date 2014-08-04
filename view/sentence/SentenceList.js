@@ -134,10 +134,12 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
                 function(match) {
                     cls = "word ";
                     if (sentence.gov_index.contains(i.toString())) {
-                        cls += "gov-highlight ";
+                        // cls += "gov-highlight ";
+                        cls += ' search-highlight';
                     }
                     if (sentence.dep_index == i) {
-                        cls += "dep-highlight ";
+                        // cls += "dep-highlight ";
+                        cls += ' search-highlight';
                     }
                     i += 1;
                     return (' onclick="Ext.getCmp(\'' +

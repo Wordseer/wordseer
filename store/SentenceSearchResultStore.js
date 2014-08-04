@@ -1,4 +1,5 @@
-/* Copyright 2012 Aditi Muralidharan. See the file "LICENSE" for the full license governing this code. */Ext.define('WordSeer.store.SentenceSearchResultStore', {
+/* Copyright 2012 Aditi Muralidharan. See the file "LICENSE" for the full license governing this code. */
+Ext.define('WordSeer.store.SentenceSearchResultStore', {
     extend:'Ext.data.Store',
     model: 'WordSeer.model.SentenceSearchResultModel',
     autoDestroy: true,
