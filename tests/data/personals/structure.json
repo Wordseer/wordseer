@@ -1,6 +1,6 @@
 {
 	"structureName":"document",
-	"xpaths":["case"],
+	"xpaths":["/case"],
 	"titleXpaths":["./title/text()"],
 	"units":[
 		{
