@@ -535,10 +535,6 @@ var NodeModel = function() {
 
                         var unit = node.units[i], rel = getRelativeXPath(unit.xpathsFull[0], node.xpathsFull[0]);
                         unit.xpaths[0]=rel;
-                       /* if (unit.xpaths.length === 1)
-                            unit.xpaths.push(rel);
-                        else
-                            unit.xpaths[1] = rel;*/
                     }
 
                 }
@@ -550,12 +546,7 @@ var NodeModel = function() {
                     {
                         var meta = node.metadata[i], rel = getRelativeXPath(meta.xpathsFull[0], node.xpathsFull[0]);
                         meta.xpaths[0] = rel;
-                       /* if (meta.xpaths.length === 1)
-                            meta.xpaths.push(rel);
-                        else
-                            meta.xpaths[1] = rel;*/
                     }
-
                 }
                 if(node.titleXpaths.length>0)
                 {
@@ -800,7 +791,12 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, secondaryXPat
     return result;
 }
 
-
+/**
+ * Create a relative XPath for a node from its parent
+ * @param {String} nodeXpath 
+ * @param {String} parentXpath
+ * @returns {String} relative xpath
+ */
 function getRelativeXPath(nodeXpath, parentXpath)
 {
     var parent_XPaths = S(parentXpath).chompRight('/text()').s;
