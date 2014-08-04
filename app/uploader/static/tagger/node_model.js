@@ -487,9 +487,9 @@ var NodeModel = function() {
      */
     self.toActiveJSON = function() {
         var jsonIn = self.toJSONAll(), json;
-        console.log(jsonIn);
+//        console.log(jsonIn);
 
-        function cleanUp(node)
+        function cleanUp(node, parent)
         {
             var out, tempMeta = [], tempUnits = [];
             _.each(node.children, function(child)
@@ -498,7 +498,7 @@ var NodeModel = function() {
                     tempMeta.push(child);
                 else if (child.type === SUBUNIT_TAG)
                 {
-                    var tempNode = cleanUp(child);
+                    var tempNode = cleanUp(child, node);
                     if ($.isArray(tempNode))
                     {
                         _.each(tempNode, function(tempNodeChild)
@@ -525,12 +525,39 @@ var NodeModel = function() {
                 node.units = tempUnits;
                 if (node.units && node.units.length === 0)
                     delete node['units'];
+                else
+                {
+                    for (var i = 0, j = node.units.length; i < j; i++)
+                    {
+
+                        var unit = node.units[i], rel = getRelativeXPath(unit, node);
+                        if (unit.xpaths.length === 1)
+                            unit.xpaths.push(rel);
+                        else
+                            unit.xpaths[1] = rel;
+                    }
+
+                }
                 if (node.metadata && node.metadata.length === 0)
                     delete node['metadata'];
+                else
+                {
+                    for (var i = 0, j = node.metadata.length; i < j; i++)
+                    {
+                        var meta = node.metadata[i], rel = getRelativeXPath(meta, node);
+                        if (meta.xpaths.length === 1)
+                            meta.xpaths.push(rel);
+                        else
+                            meta.xpaths[1] = rel;
+                    }
+
+                }
                 if (node.attr && node.attr === '')
                     delete node['attr'];
                 delete node['children'];
                 delete node['isActive'];
+                if(node.xpaths.length===1)
+                    node.xpaths.push(node.xpaths[0]);
                 out = node;
             }
             else
@@ -542,7 +569,7 @@ var NodeModel = function() {
             return out;
         }
 
-        json = cleanUp(jsonIn);
+        json = cleanUp(jsonIn, null);
         console.log(json);
         return json;
     };
@@ -762,4 +789,13 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, secondaryXPat
         result = null;
     }
     return result;
+}
+
+
+function getRelativeXPath(node, parent)
+{
+    var parent_XPaths = S(parent.xpaths[0]).chompRight('/text()').s;
+    var xpath_rel = '.' + S(node.xpaths[0]).chompLeft(parent_XPaths).s;
+//    console.log(parent_XPaths + '\t' + node.xpaths[0] + '\t' + xpath_rel);
+    return xpath_rel;
 }
