@@ -66,7 +66,6 @@ class CollectionProcessor(object):
                     "finished_grammatical_processing").lower()):
             self.pylogger.info("Parsing documents")
             self.parse_documents()
-            self.pylogger.info("Parsing documents")
 
         if (app.config["SEQUENCE_INDEXING"] and
                 "true" in logger.get(self.project,
@@ -187,8 +186,9 @@ class CollectionProcessor(object):
             if doc_id > latest_id:
                 #TODO: readerwriter
                 doc = self.reader_writer.get_document(doc_id)
-                self.pylogger.info("Parsing document %s/%s",
-                    str(documents_parsed), str(len(document_ids)))
+                self.pylogger.info("Parsing document %s/%s (#%s)",
+                    str(documents_parsed + 1), str(len(document_ids)),
+                    str(doc_id))
                 start_time = datetime.now()
                 document_parser.parse_document(doc)
                 seconds_elapsed = (datetime.now() - start_time).total_seconds()
@@ -198,6 +198,10 @@ class CollectionProcessor(object):
                     "false", logger.REPLACE)
                 logger.log(self.project, "latest_parsed_document_id",
                     str(doc_id), logger.REPLACE)
+            else:
+                self.pylogger.info("Skipping document %s/%s (#%s)",
+                    str(documents_parsed + 1), str(len(document_ids)),
+                    str(doc_id))
 
             documents_parsed += 1
 
