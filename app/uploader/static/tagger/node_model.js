@@ -20,14 +20,14 @@ var DEFAULT_SAMPLE_SIZE = 10;
 var NodeModel = function() {
     var self = {}, xml, xmlns, url, filename, xml_raw;
     //main keys to included in structure file for each node type. Primary is included for all
-    var primaryKeys = ['id', 'tag', 'type', 'xpaths', 'name', 'isActive', 'dataType', 'dateFormat'],
-            document_keys = ['structureName', 'titleXPaths', 'filename'],
-            subunit_keys = ['structureName', 'titleXPaths', 'combine'],
+    var primaryKeys = ['id', 'tag', 'type', 'xpaths', 'xpathsFull', 'name', 'isActive', 'dataType', 'dateFormat'],
+            document_keys = ['structureName', 'titleXpaths', 'titleXpathsFull', 'filename'],
+            subunit_keys = ['structureName', 'titleXpaths', 'titleXpathsFull', 'combine'],
             metadata_keys = ['attr', 'propertyName', 'displayName', 'dataType',
                 'dateFormat', 'nameIsDisplayed', 'valueIsDisplayed',
                 'isCategory']//main keys to included in structure file for document node types;
     self.attributes = {filename: '', url: '', xml: {}, id: '', paretnId: '', tag: '', type: '',
-        xpaths: [], name: '', titleXpaths: [], titleId: '',
+        xpaths: [], xpathsFull: [], name: '', titleXpaths: [], titleXpathsFull: [], titleId: '',
         units: [], metadata: [], children: [], sub_xpaths: [], attrs: {}, attr: '',
         belongsTo: '', isAttribute: false, isActive: false, combine: false, hasChildElements: function() {
             return self.hasChildElements();
@@ -78,6 +78,7 @@ var NodeModel = function() {
         //To render XML as HTML and use JQuery, element tags must not contain '.'. All '.' are changed to '_'.
         self.attributes.id = id + S(self.attributes.tag).replace('.', '_').s;
         self.attributes.xpaths.push(((self.attributes.isRoot) ? "" : path) + "/" + self.attributes.tag);//setup initial XPath
+        self.attributes.xpathsFull.push(self.attributes.xpaths[0]);
         self.attributes.structureName = self.attributes.tag;
         self.attributes.displayName = self.attributes.structureName;
         self.attributes.dataType = DATA_TYPES.STRING;//default node type is String
@@ -259,6 +260,7 @@ var NodeModel = function() {
         self.attributes.dataType = DATA_TYPES.STRING;
         self.attributes.attr = name;
         self.attributes.xpaths.push(xpaths + '/@' + name);//XPath for attributes
+        self.attributes.xpathsFull.push(self.attributes.xpaths[0]);
         self.attributes.displayName = name;
         self.attributes.isAttribute = true;
     };
@@ -315,6 +317,7 @@ var NodeModel = function() {
      */
     self.setTitleAsXPath = function(titleXPath) {
         self.attributes.titleXpaths = [titleXPath];
+        self.attributes.titleXpathsFull = [titleXPath];
     };
     /**
      * Assign another node as a title for this node
@@ -325,7 +328,7 @@ var NodeModel = function() {
         self.map[id].rename(TITLE_NODE_TAG);
         self.map[id].attributes.isTitle = true;
         self.attributes.titleId = id;
-        self.attributes.titleXPaths = self.map[id].attributes.xpaths[0];
+        self.attributes.titleXpaths = self.attributes.titelXpathsFull = [self.map[id].attributes.xpaths[0]];
     };
     /**
      * Reset the tile node as empty
@@ -338,7 +341,7 @@ var NodeModel = function() {
         self.map[tid].rename('');
         self.map[tid].attributes.isTitle = false;
         self.attributes.titleId = '';
-        self.attributes.titleXPaths = '';
+        self.attributes.titleXpaths =self.attributes.titleXpathsFull= [];
 
     };
     /**
@@ -530,11 +533,12 @@ var NodeModel = function() {
                     for (var i = 0, j = node.units.length; i < j; i++)
                     {
 
-                        var unit = node.units[i], rel = getRelativeXPath(unit, node);
-                        if (unit.xpaths.length === 1)
+                        var unit = node.units[i], rel = getRelativeXPath(unit.xpathsFull[0], node.xpathsFull[0]);
+                        unit.xpaths[0]=rel;
+                       /* if (unit.xpaths.length === 1)
                             unit.xpaths.push(rel);
                         else
-                            unit.xpaths[1] = rel;
+                            unit.xpaths[1] = rel;*/
                     }
 
                 }
@@ -544,20 +548,25 @@ var NodeModel = function() {
                 {
                     for (var i = 0, j = node.metadata.length; i < j; i++)
                     {
-                        var meta = node.metadata[i], rel = getRelativeXPath(meta, node);
-                        if (meta.xpaths.length === 1)
+                        var meta = node.metadata[i], rel = getRelativeXPath(meta.xpathsFull[0], node.xpathsFull[0]);
+                        meta.xpaths[0] = rel;
+                       /* if (meta.xpaths.length === 1)
                             meta.xpaths.push(rel);
                         else
-                            meta.xpaths[1] = rel;
+                            meta.xpaths[1] = rel;*/
                     }
 
+                }
+                if(node.titleXpaths.length>0)
+                {
+                    node.titleXpaths[0]= getRelativeXPath(node.titleXpathsFull[0], node.xpathsFull[0]);
                 }
                 if (node.attr && node.attr === '')
                     delete node['attr'];
                 delete node['children'];
                 delete node['isActive'];
-                if(node.xpaths.length===1)
-                    node.xpaths.push(node.xpaths[0]);
+//                if (node.xpaths.length === 1)
+//                    node.xpaths.push(node.xpaths[0]);
                 out = node;
             }
             else
@@ -792,10 +801,10 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, secondaryXPat
 }
 
 
-function getRelativeXPath(node, parent)
+function getRelativeXPath(nodeXpath, parentXpath)
 {
-    var parent_XPaths = S(parent.xpaths[0]).chompRight('/text()').s;
-    var xpath_rel = '.' + S(node.xpaths[0]).chompLeft(parent_XPaths).s;
+    var parent_XPaths = S(parentXpath).chompRight('/text()').s;
+    var xpath_rel = '.' + S(nodeXpath).chompLeft(parent_XPaths).s;
 //    console.log(parent_XPaths + '\t' + node.xpaths[0] + '\t' + xpath_rel);
     return xpath_rel;
 }
