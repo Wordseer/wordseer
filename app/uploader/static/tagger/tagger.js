@@ -18,7 +18,8 @@ var TEMPLATES = {
     OUTPUT_PREVIEW: {filename: 'output_preview.html'},
     RENAME_FORM: {filename: 'rename_form.html'},
     COMBINE_FORM: {filename: 'combine_form.html'},
-    INTRO: {filename: 'intro.html'}
+    INTRO: {filename: 'intro.html'},
+    JSON_PREVIEW: {filename: 'json_preview.html'}
 };
 
 var buckets = {
@@ -149,6 +150,19 @@ function saveStructureFile()
             });
         }
     });
+}
+
+function previewStructureFile()
+{
+    var json = nodes.toActiveJSON();
+    renderTemplate('#json-preview-box', TEMPLATES.JSON_PREVIEW, {json: JSON.stringify(json, undefined, 2)})
+    $('#json-preview-box').show().on('click', function() {
+        $(this).hide();
+    });
+    ;
+    console.log(json);
+
+    return false;
 }
 /**
  * Hide the save file response dialogue
