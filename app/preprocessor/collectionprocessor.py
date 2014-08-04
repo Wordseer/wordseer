@@ -205,7 +205,7 @@ class CollectionProcessor(object):
 
             documents_parsed += 1
 
-        counter.count()
+        counter.count(self.project)
 
     def calculate_index_sequences(self):
         """Calculate and index sequences, if not already done during grammatical
