@@ -15,7 +15,7 @@ class LoggerTests(unittest.TestCase):
     def setUp(self):
         """Clean the database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_log(self):
         """Test the log() method. These tests assume that get() works.

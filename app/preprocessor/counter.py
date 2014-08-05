@@ -31,6 +31,5 @@ def count(project):
                 sequence.document_count = len(set([sentence.document
                     for sentence in sequence.sentences]))
                 sequence.save(False)
-
     db.session.commit()
 

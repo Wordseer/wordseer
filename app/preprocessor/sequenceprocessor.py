@@ -11,6 +11,8 @@ this sentence and record them in the database.
 
 from app import app
 from app.models.sequence import Sequence
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound
 
 LEMMA = "lemma"
 WORD = "word"
@@ -19,16 +21,11 @@ class SequenceProcessor(object):
     """Process given input into Sequences.
     """
 
-    def __init__(self, reader_writer):
+    def __init__(self):
         """Set up local variables for the SequenceProcessor.
 
-        :param ReaderWriter reader_writer: A reader/writer to interface with the
-            database to write the sequences to the database.
         :param boolean grammatical_info_exists: ??
         """
-
-        # TODO: handle reader_writer once it's finished
-        self.reader_writer = reader_writer
 
         self.previously_indexed = []
 
@@ -46,7 +43,7 @@ class SequenceProcessor(object):
 
         return without_stops
 
-    def process(self, sentence):
+    def process(self, sentence, sequence_dict=None):
         """Iterate and record every four word long sequence. The method records
         using the ReaderWriter a list of sequences present in the given
         sentence.
@@ -67,10 +64,52 @@ class SequenceProcessor(object):
                     # create a new Sequence (four or fewer words)
                     sequences.extend(self.get_sequence(sentence, i, j))
 
-        # TODO: readerwriter
-        # for sequence in sequences:
-        #     self.reader_writer.index_sequence(sequence)
-        self.reader_writer.index_sequences(sequences)
+        # Write the sequences to the database using duplication check
+
+        if isinstance(sequence_dict, dict):
+
+            for sequence in sequences:
+                sequence_text = sequence["sequence"]
+                lemmatized = sequence["is_lemmatized"]
+                has_function_words = sequence["has_function_words"]
+                all_function_words = sequence["all_function_words"]
+                length = len(sequence["words"])
+                position = sequence["start_position"]
+
+                key = (sequence_text, lemmatized, has_function_words, all_function_words)
+
+                if key in sequence_dict.keys():
+                    sequence = sequence_dict[key]
+                else:
+
+                    try:
+                        sequence = Sequence.query.filter_by(
+                            sequence = sequence_text,
+                            lemmatized = lemmatized,
+                            has_function_words = has_function_words,
+                            all_function_words = all_function_words
+                        ).one()
+                    except(MultipleResultsFound):
+                        self.logger.error("duplicate records found for: %s",
+                            str(key))
+                    except(NoResultFound):
+                        sequence = Sequence(
+                            sequence = sequence_text,
+                            lemmatized = lemmatized,
+                            has_function_words = has_function_words,
+                            all_function_words = all_function_words,
+                            length = length
+                        )
+
+                    sequence_dict[key] = sequence
+                    sequence.save(False)
+
+                    sentence.add_sequence(
+                        sequence = sequence,
+                        position = position,
+                        force = False
+                    )
+
         return sequences
 
     def get_sequence(self, sentence, i, j):

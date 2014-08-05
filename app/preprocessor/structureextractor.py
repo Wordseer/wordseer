@@ -14,6 +14,7 @@ from app.models.document import Document
 from app.models.sentence import Sentence
 from app.models.unit import Unit
 from app.models.property import Property
+from app import db
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
@@ -41,6 +42,29 @@ class StructureExtractor(object):
         :return Document: The Document that this file represents
         """
         doc = etree.parse(infile)
+        documents = []
+
+        # Check for unescaped special characters (tentative)
+        doc = None
+
+        print(infile)
+
+        try:
+            doc = etree.parse(infile)
+        except(etree.XMLSyntaxError):
+            file_string = None
+            with open(infile) as file:
+                file_string = "".join([line for line in file])
+
+            file_string = file_string.replace("&", "&amp;")
+
+            # If parsing still doesn't work, skip it
+            try:
+                doc = etree.fromstring(file_string)
+            except(etree.XMLSyntaxError) as e:
+                print("XML Error: " + str(e))
+                return documents
+
         units = self.extract_unit_information(self.document_structure, doc)
         extracted_unit = units[0]
         #TODO: this doc_num isn't very helpful
@@ -60,17 +84,14 @@ class StructureExtractor(object):
         # Hopefully we only get one unit per file
         document.properties = extracted_unit.properties
         document.sentences = extracted_unit.sentences
-        document.title = extracted_unit.name
+        document.title = extracted_unit.name #FIXME: not actual title
         document.children = extracted_unit.children
         document.number = doc_num
 
         assign_sentences(document)
         document.save()
-        #for extracted_unit in units:
-        #    pdb.set_trace()
 
         return document
-
 
     def extract_unit_information(self, structure, parent_node):
         """Process the given node, according to the given structure, and return
@@ -95,6 +116,7 @@ class StructureExtractor(object):
                 # If there are child units, retrieve them and put them in a
                 # list, otherwise get the sentences
                 children = []
+
                 if "units" in structure.keys():
                     for child_struc in structure["units"]:
                         children.extend(self.extract_unit_information(
@@ -173,10 +195,12 @@ class StructureExtractor(object):
                 sentence_nodes = parent_node.getparent().iter()
 
             for sentence_node in sentence_nodes:
-                sentence_text += etree.tostring(sentence_node,
-                    method="text").strip() + "\n"
-                sentence_metadata.extend(get_metadata(structure,
-                    sentence_node))
+                node_text = get_xml_text(sentence_node)
+
+                if node_text != None:
+                    sentence_text += node_text.strip() + "\n"
+                    sentence_metadata.extend(get_metadata(structure,
+                        sentence_node))
 
 #        if tokenize:
 #            sents = self.str_proc.tokenize(sentence_text)
@@ -290,11 +314,29 @@ def get_xpath_text(xpath_pattern, node):
     else:
         nodes = node.xpath(xpath_pattern)
         for node in nodes:
-            value = str(etree.tostring(node.getparent(), method="text")).strip()
+
+            # Adding temporary unicode check for now, could do something else later
+            value = get_xml_text(node.getparent())
+
+            # If parse failed, skip
+            if value == None:
+                continue
+
             if len(value) > 0:
                 values.append(value)
 
     return values
+
+def get_xml_text(node, encoding="utf-8", method="text"):
+    """Get the text from a etree node.
+
+    Skips the node if there is a decode error.
+    """
+
+    try:
+        return unicode(etree.tostring(node, encoding=encoding, method=method)).strip()
+    except UnicodeDecodeError:
+        return None
 
 def get_nodes_from_xpath(xpath, nodes):
     """If the selector is longer than 0 chars, then return the children
@@ -304,6 +346,7 @@ def get_nodes_from_xpath(xpath, nodes):
     :param etree nodes: LXML etree object of nodes to search.
     :return list: The matched nodes, as ElementStringResult objects.
     """
+
     if len(xpath.strip()) == 0 or nodes in nodes.xpath("../" + xpath):
         return [nodes]
     return nodes.xpath(xpath)

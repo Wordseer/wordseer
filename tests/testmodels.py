@@ -25,7 +25,7 @@ class TestWordModel(unittest.TestCase):
     def setUp(self):
         """Clean the current database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_model_word(self):
         """Test to make sure that the atttributes of the Word model can be
@@ -63,7 +63,7 @@ class TestSentenceModel(unittest.TestCase):
     def setUp(self):
         """Clean the current database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_model_sentence(self):
         """Test to make sure that Sentence is working properly.
@@ -162,7 +162,7 @@ class TestDependencyModel(unittest.TestCase):
     def setUp(self):
         """Clean the current database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_model_dependency(self):
         """Test to make sure that Dependency is working properly.
@@ -185,7 +185,7 @@ class TestSequenceModel(unittest.TestCase):
     def setUp(self):
         """Clean the current database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_model_sequence(self):
         """Test to make sure that Sequence is working properly.
@@ -207,7 +207,7 @@ class TestUnitModels(unittest.TestCase):
     def setUp(self):
         """Clean the current database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_model_unit(self):
         """Test to make sure that Unit is working properly.
@@ -231,7 +231,7 @@ class TestUnitModels(unittest.TestCase):
         unit.properties.append(prop)
 
         assert unit.sentences == [sentence]
-        assert unit.properties == [unit_type, prop]
+        assert unit.properties.all() == [unit_type, prop]
 
         unit.save()
         prop.save()
@@ -283,7 +283,7 @@ class TestPropertyModel(unittest.TestCase):
     def setUp(self):
         """Clean the current database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_model_property(self):
         """Test to make sure that Property is working properly.
@@ -311,10 +311,9 @@ class TestPropertyModel(unittest.TestCase):
 class TestSetsModels(unittest.TestCase):
     """Test all the different ``Set`` models.
     """
-
     @classmethod
     def setUpClass(cls):
-        database.restore_cache()
+        database.clean()
 
         cls.set = Set()
         cls.sequenceset = SequenceSet()

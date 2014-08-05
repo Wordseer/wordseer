@@ -26,7 +26,7 @@ class CommonTests(object):
         :param str input_file: The XML file to test.
 
         """
-        database.restore_cache()
+        database.clean()
         self.path = path
         self.structure_file = path + structure_file
         self.input_file = path + input_file

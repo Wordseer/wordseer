@@ -15,11 +15,10 @@ LATEST_SEQ_SENT = "latest_sequence_sentence"
 class DocumentParser(object):
     """Handle parsing a document.
     """
-    def __init__(self, reader_writer, parser, project):
+    def __init__(self, parser, project):
         self.pylogger = logging.getLogger(__name__)
-        self.reader_writer = reader_writer
         self.parser = parser
-        self.sequence_processor = SequenceProcessor(reader_writer)
+        self.sequence_processor = SequenceProcessor()
         self.project = project
 
     def parse_document(self, document):
@@ -46,11 +45,13 @@ class DocumentParser(object):
 
         relationships = dict()
         dependencies = dict()
+        sequences = dict()
         sentence_count = len(document.all_sentences)
         for sentence in document.all_sentences:
             if sentence.id > int(logger.get(self.project, LATEST_SENT_ID)):
                 parsed = self.parser.parse(sentence, relationships,
                     dependencies)
+                self.sequence_processor.process(sentence, sequences)
                 products.append(parsed)
                 count += 1
                 current_max = sentence.id
@@ -64,6 +65,7 @@ class DocumentParser(object):
                     products = []
                     relationships = dict()
                     dependencies = dict()
+
                     db.session.commit()
         db.session.commit()
 

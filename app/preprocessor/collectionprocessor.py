@@ -14,13 +14,13 @@ from .sequenceprocessor import SequenceProcessor
 from . import structureextractor
 from .stringprocessor import StringProcessor
 from . import counter
-from .database.readerwriter import ReaderWriter
+
+from app.models import Document, Base
 
 class CollectionProcessor(object):
     """Process a collection of files.
     """
-    def __init__(self, reader_writer, project):
-        self.reader_writer = reader_writer
+    def __init__(self, project):
         self.str_proc = StringProcessor()
         self.pylogger = logging.getLogger(__name__)
         self.project = project
@@ -45,7 +45,10 @@ class CollectionProcessor(object):
         :param boolean start_from_scratch: If true, then the tables in the
             database will be recreated.
         """
-	# Set up database if necessary
+
+        Base.commit_on_save = False
+
+	    # Set up database if necessary
         if start_from_scratch is True:
             database.reset()
 
@@ -66,34 +69,23 @@ class CollectionProcessor(object):
             self.pylogger.info("Parsing documents")
             self.parse_documents()
 
-        if (app.config["SEQUENCE_INDEXING"] and
-                "true" in logger.get(self.project,
-                    "finished_sequence_processing").lower()):
-            self.pylogger.info("finishing indexing sequences")
-            self.calculate_index_sequences()
-            #TODO: reader_writer
-            self.reader_writer.finish_indexing_sequences()
-
         # Calculate word-in-sentence counts and TF-IDFs
         if not "true" in logger.get(self.project, "word_counts_done").lower():
             self.pylogger.info("Calculating word counts")
-            #TODO: reader_writer
-            self.reader_writer.calculate_word_counts()
-            logger.log(self.project, "word_counts_done", "true", logger.REPLACE)
+            # TODO: implement a method to do word counts for sentences
+            logger.log("word_counts_done", "true", logger.REPLACE)
 
         # Calculate word TFIDFs
         if not "true" in logger.get(self.project, "tfidf_done").lower():
             self.pylogger.info("Calculating TF IDF's")
-            #TODO: reader_writer
-            self.reader_writer.calculate_tfidfs()
+            # TODO: implement tfidf method in document
 
         # Calculate word-to-word-similarities
         if (app.config["WORD_TO_WORD_SIMILARITY"] and not
                 "true" in logger.get(self.project,
                     "word_similarity_calculations_done")):
             self.pylogger.info("Calculating Lin Similarities")
-            #TODO: reader_writer
-            self.reader_writer.calculate_lin_similarities()
+            # TODO: implement similarities
 
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):
@@ -170,12 +162,11 @@ class CollectionProcessor(object):
 
         # TODO: readerwriter
         documents = self.project.documents
-        document_parser = DocumentParser(self.reader_writer, self.str_proc,
-            self.project)
+        document_parser = DocumentParser(self.str_proc, self.project)
         documents_parsed = 0
         latest = logger.get(self.project, "latest_parsed_document_id")
 
-        if len(latest) == 0:
+        if not latest:
             latest = "0"
 
         latest_id = int(latest)
@@ -206,53 +197,6 @@ class CollectionProcessor(object):
 
         counter.count(self.project)
 
-    def calculate_index_sequences(self):
-        """Calculate and index sequences, if not already done during grammatical
-        processing.
-
-        For every sentence logged in the database with an ID less than the
-        ID returned by ``get_max_setnece_id``, this method retrieves it and
-        calls
-        :meth:`~wordseerbackend.sequenceprocessor.SequenceProcessor.process`
-        on it.
-        """
-
-        latest_sentence = logger.get(self.project, "latest_sequence_sentence")
-
-        if len(latest_sentence) == 0:
-            latest_sentence = "0"
-
-        latest_id = int(latest_sentence)
-        # TODO: readerwriter
-        max_sentence_id = self.reader_writer.get_max_sentence_id()
-        sentences_processed = 0
-        seq_proc = SequenceProcessor(self.reader_writer)
-        #TODO: readerwriter
-        self.reader_writer.load_sequence_counts()
-        start_time = datetime.now()
-
-        for i in range(latest_id, max_sentence_id):
-            if i > latest_id:
-                #TODO: readerwriter
-                sentence = self.reader_writer.get_sentence(i)
-                if len(sentence.words) > 0:
-                    latest_id = sentence.id
-                    processed_sequences = seq_proc.process(sentence)
-                    if processed_sequences:
-                        logger.log(self.project, "finished_sequence_processing",
-                            "false", logger.REPLACE)
-                        logger.log(self.project, "latest_sequence_sentence",
-                            str(i), logger.REPLACE)
-
-                if sentences_processed % 1000 == 0:
-                    self.pylogger.info("Sequence-processing sentence %s/%s",
-                        str(i), str(max_sentence_id))
-                    self.pylogger.info("Average processing speed: %ss",
-                        (start_time - datetime.now()).total_seconds() / 1000)
-                    start_time = datetime.now()
-
-            sentences_processed += 1
-
 def cp_run(collection_dir, structure_file, extension, project):
     """Run the collection processor.
 
@@ -265,8 +209,7 @@ def cp_run(collection_dir, structure_file, extension, project):
     if extension[0] != ".":
         extension = "." + extension
 
-    reader_writer = ReaderWriter()
-    collection_processor = CollectionProcessor(reader_writer, project)
+    collection_processor = CollectionProcessor(project)
     collection_processor.process(collection_dir, structure_file, extension,
        False)
 
