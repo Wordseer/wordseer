@@ -132,9 +132,6 @@ class TestCollectionProcessorProcess(unittest.TestCase):
     """
     def setUp(self):
         database.clean()
-        colproc.calculate_index_sequences = mock.create_autospec(
-            colproc.calculate_index_sequences)
-            #name="calc_index_sequences",)
         colproc.parse_documents = mock.create_autospec(
             colproc.parse_documents)
             #name="parse_documents",)
@@ -175,7 +172,6 @@ class TestCollectionProcessorProcess(unittest.TestCase):
             colproc.process(*self.args)
 
         assert colproc.extract_record_metadata.called
-        assert colproc.calculate_index_sequences.called == False
         assert colproc.parse_documents.called == False
         # assert len(colproc.reader_writer.method_calls) == 0
 
@@ -196,7 +192,6 @@ class TestCollectionProcessorProcess(unittest.TestCase):
             colproc.process(*self.args)
 
         assert colproc.parse_documents.call_count == 1
-        assert colproc.calculate_index_sequences.called == False
         assert colproc.extract_record_metadata.called == False
         # assert len(colproc.reader_writer.method_calls) == 0
 
@@ -214,7 +209,6 @@ class TestCollectionProcessorProcess(unittest.TestCase):
 
         assert mock_writer.calculate_word_counts.call_count == 1
         assert len(mock_writer.method_calls) == 1
-        assert colproc.calculate_index_sequences.called == False
         assert colproc.parse_documents.called == False
         assert colproc.extract_record_metadata.called == False
         mock_logger.log.assert_called_once_with("word_counts_done", "true",
@@ -233,7 +227,6 @@ class TestCollectionProcessorProcess(unittest.TestCase):
 
         assert mock_writer.calculate_tfidfs.call_count == 1
         assert len(mock_writer.method_calls) == 1
-        assert colproc.calculate_index_sequences.called == False
         assert colproc.parse_documents.called == False
         assert colproc.extract_record_metadata.called == False
 
@@ -250,7 +243,6 @@ class TestCollectionProcessorProcess(unittest.TestCase):
 
         assert mock_writer.calculate_lin_similarities.call_count == 1
         assert len(mock_writer.method_calls) == 1
-        assert colproc.calculate_index_sequences.called == False
         assert colproc.parse_documents.called == False
         assert colproc.extract_record_metadata.called == False
 
