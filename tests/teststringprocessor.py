@@ -172,18 +172,6 @@ class ParseTests(unittest.TestCase):
 
         self.assertRaises(ValueError, t.parse, sent)
 
-    @unittest.skip("Feature in limbo")
-    def test_parse_maxlength(self, mock_parser, mock_tokenizer):
-        """Check to make sure that parse() uses a rudimentary sentence length
-        check.
-        """
-
-        sent = mock.MagicMock(name="sentence")
-
-        sent.split.return_value = range(0, 60)
-
-        self.assertRaises(ValueError, t.parse, sent)
-
 class ParseWithErrorHandlingTest(unittest.TestCase):
     """Test the parse_with_error_handling method.
     """
