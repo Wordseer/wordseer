@@ -9,6 +9,7 @@ from app.models.property import Property
 from app.models.sentence import Sentence
 from app.preprocessor.structureextractor import *
 from app.preprocessor.stringprocessor import StringProcessor
+import database
 
 t = StringProcessor()
 
@@ -25,6 +26,7 @@ class CommonTests(object):
         :param str input_file: The XML file to test.
 
         """
+        database.clean()
         self.path = path
         self.structure_file = path + structure_file
         self.input_file = path + input_file

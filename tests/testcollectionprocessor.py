@@ -13,6 +13,7 @@ from app.preprocessor import structureextractor
 from app.preprocessor import logger
 from app.preprocessor import documentparser
 from app.preprocessor import sequenceprocessor
+import database
 
 def setUpModule():
     with mock.patch("app.preprocessor.collectionprocessor.StringProcessor",
@@ -24,6 +25,9 @@ def setUpModule():
 class TestCollectionProcessor(unittest.TestCase):
     """Test the CollectionProcessor class.
     """
+    def setUp(self):
+        database.clean()
+
     @mock.patch("app.preprocessor.collectionprocessor.structureextractor",
         autospec=True)
     @mock.patch("app.preprocessor.collectionprocessor.os", autospec=True)
@@ -173,6 +177,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
     """Tests specifically for CollectionProcessor.process().
     """
     def setUp(self):
+        database.clean()
         colproc.calculate_index_sequences = mock.create_autospec(
             colproc.calculate_index_sequences)
             #name="calc_index_sequences",)

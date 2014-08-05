@@ -10,6 +10,7 @@ from app.models.word import Word
 from app.models.sentence import Sentence
 from app.preprocessor.sequenceprocessor import (SequenceProcessor,
     join_tws, LEMMA, WORD)
+import database
 
 class SequenceProcessorTests(unittest.TestCase):
     """Tests for SequenceProcessor.
@@ -17,6 +18,7 @@ class SequenceProcessorTests(unittest.TestCase):
     def setUp(self):
         """Obtain a SequenceProcessor.
         """
+        database.clean()
         self.seq_proc = SequenceProcessor()
 
         self.words = [Word(lemma="first", word="first"),

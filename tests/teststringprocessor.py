@@ -6,6 +6,7 @@ import unittest
 from app.models.sentence import Sentence
 from app.models.dependency import Dependency
 from app.preprocessor import stringprocessor
+import database
 
 t = stringprocessor.StringProcessor()
 
@@ -15,6 +16,7 @@ class CommonTests(object):
     def setUp(self, text=""):
         """Set up some local variables.
         """
+        database.clean()
         self.example = text
         self.result = t.tokenize(self.example)
         self.raw = t.parser.raw_parse(self.example)
@@ -107,6 +109,7 @@ class ParseTests(unittest.TestCase):
     def setUp(self):
         """Mock out the parser for testing.
         """
+        database.clean()
         #t.parser = mock.MagicMock()
 
     @mock.patch("app.preprocessor.stringprocessor.Word.query", autospec=True)
@@ -189,9 +192,10 @@ class ParseWithErrorHandlingTest(unittest.TestCase):
         """Method should output the same result as running raw_parse directly
         when run on a normal sentence text.
         """
-
+        database.clean()
         text = "The fox is brown."
         result = t.parse_with_error_handling(text)
         expected_result = t.parser.raw_parse(text)
 
         self.failUnless(result == expected_result)
+
