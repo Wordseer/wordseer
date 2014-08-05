@@ -66,13 +66,6 @@ class CollectionProcessor(object):
             self.pylogger.info("Parsing documents")
             self.parse_documents()
             self.pylogger.info("Parsing documents")
-        if (app.config["SEQUENCE_INDEXING"] and
-            "true" in logger.get("finished_sequence_processing").lower()):
-            print "finishing indexing sequences"
-            self.calculate_index_sequences()
-            # self.reader_writer.finish_indexing_sequences()
-            # NOTE: this part never gets called; what is even supposed to
-            # happen here?
 
         # Calculate word-in-sentence counts and TF-IDFs
         if not "true" in logger.get("word_counts_done").lower():
@@ -192,51 +185,4 @@ class CollectionProcessor(object):
             documents_parsed += 1
 
         counter.count()
-
-    def calculate_index_sequences(self):
-        """Calculate and index sequences, if not already done during grammatical
-        processing.
-
-        For every sentence logged in the database with an ID less than the
-        ID returned by ``get_max_setnece_id``, this method retrieves it and
-        calls
-        :meth:`~wordseerbackend.sequenceprocessor.SequenceProcessor.process`
-        on it.
-        """
-
-        latest_sentence = logger.get("latest_sequence_sentence")
-
-        if len(latest_sentence) == 0:
-            latest_sentence = "0"
-
-        latest_id = int(latest_sentence)
-        # TODO: readerwriter
-        max_sentence_id = self.reader_writer.get_max_sentence_id()
-        sentences_processed = 0
-        seq_proc = SequenceProcessor(self.reader_writer)
-        #TODO: readerwriter
-        self.reader_writer.load_sequence_counts()
-        start_time = datetime.now()
-
-        for i in range(latest_id, max_sentence_id):
-            if i > latest_id:
-                #TODO: readerwriter
-                sentence = self.reader_writer.get_sentence(i)
-                if len(sentence.words) > 0:
-                    latest_id = sentence.id
-                    processed_sequences = seq_proc.process(sentence)
-                    if processed_sequences:
-                        logger.log("finished_sequence_processing", "false",
-                            logger.REPLACE)
-                        logger.log("latest_sequence_sentence", str(i),
-                            logger.REPLACE)
-
-                if sentences_processed % 1000 == 0:
-                    self.pylogger.info("Sequence-processing sentence %s/%s",
-                        str(i), str(max_sentence_id))
-                    self.pylogger.info("Average processing speed: %ss",
-                        (start_time - datetime.now()).total_seconds() / 1000)
-                    start_time = datetime.now()
-
-            sentences_processed += 1
 

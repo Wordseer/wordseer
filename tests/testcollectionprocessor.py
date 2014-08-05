@@ -127,50 +127,6 @@ class TestCollectionProcessor(unittest.TestCase):
                 str(i), mock_logger.REPLACE))
         mock_logger.log.assert_has_calls(logger_calls)
 
-    @unittest.skip("Still uses ReaderWriter")
-    @mock.patch("app.preprocessor.collectionprocessor.SequenceProcessor",
-        autospec=True)
-    def test_calculate_index_sequences(self, mock_seq_proc, mock_logger):
-        """Tests for the calculate_index_sequences method.
-        """
-        # Set up the mocks
-        latest = 5
-        mock_logger.get.return_value = str(latest)
-
-        max_id = 20
-        mock_writer.get_max_sentence_id.return_value = max_id
-
-        sentences = [mock.MagicMock(words=range(10), id=x)
-            for x in range(0, max_id)]
-
-        def get_sentence(arg):
-            return sentences[arg]
-
-        mock_writer.get_sentence.side_effect = get_sentence
-
-        mock_seq_proc_instance = mock_seq_proc("")
-        mock_seq_proc_instance.process.return_value = True
-
-        # Run the SUT
-        colproc.calculate_index_sequences()
-
-        # Reader writer should have been called once
-        mock_writer.load_sequence_counts.assert_called_once()
-
-        # Sequence processor called for every sentence
-        seq_proc_calls = [mock.call(sentences[i])
-            for i in range(latest + 1, max_id)]
-        mock_seq_proc_instance.process.assert_has_calls(seq_proc_calls)
-
-        # Logger should be called twice a sentence
-        logger_calls = []
-        for i in range(latest + 1, max_id):
-            logger_calls.append(mock.call("finished_sequence_processing",
-                "false", mock_logger.REPLACE))
-            logger_calls.append(mock.call("latest_sequence_sentence",
-                str(i), mock_logger.REPLACE))
-        mock_logger.log.assert_has_calls(logger_calls)
-
 class TestCollectionProcessorProcess(unittest.TestCase):
     """Tests specifically for CollectionProcessor.process().
     """
@@ -243,23 +199,6 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.calculate_index_sequences.called == False
         assert colproc.extract_record_metadata.called == False
         # assert len(colproc.reader_writer.method_calls) == 0
-
-    @unittest.skip("Still uses ReaderWriter")
-    @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=True)
-    def test_process_calc_index_sequences(self, mock_logger):
-        """Test that calculate_index_sequences() is called along with
-        the reader_writer.
-        """
-        mock_logger.get.side_effect = self.log_dict.__getitem__
-
-        # Should run calculate_index_sequences() and run the reader_writer
-        colproc.process(*self.args)
-
-        assert colproc.calculate_index_sequences.call_count == 1
-        assert mock_writer.finish_indexing_sequences.call_count == 1
-        assert len(mock_writer.method_calls) == 1
-        assert colproc.parse_documents.called == False
-        assert colproc.extract_record_metadata.called == False
 
     @unittest.skip("Method is gone, do we need this?")
     @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=True)
