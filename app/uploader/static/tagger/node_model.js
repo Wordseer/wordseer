@@ -96,9 +96,9 @@ var NodeModel = function() {
             var node = new NodeModel();//create child node model
             node.createAsAttribute(self.attributes.id, attr.nodeName, attr.nodeValue, self.attributes.xpaths);
             //if this element tag was not processed before, process it. this will create a tree of uniqu structure elements
-            if (!_.contains(self.attributes.sub_xpaths, node.attributes.xpaths[0]))
+            if (!_.contains(self.attributes.sub_xpaths, node.attributes.xpathsFull[0]))
             {
-                self.attributes.sub_xpaths.push(node.attributes.xpaths[0]);
+                self.attributes.sub_xpaths.push(node.attributes.xpathsFull[0]);
                 self.attributes.metadata.push(node);
                 self.map[node.attributes.id] = node;
             }
@@ -113,7 +113,7 @@ var NodeModel = function() {
             _.each(children, function(child)
             {
                 var node = new NodeModel();
-                node.createFromXML(child, self.attributes.xpaths[0], self.attributes.id);
+                node.createFromXML(child, self.attributes.xpathsFull[0], self.attributes.id);
                 if (!self.hasChild(node.attributes.id))//if element type is new
                 {
                     self.addChild(node);
@@ -141,11 +141,13 @@ var NodeModel = function() {
         {
             self.attributes.type = SUBUNIT_TAG;
             self.attributes.xpaths[0] += '/text()';
+            self.attributes.xpathsFull[0] += '/text()';
         }
         //if this element is a leaf node with no attributes
         else {
             self.attributes.type = METADATA_TAG;
             self.attributes.xpaths[0] += '/text()';
+            self.attributes.xpathsFull[0] += '/text()';
         }
         if (self.attributes.isRoot)
         {
@@ -181,7 +183,7 @@ var NodeModel = function() {
      */
     self.addChild = function(node)
     {
-        self.attributes.sub_xpaths.push(node.attributes.xpaths[0]);
+        self.attributes.sub_xpaths.push(node.attributes.xpathsFull[0]);
 //        if(!self.attributes.children)
         self.attributes.children.push(node);
         if (node.attributes.type === METADATA_TAG)
@@ -328,7 +330,7 @@ var NodeModel = function() {
         self.map[id].rename(TITLE_NODE_TAG);
         self.map[id].attributes.isTitle = true;
         self.attributes.titleId = id;
-        self.attributes.titleXpaths = self.attributes.titelXpathsFull = [self.map[id].attributes.xpaths[0]];
+        self.attributes.titleXpaths = self.attributes.titelXpathsFull = [self.map[id].attributes.xpathsFull[0]];
     };
     /**
      * Reset the tile node as empty
@@ -341,7 +343,7 @@ var NodeModel = function() {
         self.map[tid].rename('');
         self.map[tid].attributes.isTitle = false;
         self.attributes.titleId = '';
-        self.attributes.titleXpaths =self.attributes.titleXpathsFull= [];
+        self.attributes.titleXpaths = self.attributes.titleXpathsFull = [];
 
     };
     /**
@@ -403,7 +405,13 @@ var NodeModel = function() {
             self.attributes.type = SUBUNIT_TAG;
             self.attributes.isCategory = false;
             if (!S(self.attributes.xpaths[0]).endsWith('/text()') && !self.attributes.isAttribute)
+            {
                 self.attributes.xpaths[0] += '/text()';
+            }
+            if (!S(self.attributes.xpathsFull[0]).endsWith('/text()') && !self.attributes.isAttribute)
+            {
+                self.attributes.xpathsFull[0] += '/text()';
+            }
         }
         else
         {
@@ -427,6 +435,8 @@ var NodeModel = function() {
             self.attributes.isCategory = true;
             if (S(self.attributes.xpaths[0]).endsWith('/text()'))
                 self.attributes.xpaths[0] = S(self.attributes.xpaths[0]).chompRight('/text()').s;
+            if (S(self.attributes.xpathsFull[0]).endsWith('/text()'))
+                self.attributes.xpathsFull[0] = S(self.attributes.xpathsFull[0]).chompRight('/text()').s;
         }
         else
         {
@@ -534,7 +544,7 @@ var NodeModel = function() {
                     {
 
                         var unit = node.units[i], rel = getRelativeXPath(unit.xpathsFull[0], node.xpathsFull[0]);
-                        unit.xpaths[0]=rel;
+                        unit.xpaths[0] = rel;
                     }
 
                 }
@@ -548,9 +558,9 @@ var NodeModel = function() {
                         meta.xpaths[0] = rel;
                     }
                 }
-                if(node.titleXpaths.length>0)
+                if (node.titleXpaths.length > 0)
                 {
-                    node.titleXpaths[0]= getRelativeXPath(node.titleXpathsFull[0], node.xpathsFull[0]);
+                    node.titleXpaths[0] = getRelativeXPath(node.titleXpathsFull[0], node.xpathsFull[0]);
                 }
                 if (node.attr && node.attr === '')
                     delete node['attr'];
@@ -604,7 +614,7 @@ var NodeModel = function() {
             for (var i = 1; i <= size; i++)
             {
 
-                var outputItem = [], xpath = node.attributes.xpaths[0], combine = node.attributes.combine,
+                var outputItem = [], xpath = node.attributes.xpathsFull[0], combine = node.attributes.combine,
                         sentence = new sampleColumn();
                 sentence.help = 'sentence';
                 sentence.tag = node.attributes.tag;
@@ -618,7 +628,7 @@ var NodeModel = function() {
                     outputItem.push(sentence);
                     _.each(properties, function(property)
                     {
-                        var dim_col = new sampleColumn(), xpath2 = property.attributes.xpaths[0], xpath2Title, titleId = property.attributes.titleId, propertyId = property.attributes.id;
+                        var dim_col = new sampleColumn(), xpath2 = property.attributes.xpathsFull[0], xpath2Title, titleId = property.attributes.titleId, propertyId = property.attributes.id;
                         dim_col.help = 'property';
                         dim_col.tag = property.attributes.tag;
                         dim_col.name = property.attributes.name;
@@ -629,7 +639,7 @@ var NodeModel = function() {
 
                         }
                         else
-                            xpath2Title = self.map[titleId].attributes.xpaths[0];
+                            xpath2Title = self.map[titleId].attributes.xpathsFull[0];
                         if (combine)
                         {
                             dim_col.value = getTextXPathNode(xml_raw, xmlns, xpath, i, xpath2Title, combine);
@@ -663,7 +673,7 @@ var NodeModel = function() {
         var result = [], node = self.map[id];
         for (var i = 1; i <= size; i++)
         {
-            var output = getTextXPathNode(xml_raw, xmlns, node.attributes.xpaths[0], i, null, combine);
+            var output = getTextXPathNode(xml_raw, xmlns, node.attributes.xpathsFull[0], i, null, combine);
             result.push(output);
         }
         return result;
