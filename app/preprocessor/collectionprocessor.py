@@ -164,9 +164,10 @@ class CollectionProcessor(object):
         Afterwards, call ``finish_grammatical_processing`` on the reader/writer.
         """
 
+        documents = Document.query.all()
         document_parser = DocumentParser(self.str_proc)
         documents_parsed = 0
-        document_count = len(Document.query.all())
+        document_count = len(documents)
         latest = logger.get("latest_parsed_document_id")
 
         if len(latest) == 0:
@@ -174,7 +175,7 @@ class CollectionProcessor(object):
 
         latest_id = int(latest)
 
-        for document in Document.query.all():
+        for document in documents:
             if document.id > latest_id:
                 self.pylogger.info("Parsing document %s/%s",
                     str(documents_parsed), str(document_count))

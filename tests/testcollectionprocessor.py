@@ -89,19 +89,20 @@ class TestCollectionProcessor(unittest.TestCase):
             self.failUnless(call in mock_strucex_instance.extract.\
                 call_args_list)
 
-    @unittest.skip("Removed ReaderWriter; fix tests as needed.")
     @mock.patch("app.preprocessor.collectionprocessor.DocumentParser",
         autospec=True)
-    def test_parse_documents(self, mock_dp, mock_logger):
+    @mock.patch("app.preprocessor.collectionprocessor.Document.query",
+        autospec=True)
+    @mock.patch("app.preprocessor.collectionprocessor.counter", autospec=True)
+    def test_parse_documents(self, mock_counter, mock_document_query, mock_dp,
+            mock_logger):
         """Tests for the test_parse_documents method.
         """
         # Set up the mocks
         max_doc = 20
-        mock_writer.list_document_ids.return_value = range(max_doc)
-        mock_dp_instance = mock_dp("", "")
-
-        mock_gotten_doc = mock.create_autospec(Document)
-        mock_writer.get_document.return_value = mock_gotten_doc
+        mock_documents = [mock.create_autospec(Document, id=i) for i in range(max_doc)]
+        mock_document_query.all.return_value = mock_documents
+        mock_dp_instance = mock_dp.return_value
 
         latest = 5
         mock_logger.get.return_value = str(latest)
@@ -109,15 +110,12 @@ class TestCollectionProcessor(unittest.TestCase):
         # Run the SUT
         colproc.parse_documents()
 
-        # Reader writer should have been called for every id greater than
-        # what the logger returned and once at the end
-        get_doc_calls = [mock.call(x) for x in range(latest + 1, max_doc)]
-        mock_writer.get_document.assert_has_calls(get_doc_calls)
-        mock_writer.finish_grammatical_processing.assert_called_once()
+        # The counter should be called once at the end
+        mock_counter.count.assert_called_once_with()
 
         # Document parser should have been called on every doc
-        parse_calls = [mock.call(mock_gotten_doc)
-            for x in range(latest + 1, max_doc)]
+        parse_calls = [mock.call(mock_documents[i])
+            for i in range(latest + 1, max_doc)]
         mock_dp_instance.parse_document.assert_has_calls(parse_calls)
 
         # Logger should be called twice per doc
@@ -129,7 +127,7 @@ class TestCollectionProcessor(unittest.TestCase):
                 str(i), mock_logger.REPLACE))
         mock_logger.log.assert_has_calls(logger_calls)
 
-    @unittest.skip("Removed ReaderWriter; fix tests as needed.")
+    @unittest.skip("Still uses ReaderWriter")
     @mock.patch("app.preprocessor.collectionprocessor.SequenceProcessor",
         autospec=True)
     def test_calculate_index_sequences(self, mock_seq_proc, mock_logger):
@@ -246,7 +244,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.extract_record_metadata.called == False
         # assert len(colproc.reader_writer.method_calls) == 0
 
-    @unittest.skip("Removed ReaderWriter; fix tests as needed.")
+    @unittest.skip("Still uses ReaderWriter")
     @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=True)
     def test_process_calc_index_sequences(self, mock_logger):
         """Test that calculate_index_sequences() is called along with
@@ -263,7 +261,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.parse_documents.called == False
         assert colproc.extract_record_metadata.called == False
 
-    @unittest.skip("Removed ReaderWriter; fix tests as needed.")
+    @unittest.skip("Method is gone, do we need this?")
     @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=True)
     def test_process_calc_word_counts(self, mock_logger):
         """Test that ReaderWriter.calculate_word_counts() is called along with
@@ -283,7 +281,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         mock_logger.log.assert_called_once_with("word_counts_done", "true",
             mock_logger.REPLACE)
 
-    @unittest.skip("Removed ReaderWriter; fix tests as needed.")
+    @unittest.skip("Method is gone, do we need this?")
     @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=True)
     def test_process_tfidfs(self, mock_logger):
         """Test that ReaderWriter.calculate_tfidfs() is called.
@@ -300,7 +298,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         assert colproc.parse_documents.called == False
         assert colproc.extract_record_metadata.called == False
 
-    @unittest.skip("Removed ReaderWriter; fix tests as needed.")
+    @unittest.skip("Method is gone, do we need this?")
     @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=True)
     def test_process_w2w(self, mock_logger):
         """Test that calculate_lin_similarities() is run.
