@@ -1,16 +1,11 @@
-"""The DocumentParser takes in a Document object and parses it by creating a
-ParsedParagraph object for every sentence in the Document.
-
-The ParsedParagraph will then be written to the database, and each sentence
-returned from the write_parse_products method will be passed to
-SequenceProcessor.process().
+"""The DocumentParser takes in a Document object and parses it by sending
+every sentence to the `StringProcessor`, which writes it to the database.
 """
+
 from datetime import datetime
 import logging
 
-from app.models.parsedparagraph import ParsedParagraph
 from . import logger
-from app.models.parseproducts import ParseProducts
 from .sequenceprocessor import SequenceProcessor
 from app import db
 
@@ -20,18 +15,17 @@ LATEST_SEQ_SENT = "latest_sequence_sentence"
 class DocumentParser(object):
     """Handle parsing a document.
     """
-    def __init__(self, reader_writer, parser):
+    def __init__(self, parser):
         self.pylogger = logging.getLogger(__name__)
-        self.reader_writer = reader_writer
         self.parser = parser
-        self.sequence_processor = SequenceProcessor(reader_writer)
+        self.sequence_processor = SequenceProcessor()
 
     def parse_document(self, document):
         """Parse a document and write it to the database.
 
         Given a certain document, this method will parse every sentence in
-        it to a ParsedParagraph object. Ater every 50th sentence it will call
-        write_and_parse and supply the ParseProducts and the latest sentence ID.
+        it. Ater every 50th sentence it will call write_and_parse and supply the
+        ParseProducts and the latest sentence ID.
 
         :param Document document: The document to parse and record.
         """
@@ -48,10 +42,12 @@ class DocumentParser(object):
 
         relationships = dict()
         dependencies = dict()
+        sequences = dict()
         sentence_count = len(document.all_sentences)
         for sentence in document.all_sentences:
             if sentence.id > int(logger.get(LATEST_SENT_ID)):
                 parsed = self.parser.parse(sentence, relationships, dependencies)
+                self.sequence_processor.process(sentence, sequences)
                 products.append(parsed)
                 count += 1
                 current_max = sentence.id
@@ -65,6 +61,7 @@ class DocumentParser(object):
                     products = []
                     relationships = dict()
                     dependencies = dict()
+                    
                     db.session.commit()
         db.session.commit()
 

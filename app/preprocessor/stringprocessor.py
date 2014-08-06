@@ -9,7 +9,6 @@ from app.models.sentence import Sentence
 from app.models.word import Word
 from app.models.dependency import Dependency
 from app.models.grammaticalrelationship import GrammaticalRelationship
-from app.models.parseproducts import ParseProducts
 from app import db
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
@@ -56,7 +55,7 @@ class StringProcessor(object):
         parsed = self.parse_with_error_handling(sentence.text)
 
         # If the parse was unsuccessful, exit
-        if not parsed:
+        if parsed == None:
             return
 
         parsed_sentence = parsed["sentences"][0]
@@ -118,6 +117,17 @@ class StringProcessor(object):
                         part_of_speech = dependent_pos
                     ).first()
 
+                    # Temporary skip if one of the words is not found;
+                    # see issue #128 on Github.
+                    # TODO: remove
+                    try:
+                        governor.id
+                        dependent.id
+                    except:
+                        self.logger.error("Governor or dependent not found; giving up on parse.")
+                        self.logger.info(sentence)
+                        return sentence
+
                     key = (relationship.name, governor.id, dependent.id)
 
                     if key in dependencies.keys():
@@ -147,6 +157,7 @@ class StringProcessor(object):
                         dependency = dependency,
                         governor_index = governor_index,
                         dependent_index = dependent_index,
+                        force = False
                     )
 
                     dependency.save(False)
@@ -230,6 +241,8 @@ def split_sentences(text):
     :param str text: The text to split
     """
 
+    logger = logging.getLogger(__name__)
+
     sentences = []
 
     # Split sentences using NLTK
@@ -244,6 +257,7 @@ def split_sentences(text):
         if approx_sentence_length > max_length:
             logger.warning("Sentence appears to be too long, max length " +
                 "is " + str(max_length))
+            logger.info(sentence_text[:app.config["LOG_SENTENCE_TRUNCATE_LENGTH"]] + "...")
 
             # Attempt to split on a suitable punctuation mark
             # Order (tentative): semicolon, double-dash, colon, comma
@@ -278,7 +292,7 @@ def split_sentences(text):
                 index = 0
                 # Join every max_length number of words
                 while index < approx_sentence_length:
-                    subsentences.append(split_sentence[index:index+max_length])
+                    subsentences.append(" ".join(split_sentence[index:index+max_length]))
                     index += max_length
 
             sentences.extend(subsentences)
@@ -357,7 +371,8 @@ def tokenize_from_raw(parsed_text, txt):
                 word = word,
                 position = position,
                 space_before = space_before, # word["space_before"],
-                part_of_speech = word.part_of_speech
+                part_of_speech = word.part_of_speech,
+                force=False
             )
 
             position += 1

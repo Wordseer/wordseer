@@ -6,9 +6,9 @@ import pdb
 
 from app.models.document import Document
 from app.models.sentence import Sentence
-from app.models.parsedparagraph import ParsedParagraph
 from app.preprocessor import documentparser
 from app.preprocessor.stringprocessor import StringProcessor
+import database
 
 @patch("app.preprocessor.documentparser.logger", autospec=True)
 class DocumentParserTests(unittest.TestCase):
@@ -17,11 +17,10 @@ class DocumentParserTests(unittest.TestCase):
     def setUp(self):
         """Get the documentparser instance.
         """
-        self.mock_reader_writer = MagicMock()
+        database.clean()
         self.mock_str_proc = MagicMock()
         with patch("app.preprocessor.documentparser.SequenceProcessor"):
             self.docparser = documentparser.DocumentParser(
-                self.mock_reader_writer,
                 self.mock_str_proc)
 
     @patch("app.preprocessor.documentparser.db", autospec=True)

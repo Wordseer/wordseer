@@ -23,7 +23,7 @@ class ViewsTests(unittest.TestCase):
         """Clear the database for the next unit test.
         """
         self.client = application.test_client()
-        database.restore_cache()
+        database.clean()
         self.user = user_datastore.create_user(email="foo@foo.com",
             password="password")
         db.session.commit()
@@ -386,7 +386,7 @@ class AuthTests(unittest.TestCase):
     """
     #TODO: can we make this a classmethod without SQLAlchemy complaining?
     def setUp(self):
-        database.restore_cache()
+        database.clean()
         self.client = application.test_client()
         self.user1 = user_datastore.create_user(email="foo@foo.com",
             password="password")
@@ -446,7 +446,7 @@ class LoggedOutTests(unittest.TestCase):
     def setUp(self):
         """Reset the DB and create a dummy project and document.
         """
-        database.restore_cache()
+        database.clean()
         self.client = application.test_client()
         user = User()
         db.session.add(user)

@@ -110,6 +110,9 @@ class BaseConfig(object):
     SKIP_SENTENCE_ON_ERROR = False
     SENTENCE_MAX_LENGTH = 40
 
+    # Logging config
+    LOG_SENTENCE_TRUNCATE_LENGTH = 140
+
 
 class Production(BaseConfig):
     """Config for the production server.

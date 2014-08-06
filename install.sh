@@ -24,8 +24,7 @@ python -m nltk.downloader punkt
 
 # Set up the database
 echo "Setting up database..."
-python database.py create
-python database.py migrate
+python database.py reset
 
 # Download and move stanford-corenlp
 echo "Installing stanford-corenlp..."

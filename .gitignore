@@ -24,3 +24,5 @@ stanford-corenlp
 # line_profiler
 *.*prof
 
+# logs
+*.log

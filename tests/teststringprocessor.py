@@ -5,8 +5,8 @@ import unittest
 
 from app.models.sentence import Sentence
 from app.models.dependency import Dependency
-from app.models.parseproducts import ParseProducts
 from app.preprocessor import stringprocessor
+import database
 
 t = stringprocessor.StringProcessor()
 
@@ -16,6 +16,7 @@ class CommonTests(object):
     def setUp(self, text=""):
         """Set up some local variables.
         """
+        database.clean()
         self.example = text
         self.result = t.tokenize(self.example)
         self.raw = t.parser.raw_parse(self.example)
@@ -108,6 +109,7 @@ class ParseTests(unittest.TestCase):
     def setUp(self):
         """Mock out the parser for testing.
         """
+        database.clean()
         #t.parser = mock.MagicMock()
 
     @mock.patch("app.preprocessor.stringprocessor.Word.query", autospec=True)
@@ -150,7 +152,8 @@ class ParseTests(unittest.TestCase):
             expected_added_deps.append(mock.call(
                 dependency=mock_dependency_query.filter_by.return_value.one.return_value,
                 governor_index=gov_index,
-                dependent_index=dep_index))
+                dependent_index=dep_index,
+                force=False))
 
         sent.add_dependency.assert_has_calls(expected_added_deps)
 
@@ -169,18 +172,6 @@ class ParseTests(unittest.TestCase):
 
         self.assertRaises(ValueError, t.parse, sent)
 
-    @unittest.skip("Feature in limbo")
-    def test_parse_maxlength(self, mock_parser, mock_tokenizer):
-        """Check to make sure that parse() uses a rudimentary sentence length
-        check.
-        """
-
-        sent = mock.MagicMock(name="sentence")
-
-        sent.split.return_value = range(0, 60)
-
-        self.assertRaises(ValueError, t.parse, sent)
-
 class ParseWithErrorHandlingTest(unittest.TestCase):
     """Test the parse_with_error_handling method.
     """
@@ -189,9 +180,10 @@ class ParseWithErrorHandlingTest(unittest.TestCase):
         """Method should output the same result as running raw_parse directly
         when run on a normal sentence text.
         """
-
+        database.clean()
         text = "The fox is brown."
         result = t.parse_with_error_handling(text)
         expected_result = t.parser.raw_parse(text)
 
         self.failUnless(result == expected_result)
+
