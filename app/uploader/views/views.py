@@ -20,6 +20,7 @@ from flask.views import View
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug import secure_filename
 
+import pdb
 from .. import exceptions
 from .. import forms
 from .. import helpers
@@ -130,6 +131,10 @@ class CLPDView(View):
 
     def pre_tests(self, **kwargs):
         """If necessary, run checks before continuing with the view logic.
+
+        If this function returns anything, then the return value will be the
+        returned response rather than the template. This is useful for
+        authorization checks.
         """
         pass
 
@@ -138,7 +143,10 @@ class CLPDView(View):
         passed to the URL.
         """
 
-        self.pre_tests(**kwargs)
+        not_authorized = self.pre_tests(**kwargs)
+
+        if not_authorized:
+            return not_authorized
 
         self.set_choices(**kwargs)
 
@@ -173,8 +181,7 @@ class ProjectsCLPD(CLPDView):
         """Every choice is in the form of (project.id, project.name).
         """
         self.process_form.selection.choices = []
-        for project in Project.query.filter(User.id ==
-            current_user.id).all():
+        for project in current_user.projects:
             self.process_form.selection.add_choice(project.id, project.name)
 
     def handle_create(self, **kwargs):
@@ -228,8 +235,8 @@ class ProjectCLPD(CLPDView):
             exceptions.ProjectNotFoundException)
 
         self.template_kwargs["project"] = self.project
-
-        if self.project.user != current_user.id:
+        pdb.set_trace()
+        if self.project not in current_user.projects:
             return app.login_manager.unauthorized()
 
     def set_choices(self, **kwargs):

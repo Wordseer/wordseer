@@ -400,7 +400,7 @@ class AuthTests(unittest.TestCase):
             sess["user_id"] = self.user1.get_id()
             sess["_fresh"] = True
 
-        self.project = Project(name="Bar's project", user=self.user2)
+        self.project = Project(name="Bars project", user=self.user2)
         self.project.save()
 
         file_handle, file_path = tempfile.mkstemp()
@@ -416,14 +416,14 @@ class AuthTests(unittest.TestCase):
         """
         result = self.client.get("/projects/")
 
-        assert "Bar's project" not in result.data
+        assert "Bars project" not in result.data
 
     def test_view_project(self):
         """Test to make sure that foo can't see bar's project.
         """
         result = self.client.get("/projects/" + str(self.project.id))
 
-        assert "Bar's project" not in result.data
+        assert "Bars project" not in result.data
 
     def test_view_document(self):
         """Test to make sure that foo can't see bar's file.
@@ -454,7 +454,7 @@ class LoggedOutTests(unittest.TestCase):
         user = User()
         db.session.add(user)
         db.session.commit()
-        project = Project(name="Bar's project", user=user)
+        project = Project(name="Bars project", user=user)
         project.save()
 
         self.file_handle, self.file_path = tempfile.mkstemp()
@@ -470,7 +470,7 @@ class LoggedOutTests(unittest.TestCase):
         """
         result = self.client.get("/projects")
 
-        assert "Bar's project" not in result.data
+        assert "Bars project" not in result.data
 
     def test_list_files(self):
         """Test to make sure that unauthed users can't see a specific project.
