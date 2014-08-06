@@ -84,22 +84,6 @@ app.models.mixins module
     :undoc-members:
     :show-inheritance:
 
-app.models.parsedparagraph module
----------------------------------
-
-.. automodule:: app.models.parsedparagraph
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-app.models.parseproducts module
--------------------------------
-
-.. automodule:: app.models.parseproducts
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 app.models.project module
 -------------------------
 
