@@ -13,6 +13,7 @@ from app import app as application
 from app import db
 from app import user_datastore
 from app.models.document import Document
+from app.models.documentfile import DocumentFile
 from app.models.flask_security import User
 from app.models.project import Project
 from app.models.structurefile import StructureFile
@@ -152,10 +153,12 @@ class ViewsTests(unittest.TestCase):
         project = Project(name="test", user=self.user)
         project.save()
 
-        document1 = Document(projects=[project], path="/test-path/1.xml")
-        document2 = Document(projects=[project], path="/test-path/2.json")
-        document1.save()
-        document2.save()
+        document_file1 = DocumentFile(projects=[project],
+            path="/test-path/1.xml")
+        document_file2 = DocumentFile(projects=[project],
+            path="/test-path/2.json")
+        document_file1.save()
+        document_file2.save()
 
         result = self.client.post("/projects/", data={
             "process-submitted": "true",
@@ -180,10 +183,10 @@ class ViewsTests(unittest.TestCase):
         """
         project = Project(name="test", user=self.user)
         project.save()
-        document1 = Document(path="/test/doc1.xml", projects=[project])
-        document2 = Document(path="/test/doc2.xml", projects=[project])
-        document1.save()
-        document2.save()
+        document_file1 = DocumentFile(path="/test/doc1.xml", projects=[project])
+        document_file2 = DocumentFile(path="/test/doc2.xml", projects=[project])
+        document_file1.save()
+        document_file2.save()
         result = self.client.get("/projects/1")
 
         assert "doc1.xml" in result.data
@@ -263,10 +266,12 @@ class ViewsTests(unittest.TestCase):
         project = Project(name="test", user=self.user)
         project.save()
 
-        document1 = Document(projects=[project], path="/test-path/1.xml")
-        document2 = Document(projects=[project], path="/test-path/2.xml")
-        document1.save()
-        document2.save()
+        document_file1 = DocumentFile(projects=[project],
+            path="/test-path/1.xml")
+        document_file2 = DocumentFile(projects=[project],
+            path="/test-path/2.xml")
+        document_file1.save()
+        document_file2.save()
 
         result = self.client.post("/projects/1", data={
             "process-submitted": "true",
@@ -274,8 +279,8 @@ class ViewsTests(unittest.TestCase):
             "process-selection": ["1", "2"]
             })
         assert "no files in this project" in result.data
-        mock_os.remove.assert_any_call(document1.path)
-        mock_os.remove.assert_any_call(document2.path)
+        mock_os.remove.assert_any_call(document_file1.path)
+        mock_os.remove.assert_any_call(document_file2.path)
         assert mock_os.remove.call_count == 2
 
     def test_project_show_bad_delete(self):
@@ -284,10 +289,12 @@ class ViewsTests(unittest.TestCase):
         project = Project(name="test", user=self.user)
         project.save()
 
-        unit1 = Document(projects=[project], path="/test-path/1.xml")
-        unit2 = Document(projects=[project], path="/test-path/2.xml")
-        unit1.save()
-        unit2.save()
+        document_file1 = DocumentFile(projects=[project],
+            path="/test-path/1.xml")
+        document_file2 = DocumentFile(projects=[project],
+            path="/test-path/2.xml")
+        document_file1.save()
+        document_file2.save()
 
         result = self.client.post("/projects/1", data={
             "process-submitted": "true",
@@ -305,10 +312,12 @@ class ViewsTests(unittest.TestCase):
         project = Project(name="test", user=self.user)
         project.save()
 
-        unit1 = Document(projects=[project], path="/test-path/1.xml")
-        unit2 = Document(projects=[project], path="/test-path/2.json")
-        unit1.save()
-        unit2.save()
+        document_file1 = DocumentFile(projects=[project],
+            path="/test-path/1.xml")
+        document_file2 = DocumentFile(projects=[project],
+            path="/test-path/2.json")
+        document_file1.save()
+        document_file2.save()
 
         result = self.client.post("/projects/1", data={
             "process-submitted": "true",
@@ -325,10 +334,12 @@ class ViewsTests(unittest.TestCase):
         project = Project(name="test", user=self.user, path="/foo")
         project.save()
 
-        unit1 = Document(projects=[project], path="/test-path/1.xml")
-        unit2 = Document(projects=[project], path="/test-path/2.xml")
-        unit1.save()
-        unit2.save()
+        document_file1 = DocumentFile(projects=[project],
+            path="/test-path/1.xml")
+        document_file2 = DocumentFile(projects=[project],
+            path="/test-path/2.xml")
+        document_file1.save()
+        document_file2.save()
 
         result = self.client.post("/projects/1", data={
             "process-submitted": "true",
@@ -357,8 +368,8 @@ class ViewsTests(unittest.TestCase):
 
         project = Project(user=self.user)
 
-        document = Document(path=file_path, projects=[project])
-        document.save()
+        document_file = DocumentFile(path=file_path, projects=[project])
+        document_file.save()
 
         result = self.client.get("/uploads/1")
         with open(file_path) as test_file:
@@ -369,7 +380,8 @@ class ViewsTests(unittest.TestCase):
         """
         projxyz = Project(name="test project", path="/test-path/",
             user=self.user)
-        docxyz = Document(path="/test-path/test-file.xml", projects=[projxyz])
+        docxyz = DocumentFile(path="/test-path/test-file.xml",
+            projects=[projxyz])
 
         docxyz.save()
         projxyz.save()
@@ -408,8 +420,9 @@ class AuthTests(unittest.TestCase):
         file_handle.write("foobar")
 
         self.file_path = os.path.join(file_path)
-        self.document = Document(projects=[self.project], path=self.file_path)
-        self.document.save()
+        self.document_file = DocumentFile(projects=[self.project],
+                path=self.file_path)
+        self.document_file.save()
 
     def test_list_projects(self):
         """Test to make sure that bar's projects aren't listed for foo.
@@ -429,14 +442,14 @@ class AuthTests(unittest.TestCase):
         """Test to make sure that foo can't see bar's file.
         """
         result = self.client.get("/projects/" + str(self.project.id) +
-            "/documents/" + str(self.document.id))
+            "/documents/" + str(self.document_file.id))
 
-        assert "/uploads/" + str(self.document.id) not in result.data
+        assert "/uploads/" + str(self.document_file.id) not in result.data
 
     def test_get_document(self):
         """Test to make sure that foo can't get bar's file.
         """
-        result = self.client.get("/uploads/" + str(self.document.id))
+        result = self.client.get("/uploads/" + str(self.document_file.id))
 
         with open(self.file_path) as test_file:
             assert result.data is not test_file.read()
@@ -462,8 +475,8 @@ class LoggedOutTests(unittest.TestCase):
         self.file.write("foobar")
         self.file_name = os.path.split(self.file_path)[1]
 
-        document = Document(projects=[project], path=self.file_path)
-        document.save()
+        document_file = DocumentFile(projects=[project], path=self.file_path)
+        document_file.save()
 
     def test_list_projects(self):
         """Test to make sure that unauthed users can't see project lists.

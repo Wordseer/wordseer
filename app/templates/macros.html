@@ -156,7 +156,7 @@ non-functional. #}
                                     project_id=choice.data, **kwargs) }}">
                             {% elif "document" in type %}
                                 <a href="{{ url_for(link_dest,
-                                    document_id=choice.data, **kwargs) }}">
+                                    document_file_id=choice.data, **kwargs) }}">
                             {% endif %}
                                 {{ choice.label.text }}
                             </a>
