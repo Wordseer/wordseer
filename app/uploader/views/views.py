@@ -95,7 +95,8 @@ class CLPDView(View):
         if os.path.isdir(obj.path):
             shutil.rmtree(obj.path)
             for document in obj.documents:
-                db.session.delete(document)
+#                db.session.delete(document)
+                document.delete()
                 # TODO: change to document.delete
             db.session.commit()
             # TODO: remove
@@ -377,13 +378,13 @@ def document_map(project_id, document_id):
         map_document = map_document,
         document_url="%s%s"%(app.config["UPLOAD_ROUTE"],document.id))
 
-@uploader.route(app.config["UPLOAD_ROUTE"] + "<int:document_id>")
+@uploader.route(app.config["UPLOAD_ROUTE"] + "<int:file_id>")
 @login_required
-def get_file(document_id):
+def get_file(file_id):
     """If the user has permission to view this file, then return it.
     """
 
-    document = Document.query.get(document_id)
+    document = Document.query.get(file_id)
     try:
         access_granted = current_user.has_document(document)
     except TypeError:
