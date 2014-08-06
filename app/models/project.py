@@ -19,8 +19,22 @@ class Project(db.Model, Base):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     # Relationships
-    documents = db.relationship("Document", secondary="documents_in_projects",
-            backref="projects")
+    document_files = db.relationship("DocumentFile",
+            secondary="document_files_in_projects", backref="projects")
     structure_files = db.relationship("StructureFile", backref="project")
     logs = db.relationship("Log", backref="project")
+
+    def get_documents(self):
+        """A method to get all the ``Document``\s that are in this project.
+
+        Returns:
+            list of ``Document``\s.
+        """
+
+        documents = []
+
+        for document_file in self.document_files:
+            documents.extend(document_file.documents)
+
+        return documents
 

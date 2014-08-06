@@ -14,8 +14,9 @@ class Document(Unit):
 
     Attributes:
         title (str): the title of the document
-        path (str): the location of the file on the system
         projects (list of Projects): ``Project``\s that this ``Document`` is in.
+        document_file (DocumentFile): The ``DocumentFile`` that this
+            ``Document`` is a part of.
 
     Relationships:
         has one: unit
@@ -27,13 +28,13 @@ class Document(Unit):
     # We need to redefine ID here for polymorphic inheritance
     id = db.Column(db.Integer, db.ForeignKey("unit.id"), primary_key=True)
     title = db.Column(db.String, index=True)
-    path = db.Column(db.String)
     sentence_count = db.Column(db.Integer)
 
     # Relationships
     parent_id = None
     parent = None
     #children = db.relationship("Unit", backref="parent") FIXME: No parents
+    document_file_id = db.Column(db.Integer, db.ForeignKey("document_file.id"))
 
     __mapper_args__ = {
         "polymorphic_identity": "document",
@@ -49,8 +50,8 @@ class Document(Unit):
             ``True`` if this ``Document`` is in any of the ``Project``s owned
             by ``user``, ``False`` otherwise.
         """
-
-        return any([project in user.projects for project in self.projects])
+        return any([project in user.projects for project in
+            self.document_file.projects])
 
     def __repr__(self):
         return "<Document: " + str(self.title) + ">"
