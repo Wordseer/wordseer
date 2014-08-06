@@ -79,7 +79,7 @@ class CLPDView(View):
         self.create_form = create_form(prefix="create")
         self.process_form = process_form(prefix="process")
         self.confirm_delete_form = confirm_delete_form(prefix="confirm_delete")
-       
+    
         self.template_kwargs = {}
 
     # TODO: this method does more than delete the object so its name should
@@ -98,14 +98,15 @@ class CLPDView(View):
 #                db.session.delete(document)
                 document.delete()
                 # TODO: change to document.delete
-            db.session.commit()
+#            db.session.commit()
             # TODO: remove
         else:
             os.remove(obj.path)
         self.process_form.selection.delete_choice(obj.id, data)
-        db.session.delete(obj)
+        obj.delete()
+#        db.session.delete(obj)
         # TODO: change to obj.delete
-        db.session.commit()
+#        db.session.commit()
         # TODO: remove
 
     def set_choices(self, **kwargs):
@@ -137,7 +138,7 @@ class CLPDView(View):
     def dispatch_request(self, **kwargs):
         """Render the template with the required data. kwargs are data
         passed to the URL.
-        if the map request button is clickec and valid, redirect to the mapping page
+        if the map request button is clicked and valid, redirect to the mapping page
         """
         to_redirect = 0
         self.pre_tests(**kwargs)
@@ -145,12 +146,13 @@ class CLPDView(View):
         self.set_choices(**kwargs)
         
         if helpers.really_submitted(self.create_form):
-            self.handle_create(**kwargs)
+            to_redirect = self.handle_create(**kwargs)
 
         elif helpers.really_submitted(self.process_form):
-            to_redirect =   self.handle_process(**kwargs)
+            to_redirect = self.handle_process(**kwargs)
+        print to_redirect
         #TODO: maybe not the cleanest way to do it!!
-        if to_redirect == 0:
+        if to_redirect == 0 or to_redirect is None:
             self.reset_fields()
 
             return render_template(self.template,
@@ -209,6 +211,7 @@ class ProjectsCLPD(CLPDView):
         if request.form["action"] == self.process_form.PROCESS:
             #TODO : process the projects
             pass
+#        return 0
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"],
     view_func=ProjectsCLPD.as_view("projects"))
@@ -244,13 +247,12 @@ class ProjectCLPD(CLPDView):
     def set_choices(self, **kwargs):
         """The template needs the choices in the form of (id, filename).
         """
-        file_objects = Document.query.filter(Project.id == self.project.id).\
-            all()
-        # TODO: change to self.project.documents
+#        file_objects = Document.query.filter(Project.id == self.project.id).\
+#            all()
         self.process_form.selection.choices = []
-        for file_object in file_objects:
-            self.process_form.selection.add_choice(file_object.id,
-                os.path.split(file_object.path)[1])
+        for document in self.project.documents:
+            self.process_form.selection.add_choice(document.id,
+                os.path.split(document.path)[1])
 
     def handle_create(self, **kwargs):
         """For every file, check if it exists and if not then upload it to
@@ -287,7 +289,7 @@ class ProjectCLPD(CLPDView):
                 file_model = Unit.query.filter(Unit.id == file_id).one()
                 # NOTE: why are the file_ids not document IDs?
                 file_name = os.path.split(file_model.path)[1]
-                self.delete_object(file_model, file_name)
+                self.delete_object(file_model, file_name) 
         elif request.form["action"] == self.process_form.STRUCTURE:
             """ return the URL for structure mapping 
             """
@@ -296,10 +298,9 @@ class ProjectCLPD(CLPDView):
             file_name = os.path.split(file_model.path)[1]
             url = url_for('uploader.document_map', document_id=int(float(file_id)), **kwargs)
             return url
-
-            
         elif request.form["action"] == self.process_form.PROCESS:
             pass
+        return 0
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
     view_func=ProjectCLPD.as_view("project_show"))
