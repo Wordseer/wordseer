@@ -130,7 +130,11 @@ and open the template in the editor.
 .expand-node:hover , .collapse-node:hover{
     opacity: 1;
 }
+<<<<<<< HEAD
 .highlighted-nodes, .text-display-mode.active{
+=======
+.highlighted-nodes{
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     background-color: rgba(255, 210, 99, .4) !important;
 }
 .highlighted-tag{
@@ -188,21 +192,31 @@ and open the template in the editor.
 }
 
 
+<<<<<<< HEAD
 .hidden-box{
+=======
+#tagger-rename-dialogue, .hidden-box{
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     width:100%;
     height: 100%;
     position: fixed;
     top:0;
     left:0;
     background-color: rgba(0,0,0,.4);
+<<<<<<< HEAD
     z-index:100;
 }
 #rename-form, #tagger-save-file-response, #tagger-intro, #combine-form{
+=======
+}
+#rename-form, #tagger-save-file-response, #tagger-intro{
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     width:70%;
     top:10%;
     left:15%;
     position: fixed;
     overflow: auto;
+<<<<<<< HEAD
     max-height: 80%;
     min-height:35%;
     z-index: 200;
@@ -234,6 +248,12 @@ and open the template in the editor.
 #tagger-loading img{
     width:100%;
 }
+=======
+    max-height: 80%
+
+}
+
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 #save-structure-button{
     float:right;
     display:inline-block;

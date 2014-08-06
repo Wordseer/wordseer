@@ -8,8 +8,13 @@
 <link rel="stylesheet" href = "{{ url_for('uploader.static',filename='external_lib/jquery-ui.min.css') }}" type = "text/css"/>
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/jquery-1.11.1.min.js') }}"></script>
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/jquery-ui.min.js') }}"></script>
+<<<<<<< HEAD
     <script type = 'text/javascript' src = "{{ url_for('uploader.static',filename='external_lib/jquery.tooltipster.min.js') }}">
 < link rel = "stylesheet" href = "{{ url_for('uploader.static',filename='external_lib/tooltipster.css') }}" type = "text/css" / ></script>
+=======
+<script type = 'text/javascript' src = "{{ url_for('uploader.static',filename='external_lib/jquery.tooltipster.min.js') }}">
+        < link rel = "stylesheet" href = "{{ url_for('uploader.static',filename='external_lib/tooltipster.css') }}" type = "text/css" / ></script>
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/bootstrap.min.js') }}"></script>
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/jquery.xpath.js') }}"></script>
@@ -18,6 +23,12 @@
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/node_model.js') }}"></script>
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/tagger.js') }}"></script>
 
+<<<<<<< HEAD
+=======
+
+<!--<link rel="stylesheet" href="{{ url_for('uploader.static',
+        filename='tagger/bootstrap.min.css') }}" type="text/css" />-->
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 {% endblock %}
 {% block title %}Document Details{% endblock %}
 {% block body %}
@@ -31,11 +42,14 @@
 </h1>
 
 {% block tagger %}
+<<<<<<< HEAD
 <div id="tagger-loading-box" class='hidden-box'>
     <div id='tagger-loading' class=''>
         <img src="{{ url_for('uploader.static',filename='images/loadingGif.gif') }}" alt="Loading"/>
     </div>
 </div>
+=======
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 <form id='tagger'>
     {{map_document.hidden_tag()}}
     <input type="hidden" id="project-id" value="{{project.id}}"/>
@@ -44,7 +58,10 @@
     <input type="hidden" id="filename" value="{{filename}}"/>
     <input type="hidden" id="templates-url" value="{{url_for('uploader.static', filename='tagger/templates')}}"/>
     <input type='button' id='show-intro'  class="btn btn-md btn-info" value='Show Intro'/>
+<<<<<<< HEAD
     <input type='button' id='preview-structure'  class="btn btn-md btn-info" value='Preview Structure File' onclick="previewStructureFile()"/>
+=======
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     <input type="submit" id="save-structure-button" class="btn btn-md btn-success" name='action' value='Save and Return'/>
     <div id='tagger-previews'>
         <div id="tagger-node-preview" class="panel panel-default tagger-box"></div>
@@ -52,8 +69,12 @@
     </div>
     <div id="tagger-buckets" class="tagger-box"></div>
     <div id="tagger-output-preview" class="tagger-box"></div>
+<<<<<<< HEAD
     <div id="tagger-rename-dialogue" style="display:none" class="hidden-box"></div>
     <div id="tagger-combine-dialogue" style="display:none" class="hidden-box"></div>
+=======
+    <div id="tagger-rename-dialogue" style="display:none"></div>
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     <div id="tagger-save-file-result" class='hidden-box' style="display:none">
         <div id='tagger-save-file-response' class='panel panel-info'>
             <div class='panel-heading'><div class='panel-title'>Save Response</div></div>
@@ -61,9 +82,14 @@
         </div>
     </div>
     <div id="tagger-intro-box" class='hidden-box' style="display:none">
+<<<<<<< HEAD
     </div>
     <div id="json-preview-box" class="hidden-box" style="display:none"></div>
 
+=======
+
+    </div>
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 </form>
 {% endblock %}
 

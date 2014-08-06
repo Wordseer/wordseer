@@ -12,11 +12,17 @@
             <% if (attributes.isSentence){%> bucket-tag-sentence<%}%>" 
             data-id='<%= attributes.id %>' data-xpaths='<%= attributes.xpaths[0] %>' 
             data-type='<%=attributes.type%>'
+<<<<<<< HEAD
             data-node-type='<%=attributes.nodeType%>' 
             data-isattribute='<%if(attributes.isAttribute){%>1<% }else{ %>0<%}%>'
             title="belongs to <%=attributes.belongsTo%><%if(attributes.isProperty){%>. Click to rename<%}%>">
        <% if(attributes.combine){%>Combined <%}%> 
        <%=attributes.name%> (<%=attributes.tag%>)  <span class='glyphicon glyphicon-edit'></span>
+=======
+            data-isattribute='<%if(attributes.isAttribute){%>1<% }else{ %>0<%}%>'
+            title="belongs to <%=attributes.belongsTo%><%if(attributes.isProperty){%>. Click to rename<%}%>">
+        <%=attributes.name%> (<%=attributes.tag%>)  <% if(attributes.isProperty){%><span class='glyphicon glyphicon-edit'></span><%}%>
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     </button>
 
     <% if(attributes.titleId!==''){%>
@@ -32,17 +38,24 @@
             <% if (sub_node.isSentence){%> bucket-tag-sentence<%}%>" 
             data-id='<%= sub_node.id %>'  
             data-type='<%=sub_node.type%>'
+<<<<<<< HEAD
             
+=======
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
             data-isattribute='<%if(sub_node.isAttribute){%>1<% }else{ %>0<%}%>'
             title="belongs to <%=sub_node.belongsTo%>">
         <%=sub_node.name%> (<%=sub_node.tag%>)
     </button>
     <%}%>
     <%if(attributes.type!=='document'){%>
+<<<<<<< HEAD
     <button class='bucket-tag-remove attributes.id btn <%=btn_type%> <%=attributes.id%>' 
             data-id='<%=attributes.id%>' 
             data-type='<%=attributes.type%>'
             data-node-type='<%=attributes.nodeType%>' 
             ><span class='glyphicon glyphicon-remove'></span></button>
+=======
+    <button class='bucket-tag-remove attributes.id btn <%=btn_type%> <%=attributes.id%>' data-id='<%=attributes.id%>' data-type='<%=attributes.type%>'><span class='glyphicon glyphicon-remove'></span></button>
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     <%}%>
 </div>

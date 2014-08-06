@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 <!--<div id='rename-form-background' class='fadeout-background hidden-box'></div>-->
 <div id='rename-form' class='panel panel-default'>
 
+=======
+<div id='rename-form' class='panel panel-default'>
+    <div id='rename-form-backgroun' class='fadeout-background'></div>
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     <div class='panel-heading tagger-tooltip' title='Edit the title and display text for a property'>
         <h4 class='panel-title'>Edit property title and display</h4>
     </div>
@@ -11,6 +16,7 @@
         <div class="input-group">
             <span class="input-group-addon">Display Name</span>
             <input type="text" id='selected-display-title' data-id='' class="form-control" value="<%=displayName%>">
+<<<<<<< HEAD
             <span class="input-group-addon">Data Type</span>
             <div class="input-group-btn">
                 <button type="button" id='selected-property-data-type' class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-type="<%=dataType%>"><%=dataType%> <span class="caret"></span></button>
@@ -27,6 +33,8 @@
                       title='Enter the date format according to d3 standards. Click to view'
                    <% if(dataType!=='date'){%>style="display:none"<%}%>>?</a>
 
+=======
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         </div>
         <% if(type!==METADATA_TAG){%>
         <h4>Assign title to <%=tag%></h4>
@@ -37,12 +45,20 @@
         <div class="input-group">
             <span class="input-group-addon">Title Element</span>
             <input type="text" id='selected-property-title' data-id='<%=titleId%>' class="form-control" placeholder="Title Element" value='<%+displayName%>'>
+<<<<<<< HEAD
 
         </div>
         <%}%>
         <br/>
         <button id='rename-form-clear-title' class="btn btn-info" >Clear</button>
         <button id='rename-form-cancel-btn' class='btn btn-danger' onclick="hideRenameDialogue(true, '<%=id%>', '<%=nodeType%>')">Cancel</button>
+=======
+            <span id='rename-form-clear-title' class="input-group-addon btn btn-info" >Clear</span>
+        </div>
+        <%}%>
+        <br/>
+        <button id='rename-form-cancel-btn' class='btn btn-danger' onclick="hideRenameDialogue()">Cancel</button>
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         <button id='rename-form-save-btn' class='btn btn-success' onclick="saveRenameDialogue()">Save</button>
 
 

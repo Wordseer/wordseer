@@ -8,10 +8,12 @@
         <title>{% block title %}{% endblock %} - WordSeer</title>
 
         <!-- Bootstrap stuff -->
-        <link rel="stylesheet"
-        href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
         <link rel="stylesheet" href="{{ url_for('uploader.static',
             filename='custom_styles.css') }}">
+        <link rel="stylesheet"
+              href="{{ url_for('uploader.static',
+            filename='external_lib/bootstrap.min.css') }}">
+
     </head>
     <body>
         <div class="container">
@@ -21,53 +23,53 @@
                     display -->
                     <div class="navbar-header">
                         <button type="button" class="navbar-toggle"
-                            data-toggle="collapse"
-                            data-target="#bs-example-navbar-collapse-1">
+                                data-toggle="collapse"
+                                data-target="#bs-example-navbar-collapse-1">
                             <span class="sr-only">Toggle navigation</span>
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
                         <a class="navbar-brand"
-                            href="{{ url_for('uploader.home') }}">
+                           href="{{ url_for('uploader.home') }}">
                             WordSeer
                         </a>
                     </div>
                     <!-- Collect the nav links, forms, and other content for
                     toggling -->
                     <div class="collapse navbar-collapse"
-                        id="bs-example-navbar-collapse-1">
+                         id="bs-example-navbar-collapse-1">
                         {% if current_user.is_authenticated() %}
-                            <ul class="nav navbar-nav">
-                                <li><a
+                        <ul class="nav navbar-nav">
+                            <li><a
                                     href="{{ url_for('uploader.projects') }}">
                                     Projects
                                 </a></li>
-                            </ul>
+                        </ul>
                         {% endif %}
                         <ul class="nav navbar-nav navbar-right">
                             {% if not current_user.is_authenticated() %}
-                                <li>
-                                    <a href="{{ url_for_security('login') }}">
-                                        Log in
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ url_for_security(
+                            <li>
+                                <a href="{{ url_for_security('login') }}">
+                                    Log in
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for_security(
                                         'register') }}">
-                                        Register
-                                    </a>
-                                </li>
+                                    Register
+                                </a>
+                            </li>
                             {% else %}
-                                <li><span>
+                            <li><span>
                                     Logged in as
                                     <strong>{{ current_user.email }}</strong>
-                                </li></span>
-                                <li>
-                                    <a href="{{ url_for_security('logout') }}">
-                                        Log out
-                                    </a>
-                                </li>
+                            </li></span>
+                            <li>
+                                <a href="{{ url_for_security('logout') }}">
+                                    Log out
+                                </a>
+                            </li>
                             {% endif %}
                         </ul>
                     </div><!-- /.navbar-collapse -->
@@ -81,3 +83,4 @@
         {% block scripts %}{% endblock %}
     </body>
 </html>
+

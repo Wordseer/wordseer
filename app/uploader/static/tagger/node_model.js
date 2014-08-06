@@ -10,6 +10,7 @@ var DOCUMENT_TAG = 'document',
         NODE_ID_PREFIX = 'tagger-id-',
         TITLE_NODE_TAG = 'title'
         ;
+<<<<<<< HEAD
 var NODE_TYPES = {TEXT: 'text', PROPERTY: 'property'};
 var DATA_TYPES = {'STRING': 'string', 'NUMBER': 'number', 'DATE': 'date'};
 var DEFAULT_SAMPLE_SIZE = 10;
@@ -35,16 +36,36 @@ var NodeModel = function() {
         isCategory: false, nameIsDisplayed: false, valueIsDisplayed: false, dataType: '', dateFormat: '',
         structureName: '', 'propertyName': '', displayName: '',
         isRoot: false, isSentence: false, isProperty: false, isTitle: false, nodeType: null};
+=======
+var NodeModel = function() {
+    var self = {}, xml, xmlns, url, filename, xml_raw;
+    var primaryKeys = ['id', 'tag', 'type', 'xpaths', 'name', 'isActive'],
+            document_keys = ['titleXPaths', 'filename'],
+            subunit_keys = ['structureName', 'titleXPaths'],
+            metadata_keys = ['attr', 'propertyName', 'displayName', 'dataType', 'nameIsDisplayed', 'valueIsDisplayed', 'isCategory'];
+    self.attributes = {filename: '', url: '', xml: {}, id: '', tag: '', type: '',
+        xpaths: [], name: '', titleXpaths: [], titleId: '',
+        units: [], metadata: [], children: [], sub_xpaths: [], attrs: {}, attr: '',
+        belongsTo: '', isAttribute: false, isActive: false, hasChildElements: function() {
+            return self.hasChildElements();
+        },
+        isCategory: false, nameIsDisplayed: false, valueIsDisplayed: false, dataType: '',
+        structureName: '', 'propertyName': '', displayName: '',
+        isRoot: false, isSentence: false, isProperty: false, isTitle: false};
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     self.map = {};
     self.init = function() {
 
     };
+<<<<<<< HEAD
     /*
      * Inital call to generate internal node model from XML
      * @param {string} xml_filepath full XML file path
      * @param {string} fn filename
      * @returns {undefined}
      */
+=======
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     self.loadFromXMLURL = function(xml_filepath, fn)
     {
         var jqxhr = $.ajax({url: xml_filepath, async: false});
@@ -56,6 +77,7 @@ var NodeModel = function() {
         self.createFromXML($(xml).children()[0]);
         //TODO: Fix slave narratives
     };
+<<<<<<< HEAD
     /**
      * Recursive funciton to generate internal node model from XML
      * @param {XML} inXML raw XML data
@@ -63,10 +85,13 @@ var NodeModel = function() {
      * @param {string} id recursively passed id
      * @returns {undefined}
      */
+=======
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     self.createFromXML = function(inXML, path, id)
     {
         xml = inXML;
         path = (path) ? path : '/';
+<<<<<<< HEAD
         id = (id) ? id : NODE_ID_PREFIX;//for root node
         //setup basic attributes
         self.attributes.isRoot = (path === '/') ? true : false;
@@ -82,6 +107,18 @@ var NodeModel = function() {
         self.attributes.structureName = self.attributes.tag;
         self.attributes.displayName = self.attributes.structureName;
         self.attributes.dataType = DATA_TYPES.STRING;//default node type is String
+=======
+        id = (id) ? id : NODE_ID_PREFIX;
+        //setup basic attributes
+        self.attributes.isRoot = (path === '/') ? true : false;
+        var children = $(xml).children(), attrs = xml.attributes;
+        self.attributes.tag = $(xml).prop('tagName');
+        self.attributes.name = $(xml).prop('tagName');
+        self.attributes.id = id + S(self.attributes.tag).replace('.', '_').s;
+        self.attributes.xpaths.push(path + self.attributes.tag + "/");
+        self.attributes.structureName = self.attributes.tag;
+        self.attributes.displayName = self.attributes.structureName;
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         var paths = path.split('/');
         if (paths.length > 1)
             self.attributes.belongsTo = paths[paths.length - 2];
@@ -93,22 +130,34 @@ var NodeModel = function() {
             {
                 xmlns = attr.nodeValue;
             }
+<<<<<<< HEAD
             var node = new NodeModel();//create child node model
             node.createAsAttribute(self.attributes.id, attr.nodeName, attr.nodeValue, self.attributes.xpaths);
             //if this element tag was not processed before, process it. this will create a tree of uniqu structure elements
             if (!_.contains(self.attributes.sub_xpaths, node.attributes.xpathsFull[0]))
             {
                 self.attributes.sub_xpaths.push(node.attributes.xpathsFull[0]);
+=======
+            var node = new NodeModel();
+            node.createAsAttribute(self.attributes.id, attr.nodeName, attr.nodeValue, self.attributes.xpaths);
+            if (!_.contains(self.attributes.sub_xpaths, node.attributes.xpaths[0]))
+            {
+                self.attributes.sub_xpaths.push(node.attributes.xpaths[0]);
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
                 self.attributes.metadata.push(node);
                 self.map[node.attributes.id] = node;
             }
         });
         //process child nodes
+<<<<<<< HEAD
         //IF this child has child nodes
+=======
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         if (children.length > 0)
         {
             if (!self.attributes.isRoot)
                 self.attributes.type = SUBUNIT_TAG;
+<<<<<<< HEAD
             //process each child
             _.each(children, function(child)
             {
@@ -120,6 +169,27 @@ var NodeModel = function() {
                 }
                 else//node type processed before: compare children to include any new children
                 {
+=======
+            _.each(children, function(child)
+            {
+                var node = new NodeModel();
+                node.createFromXML(child, self.attributes.xpaths[0], self.attributes.id);
+                if (!self.hasChild(node.attributes.id))//if node type is new
+                {
+                    self.addChild(node);
+                }
+                else//node type processed before: compare children
+                {
+//                    console.log(node)
+                    /*
+                     if (self.map[node.attributes.id].attributes.type !== node.attributes.type)
+                     {
+                     if (node.attributes.type === SUBUNIT_TAG) {
+                     self.map[node.attributes.id] = node;
+                     console.log('node type change ' + node.attributes.id);
+                     }
+                     }*/
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
                     var myChild = self.map[node.attributes.id];
                     _.each(node.attributes.children, function(nodeChild)
                     {
@@ -136,6 +206,7 @@ var NodeModel = function() {
                 }
             });
         }
+<<<<<<< HEAD
         //If this element has no child nodes but has attributes
         else if (attrs.length > 0)
         {
@@ -148,6 +219,16 @@ var NodeModel = function() {
             self.attributes.type = METADATA_TAG;
             self.attributes.xpaths[0] += '/text()';
             self.attributes.xpathsFull[0] += '/text()';
+=======
+        else if (attrs.length > 0)
+        {
+            self.attributes.type = SUBUNIT_TAG;
+            self.attributes.xpaths[0] += 'text()';
+        }
+        else {
+            self.attributes.type = METADATA_TAG;
+            self.attributes.xpaths[0] += 'text()';
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         }
         if (self.attributes.isRoot)
         {
@@ -158,11 +239,14 @@ var NodeModel = function() {
             self.map[self.attributes.id] = self;
         }
     };
+<<<<<<< HEAD
     /*
      * Check if node has a direct child with id
      * @param {string} id
      * @returns {Boolean}
      */
+=======
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     self.hasChild = function(id)
     {
 
@@ -174,6 +258,7 @@ var NodeModel = function() {
                 return true;
             }
         }
+<<<<<<< HEAD
         return false;
     };
     /**
@@ -184,6 +269,14 @@ var NodeModel = function() {
     self.addChild = function(node)
     {
         self.attributes.sub_xpaths.push(node.attributes.xpathsFull[0]);
+=======
+
+        return false;
+    };
+    self.addChild = function(node)
+    {
+        self.attributes.sub_xpaths.push(node.attributes.xpaths[0]);
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 //        if(!self.attributes.children)
         self.attributes.children.push(node);
         if (node.attributes.type === METADATA_TAG)
@@ -197,10 +290,13 @@ var NodeModel = function() {
                 self.map[key] = item;
         });
     };
+<<<<<<< HEAD
     /**
      * If if this node has any unit or metadata childrent
      * @returns {Boolean}
      */
+=======
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     self.hasChildElements = function()
     {
         if (self.attributes.units.length > 0)
@@ -215,6 +311,7 @@ var NodeModel = function() {
 
         return false;
     };
+<<<<<<< HEAD
     /**
      * Check if another node ID is a descendant of this node
      * @param {string} childId
@@ -253,22 +350,31 @@ var NodeModel = function() {
      * @param {string} xpaths
      * @returns {undefined}
      */
+=======
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     self.createAsAttribute = function(id, name, value, xpaths)
     {
         self.attributes.id = id + 'attr' + name;
         self.attributes.tag = name;
         self.attributes.tag = name;
         self.attributes.type = METADATA_TAG;
+<<<<<<< HEAD
         self.attributes.dataType = DATA_TYPES.STRING;
         self.attributes.attr = name;
         self.attributes.xpaths.push(xpaths + '/@' + name);//XPath for attributes
         self.attributes.xpathsFull.push(self.attributes.xpaths[0]);
+=======
+        self.attributes.dataType = "string";
+        self.attributes.attr = name;
+        self.attributes.xpaths.push(xpaths + '@' + name);
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         self.attributes.displayName = name;
         self.attributes.isAttribute = true;
     };
     self.loadFromJSON = function(json) {
 
     };
+<<<<<<< HEAD
     /**
      * Activate the node (include it in structure file)
      * @returns {undefined}
@@ -280,10 +386,16 @@ var NodeModel = function() {
      * Deactivate the node and reset its values
      * @returns {undefined}
      */
+=======
+    self.activate = function() {
+        self.attributes.isActive = self.attributes.valueIsDisplayed = self.attributes.nameIsDisplayed = true;
+    };
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     self.deactivate = function() {
         self.attributes.isActive = self.attributes.valueIsDisplayed
                 = self.attributes.nameIsDisplayed = self.attributes.isSentence
                 = self.attributes.isProperty = false;
+<<<<<<< HEAD
         self.updateNodeType();
     };
     /**
@@ -300,10 +412,20 @@ var NodeModel = function() {
      * @param {string} name
      * @returns {undefined}
      */
+=======
+    };
+    self.rename = function(newName) {
+        var oldName = self.attributes.name + '';
+        self.attributes.displayName = self.attributes.name = self.attributes.propertyName = newName;
+//console.log('renaming '+oldName +' to ' +self.attributes.name);
+
+    };
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     self.setDisplayName = function(name)
     {
         self.attributes.displayName = name;
     };
+<<<<<<< HEAD
     /**
      * Change the title of this node
      * @param {string} title
@@ -326,16 +448,29 @@ var NodeModel = function() {
      * @param {string} id of title node
      * @returns {undefined}
      */
+=======
+    self.setTitleAsText = function(title) {
+        self.rename(title);
+    };
+    self.setTitleAsXPath = function(titleXPath) {
+        self.attributes.titleXpaths = [titleXPath];
+    };
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     self.setTitleNode = function(id) {
         self.map[id].rename(TITLE_NODE_TAG);
         self.map[id].attributes.isTitle = true;
         self.attributes.titleId = id;
+<<<<<<< HEAD
         self.attributes.titleXpaths = self.attributes.titelXpathsFull = [self.map[id].attributes.xpathsFull[0]];
     };
     /**
      * Reset the tile node as empty
      * @returns {undefined}
      */
+=======
+        self.attributes.titleXPaths = self.map[id].attributes.xpaths[0];
+    };
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     self.resetTitleNode = function()
     {
         self.setTitleAsXPath('');
@@ -343,6 +478,7 @@ var NodeModel = function() {
         self.map[tid].rename('');
         self.map[tid].attributes.isTitle = false;
         self.attributes.titleId = '';
+<<<<<<< HEAD
         self.attributes.titleXpaths = self.attributes.titleXpathsFull = [];
 
     };
@@ -396,6 +532,14 @@ var NodeModel = function() {
      * @param {boolean} flag boolean
      * @returns {undefined}
      */
+=======
+        self.attributes.titleXPaths = '';
+
+    };
+    self.hasChildren = function() {
+        return self.attributes.children.length > 0;
+    };
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     self.setAsSentence = function(flag) {
         if (flag)
         {
@@ -404,6 +548,7 @@ var NodeModel = function() {
             self.attributes.isProperty = false;
             self.attributes.type = SUBUNIT_TAG;
             self.attributes.isCategory = false;
+<<<<<<< HEAD
             if (!S(self.attributes.xpaths[0]).endsWith('/text()') && !self.attributes.isAttribute)
             {
                 self.attributes.xpaths[0] += '/text()';
@@ -412,12 +557,19 @@ var NodeModel = function() {
             {
                 self.attributes.xpathsFull[0] += '/text()';
             }
+=======
+//console.log(self.attributes.xpaths[0]);
+            if (!S(self.attributes.xpaths[0]).endsWith('text()') && !self.attributes.isAttribute)
+                self.attributes.xpaths[0] += 'text()';
+//console.log(self.attributes.xpaths[0]);
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         }
         else
         {
             self.rename('');
             self.attributes.isSentence = false;
         }
+<<<<<<< HEAD
         self.updateNodeType();
     };
     /**
@@ -425,6 +577,9 @@ var NodeModel = function() {
      * @param {boolean} flag boolean
      * @returns {undefined}
      */
+=======
+    };
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     self.setAsProperty = function(flag)
     {
         if (flag)
@@ -432,17 +587,27 @@ var NodeModel = function() {
             self.rename(self.attributes.tag);
             self.attributes.isSentence = false;
             self.attributes.isProperty = true;
+<<<<<<< HEAD
             self.attributes.isCategory = true;
             if (S(self.attributes.xpaths[0]).endsWith('/text()'))
                 self.attributes.xpaths[0] = S(self.attributes.xpaths[0]).chompRight('/text()').s;
             if (S(self.attributes.xpathsFull[0]).endsWith('/text()'))
                 self.attributes.xpathsFull[0] = S(self.attributes.xpathsFull[0]).chompRight('/text()').s;
+=======
+//self.attributes.type = METADATA_TAG;
+            self.attributes.isCategory = true;
+
+            if (S(self.attributes.xpaths[0]).endsWith('text()'))
+                self.attributes.xpaths[0] = S(self.attributes.xpaths[0]).chompRight('text()').s;
+//console.log(self.attributes.xpaths[0]);
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         }
         else
         {
             self.rename('');
             self.attributes.isSentence = false;
         }
+<<<<<<< HEAD
         self.updateNodeType();
     };
     /**
@@ -450,6 +615,10 @@ var NodeModel = function() {
      * @returns {NodeModel.self.toJSONAll.json|Window.attributes|self.attributes}
      */
     self.toJSONAll = function() {
+=======
+    };
+    self.toJSONAll = function(activeOnly) {
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         var json = {};
         // put the primary keys in the json file
         _.each(primaryKeys, function(key) {
@@ -477,16 +646,35 @@ var NodeModel = function() {
         {
             json['metadata'] = [];
             _.each(self.attributes.metadata, function(unit) {
+<<<<<<< HEAD
                 json.metadata.push(unit.toJSONAll());
                 json.children.push(unit.toJSONAll());
+=======
+                json.metadata.push(unit.toJSONAll(activeOnly));
+                json.children.push(unit.toJSONAll(activeOnly));
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
             });
         }
         if (self.attributes.units.length > 0)
         {
             json['units'] = [];
             _.each(self.attributes.units, function(unit) {
+<<<<<<< HEAD
                 json.units.push(unit.toJSONAll());
                 json.children.push(unit.toJSONAll());
+=======
+//                var children = unit
+//                if (self.attributes.isActive || !activeOnly)//if activeOnly, only process active nodes
+                json.units.push(unit.toJSONAll(activeOnly));
+                json.children.push(unit.toJSONAll(activeOnly));
+                /*  else
+                 {
+                 _.each(unit.attributes.units, function(sub_unit){
+                 
+                 })
+                 
+                 }*/
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
             });
         }
         //create metadata child objects
@@ -494,6 +682,7 @@ var NodeModel = function() {
             delete json['children'];
         return json;
     };
+<<<<<<< HEAD
     /**
      * Retrieve the wordseer valid structure file of selected nodes (active).
      * @returns {Array}
@@ -503,6 +692,13 @@ var NodeModel = function() {
 //        console.log(jsonIn);
 
         function cleanUp(node, parent)
+=======
+    self.toActiveJSON = function() {
+        var jsonIn = self.toJSONAll(), json;
+        console.log(jsonIn);
+
+        function cleanUp(node)
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         {
             var out, tempMeta = [], tempUnits = [];
             _.each(node.children, function(child)
@@ -511,7 +707,11 @@ var NodeModel = function() {
                     tempMeta.push(child);
                 else if (child.type === SUBUNIT_TAG)
                 {
+<<<<<<< HEAD
                     var tempNode = cleanUp(child, node);
+=======
+                    var tempNode = cleanUp(child);
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
                     if ($.isArray(tempNode))
                     {
                         _.each(tempNode, function(tempNodeChild)
@@ -536,6 +736,7 @@ var NodeModel = function() {
             {
                 node.metadata = tempMeta;
                 node.units = tempUnits;
+<<<<<<< HEAD
                 if (node.units && node.units.length === 0)
                     delete node['units'];
                 else
@@ -568,6 +769,10 @@ var NodeModel = function() {
                 delete node['isActive'];
 //                if (node.xpaths.length === 1)
 //                    node.xpaths.push(node.xpaths[0]);
+=======
+                delete node['children'];
+                delete node['isActive'];
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
                 out = node;
             }
             else
@@ -579,6 +784,7 @@ var NodeModel = function() {
             return out;
         }
 
+<<<<<<< HEAD
         json = cleanUp(jsonIn, null);
         console.log(json);
         return json;
@@ -592,6 +798,15 @@ var NodeModel = function() {
     self.getSample = function(size)
     {
         size = (size) ? size : DEFAULT_SAMPLE_SIZE;
+=======
+        json = cleanUp(jsonIn);
+        console.log(json);
+        return json;
+    };
+    self.getSample = function(size)
+    {
+        size = (size) ? size : 10;
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         var sample = [];
         var map = self.map;
 
@@ -610,17 +825,30 @@ var NodeModel = function() {
 
         _.each(sentences, function(node, key)
         {
+<<<<<<< HEAD
             var outputItems = [], nodeId = node.attributes.id;
             for (var i = 1; i <= size; i++)
             {
 
                 var outputItem = [], xpath = node.attributes.xpathsFull[0], combine = node.attributes.combine,
+=======
+            var outputItems = [];
+            for (var i = 1; i <= size; i++)
+            {
+
+                var outputItem = [];
+                var xpath = node.attributes.xpaths[0],
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
                         sentence = new sampleColumn();
                 sentence.help = 'sentence';
                 sentence.tag = node.attributes.tag;
                 sentence.name = node.attributes.name;
+<<<<<<< HEAD
 //                sentence.value = getXPathNode(xml_raw, xmlns, xpath, i, null, null, node.attributes.isAttribute);
                 sentence.value = getTextXPathNode(xml_raw, xmlns, xpath, i, null, combine);
+=======
+                sentence.value = getXPathNode(xml_raw, xmlns, xpath, i, null, node.attributes.isAttribute);
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
                 sentence.xpath = xpath;
                 sentence.id = node.attributes.id;
                 if (sentence.value !== null)
@@ -628,6 +856,7 @@ var NodeModel = function() {
                     outputItem.push(sentence);
                     _.each(properties, function(property)
                     {
+<<<<<<< HEAD
                         var dim_col = new sampleColumn(), xpath2 = property.attributes.xpathsFull[0], xpath2Title, titleId = property.attributes.titleId, propertyId = property.attributes.id;
                         dim_col.help = 'property';
                         dim_col.tag = property.attributes.tag;
@@ -647,6 +876,18 @@ var NodeModel = function() {
                         {
                             dim_col.value = getXPathNode(xml_raw, xmlns, xpath, i, xpath2Title, null);
                         }
+=======
+                        var dim_col = new sampleColumn(), xpath2 = property.attributes.xpaths[0], xpath2Title;
+                        dim_col.help = 'property';
+                        dim_col.tag = property.attributes.tag;
+                        dim_col.name = property.attributes.name;
+                        if (property.attributes.titleId === '')
+                            xpath2Title = xpath2;
+                        else
+                            xpath2Title = self.map[property.attributes.titleId].attributes.xpaths[0];
+                        dim_col.value = getXPathNode(xml_raw, xmlns, xpath, i, xpath2Title, property.attributes.isAttribute);
+                        //console.log(typeof (dim_col.value));
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
                         dim_col.xpath = xpath2;
                         dim_col.id = property.attributes.id;
                         if (!property.attributes.isTitle)
@@ -656,6 +897,7 @@ var NodeModel = function() {
                 }
             }
             sample.push(outputItems);
+<<<<<<< HEAD
         });
         return sample;
     };
@@ -743,6 +985,40 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, secondaryXPat
                 ancestorList = ancestorXPath.substring(1).replace('/text()', '').split('/'),
                 nodeList = nodeXPath.substring(1).replace('/text()', '').split('/');
         if (S(ancestorXPath).contains(fullNodeXPath))
+=======
+//console.log(node);
+        });
+
+
+//console.log(sample);
+        return sample;
+    };
+    return self;
+};
+
+/**
+ * 
+ * @param {type} xml XML DOM
+ * @param {type} xmlns XML Name space
+ * @param {type} nodeXPath the xpath to the primary node to evaluate
+ * @param {type} index (optional) retrieve a specific element from the primary node
+ * @param {type} ancestorXPath retrieve the andestors of the specific primary node
+ * @param {type} isAttribute is this an attribute?
+ * @returns {unresolved} results
+ */
+function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, isAttribute)
+{
+    var result,
+            xpathExpression = '(' + nodeXPath + ')',
+            isChild = false, secondaryXPath = '';
+    xpathExpression = (index) ? xpathExpression + '[' + index + ']' : xpathExpression;
+    if (ancestorXPath)
+    {
+        var ancestorXPathShort = ancestorXPath.substring(1),
+                ancestorList = ancestorXPath.substring(1).replace('/text()', '').split('/'),
+                nodeList = nodeXPath.substring(1).replace('/text()', '').split('/');
+        if (S(ancestorXPath).contains(nodeXPath))
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         {
             isChild = true;
             xpathExpression += ancestorXPath.replace(nodeXPath);
@@ -759,8 +1035,11 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, secondaryXPat
             xpathExpression += (ancestorXPathShort.length > 0) ? '/ancestor::' + S(ancestorXPathShort).chompRight('/').s : '';
         }
     }
+<<<<<<< HEAD
 
 //    console.log(xpathExpression);
+=======
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     xmlns = (xmlns) ? xmlns : null;
     var xpe = new XPathEvaluator();
     var nsResolver = (function(element) {
@@ -772,6 +1051,7 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, secondaryXPat
     }(xml.documentElement));
 
     var nodes = xpe.evaluate(xpathExpression, xml, nsResolver, XPathResult.ANY_TYPE, null);
+<<<<<<< HEAD
     result = '';
     var node = nodes.iterateNext();
     if (node === null)
@@ -782,11 +1062,28 @@ function getXPathNode(xml, xmlns, nodeXPath, index, ancestorXPath, secondaryXPat
         if (node.childNodes && node.childNodes[0] && node.childNodes.length > 0)
         {
             result += ' ' + node.childNodes[0].nodeValue;
+=======
+    result = nodes;
+    var node = nodes.iterateNext();
+
+    if (node === null)
+    {
+        //TODO: FIx Slave narratives
+        //console.log('null detected');
+        node = nodes.iterateNext();
+    }
+    if (node)
+    {
+        if (node.childNodes && node.childNodes[0] && node.childNodes.length > 0)
+        {
+            result = node.childNodes[0].nodeValue;
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         }
         else
         {
             if (typeof (node) === 'object')
             {
+<<<<<<< HEAD
                 result += ' ' + $(node)[0].nodeValue;
             }
             else
@@ -813,4 +1110,17 @@ function getRelativeXPath(nodeXpath, parentXpath)
     var xpath_rel = '.' + S(nodeXpath).chompLeft(parent_XPaths).s;
 //    console.log(parent_XPaths + '\t' + node.xpaths[0] + '\t' + xpath_rel);
     return xpath_rel;
+=======
+                result = $(node)[0].nodeValue;
+            }
+            else
+                result = node;
+        }
+        return result;
+    }
+    else
+    {
+        return null;
+    }
+>>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 }

@@ -44,9 +44,13 @@ Follow the directions in the "Installing" sections found below.
 ### Installing
 1.  Create a virtualenv
 
-2.  Run:
+2.  On linux, run:
 
         pip -r install requirements.txt
+
+    On windows, run:
+
+        pip -r install requirements_win.txt
 
     to install the necessary packages.
 
