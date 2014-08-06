@@ -14,6 +14,10 @@ Feature branches that wish to make a change to the application should be
 branched from `development`. Once they are ready, they'll be merged into
 `development`, which is periodically merged into `master`.
 
+Hotfixes that should be applied quickly to `master` are branched off of `master`
+and called `hotfix-xyz`. Unit tests must be passing in a hotfix branch before
+it can be merged.
+
 Unit tests must always be passing in `master`.
 
 ## Ways to contribute
