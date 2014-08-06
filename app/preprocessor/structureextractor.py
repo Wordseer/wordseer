@@ -11,6 +11,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound
 
 from app.models.project import Project
 from app.models.document import Document
+from app.models.documentfile import DocumentFile
 from app.models.sentence import Sentence
 from app.models.unit import Unit
 from app.models.property import Property
@@ -35,19 +36,19 @@ class StructureExtractor(object):
         self.logger = logging.getLogger(__name__)
 
     def extract(self, infile):
-        """Extract a Document from a file. This method uses the
-        structure_file given in the constructor for rules to identify documents.
+        """Extract ``Document``\s from a ``DocumentFile``. This method uses the
+        structure_file given in the constructor for rules to identify
+        ``Document``\s.
 
         :param str infile: The path to the file to extract.
-        :return Document: The Document that this file represents
+        :return list of DocumentFiles: The DocumentFile that contains the
+            extracted documents.
         """
         doc = etree.parse(infile)
         documents = []
 
         # Check for unescaped special characters (tentative)
         doc = None
-
-        print(infile)
 
         try:
             doc = etree.parse(infile)
@@ -65,33 +66,38 @@ class StructureExtractor(object):
                 print("XML Error: " + str(e))
                 return documents
 
-        units = self.extract_unit_information(self.document_structure, doc)
-        extracted_unit = units[0]
+        extracted_units = self.extract_unit_information(self.document_structure,
+            doc)
         #TODO: this doc_num isn't very helpful
         doc_num = 0
 
         try:
-            document = Document.query.filter(Document.path == infile).one()
+            document_file = DocumentFile.query.\
+                filter(DocumentFile.path == infile).one()
         except NoResultFound:
-            self.logger.warning("Could not find document with path %s, making "
+            self.logger.warning("Could not find file with path %s, making "
                 "new one", infile)
-            document = Document()
+            document_file = DocumentFile()
         except MultipleResultsFound:
-            self.logger.error("Found multiple documents with path %s, "
+            self.logger.error("Found multiple files with path %s, "
                 "skipping.", infile)
-            return Document()
+            return DocumentFile()
 
-        # Hopefully we only get one unit per file
-        document.properties = extracted_unit.properties
-        document.sentences = extracted_unit.sentences
-        document.title = extracted_unit.name #FIXME: not actual title
-        document.children = extracted_unit.children
-        document.number = doc_num
+        for extracted_unit in extracted_units:
+            document = Document()
+            document.properties = extracted_unit.properties
+            document.sentences = extracted_unit.sentences
+            document.title = extracted_unit.name #FIXME: not actual title
+            document.children = extracted_unit.children
+            document.number = doc_num
 
-        assign_sentences(document)
-        document.save()
+            assign_sentences(document)
+            document_file.documents.append(document)
+            document.save(False)
 
-        return document
+        db.session.commit()
+
+        return document_file
 
     def extract_unit_information(self, structure, parent_node):
         """Process the given node, according to the given structure, and return

@@ -13,7 +13,7 @@ def count(project):
         project (Project): The project to do counts for.
     """
     # Calculate counts for documents
-    for document in project.documents:
+    for document in project.get_documents():
         document.sentence_count = len(document.all_sentences)
         document.save(False)
 
