@@ -75,8 +75,8 @@ We also recommend installing the python dependencies (discussed below) in a
 
 1. `corenlp` must be installed manually. Clone the repository:
 
-    git clone https://github.com/silverasm/stanford-corenlp-python.git
-    cd stanford-corenlp-python
+        git clone https://github.com/silverasm/stanford-corenlp-python.git
+        cd stanford-corenlp-python
 
     Create a file called `setup.py` in its root directory containing the
     following:
