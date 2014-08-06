@@ -377,14 +377,13 @@ def document_map(project_id, document_id):
         map_document = map_document,
         document_url="%s%s"%(app.config["UPLOAD_ROUTE"],document.id))
 
-# TODO: change file_id to document_id
-@uploader.route(app.config["UPLOAD_ROUTE"] + "<int:file_id>")
+@uploader.route(app.config["UPLOAD_ROUTE"] + "<int:document_id>")
 @login_required
-def get_file(file_id):
+def get_file(document_id):
     """If the user has permission to view this file, then return it.
     """
 
-    document = Document.query.get(file_id)
+    document = Document.query.get(document_id)
     try:
         access_granted = current_user.has_document(document)
     except TypeError:
