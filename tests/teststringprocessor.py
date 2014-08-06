@@ -50,11 +50,7 @@ class TokenizeParagraphTests(CommonTests, unittest.TestCase):
             "been a time for such a word. Tomorrow, and tomorrow, and "
             "tomorrow, Creeps in this petty pace from day to day, To the "
             "last syllable of recorded time; And all our yesterdays have "
-            "lighted fools The way to dusty death. Out, out, brief candle! "
-            "Life's but a walking shadow, a poor player That struts and "
-            "frets his hour upon the stage And then is heard no more. It "
-            "is a tale Told by an idiot, full of sound and fury Signifying "
-            "nothing.")
+            "lighted fools The way to dusty death. Out, out, brief candle! ")
         super(TokenizeParagraphTests, self).setUp(text=example)
 
     def test_sentences(self):
@@ -64,7 +60,7 @@ class TokenizeParagraphTests(CommonTests, unittest.TestCase):
         for sent in self.result:
             self.failUnless(isinstance(sent, Sentence))
             self.failUnless(sent.words[-2].word in ["word", "death",
-                "candle", "more", "nothing"])
+                "candle"])
 
 class TokenizeSentenceTests(CommonTests, unittest.TestCase):
     """Test tokenize() given a single sentence.
