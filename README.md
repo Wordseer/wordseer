@@ -107,7 +107,7 @@ Particularly make sure to point `CORE_NLP_DIR` to the Stanford NLP library.
 
 4. Run the following command in the console:
 
-    python -m nltk.downloader punkt
+        python -m nltk.downloader punkt
 
     You should then be ready to parse files. Example XML and JSON files are
     included in `tests/data`.
