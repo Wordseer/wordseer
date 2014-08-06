@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /* This file contains all the UI interactions for the XML tagger
  * @Author = Hassan Jannah
  */
@@ -7,16 +6,6 @@ $(document).ready(function() {
     init_tagger();
 });
 
-=======
-/* 
- * @Author = Hassan Jannah
- */
-
-
-$(document).ready(function() {
-    init_tagger();
-});
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 var project_id, document_id, document_url, filename, kwargs, templates_url;
 var BODY_CHANGE_EVENT = 'bodyChange';
 var TEMPLATES = {
@@ -28,16 +17,11 @@ var TEMPLATES = {
     XML_PREVIEW: {filename: 'xml_preview.html'},
     OUTPUT_PREVIEW: {filename: 'output_preview.html'},
     RENAME_FORM: {filename: 'rename_form.html'},
-<<<<<<< HEAD
     COMBINE_FORM: {filename: 'combine_form.html'},
     INTRO: {filename: 'intro.html'},
     JSON_PREVIEW: {filename: 'json_preview.html'}
 };
 
-=======
-    INTRO: {filename: 'intro.html'}
-};
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 var buckets = {
     sentences: {id: 'sentence-bucket',
         header: 'Selected text nodes to analyze',
@@ -45,7 +29,6 @@ var buckets = {
     properties: {id: 'property-bucket',
         header: 'Selected analysis properties',
         help: 'Properties are additional information that help perform multi-propertyal analysis on the text.'}};
-<<<<<<< HEAD
 
 var nodes;//the node model 
 /**
@@ -58,16 +41,6 @@ function init_tagger()
     loadRequestParams();
     nodes = new NodeModel();
     nodes.loadFromXMLURL(document_url, filename);
-=======
-var NODE_TYPES = {TEXT: 'text', PROPERTY: 'property'};
-var nodes;
-function init_tagger()
-{
-    loadRequestParams();
-    nodes = new NodeModel();
-    nodes.loadFromXMLURL(document_url, filename);
-//    console.log(nodes);
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     loadTemplates();
     render();
     loadNodeTreeEvents();
@@ -77,21 +50,10 @@ function init_tagger()
     addRootNode();
     loadIntro();
 }
-<<<<<<< HEAD
 /**
  * render inital UI elements
  * @returns {undefined}
  */
-=======
-function test()
-{
-    var counter = 0;
-    _.each(nodes.map, function(item)
-    {
-        item.attributes.dataType = 'text ' + counter++;
-    });
-}
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function render()
 {
     renderContainers();
@@ -100,13 +62,10 @@ function render()
     renderXMLPreview(nodes.attributes.xml, '#tagger-xml-preview .tagger-container-body');
 //    $('.tagger-container').resizable();
 }
-<<<<<<< HEAD
 /**
  * Load request params
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function loadRequestParams()
 {
     project_id = $('#project-id').val();
@@ -115,7 +74,6 @@ function loadRequestParams()
     document_url = $('#document-url').val();
     templates_url = $('#templates-url').val();
 }
-<<<<<<< HEAD
 /**
  * Load events related to submitting the form (save file) eents will prevent the form from refreshing
  * @returns {undefined}
@@ -123,14 +81,6 @@ function loadRequestParams()
 function loadSubmitEvent()
 {
 
-=======
-function loadSubmitEvent()
-{
-//    $('#tagger').submit(function() {
-//        saveStructureFile();
-//        return false;
-//    });
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     $('#tagger').submit(function() {
         return false;
     });
@@ -140,7 +90,6 @@ function loadSubmitEvent()
     });
 }
 
-<<<<<<< HEAD
 /**
  * Load introduction dialogue
  * @returns {undefined}
@@ -148,11 +97,6 @@ function loadSubmitEvent()
 function loadIntro()
 {
     $('#tagger-loading-box').hide();
-=======
-
-function loadIntro()
-{
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     renderTemplate('#tagger-intro-box', TEMPLATES.INTRO);
     $('#tagger-intro-box').show()
             .on('click', function() {
@@ -177,13 +121,9 @@ function saveStructureFile()
 {
 //    alert('Saving structure file');
     var data = nodes.toActiveJSON(), token = $('#csrf_token').val();
-<<<<<<< HEAD
     var url = S(window.location.href).chompRight('#').s + '/save/';
     console.log(url);
     //Submit ajax request to Flask to save file
-=======
-    var url = window.location.href + '/save/';
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     $.ajax({
         type: "POST",
         url: url,
@@ -199,11 +139,7 @@ function saveStructureFile()
         var pieces = url.split('/'), temp = pieces.slice(0, pieces.length - 4), redirect_url = temp.join('/');
         if (text === 'ok')
         {
-<<<<<<< HEAD
             //if the save was successful, reirect to project main page
-=======
-
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
             window.location.replace(redirect_url);
             return false;
         }
@@ -215,7 +151,6 @@ function saveStructureFile()
         }
     });
 }
-<<<<<<< HEAD
 
 function previewStructureFile()
 {
@@ -233,19 +168,14 @@ function previewStructureFile()
  * Hide the save file response dialogue
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function hideSaveFileResponse()
 {
     $('#tagger-save-file-result').hide();
 }
-<<<<<<< HEAD
 /**
  * Load all app templates locally (not render)
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function loadTemplates()
 {
     for (var template in TEMPLATES)
@@ -255,27 +185,20 @@ function loadTemplates()
         TEMPLATES[template]['render'] = _.template(TEMPLATES[template]['html']);
     }
 }
-<<<<<<< HEAD
 /**
  * Load a specific HTML template
  * @param {string} filename filename of the template
  * @returns {$@call;ajax.responseText}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function loadTemplate(filename)
 {
     var jqxhr = $.ajax({url: filename, async: false});
     return jqxhr.responseText;
 }
-<<<<<<< HEAD
 /**
  * Load all tooltips associated with the tooltipster library 
  * @returns {undefined}
  */
-=======
-
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function loadTooltips()
 {
     try {
@@ -286,7 +209,6 @@ function loadTooltips()
 
     }
 }
-<<<<<<< HEAD
 /*
  * Render a specific HTML template
  * @param {string} target target HTML element ID to render the template under
@@ -296,8 +218,6 @@ function loadTooltips()
  * @param {string} id the id to give the rendered template
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function renderTemplate(target, template, args, replace, id)
 {
     if (replace)
@@ -317,27 +237,21 @@ function renderTemplate(target, template, args, replace, id)
     }
     $(target).trigger(BODY_CHANGE_EVENT);
 }
-<<<<<<< HEAD
 /**
  * Remove a specific HTML element from its parent and refresh it
  * @param {string} target HTML ID
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function removeNode(target) {
 
     var parent = $(target).parent();
     $(target).remove();
     parent.trigger(BODY_CHANGE_EVENT);
 }
-<<<<<<< HEAD
 /**
  * REnder the initial containers
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function renderContainers()
 {
     renderTemplate('#tagger-buckets', TEMPLATES.CONTAINER,
@@ -354,14 +268,10 @@ function renderContainers()
                 help: 'a preview of the source Output text and properties document'});
 }
 
-<<<<<<< HEAD
 /**
  * Render the bucket (sentences and properties)
  * @returns {undefined}
  */
-=======
-
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function renderBuckets() {
     $('#tagger-buckets-container .tagger-container-body').append('<table></table>');
     for (var bucket in buckets)
@@ -369,34 +279,27 @@ function renderBuckets() {
         renderTemplate('#tagger-buckets-container .tagger-container-body table', TEMPLATES.BUCKET, buckets[bucket]);
     }
 }
-<<<<<<< HEAD
 /**
  * Render the main tree nodes
  * @param {NodeModel} node root node
  * @param {string} target target HTML ID
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function renderTreeNodes(node, target)
 {
     renderNodes(node, TEMPLATES.TREE_NODE, target, 'tree');
 }
-<<<<<<< HEAD
 /**
  * Render the tree nodes in the select node title dialogue
  * @param {NodeModel} node root node
  * @param {string} target target HTML ID
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function renderTitleTreeNodes(node, target)
 {
     renderNodes(node, TEMPLATES.TITLE_TREE_NODE, target, 'title');
 }
 
-<<<<<<< HEAD
 /**
  * Recursively render node under a specific target
  * @param {NodeModel} node the node to render
@@ -405,8 +308,6 @@ function renderTitleTreeNodes(node, target)
  * @param {string} target_prefix whether the target is a Tree node or a title tree node
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function renderNodes(node, template, target, target_prefix)
 {
     if (node) {
@@ -424,7 +325,6 @@ function renderNodes(node, template, target, target_prefix)
             }
     }
 }
-<<<<<<< HEAD
 /**
  * Recursively render the XML document preview
  * @param {XML} xml
@@ -432,9 +332,6 @@ function renderNodes(node, template, target, target_prefix)
  * @param {string} parent_id the ID of the current XML element's parent
  * @returns {undefined}
  */
-=======
-
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function renderXMLPreview(xml, target, parent_id)
 {
     parent_id = (parent_id) ? parent_id : NODE_ID_PREFIX;
@@ -446,22 +343,15 @@ function renderXMLPreview(xml, target, parent_id)
     {
         _.each(children, function(child)
         {
-<<<<<<< HEAD
             //render the children of this node directly under it
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
             renderXMLPreview(child, '.' + node_id + ':last .xml-preview-children:first', node_id);
         });
     }
 }
-<<<<<<< HEAD
 /**
  * Add the root node to the property bucket by default
  * @returns {undefined}
  */
-=======
-
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function addRootNode()
 {
     var root_node = $('.node-tag-document');
@@ -471,7 +361,6 @@ function addRootNode()
 /********************
  *      EVENTS      *
  ********************/
-<<<<<<< HEAD
 /**
  * Load node tree vents
  * @returns {undefined}
@@ -485,36 +374,18 @@ function loadNodeTreeEvents()
         enableHighlightNodes(id, false);
     });
     //text node added
-=======
-function loadNodeTreeEvents()
-{
-    loadGenericNodeTreeEvents();
-    $('.node-tag').on('click', function() {
-        var self = $(this), id = self.attr('data-id');
-        enableHighlightNodes(id, false);
-        /* $('.xml-preview-node .highlighted-nodes').removeClass('highlighted-nodes');
-         $('.xml-preview-node .' + id).addClass('highlighted-nodes');
-         $('#tagger-xml-preview-container .tagger-container-body').scrollTop(0);
-         var top = $('#tagger-xml-preview-container .' + id + ":first").offset().top - $('#tagger-xml-preview-container .tagger-container-body').position().top - 25;
-         $('#tagger-xml-preview-container .tagger-container-body').scrollTop(top);*/
-    });
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     $('.node-tag-action-text').on('click', function()
     {
         processElement(this);
 
     });
-<<<<<<< HEAD
     //property node added
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     $('.node-tag-action-property').on('click', function()
     {
         processElement(this);
 
     });
 }
-<<<<<<< HEAD
 
 /**
  * Load generic events associated with tree nodes
@@ -523,10 +394,6 @@ function loadNodeTreeEvents()
 function loadGenericNodeTreeEvents()
 {
     //Tree collapse events
-=======
-function loadGenericNodeTreeEvents()
-{
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     $('.tagger-node .collapse-node').unbind('click').on('click', function() {
         var self = $(this);
         self.parents('.tagger-node:first').children('.tagger-node-children:first').slideUp();
@@ -539,10 +406,7 @@ function loadGenericNodeTreeEvents()
         var self = $(this);
         self.parents('.tagger-node:first').children('.tagger-node-children:first').removeClass('highlighted-nodes');
     });
-<<<<<<< HEAD
     //Tree expand events
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     $('.tagger-node .expand-node').unbind('click').on('click', function() {
         var self = $(this);
         self.parents('.tagger-node:first').children('.tagger-node-children:first').slideDown();
@@ -551,7 +415,6 @@ function loadGenericNodeTreeEvents()
     });
 }
 
-<<<<<<< HEAD
 /**
  * Add bucket tag events
  * @param {string} id node id
@@ -559,9 +422,6 @@ function loadGenericNodeTreeEvents()
  */
 function addBucketTagEvents(id) {
     //highlight xml and other elements when hovering
-=======
-function addBucketTagEvents(id) {
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     $('.bucket-body > .' + id).on('mouseover', function()
     {
         enableHighlightNodes(id, true);
@@ -570,7 +430,6 @@ function addBucketTagEvents(id) {
     {
         disableHighlightNodes(id);
     });
-<<<<<<< HEAD
     //show rename dialogue when a property bucket node is clicked
     $('.bucket-body .bucket-tag-property.' + id).unbind('click').on('click', function()
     {
@@ -586,29 +445,16 @@ function addBucketTagEvents(id) {
     //removing a bucket node
     $('.bucket-tag-remove.' + id).on('click', function() {
         var myId = $(this).attr('data-id'), type = $(this).attr('data-node-type');
-=======
-    $('.bucket-body .bucket-tag-property.' + id).on('click', function()
-    {
-        var self = $(this), type = self.attr('data-type');
-        showRenameDialogue(id);
-    });
-    $('.bucket-tag-remove.' + id).on('click', function() {
-        var myId = $(this).attr('data-id'), type = $(this).attr('data-type');
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         removeElement(null, myId, type);
         disableHighlightNodes(myId);
     });
 }
-<<<<<<< HEAD
 /*
  * Highlight all instances of specifc node id in XML preview, tree node, and output preview
  * @param {string} id node id to highlihgt
  * @param {boolean} highlightTreeNodes highlight tree nodes or not
  * @returns {undefined}
  */
-=======
-
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function enableHighlightNodes(id, highlightTreeNodes)
 {
     if (highlightTreeNodes) {
@@ -626,14 +472,11 @@ function enableHighlightNodes(id, highlightTreeNodes)
         enableHighlightNodes(tid, highlightTreeNodes);
     }
 }
-<<<<<<< HEAD
 /** 
  * disable highlights
  * @param {string} id node id
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function disableHighlightNodes(id)
 {
     $('#tagger-node-preview  .' + id).removeClass('highlighted-tag');
@@ -642,15 +485,12 @@ function disableHighlightNodes(id)
         disableHighlightNodes(nodes.map[id].attributes.titleId);
 
 }
-<<<<<<< HEAD
 
 /**
  * Process a tree node element (add or remove)
  * @param {HTML} el HTML element to process
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function processElement(el)
 {
     var tag = $(el), id = tag.attr('data-id'), nodeType = tag.attr('data-node-type'), active = nodes.map[id].attributes.isActive;
@@ -660,7 +500,6 @@ function processElement(el)
     else
         addElement(tag, id, nodeType);
 }
-<<<<<<< HEAD
 /**
  * Remvoe an element from buckets
  * @param {string} tag HTML tag
@@ -668,23 +507,16 @@ function processElement(el)
  * @param {string} nodeType from NODE_TYPES
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function removeElement(tag, id, nodeType)
 {
     if (!tag)
         tag = $('.node-tag-action.' + id);
-<<<<<<< HEAD
-=======
-//    tag.removeClass('added-node');
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     if (nodeType === NODE_TYPES.TEXT)
         removeTextElement(id);
     else
         removePropertyElement(id);
     refreshNodeTreeView();
 }
-<<<<<<< HEAD
 
 /**
  * Add and element to buckets
@@ -695,8 +527,6 @@ function removeElement(tag, id, nodeType)
  * @param {boolean} preventRender prevent render the UI after adding
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function addElement(tag, id, nodeType, renameDialogue, preventRender)
 {
     var bucket = $('.bucket-tag-' + nodeType + '.' + id);
@@ -722,14 +552,11 @@ function addElement(tag, id, nodeType, renameDialogue, preventRender)
     }
     refreshNodeTreeView();
 }
-<<<<<<< HEAD
 /**
  * Add a node to the sentence bucket
  * @param {string} id node id
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function addTextElement(id)
 {
     removePropertyElement(id);
@@ -739,16 +566,12 @@ function addTextElement(id)
         node.activate();
         node.setAsSentence(true);
         renderTemplate('#sentence-bucket .bucket-body', TEMPLATES.BUCKET_NODE, node);
-<<<<<<< HEAD
         showCombineForm(id);
 
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     } else {
         alert('node already added');
     }
 }
-<<<<<<< HEAD
 /**
  * Add a node to the properties bucket
  * @param {string} id node id
@@ -756,8 +579,6 @@ function addTextElement(id)
  * @param {boolean} preventRender prvent UI refresh after adding
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function addPropertyElement(id, renameDialogue, preventRender)
 {
     removeTextElement(id);
@@ -775,7 +596,6 @@ function addPropertyElement(id, renameDialogue, preventRender)
     if (renameDialogue || node.attributes.type === SUBUNIT_TAG)
         showRenameDialogue(id);
 }
-<<<<<<< HEAD
 /**
  * Remvoe node form sentence bucket and deactivate it
  * @param {string} id node id
@@ -784,23 +604,16 @@ function addPropertyElement(id, renameDialogue, preventRender)
 function removeTextElement(id)
 {
 
-=======
-function removeTextElement(id)
-{
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     var node = nodes.map[id];
     node.deactivate();
     node.setAsSentence(false);
     removeNode('#sentence-bucket .bucket-body .' + id);
 }
-<<<<<<< HEAD
 /**
  * Remvoe node form properties bucket and deactivate it
  * @param {string} id node id
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function removePropertyElement(id)
 {
     var node = nodes.map[id];
@@ -812,15 +625,11 @@ function removePropertyElement(id)
         titleNode.deactivate();
     }
 }
-<<<<<<< HEAD
 /**
  * Refresh the UI of a certain bucket node from node model
  * @param {string} id node id
  * @returns {undefined}
  */
-=======
-
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function refreshElement(id) {
 
     var node = nodes.map[id], target = '.bucket-tag-group.' + id;
@@ -828,14 +637,11 @@ function refreshElement(id) {
     addBucketTagEvents(id);
 
 }
-<<<<<<< HEAD
 /**
  * Refresh the UI of the node tree preview based on the active node model nodes. 
  * This will ensure proeper UI rendering instead of handling each event individually (add/remove)
  * @returns {undefined}
  */
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function refreshNodeTreeView()
 {
     $('.node-tag-action').removeClass('added-node');
@@ -856,36 +662,23 @@ function refreshNodeTreeView()
  *      Rename dialogue     *
  ***************************/
 /**
-<<<<<<< HEAD
  * Show the rename/assign title dialogue
  * @param {string} id
-=======
- * 
- * @param {type} id
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
  * @returns {undefined}
  */
 function showRenameDialogue(id)
 {
-<<<<<<< HEAD
     hideRenameDialogue();
-=======
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     var node = nodes.map[id];
     renderTemplate('#tagger-rename-dialogue', TEMPLATES.RENAME_FORM, node.attributes);
     if (node.attributes.type !== METADATA_TAG)
         renderTitleTreeNodes(node, '#rename-form #title-tree-nodes');
-<<<<<<< HEAD
-=======
-//    renderXMLPreview(nodes.attributes.xml, '#title-tree-xml-preview', null, 'title-xml-preview-node');
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     $('#tagger-xml-preview .xml-preview-node:first').clone().appendTo('#title-tree-xml-preview');
     $('#title-tree-xml-preview .xml-preview-node').addClass('title-xml-preview-node').removeClass('xml-preview-node');
     $('#tagger-rename-dialogue').fadeIn();
     loadRenameDialogueEvents();
     if (node.attributes.titleId !== '')
     {
-<<<<<<< HEAD
         $('.title-node-tag.' + node.attributes.titleId).trigger('click');
     }
 }
@@ -897,15 +690,6 @@ function loadRenameDialogueEvents()
 {
     loadGenericNodeTreeEvents();
     //tag click event to add as title, 
-=======
-//        console.log('has title ' + node.attributes.titleId);
-        $('.title-node-tag.' + node.attributes.titleId).trigger('click');
-    }
-}
-function loadRenameDialogueEvents()
-{
-    loadGenericNodeTreeEvents();
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     $('.title-node-tag').unbind('click')
             .on('click', function()
             {
@@ -915,13 +699,8 @@ function loadRenameDialogueEvents()
                         .val(self.text());
                 $('.title-node-tag').removeClass('highlighted-tag');
                 self.addClass('highlighted-tag');
-<<<<<<< HEAD
             })
             //tag hover event to highlight XML
-=======
-
-            })
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
             .on('mouseover', function()
             {
                 var self = $(this), id = self.attr('data-id');
@@ -931,17 +710,12 @@ function loadRenameDialogueEvents()
                 var top = $('#title-tree-xml-preview .' + id + ":first").offset().top - $('#title-tree-xml-preview').position().top - 160;
                 $('#title-tree-xml-preview').scrollTop(top);
             });
-<<<<<<< HEAD
     //clear form event
-=======
-
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     $('#rename-form-clear-title').unbind('click').on('click', function()
     {
         $('#selected-property-title').val('').attr('data-id', '');
         $('.title-node-tag.highlighted-tag').removeClass('highlighted-tag');
     });
-<<<<<<< HEAD
     //data type event
     $('#selected-property-data-type').dropdown();
     $('#selected-property-data-type-list li a').on('click', function() {
@@ -979,23 +753,11 @@ function hideRenameDialogue(remove, id, nodeType)
  * Save the outcome of the rename dialogue to the node model
  * @returns {undefined}
  */
-=======
-
-}
-function hideRenameDialogue()
-{
-    $('#tagger-rename-dialogue').hide();
-    $('#tagger-rename-dialogue').empty();
-    loadRenameDialogueEvents();
-
-}
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
 function saveRenameDialogue()
 {
     var id = $('#title-tree-node-target').val(),
             new_name = $('#selected-display-title').val(),
             new_target_id = $('#selected-property-title').attr('data-id'),
-<<<<<<< HEAD
             data_type = $('#selected-property-data-type').attr('data-type'),
             date_format = $('#selected-property-date-format').val(),
             node = nodes.map[id];
@@ -1010,50 +772,31 @@ function saveRenameDialogue()
         node.setTitleNode(new_target_id);
 
         nodes.map[new_target_id].setDataType(data_type);
-=======
-            node = nodes.map[id];
-    if (new_name.length > 0)
-        node.rename(new_name);
-    if (nodes.map[new_target_id])
-    {
-        node.setTitleAsXPath(nodes.map[new_target_id].attributes.xpaths[0]);
-        node.setTitleNode(new_target_id);
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         var tag;
 //        refreshElement(id);
         addElement(tag, new_target_id, NODE_TYPES.PROPERTY, false, true);
     }
     else
     {
-<<<<<<< HEAD
         //reset node title
         var tid = node.attributes.titleId;
         if (tid !== '')
-=======
-        var tid =node.attributes.titleId;
-        if(tid!=='')
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         {
             node.resetTitleNode();
         }
     }
-<<<<<<< HEAD
     node.setDataType(data_type);
 //update date format for date dataType
     if (data_type === DATA_TYPES.DATE) {
         node.setDateFormat(date_format);
     }
     refreshElement(id);//refresh the node UI after updating the model
-=======
-    refreshElement(id);
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
     hideRenameDialogue();
 }
 
 /****************************
  *      OUTPUT PREVIEW      *
  ****************************/
-<<<<<<< HEAD
 //default sample size
 var sampleSize = DEFAULT_SAMPLE_SIZE, defaultIncrease = DEFAULT_SAMPLE_SIZE;
 /**
@@ -1067,14 +810,6 @@ function loadOutputPreview()
     $('.bucket-body').unbind(BODY_CHANGE_EVENT).on(BODY_CHANGE_EVENT, function()
     {
         var data = nodes.getSample(sampleSize);
-=======
-function loadOutputPreview()
-{
-    //"DOMSubtreeModified"
-    $('.bucket-body').on(BODY_CHANGE_EVENT, function()
-    {
-        var data = nodes.getSample();
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
         $('#tagger-output-preview-container').empty();
         if (data.length > 0) {
             for (var i = 0, j = data.length; i < j; i++)
@@ -1086,7 +821,6 @@ function loadOutputPreview()
         }
     });
 }
-<<<<<<< HEAD
 /**
  * Show more outputs by increasing the smaple size 
  * @returns {undefined}
@@ -1174,7 +908,3 @@ function showLoading() {
 function hideLoading() {
     $('#tagger-loading-box').fadeOut(200);
 }
-=======
-
-
->>>>>>> parent of 89fc010... Revert "Merge pull request #72 from Wordseer/HMJ-XML-Mapper"
