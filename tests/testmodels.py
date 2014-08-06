@@ -5,6 +5,7 @@ import unittest
 from app import db
 from app.models import Dependency
 from app.models import Document
+from app.models import DocumentFile
 from app.models import DocumentSet
 from app.models import Property
 from app.models import Project
@@ -246,7 +247,7 @@ class TestUnitModels(unittest.TestCase):
         """Test to make sure that Document is working properly.
         """
 
-        d1 = Document(title="test", path="/path/to/d1")
+        d1 = Document(title="test")
         d1.save()
 
         assert d1.type == "document"
@@ -266,14 +267,17 @@ class TestUnitModels(unittest.TestCase):
 
         user = User()
         project = Project()
+        document_file = DocumentFile()
         document = Document()
 
-        project.documents = [document]
+        project.document_files = [document_file]
+        document_file.documents = [document]
         user.projects = [project]
 
         user.save()
         project.save()
         document.save()
+        document_file.save()
 
         assert document.belongs_to(user)
 
@@ -375,7 +379,7 @@ class TestStructureFileModel(unittest.TestCase):
     """
 
     def setUp(self):
-        database.restore_cache()
+        database.clean()
 
     def test_model_structure_file(self):
         """Test to make sure that StructureFile is working properly.
@@ -390,4 +394,57 @@ class TestStructureFileModel(unittest.TestCase):
 
         assert Project.query.all()[0].structure_files == [structure_file1,
             structure_file2]
+
+class TestProjectModel(unittest.TestCase):
+    """Tests for the Project model.
+    """
+
+    def setUp(self):
+        database.clean()
+
+    def test_get_documents(self):
+        """Test the get_documents method.
+        """
+        document_file1 = DocumentFile()
+        document_file2 = DocumentFile()
+
+        document1 = Document()
+        document2 = Document()
+        document3 = Document()
+
+        project = Project()
+
+        document_file1.documents = [document1, document2]
+        document_file2.documents = [document3]
+
+        project.document_files = [document_file1, document_file2]
+        project.save()
+
+        assert project.get_documents() == [document1, document2, document3]
+
+
+class TestDocumentFileModule(unittest.TestCase):
+    """Test the DocumentFile model.
+    """
+
+    def setUp(self):
+        database.clean()
+
+    def test_model_document_file(self):
+        """Test to make sure that DocumentFile is working properly.
+        """
+
+        documentfile = DocumentFile()
+        document1 = Document()
+        document2 = Document()
+        project1 = Project()
+        project2 = Project()
+
+        documentfile.path = "/foo/bar"
+        documentfile.documents = [document1, document2]
+        documentfile.projects = [project1, project2]
+        documentfile.save()
+
+        assert len(documentfile.documents) == 2
+        assert len(documentfile.projects) == 2
 

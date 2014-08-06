@@ -73,7 +73,7 @@ class CollectionProcessor(object):
         if not "true" in logger.get(self.project, "word_counts_done").lower():
             self.pylogger.info("Calculating word counts")
             # TODO: implement a method to do word counts for sentences
-            logger.log("word_counts_done", "true", logger.REPLACE)
+            logger.log(self.project, "word_counts_done", "true", logger.REPLACE)
 
         # Calculate word TFIDFs
         if not "true" in logger.get(self.project, "tfidf_done").lower():
@@ -160,8 +160,7 @@ class CollectionProcessor(object):
         Afterwards, call ``finish_grammatical_processing`` on the reader/writer.
         """
 
-        # TODO: readerwriter
-        documents = self.project.documents
+        documents = self.project.get_documents()
         document_parser = DocumentParser(self.str_proc, self.project)
         documents_parsed = 0
         latest = logger.get(self.project, "latest_parsed_document_id")

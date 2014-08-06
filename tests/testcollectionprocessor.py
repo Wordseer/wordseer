@@ -109,7 +109,7 @@ class TestCollectionProcessor(unittest.TestCase):
         mock_documents = [mock.create_autospec(Document, id=i)
             for i in range(max_doc)]
 
-        colproc.project.documents = mock_documents
+        colproc.project.get_documents.return_value = mock_documents
 
         latest = 5
         mock_logger.get.return_value = str(latest)

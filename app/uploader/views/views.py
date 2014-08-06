@@ -26,6 +26,7 @@ from .. import forms
 from .. import helpers
 from .. import uploader
 from ...models import Document
+from ...models import DocumentFile
 from ...models import Project
 from ...models import StructureFile
 from ...models import Unit
@@ -86,14 +87,14 @@ class CLPDView(View):
     def delete_object(self, obj, data):
         """Given a Unit or Project object, delete their files,
         database records, and entries in the process form's choices.
-        :arg obj: A Unit or Project objects.
+        :arg obj: A DocumentFile or Project objects.
         :arg data: The second part of the tuple in the process form, the first
         item being the object's id.
         """
         if os.path.isdir(obj.path):
             shutil.rmtree(obj.path)
-            for document in obj.documents:
-                db.session.delete(document)
+            for document_file in obj.document_files:
+                db.session.delete(document_file)
             db.session.commit()
         else:
             os.remove(obj.path)
@@ -208,8 +209,8 @@ class ProjectsCLPD(CLPDView):
                 self.delete_object(project, project.name)
         if request.form["action"] == self.process_form.PROCESS:
             for project in project_objects:
-                files = [document for document in project.documents]
-                structure_file = helpers.get_structure_file(files)
+                files = project.document_files
+                structure_file = project.structure_files[0]
                 process_files(project.path, structure_file.path, project)
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"],
@@ -242,7 +243,7 @@ class ProjectCLPD(CLPDView):
     def set_choices(self, **kwargs):
         """The template needs the choices in the form of (id, filename).
         """
-        file_objects = self.project.documents
+        file_objects = self.project.document_files
         self.process_form.selection.choices = []
         self.process_form.structure_file.choices = []
 
@@ -292,7 +293,7 @@ class ProjectCLPD(CLPDView):
                 os.path.split(dest_path)[1])
 
         else:
-            file_model = Document(path=dest_path, projects=[self.project])
+            file_model = DocumentFile(path=dest_path, projects=[self.project])
             file_model.save()
             self.process_form.selection.add_choice(file_model.id,
                 os.path.split(dest_path)[1])
@@ -304,7 +305,7 @@ class ProjectCLPD(CLPDView):
         files = request.form.getlist("process-selection")
         structure_file_ids = request.form.getlist("process-structure_file")
 
-        file_objects = [Document.query.get(id) for id in files]
+        file_objects = [DocumentFile.query.get(id) for id in files]
         structure_files = [StructureFile.query.get(id) for id in structure_file_ids]
 
         if request.form["action"] == self.process_form.DELETE:
@@ -322,35 +323,34 @@ uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
     view_func=ProjectCLPD.as_view("project_show"))
 
 @uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" +
-    app.config["DOCUMENT_ROUTE"] + '<int:document_id>')
+    app.config["DOCUMENT_ROUTE"] + '<int:document_file_id>')
 @login_required
-def document_show(project_id, document_id):
-    """
-    The show action, which shows details for a particular document.
+def document_show(project_id, document_file_id):
+    """The show action, which shows details for a particular DocumentFile.
 
-    :param int doc_id: The document to retrieve details for.
+    :param int document_file_id: The DocumentFile to retrieve details for.
     """
     #TODO: good spot for a helper
     #document = helpers.get_object_or_exception(Unit,
     #   Unit.id == document_id, exceptions.DocumentNotFoundException)
     try:
-        document = Document.query.get(document_id)
+        document_file = DocumentFile.query.get(document_file_id)
     except TypeError:
         return app.login_manager.unauthorized()
 
-    access_granted = current_user.has_document(Document.query.get(document_id))
+    access_granted = current_user.has_document_file(document_file)
 
     # Test if this user can see it
     if not access_granted:
         return app.login_manager.unauthorized()
 
-    filename = os.path.split(document.path)[1]
+    filename = os.path.split(document_file.path)[1]
     #TODO: move to objects
     project = Project.query.join(User).filter(User.id == current_user.id).\
-        filter(Document.id == document_id).one()
+        filter(DocumentFile.id == document_file_id).one()
 
     return render_template("document_show.html",
-        document=document,
+        document_file=document_file,
         project=project,
         filename=filename)
 
@@ -360,16 +360,16 @@ def get_file(file_id):
     """If the user has permission to view this file, then return it.
     """
 
-    document = Document.query.get(file_id)
+    document_file = DocumentFile.query.get(file_id)
     try:
-        access_granted = current_user.has_document(document)
+        access_granted = current_user.has_document_file(document_file)
     except TypeError:
         return app.login_manager.unauthorized()
 
     # Test if this user can see it
     if not access_granted:
         return app.login_manager.unauthorized()
-    directory, filename = os.path.split(document.path)
+    directory, filename = os.path.split(document_file.path)
 
     return send_from_directory(directory, filename)
 

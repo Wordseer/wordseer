@@ -40,7 +40,7 @@ def is_processable(docs=None, structure_files=None, project=None):
         struc_count = len(structure_files)
 
     else:
-        doc_count = len(project.documents)
+        doc_count = len(project.document_files)
         struc_count = len(project.structure_files)
 
     if struc_count is not 1:

@@ -2,6 +2,7 @@ from .base import Base
 from .cached_sentences import CachedSentences
 from .dependency import Dependency
 from .document import Document
+from .documentfile import DocumentFile
 from .flask_security import User, Role
 from .grammaticalrelationship import GrammaticalRelationship
 from .log import Log
