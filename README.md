@@ -35,9 +35,9 @@ The following packages must be installed before performing any setup:
 - [libxml2 2.6.21 or later](http://xmlsoft.org/downloads.html)
 - [libxslt 1.1.15 or later](http://xmlsoft.org/XSLT/downloads.html)
 - [Java 1.6 or later](https://www.java.com/en/download/manual.jsp)
-- If on linux or mac, then the [unzip](http://www.info-zip.org/UnZip.html)
+- If on linux or mac, [unzip](http://www.info-zip.org/UnZip.html)
 
-We also reccomend installing the python dependencies (discussed below) in a
+We also recommend installing the python dependencies (discussed below) in a
 [virtual environment](https://pypi.python.org/pypi/virtualenv).
 
     pip install virtualenv
@@ -48,28 +48,28 @@ We also reccomend installing the python dependencies (discussed below) in a
 
 1. Run `install.sh`:
 
-    ./install.sh
+        ./install.sh
 
-That's it.
+    That's it.
 
 ### Windows
 
 #### Installing the application
 1.  Run:
 
-    pip -r install requirements_win.txt
+        pip -r install requirements_win.txt
 
-to install the necessary packages.
+    to install the necessary packages.
 
 3.  Run:
 
-    python database.py create
+        python database.py create
 
-to create the dabase, and
+    to create the dabase, and
 
-    python database.py migrate
+        python database.py migrate
 
-to migrate the model schema into the database.
+    to migrate the model schema into the database.
 
 ### Installing the preprocessor
 
@@ -78,21 +78,21 @@ to migrate the model schema into the database.
     git clone https://github.com/silverasm/stanford-corenlp-python.git
     cd stanford-corenlp-python
 
-Create a file called `setup.py` in its root directory containing the
-following:
+    Create a file called `setup.py` in its root directory containing the
+    following:
 
-    from setuptools import setup, find_packages
-    setup(name='corenlp',
-        version='1.0',
-        packages=find_packages(),
-        package_data = {"": ["*.properties"],
-        "corenlp": ["*.properties"]},)
+        from setuptools import setup, find_packages
+        setup(name='corenlp',
+            version='1.0',
+            packages=find_packages(),
+            package_data = {"": ["*.properties"],
+            "corenlp": ["*.properties"]},)
 
-Then, from the root directory of `corenlp`, execute the following:
+    Then, from the root directory of `corenlp`, execute the following:
 
-    python setup.py install
+        python setup.py install
 
-This should install `corenlp` to your system.
+    This should install `corenlp` to your system.
 
 2. In order to complete the setup, version *3.2.0* of Stanford's CoreNLP
 library must simply be in a directory accessible to the backend. Download
@@ -100,13 +100,17 @@ library must simply be in a directory accessible to the backend. Download
 and move it to the root of the repository. Extract it and rename the folder
 from `stanford-corenlp-full-2013-06-20` to `stanford-corenlp`.
 
-2. If you followed the above directions, then you shouldn't need to worry about
+3. If you followed the above directions, then you shouldn't need to worry about
 any configuration. If you installed Stanford's CoreNLP elsewhere, then make sure
 you edit `lib/wordseerbackend/wordseerbackend/config.py` for your setup.
 Particularly make sure to point `CORE_NLP_DIR` to the Stanford NLP library.
 
-You should then be ready to parse files. Example XML and JSON files are
-included in `tests/data`.
+4. Run the following command in the console:
+
+    python -m nltk.downloader punkt
+
+    You should then be ready to parse files. Example XML and JSON files are
+    included in `tests/data`.
 
 ## Documentation
 Documentation is
@@ -121,5 +125,5 @@ Or, on windows, simply run `make.bat` in the same directory.
 ## Testing
 Simply run `runtests.py`:
 
-        python runtests.py
+    python runtests.py
 
