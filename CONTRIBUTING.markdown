@@ -1,0 +1,26 @@
+# How to contribute to Wordseer
+
+If you'd like to contribute, we'll be happy to have your help. Here's an
+overview of our development process.
+
+## Branching
+
+We have two main branches:
+
+- `master`, for stable, production-ready code
+- `development`, for recent and unstable code
+
+Feature branches that wish to make a change to the application should be
+branched from `development`. Once they are ready, they'll be merged into
+`development`, which is periodically merged into `master`.
+
+Unit tests must always be passing in `master`.
+
+## Ways to contribute
+
+1. [Report bugs](https://github.com/Wordseer/wordseer_flask/issues/new)
+
+2. Fix bugs - we have a conveniently organized
+[system](https://waffle.io/wordseer/wordseer_flask) for contributors to see
+what's ready to be worked on.
+
