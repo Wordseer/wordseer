@@ -3,15 +3,17 @@ between the input and the pipeline.
 """
 
 from datetime import datetime
+import logging
 import os
 
 from app import app
 import database
 from . import logger
-from .parser.documentparser import DocumentParser
-from .sequence.sequenceprocessor import SequenceProcessor
+from .documentparser import DocumentParser
+from .sequenceprocessor import SequenceProcessor
 from . import structureextractor
 from .stringprocessor import StringProcessor
+from . import counter
 
 class CollectionProcessor(object):
     """Process a collection of files.
@@ -19,8 +21,8 @@ class CollectionProcessor(object):
     def __init__(self, reader_writer):
         self.reader_writer = reader_writer
         self.str_proc = StringProcessor()
+        self.pylogger = logging.getLogger(__name__)
 
-    #@profile
     def process(self, collection_dir, docstruc_filename,
         filename_extension, start_from_scratch):
         """
@@ -48,7 +50,7 @@ class CollectionProcessor(object):
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
         if not "true" in logger.get("finished_recording_text_and_metadata"):
-            print("Extracting document text and metadata")
+            self.pylogger.info("Extracting document text and metadata")
             self.extract_record_metadata(collection_dir,
                 docstruc_filename, filename_extension)
 
@@ -57,9 +59,9 @@ class CollectionProcessor(object):
             (app.config["WORD_TO_WORD_SIMILARITY"] and
             app.config["PART_OF_SPEECH_TAGGING"])) and not
             "true" in logger.get("finished_grammatical_processing").lower()):
-            print("Parsing documents")
+            self.pylogger.info("Parsing documents")
             self.parse_documents()
-
+            self.pylogger.info("Parsing documents")
         if (app.config["SEQUENCE_INDEXING"] and
             "true" in logger.get("finished_sequence_processing").lower()):
             print "finishing indexing sequences"
@@ -69,21 +71,21 @@ class CollectionProcessor(object):
 
         # Calculate word-in-sentence counts and TF-IDFs
         if not "true" in logger.get("word_counts_done").lower():
-            print("Calculating word counts")
+            self.pylogger.info("Calculating word counts")
             #TODO: reader_writer
             self.reader_writer.calculate_word_counts()
             logger.log("word_counts_done", "true", logger.REPLACE)
 
         # Calculate word TFIDFs
         if not "true" in logger.get("tfidf_done").lower():
-            print("Calculating TF IDF's")
+            self.pylogger.info("Calculating TF IDF's")
             #TODO: reader_writer
             self.reader_writer.calculate_tfidfs()
 
         # Calculate word-to-word-similarities
         if (app.config["WORD_TO_WORD_SIMILARITY"] and not
             "true" in logger.get("word_similarity_calculations_done")):
-            print("Calculating Lin Similarities")
+            self.pylogger.info("Calculating Lin Similarities")
             #TODO: reader_writer
             self.reader_writer.calculate_lin_similarities()
 
@@ -131,13 +133,9 @@ class CollectionProcessor(object):
                     logger.REPLACE)
                 docs = extractor.extract(os.path.join(collection_dir,
                     filename))
-                for doc in docs:
-                    # TODO: readerwriter
-                    self.reader_writer.create_new_document(doc,
-                       num_files_done)
 
-                print("\t" + str(num_files_done) + "/" + str(len(contents))
-                    + "\t" + filename)
+                self.pylogger.info("%s/%s %s", str(num_files_done),
+                    str(len(contents)), filename)
                 logger.log("text_and_metadata_recorded",
                     str(num_files_done), logger.UPDATE)
 
@@ -173,13 +171,13 @@ class CollectionProcessor(object):
             if doc_id > latest_id:
                 #TODO: readerwriter
                 doc = self.reader_writer.get_document(doc_id)
-                print("Parsing document " + str(documents_parsed) + "/" +
-                    str(len(document_ids)))
+                self.pylogger.info("Parsing document %s/%s",
+                    str(documents_parsed), str(len(document_ids)))
                 start_time = datetime.now()
                 document_parser.parse_document(doc)
                 seconds_elapsed = (datetime.now() - start_time).total_seconds()
-                print("\tTime to parse document: " + str(seconds_elapsed) +
-                    "s\n")
+                self.pylogger.info("Time to parse document: %ss",
+                    str(seconds_elapsed))
                 logger.log("finished_grammatical_processing", "false",
                     logger.REPLACE)
                 logger.log("latest_parsed_document_id", str(doc_id),
@@ -187,8 +185,7 @@ class CollectionProcessor(object):
 
             documents_parsed += 1
 
-        #TODO: reader_writer
-        self.reader_writer.finish_grammatical_processing()
+        counter.count()
 
     def calculate_index_sequences(self):
         """Calculate and index sequences, if not already done during grammatical
@@ -226,8 +223,8 @@ class CollectionProcessor(object):
                         logger.log("latest_sequence_sentence", str(i),
                             logger.REPLACE)
                 if sentences_processed % 1000 == 0:
-                    print("Sequence-processing sentence " + str(i) + "/" +
-                        str(max_sentence_id))
+                    self.pylogger.info("Sequence-processing sentence %s/%s",
+                        str(i), str(max_sentence_id))
 
             sentences_processed += 1
 

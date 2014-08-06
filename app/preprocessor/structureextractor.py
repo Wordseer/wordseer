@@ -1,7 +1,4 @@
-"""
-.. module:: StuctureExtractor
-    :synopsis: Methods to parse XML files and generate python classes from their
-    contents.
+"""Methods to parse XML files and generate python classes from their contents.
 """
 
 import json
@@ -41,11 +38,15 @@ class StructureExtractor(object):
         doc = etree.parse(infile)
         units = self.extract_unit_information(self.document_structure, doc)
 
+        doc_num = 0
         for extracted_unit in units:
             d = Document(properties=extracted_unit.properties,
                 sentences=extracted_unit.sentences,
                 title=extracted_unit.name,
-                children=extracted_unit.children)
+                children=extracted_unit.children,
+                number = doc_num)
+            assign_sentences(d)
+
             documents.append(d)
 
         return documents
@@ -91,6 +92,7 @@ class StructureExtractor(object):
 
                 if not structure.get("combine") or len(combined_nodes) == 1:
                     current_unit.children = children
+                    current_unit.save(False)
                     units.append(current_unit)
 
             # TODO: refactor, this code is similar in get_sentences
@@ -168,7 +170,8 @@ class StructureExtractor(object):
         sentences = self.get_sentences_from_text(sentence_text, tokenize)
 
         for sentence in sentences:
-            sentence.properties = sentence_metadata
+            # TODO: figure out sentence properties
+            # sentence.properties = sentence_metadata
             result_sentences.append(sentence)
 
         return result_sentences
@@ -219,7 +222,7 @@ def get_metadata(structure, node):
                 metadata_list.append(Property(
                     value=val,
                     name=spec["propertyName"],
-                    specification=spec))
+                ))
     return metadata_list
 
 def get_xpath_attribute(xpath_pattern, attribute, node):
@@ -286,4 +289,30 @@ def get_nodes_from_xpath(xpath, nodes):
     if len(xpath.strip()) == 0 or nodes in nodes.xpath("../" + xpath):
         return [nodes]
     return nodes.xpath(xpath)
+
+def assign_sentences(document):
+    """Populates the all_sentences relationship for the document.
+
+    :param Document document: The document to use
+    """
+
+    document.all_sentences = _get_sentences(document)
+
+def _get_sentences(unit):
+    """Recursively traverse the unit tree for sentences.
+
+    :param Unit unit: The unt to use
+    :return list: A nested list of sentences
+    """
+
+    if not unit.children:
+        return unit.sentences
+
+    else:
+        sentences = list(unit.sentences)
+
+        for child in unit.children:
+            sentences.extend(_get_sentences(child))
+
+        return sentences
 
