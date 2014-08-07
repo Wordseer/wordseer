@@ -12,9 +12,7 @@ CORENLP_DESTINATION="."
 # Directory name for the corenlp tree
 CORENLP_FINAL_NAME="stanford-corenlp"
 
-DIRS=(${CORENLP//\// })
-#FILENAME=${DIRS[${#DIRS[@]} - 1]}
-FILENAME=${DIRS[-1]}
+FILENAME=`basename $CORENLP`
 CORENLP_FINAL_PATH=$CORENLP_DESTINATION"/"$CORENLP_FINAL_NAME
 
 # Install python requirements
@@ -31,7 +29,7 @@ echo "Installing stanford-corenlp..."
 cd $CORENLP_DESTINATION
 curl -o $CORENLP_FINAL_NAME".zip" $CORENLP
 unzip $CORENLP_FINAL_NAME".zip"
-mv ${FILENAME:0:-4} $CORENLP_FINAL_NAME
+mv -f ${FILENAME:0:${#FILENAME}-4} $CORENLP_FINAL_NAME
 
 # Clean up
 echo "Cleaning up..."
