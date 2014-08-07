@@ -1,0 +1,42 @@
+<div id='combine-form' class='panel panel-default' data-id="<%=node.attributes.id%>">
+
+    <div class='panel-heading tagger-tooltip' title='Edit the title and display text for a property'>
+        <h4 class='panel-title'>Select the text processing mode</h4>
+    </div>
+
+    <div class='panel-body'>
+        <p><b>Wordseer</b> requires at least one XML element to be designated as a text node. The smallest unit of text analysis for this text is a sentence. 
+            Ideally, the selected text element must contain one or more sentences per element. 
+            If sentences are split into multiple elements, they should be <b>combined</b>. 
+            <em>During processing, individual sentences will be extracted from text blocks to form units of analysis.</em></p>
+        <h3>Select the way text is processed and displayed in <b>Wordseer</b>:</h3>
+
+        <div id="select-text-display-modes" class="btn-group" data-toggle="buttons">
+            <div class="text-display-mode btn btn-default <% if(!node.attributes.combine){%>active<%}%>" data-combine="false">
+                <input type="radio" name="options" id="text-display-mode1" checked>
+                <h2>Normal Sample</h2>
+                <table class="table table-striped">
+                    <% _.each(sample1,function(item){%>
+                    <tr><td><%=item%></td></tr>
+                    <%})%>
+                </table>
+
+            </div>
+            <div class="text-display-mode btn btn-default <% if(node.attributes.combine){%>active<%}%>" data-combine="true">
+
+                <input type="radio" name="options" id="text-display-mode2" >
+                <h2>Combined Sample</h2>
+                <table class="table table-striped" style="width:100%">
+                    <% _.each(sample2,function(item){%>
+                    <tr><td><%=item%></td></tr>
+                    <%})%>
+                </table>
+
+            </div>
+        </div>
+        <button id='combine-form-cancel-btn' class='btn btn-danger' onclick="hideCombineForm(true, '<%=node.attributes.id%>', '<%=node.attributes.nodeType%>')">Cancel</button>
+        <button id='combine-form-save-btn' class='btn btn-success' onclick="saveCombineForm()">Save</button>
+    </div>
+    <!--<button id='rename-form-clear-title' class="btn btn-info" >Clear</button>-->
+
+</div>

@@ -6,10 +6,11 @@ import os
 import threading
 import shutil
 import random
+import json
 from string import ascii_letters, digits
-
+from cStringIO import StringIO
 from flask import config
-from flask import redirect
+from flask import redirect, url_for
 from flask import render_template
 from flask import request
 from flask import send_from_directory
@@ -20,7 +21,6 @@ from flask.views import View
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug import secure_filename
 
-import pdb
 from .. import exceptions
 from .. import forms
 from .. import helpers
@@ -35,6 +35,7 @@ from app import app
 from app import db
 from app.models import User
 from app.preprocessor.collectionprocessor import cp_run
+from app import csrf
 
 def generate_form_token():
     """Sets a token to prevent double posts."""
@@ -61,7 +62,7 @@ class CLPDView(View):
     we can reduce the redundancy.
     """
 
-    #TODO: facilitate delete
+    #TODO : facilitate delete
 
     decorators = [login_required]
     methods = ["GET", "POST"]
@@ -82,8 +83,11 @@ class CLPDView(View):
         self.create_form = create_form(prefix="create")
         self.process_form = process_form(prefix="process")
         self.confirm_delete_form = confirm_delete_form(prefix="confirm_delete")
+
         self.template_kwargs = {}
 
+    # TODO: this method does more than delete the object so its name should
+    # reflect that
     def delete_object(self, obj, data):
         """Given a Unit or Project object, delete their files,
         database records, and entries in the process form's choices.
@@ -94,7 +98,8 @@ class CLPDView(View):
         if os.path.isdir(obj.path):
             shutil.rmtree(obj.path)
             for document_file in obj.document_files:
-                db.session.delete(document_file)
+                #TODO: can't we cascade this?
+                document_file.delete()
             db.session.commit()
         else:
             os.remove(obj.path)
@@ -105,9 +110,7 @@ class CLPDView(View):
         else:
             self.process_form.selection.delete_choice(obj.id, data)
 
-
-        db.session.delete(obj)
-        db.session.commit()
+        obj.delete()
 
     def set_choices(self, **kwargs):
         """Set the appropriate choices for the list view.
@@ -142,27 +145,33 @@ class CLPDView(View):
     def dispatch_request(self, **kwargs):
         """Render the template with the required data. kwargs are data
         passed to the URL.
+        if the map request button is clicked and valid, redirect to the mapping page
         """
-
         not_authorized = self.pre_tests(**kwargs)
 
         if not_authorized:
             return not_authorized
 
+        to_redirect = 0
+
         self.set_choices(**kwargs)
 
         if helpers.really_submitted(self.create_form):
-            self.handle_create(**kwargs)
+            to_redirect = self.handle_create(**kwargs)
 
         elif helpers.really_submitted(self.process_form):
-            self.handle_process(**kwargs)
+            to_redirect = self.handle_process(**kwargs)
 
-        self.reset_fields()
+        #TODO: maybe not the cleanest way to do it!!
+        if to_redirect == 0 or to_redirect is None:
+            self.reset_fields()
 
-        return render_template(self.template,
-            create_form=self.create_form,
-            process_form=self.process_form,
-            **self.template_kwargs)
+            return render_template(self.template,
+                create_form=self.create_form,
+                process_form=self.process_form,
+                **self.template_kwargs)
+        else:
+            return redirect(to_redirect)
 
 @uploader.route("/")
 def home():
@@ -217,6 +226,9 @@ uploader.add_url_rule(app.config["PROJECT_ROUTE"],
     view_func=ProjectsCLPD.as_view("projects"))
 
 #TODO: rename this?
+# NOTE: Is this not basically document handling? DocumentCLPD would be fine
+# although I really don't like CLPD at the end; can we just call these views
+# ProjectsView and DocumentsView? (plural because they handle multiple objects)
 class ProjectCLPD(CLPDView):
     """CLPD view for listing files in a project.
     """
@@ -234,9 +246,9 @@ class ProjectCLPD(CLPDView):
         self.project = helpers.get_object_or_exception(Project,
             Project.id == kwargs["project_id"],
             exceptions.ProjectNotFoundException)
+            # NOTE: handle access to nonexistent objects globally
 
         self.template_kwargs["project"] = self.project
-        pdb.set_trace()
         if self.project not in current_user.projects:
             return app.login_manager.unauthorized()
 
@@ -318,10 +330,25 @@ class ProjectCLPD(CLPDView):
 
         elif request.form["action"] == self.process_form.PROCESS:
             process_files(self.project.path, structure_files[0].path, self.project)
+        elif request.form["action"] == self.process_form.STRUCTURE:
+            # return the URL for structure mapping
+            file_id = files[0]
+            file_model = Unit.query.filter(Unit.id == file_id).one()
+            file_name = os.path.split(file_model.path)[1]
+            url = url_for('uploader.document_map',
+                document_id=int(float(file_id)), **kwargs)
+            return url
+        elif request.form["action"] == self.process_form.PROCESS:
+            pass
+        return 0
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
     view_func=ProjectCLPD.as_view("project_show"))
 
+# NOTE: It should not be necessary to include the project_id in the URL if this
+# just shows information about a document. The only reason it might need it is
+# if it's a page that shows information about the relationship between the
+# document and the project, which should probably be on a separate page anyway.
 @uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" +
     app.config["DOCUMENT_ROUTE"] + '<int:document_file_id>')
 @login_required
@@ -346,13 +373,49 @@ def document_show(project_id, document_file_id):
 
     filename = os.path.split(document_file.path)[1]
     #TODO: move to objects
+
     project = Project.query.join(User).filter(User.id == current_user.id).\
         filter(DocumentFile.id == document_file_id).one()
+    # NOTE: do you mean projects? why do you only load one project when
+    # documents can be part of more than one project? This should likely
+    # just be document.projects
 
     return render_template("document_show.html",
         document_file=document_file,
         project=project,
         filename=filename)
+@csrf.exempt
+@uploader.route(app.config["PROJECT_ROUTE"]+"<int:project_id>"+
+    app.config["MAP_ROUTE"] + '<int:document_id>')
+@login_required
+def document_map(project_id, document_id):
+    """
+    The map xml action, which is used create a sturctuve file map for document.
+
+    :param int doc_id: The document to retrieve details for.
+    """
+    print "DOC MAP"
+    try:
+        document = Document.query.get(document_id)
+    except TypeError:
+        return app.login_manager.unauthorized()
+
+    access_granted = current_user.has_document(Document.query.get(document_id))
+
+    # Test if this user can see it
+    if not access_granted:
+        return app.login_manager.unauthorized()
+
+    filename = os.path.split(document.path)[1]
+    project = Project.query.join(User).filter(User.id == current_user.id).\
+        filter(Document.id == document_id).one()
+    map_document = forms.MapDocumentForm()
+    return render_template("document_map.html",
+        document=document,
+        project=project,
+        filename=filename,
+        map_document = map_document,
+        document_url="%s%s"%(app.config["UPLOAD_ROUTE"],document.id))
 
 @uploader.route(app.config["UPLOAD_ROUTE"] + "<int:file_id>")
 @login_required
@@ -365,6 +428,7 @@ def get_file(file_id):
         access_granted = current_user.has_document_file(document_file)
     except TypeError:
         return app.login_manager.unauthorized()
+    # TODO: clearer error handling
 
     # Test if this user can see it
     if not access_granted:
@@ -382,4 +446,41 @@ def process_files(collection_dir, structure_file, project):
         project)
     preprocessing_process = threading.Thread(target=cp_run, args=args)
     preprocessing_process.start()
+
+@csrf.exempt
+@uploader.route(app.config["PROJECT_ROUTE"]+"<int:project_id>"+
+    app.config["MAP_ROUTE"] + '<int:document_id>'+app.config["SAVE_MAP"], methods=['POST'])
+@login_required
+def upload_structure_file( project_id, document_id):
+    """
+    Retireve the JSON object from te request, write it to a json file and
+    save it back to the project.
+    """
+    json_data = request.json
+    dest_path = ''
+    filename=''
+    counter = 0
+    while os.path.isfile(dest_path) or counter==0:
+        suffix = ''
+        if counter >0:
+            suffix='_%s'%counter
+        filename = json_data['filename']+"_structure"+suffix+".json"
+        filename = secure_filename(filename)
+        dest_path = os.path.join(app.config["UPLOAD_DIR"],
+            str(project_id), filename)
+        counter+=1
+
+    # TODO: this checks if the file exists, but can we do this
+    # inside the form?
+    if not os.path.isfile(dest_path):
+        f = open(dest_path, 'w');
+        f.write(json.dumps(json_data))
+        f.close();
+        project = Project.query.filter(Project.id == project_id).one()
+        document = Document(path=dest_path, projects=[project])
+        document.save()
+    else:
+        return "A file with name " + os.path.split(dest_path)[1] + " already exists"
+
+    return 'ok'
 

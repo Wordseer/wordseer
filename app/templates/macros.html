@@ -145,7 +145,7 @@ non-functional. #}
         </thead>
         <tbody>
             {% for choice in choices %}
-                <tr>
+                <tr class="{%if 'document' in type and '.json' in choice.label.text%}json-entry{% else %}xml-entry{%endif %}" >
                     <td>
                         {{ choice }}
                     </td>

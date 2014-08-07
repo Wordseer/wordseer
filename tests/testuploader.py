@@ -435,7 +435,6 @@ class AuthTests(unittest.TestCase):
         """Test to make sure that foo can't see bar's project.
         """
         result = self.client.get("/projects/" + str(self.project.id))
-
         assert "Bars project" not in result.data
 
     def test_view_document(self):

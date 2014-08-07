@@ -47,6 +47,7 @@ def get_relation_description(relation):
     else:
         return relation
 
+# TODO: move this to Sentence class method
 def remove_spaces_around_punctuation(sentence):
     """Remove spaces before certain punctuation marks and after certain other
     ones.
@@ -71,6 +72,7 @@ def remove_spaces_around_punctuation(sentence):
     return sentence
 
 #TODO: needs clarification
+# NOTE: this is basically the one-liner described below...why is there a helper for this?
 def get_words_in_sentence(sentence_id):
     """Given a ``Sentence`` ID, return information about all ``Word``\s in that
     sentence in the form of a list.
@@ -96,6 +98,8 @@ def get_words_in_sentence(sentence_id):
         order_by(SentenceInWord.c.position).\
         all()
 
+    # TODO: change to Sentence.query.get(sentence_id).words
+
     pass
 
 #TODO: needs clarification
@@ -106,6 +110,8 @@ def get_sequence_set_memberships():
 def get_relation_id(relation):
     pass
 
+# NOTE: I'm confused how this method works...seeing as this uses request,
+# shouldn't this be in a controller somewhere?
 def get_word_ids_from_surface_word(word):
     """Return a list of ``Word`` IDs that correspond to the given surface word.
 
@@ -160,6 +166,7 @@ def relationship_id_list(words):
 
 #TODO: can this accept and return a list instead?
 #TODO: unit testing
+# TODO: move to Word class method
 def word_id_list(raw_words):
     """Convert a list of words to a list of ``Word`` IDs.
 
@@ -187,6 +194,7 @@ def word_id_list(raw_words):
 #TODO: is this words? sequences? both?
 #TODO: why not return objects
 #TODO: plus separation does not work
+# NOTE: This can be replaced with a Sequence class method
 def sequence_id_list(sequences):
     """Convert a list of phrases to a list of sequence IDs.
 
@@ -211,11 +219,13 @@ def sequence_id_list(sequences):
         sequence_ids = db.session.query(Sequence).\
             filter(Sequence.sequence == sequence).\
             all()
+        # TODO: change to Sequence.query.filter(sequence==sequence).all()
         all_ids.extend(sequence_ids)
 
     return all_ids
 
 #TODO: needs clarification
+# TODO: move to SequenceSet instance method (sequence_set.words)
 def get_words_from_sequence_set(phrase_set_id):
     """Return a string with all the words in the given word set ID.
     """
@@ -224,10 +234,14 @@ def get_words_from_sequence_set(phrase_set_id):
 
     words = db.session.query(Word).join(SequenceSet).distinct().\
         filter(SequenceSet.id == sequence_set_id)
+        # TODO: change to:
+        #     sequences = SequenceSet.query.get(phrase_set_id).sequences
+        #     words = [ sequence.words for sequence in sequences ]
 
 #TODO: merge with above?
 #Because we're using this ORM, getting words or word ids or whatever else
 #from Word objects is trivial, and list comprehensions make lists easy to make.
+# TODO: move to SequenceSet instance method (sequence_set.word_ids)
 def get_word_ids_from_sequence_set(sequence_set_id):
     """Returns a list containing all the ``Word` IDs in the given
     ``SequenceSet``.
@@ -257,6 +271,7 @@ def get_word_ids_from_sequence_set(sequence_set_id):
                 ids.append(word.id)
     return list(set(ids))
 
+# TODO: move to Word instance method (word.lemma_variant_ids)
 def get_lemma_variant_ids(surface_word):
     """Get ``Word`` IDs for all words that have the same lemma as this one.
 
@@ -284,6 +299,7 @@ def get_lemma_variant_ids(surface_word):
     return [word.id for word in words]
 
 #TODO: merge with above?
+# TODO: move to Word instance method (word.lemma_variants)
 def get_lemma_variants(surface_word):
     """Get the ``word`` attributes of ``Word``\s that all have the same lemma
     as the given word.
