@@ -136,7 +136,7 @@ non-functional. #}
         <thead>
             <tr>
                 <th class="select">
-                    Select (<a href="#" id="check-all">All</a>)
+                    Select (<a href="#" class="check-all">All</a>)
                 </th>
                 <th>
                     {{ heading }}
@@ -145,7 +145,7 @@ non-functional. #}
         </thead>
         <tbody>
             {% for choice in choices %}
-                <tr>
+                <tr class="{%if 'document' in type and '.json' in choice.label.text%}json-entry{% else %}xml-entry{%endif %}" >
                     <td>
                         {{ choice }}
                     </td>
@@ -156,7 +156,7 @@ non-functional. #}
                                     project_id=choice.data, **kwargs) }}">
                             {% elif "document" in type %}
                                 <a href="{{ url_for(link_dest,
-                                    document_id=choice.data, **kwargs) }}">
+                                    document_file_id=choice.data, **kwargs) }}">
                             {% endif %}
                                 {{ choice.label.text }}
                             </a>
@@ -167,3 +167,4 @@ non-functional. #}
         </tbody>
     </table>
 {% endmacro %}
+

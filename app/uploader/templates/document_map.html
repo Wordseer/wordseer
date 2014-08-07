@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% from "macros.html" import breadcrumbs %}
+
+{% block head %}
+{{super()}}
+
+<link rel="stylesheet" href="{{ url_for('uploader.static',filename='tagger/tagger.css') }}" type="text/css" />
+<link rel="stylesheet" href = "{{ url_for('uploader.static',filename='external_lib/jquery-ui.min.css') }}" type = "text/css"/>
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/jquery-1.11.1.min.js') }}"></script>
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/jquery-ui.min.js') }}"></script>
+    <script type = 'text/javascript' src = "{{ url_for('uploader.static',filename='external_lib/jquery.tooltipster.min.js') }}">
+< link rel = "stylesheet" href = "{{ url_for('uploader.static',filename='external_lib/tooltipster.css') }}" type = "text/css" / ></script>
+
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/bootstrap.min.js') }}"></script>
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/jquery.xpath.js') }}"></script>
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/underscore.js') }}"></script>
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/string.js') }}"></script>
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/node_model.js') }}"></script>
+<script type='text/javascript' src="{{ url_for('uploader.static',filename='tagger/tagger.js') }}"></script>
+
+{% endblock %}
+{% block title %}Document Details{% endblock %}
+{% block body %}
+<h1>
+    {{ breadcrumbs([
+            (url_for('uploader.projects'), "Projects"),
+            (url_for('uploader.project_show', project_id=project.id),
+                project.name),
+            ("", filename)
+            ])}}
+</h1>
+
+{% block tagger %}
+<div id="tagger-loading-box" class='hidden-box'>
+    <div id='tagger-loading' class=''>
+        <img src="{{ url_for('uploader.static',filename='images/loadingGif.gif') }}" alt="Loading"/>
+    </div>
+</div>
+<form id='tagger'>
+    {{map_document.hidden_tag()}}
+    <input type="hidden" id="project-id" value="{{project.id}}"/>
+    <input type="hidden" id="document-id" value="{{document.id}}"/>
+    <input type="hidden" id="document-url" value="{{document_url}}"/>
+    <input type="hidden" id="filename" value="{{filename}}"/>
+    <input type="hidden" id="templates-url" value="{{url_for('uploader.static', filename='tagger/templates')}}"/>
+    <input type='button' id='show-intro'  class="btn btn-md btn-info" value='Show Intro'/>
+    <input type='button' id='preview-structure'  class="btn btn-md btn-info" value='Preview Structure File' onclick="previewStructureFile()"/>
+    <input type="submit" id="save-structure-button" class="btn btn-md btn-success" name='action' value='Save and Return'/>
+    <div id='tagger-previews'>
+        <div id="tagger-node-preview" class="panel panel-default tagger-box"></div>
+        <div id="tagger-xml-preview" class="panel panel-default tagger-box"></div>
+    </div>
+    <div id="tagger-buckets" class="tagger-box"></div>
+    <div id="tagger-output-preview" class="tagger-box"></div>
+    <div id="tagger-rename-dialogue" style="display:none" class="hidden-box"></div>
+    <div id="tagger-combine-dialogue" style="display:none" class="hidden-box"></div>
+    <div id="tagger-save-file-result" class='hidden-box' style="display:none">
+        <div id='tagger-save-file-response' class='panel panel-info'>
+            <div class='panel-heading'><div class='panel-title'>Save Response</div></div>
+            <div class='panel-body'></div>
+        </div>
+    </div>
+    <div id="tagger-intro-box" class='hidden-box' style="display:none">
+    </div>
+    <div id="json-preview-box" class="hidden-box" style="display:none"></div>
+
+</form>
+{% endblock %}
+
+{% endblock %}

@@ -11,10 +11,12 @@ class GrammaticalRelationship(db.Model, Base):
     dependent in the dependency model.
 
     Attributes:
-      name (str): the name of the relationship
+        name (str): the name of the relationship
+        dependency (Dependency): The ``Dependency`` this
+            ``GrammaticalRelationship`` belongs to.
 
     Relationships:
-      belongs to: dependency
+        belongs to: dependency
     """
 
     # Attributes

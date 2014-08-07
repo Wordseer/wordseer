@@ -1,0 +1,28 @@
+{
+    "version": 1,
+    "formatters": {
+        "simple": {
+            "format": "%(name)s:%(levelname)s:  %(message)s"
+        },
+        "detailed": {
+            "format": "%(name)s:%(levelname)s %(module)s:%(lineno)d: %(message)s"
+
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple"
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "formatter": "detailed",
+            "filename": "wordseer.log"
+        }
+    },
+    "root": {
+        "level": "DEBUG",
+        "handlers": ["file", "console"]
+    }
+}
+

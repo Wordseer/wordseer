@@ -130,3 +130,4 @@ class DocumentSet(Set):
         """
 
         return self.documents
+

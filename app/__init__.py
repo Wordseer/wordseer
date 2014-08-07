@@ -1,4 +1,6 @@
 import os
+import logging.config
+import json
 
 from flask import Flask
 from flask.ext.security import Security, SQLAlchemyUserDatastore
@@ -6,8 +8,11 @@ from flask_wtf.csrf import CsrfProtect
 
 from config import DEFAULT_ENV
 
+import logging.config
+import json
+
 app = Flask(__name__)
-CsrfProtect(app)
+csrf = CsrfProtect(app)
 
 # Load configurations for current environment by reading in the environment
 # variable FLASK_ENV and changing it to camel case with the title() function.
@@ -40,4 +45,13 @@ from app.wordseer import wordseer as wordseer_bp
 
 app.register_blueprint(uploader_bp)
 app.register_blueprint(wordseer_bp)
+
+"""
+==============
+Logging Set Up
+==============
+"""
+
+logfile = os.path.join(app.config["ROOT"], "logging.json")
+logging.config.dictConfig(json.load(open(logfile)))
 
