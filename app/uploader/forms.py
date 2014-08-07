@@ -12,7 +12,7 @@ from wtforms.validators import Required, ValidationError
 
 from app import app
 from .fields import ButtonField, MultiCheckboxField, MultiRadioField
-from ..models import Unit, Project
+from ..models import Unit, Project, DocumentFile
 
 class HiddenSubmitted(object):
     """A mixin to provide a hidden field called "submitted" which has a default
@@ -20,18 +20,17 @@ class HiddenSubmitted(object):
     """
 
     submitted = HiddenField(default="true")
+
 #TODO: Check if needed
 def is_mappable(ids=None, units=None):
-    """
-    validate that only one xml document is chosen to create a structure file.
-
+    """Validate that only one xml document is chosen to create a structure file.
     """
     doc_count = 0
+
     if ids:
         # Turn ids into units
-        units = []
-        for file_id in ids:
-            units.append(Unit.query.filter(Unit.id == file_id).one())
+        units = [DocumentFile.query.get(file_id) for file_id in ids]
+
     for unit in units:
         ext = os.path.splitext(unit.path)[1][1:]
         if ext in app.config["ALLOWED_EXTENSIONS"]:

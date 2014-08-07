@@ -157,7 +157,7 @@ class CLPDView(View):
         self.set_choices(**kwargs)
 
         if helpers.really_submitted(self.create_form):
-            to_redirect = self.handle_create(**kwargs)
+            self.handle_create(**kwargs)
 
         elif helpers.really_submitted(self.process_form):
             to_redirect = self.handle_process(**kwargs)
@@ -329,17 +329,18 @@ class ProjectCLPD(CLPDView):
                 self.delete_object(file_object, file_name)
 
         elif request.form["action"] == self.process_form.PROCESS:
-            process_files(self.project.path, structure_files[0].path, self.project)
+            process_files(self.project.path, structure_files[0].path,
+                self.project)
+
         elif request.form["action"] == self.process_form.STRUCTURE:
             # return the URL for structure mapping
             file_id = files[0]
-            file_model = Unit.query.filter(Unit.id == file_id).one()
+            file_model = DocumentFile.query.get(file_id)
             file_name = os.path.split(file_model.path)[1]
             url = url_for('uploader.document_map',
-                document_id=int(float(file_id)), **kwargs)
+                document_file_id=int(float(file_id)), **kwargs)
             return url
-        elif request.form["action"] == self.process_form.PROCESS:
-            pass
+
         return 0
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
@@ -386,9 +387,9 @@ def document_show(project_id, document_file_id):
         filename=filename)
 @csrf.exempt
 @uploader.route(app.config["PROJECT_ROUTE"]+"<int:project_id>"+
-    app.config["MAP_ROUTE"] + '<int:document_id>')
+    app.config["MAP_ROUTE"] + '<int:document_file_id>')
 @login_required
-def document_map(project_id, document_id):
+def document_map(project_id, document_file_id):
     """
     The map xml action, which is used create a sturctuve file map for document.
 
@@ -396,11 +397,12 @@ def document_map(project_id, document_id):
     """
     print "DOC MAP"
     try:
-        document = Document.query.get(document_id)
+        document = DocumentFile.query.get(document_file_id)
     except TypeError:
         return app.login_manager.unauthorized()
 
-    access_granted = current_user.has_document(Document.query.get(document_id))
+    access_granted = current_user.has_document_file(
+        DocumentFile.query.get(document_file_id))
 
     # Test if this user can see it
     if not access_granted:
@@ -408,7 +410,7 @@ def document_map(project_id, document_id):
 
     filename = os.path.split(document.path)[1]
     project = Project.query.join(User).filter(User.id == current_user.id).\
-        filter(Document.id == document_id).one()
+        filter(DocumentFile.id == document_file_id).one()
     map_document = forms.MapDocumentForm()
     return render_template("document_map.html",
         document=document,
@@ -476,9 +478,10 @@ def upload_structure_file( project_id, document_id):
         f = open(dest_path, 'w');
         f.write(json.dumps(json_data))
         f.close();
-        project = Project.query.filter(Project.id == project_id).one()
-        document = Document(path=dest_path, projects=[project])
-        document.save()
+        project = Project.query.get(project_id)
+        structure_file = StructureFile(path=dest_path, project=project)
+        structure_file.save()
+
     else:
         return "A file with name " + os.path.split(dest_path)[1] + " already exists"
 
