@@ -32,6 +32,7 @@ class BaseConfig(object):
     UPLOAD_DIR = os.path.join(ROOT, 'uploads')
     ALLOWED_EXTENSIONS = ["xml", "json"]
     STRUCTURE_EXTENSION = "json"
+    DOCUMENT_EXTENSION = "xml"
 
     # Routing URLS
     PROJECT_ROUTE = "/projects/"

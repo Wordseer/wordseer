@@ -7,6 +7,7 @@ import unittest
 
 from app import app
 from app.models.document import Document
+from app.models.project import Project
 from app.preprocessor import collectionprocessor
 from app.preprocessor import stringprocessor
 from app.preprocessor import structureextractor
@@ -16,10 +17,12 @@ from app.preprocessor import sequenceprocessor
 import database
 
 def setUpModule():
+    global project
+    project = Project()
     with mock.patch("app.preprocessor.collectionprocessor.StringProcessor",
             autospec=True):
         global colproc
-        colproc = collectionprocessor.CollectionProcessor()
+        colproc = collectionprocessor.CollectionProcessor(project)
 
 @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=logger)
 class TestCollectionProcessor(unittest.TestCase):
@@ -72,13 +75,15 @@ class TestCollectionProcessor(unittest.TestCase):
         log_calls = []
 
         for i in range(0, 2):
-            log_calls.append(mock.call("finished_recording_text_and_metadata",
-                "false", mock_logger.REPLACE))
-            log_calls.append(mock.call("text_and_metadata_recorded", str(i + 1),
-                mock_logger.UPDATE))
+            log_calls.append(mock.call(colproc.project,
+                "finished_recording_text_and_metadata", "false",
+                mock_logger.REPLACE))
+            log_calls.append(mock.call(colproc.project,
+                "text_and_metadata_recorded", str(i + 1), mock_logger.UPDATE))
 
-        log_calls.append(mock.call("finished_recording_text_and_metadata",
-                "true", mock_logger.REPLACE))
+        log_calls.append(mock.call(colproc.project,
+            "finished_recording_text_and_metadata", "true",
+            mock_logger.REPLACE))
         mock_logger.log.assert_has_calls(log_calls)
 
         # The extractor should have been called on each file
@@ -91,27 +96,26 @@ class TestCollectionProcessor(unittest.TestCase):
 
     @mock.patch("app.preprocessor.collectionprocessor.DocumentParser",
         autospec=True)
-    @mock.patch("app.preprocessor.collectionprocessor.Document.query",
-        autospec=True)
     @mock.patch("app.preprocessor.collectionprocessor.counter", autospec=True)
-    def test_parse_documents(self, mock_counter, mock_document_query, mock_dp,
-            mock_logger):
+    def test_parse_documents(self, mock_counter, mock_dp, mock_logger):
         """Tests for the test_parse_documents method.
         """
         # Set up the mocks
         max_doc = 20
-        mock_documents = [mock.create_autospec(Document, id=i) for i in range(max_doc)]
-        mock_document_query.all.return_value = mock_documents
         mock_dp_instance = mock_dp.return_value
+
+        colproc.project = mock.create_autospec(Project)
+
+        mock_documents = [mock.create_autospec(Document, id=i)
+            for i in range(max_doc)]
+
+        colproc.project.get_documents.return_value = mock_documents
 
         latest = 5
         mock_logger.get.return_value = str(latest)
 
         # Run the SUT
         colproc.parse_documents()
-
-        # The counter should be called once at the end
-        mock_counter.count.assert_called_once_with()
 
         # Document parser should have been called on every doc
         parse_calls = [mock.call(mock_documents[i])
@@ -121,11 +125,15 @@ class TestCollectionProcessor(unittest.TestCase):
         # Logger should be called twice per doc
         logger_calls = []
         for i in range(latest + 1, max_doc):
-            logger_calls.append(mock.call("finished_grammatical_processing",
-                "false", mock_logger.REPLACE))
-            logger_calls.append(mock.call("latest_parsed_document_id",
-                str(i), mock_logger.REPLACE))
+            logger_calls.append(mock.call(colproc.project,
+                "finished_grammatical_processing", "false",
+                mock_logger.REPLACE))
+            logger_calls.append(mock.call(colproc.project,
+                "latest_parsed_document_id", str(i), mock_logger.REPLACE))
         mock_logger.log.assert_has_calls(logger_calls)
+
+        # Make sure the counter has been called
+        mock_counter.count.assert_called_once_with(colproc.project)
 
 class TestCollectionProcessorProcess(unittest.TestCase):
     """Tests specifically for CollectionProcessor.process().
@@ -158,7 +166,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
     def test_process_e_r_m(self, mock_logger):
         """Test that extract_record_metadata() is called properly.
         """
-        mock_logger.get.side_effect = self.log_dict.__getitem__
+        mock_logger.get.side_effect = lambda proj, query: self.log_dict[query]
         # Should just extract_record_metadata
         self.log_dict["finished_recording_text_and_metadata"] = "false"
 
@@ -179,7 +187,7 @@ class TestCollectionProcessorProcess(unittest.TestCase):
     def test_process_parse_documents(self, mock_logger):
         """Test that parse_documents is called properly
         """
-        mock_logger.get.side_effect = self.log_dict.__getitem__
+        mock_logger.get.side_effect = lambda proj, query: self.log_dict[query]
 
         # Should only run parse_documents
         self.log_dict["finished_grammatical_processing"] = "false"

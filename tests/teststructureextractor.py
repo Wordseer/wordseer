@@ -7,6 +7,7 @@ from lxml import etree
 
 from app.models.property import Property
 from app.models.sentence import Sentence
+from app.models.documentfile import DocumentFile
 from app.preprocessor.structureextractor import *
 from app.preprocessor.stringprocessor import StringProcessor
 import database
@@ -30,8 +31,15 @@ class CommonTests(object):
         self.path = path
         self.structure_file = path + structure_file
         self.input_file = path + input_file
+
+        self.input_project = Project()
+        self.input_project.document_files.append(
+            DocumentFile(path=self.input_file))
+        self.input_project.save()
+
         with open(self.structure_file) as f:
             self.json = json.load(f)
+
         self.xml = etree.parse(self.input_file)
         self.extractor = StructureExtractor(t, self.structure_file)
 
@@ -59,28 +67,29 @@ class PostTests(CommonTests, unittest.TestCase):
     def test_extract(self):
         """Tests for extract().
         """
-        documents = self.extractor.extract(self.input_file)
+        document_file = self.extractor.extract(self.input_file)
 
-        # There should be one document
-        self.failUnless(len(documents) == 1)
+        # Should only be one document
+        assert len(document_file.documents) == 1
+        document = document_file.documents[0]
         # Check to make sure the name and title are correct
-        self.failUnless(documents[0].title == self.json["structureName"])
+        self.failUnless(document.title == self.json["structureName"])
         # Should be one document, with the right sentences
-        self.failUnless(len(documents[0].children) == 1)
+        self.failUnless(len(document.children) == 1)
 
         extract_sentences = [sent.text for sent in
-            documents[0].children[0].sentences]
+            document.children[0].sentences]
         unit_sentences = [sent.text for sent in
             self.extractor.extract_unit_information(self.json,
                 self.xml)[0].children[0].sentences]
 
         self.failUnless(unit_sentences == extract_sentences)
         # Only two sentences in this doc
-        self.failUnless(len(documents[0].children[0].sentences) == 2)
-        for sent in documents[0].children[0].sentences:
+        self.failUnless(len(document.children[0].sentences) == 2)
+        for sent in document.children[0].sentences:
             self.failUnless(sent.text in self.sentence_contents)
         # Check to make sure metadata is properly extracted
-        self.failUnless(compare_metadata(self.meta, documents[0].properties))
+        self.failUnless(compare_metadata(self.meta, document.properties))
 
     def test_extract_unit_information(self):
         """Tests for extract_unit_information.

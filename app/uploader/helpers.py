@@ -1,6 +1,7 @@
 """
 Various methods helpful in the wordseer flask app.
 """
+import os
 
 from flask import abort, render_template
 from flask_security.core import current_user
@@ -46,4 +47,16 @@ def not_found(item):
     :arg str item: The name of the item not found.
     """
     return render_template("item_not_found.html", item=item), 404
+
+def get_structure_file(files):
+    """Given a list of Document objects, return the Document that is a structure
+    file. Assumes that there is only one structure file in this list.
+
+    Arguments:
+        files (list of Documents): The list of Documents to check.
+    """
+    for file in files:
+        ext = os.path.splitext(file.path)[1][1:]
+        if ext == app.config["STRUCTURE_EXTENSION"]:
+            return file
 

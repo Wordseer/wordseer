@@ -11,8 +11,8 @@ from wtforms.fields import StringField, HiddenField
 from wtforms.validators import Required, ValidationError
 
 from app import app
-from .fields import ButtonField, MultiCheckboxField
-from ..models import Unit, Project
+from .fields import ButtonField, MultiCheckboxField, MultiRadioField
+from ..models import Unit, Project, DocumentFile
 
 class HiddenSubmitted(object):
     """A mixin to provide a hidden field called "submitted" which has a default
@@ -20,62 +20,48 @@ class HiddenSubmitted(object):
     """
 
     submitted = HiddenField(default="true")
+
 #TODO: Check if needed
 def is_mappable(ids=None, units=None):
-    """
-    validate that only one xml document is chosen to create a structure file.
-    
+    """Validate that only one xml document is chosen to create a structure file.
     """
     doc_count = 0
+
     if ids:
         # Turn ids into units
-        units = []
-        for file_id in ids:
-            units.append(Unit.query.filter(Unit.id == file_id).one())
+        units = [DocumentFile.query.get(file_id) for file_id in ids]
+
     for unit in units:
         ext = os.path.splitext(unit.path)[1][1:]
         if ext in app.config["ALLOWED_EXTENSIONS"]:
             doc_count += 1
-    
+
     file_path = units[0].path
     if doc_count is not 1:
         raise ValidationError("Selection must include exactly one " +
-            " or ".join(app.config["ALLOWED_EXTENSIONS"]) + " file")
+            app.config["ALLOWED_EXTENSIONS"] + " file")
     return True
 
-    #TODO: load tagger here
-    
-    
-    
-    
-def is_processable(ids=None, units=None):
-    """Given a list of file IDs or Unit objects, determine if this collection of
-    files can be processed (no more than one struc file, at least one xml file).
-    You should provide either ids or units.
+def is_processable(docs=None, structure_files=None, project=None):
+    """Given a list of file IDs or a Project object, determine if this
+    collection of files can be processed (no more than one struc file, at least
+    one xml file). You should provide either ids or units.
 
     :param list files: A list of file IDs to check.
-    :param list units: A list of Unit objects to check.
+    :param Project project: A Project object to check.
     :returns boolean: True if processable, raises an exception otherwise.
     """
-
-    #TODO: could be a cleaner way to write this
 
     struc_count = 0
     doc_count = 0
 
-    if ids:
-        # Turn ids into units
-        units = []
-        for file_id in ids:
-            units.append(Unit.query.filter(Unit.id == file_id).one())
-    
-    for unit in units:
-        # Then process the units
-        ext = os.path.splitext(unit.path)[1][1:]
-        if ext in app.config["STRUCTURE_EXTENSION"]:
-            struc_count += 1
-        else:
-            doc_count += 1
+    if docs or structure_files:
+        doc_count = len(docs)
+        struc_count = len(structure_files)
+
+    else:
+        doc_count = len(project.document_files)
+        struc_count = len(project.structure_files)
 
     if struc_count is not 1:
         raise ValidationError("Selection must include exactly one " +
@@ -95,10 +81,8 @@ class ProcessForm(Form, HiddenSubmitted):
 
     selection = MultiCheckboxField("Select",
         coerce=int,
-        validators=[
-            Required("You must select at least one item from the table.")
-        ],
         choices=[])
+
     process_button = ButtonField("Process", name="action", value=PROCESS)
     delete_button = ButtonField("Delete", name="action", value=DELETE)
     structure_button = ButtonField("Map Structure", name="action", value=STRUCTURE)
@@ -118,19 +102,23 @@ class DocumentUploadForm(Form, HiddenSubmitted):
 class DocumentProcessForm(ProcessForm):
     """A ProcessForm configured to validate selections of documents.
     """
+    structure_file = MultiCheckboxField("Select",
+        coerce=int,
+        choices=[])
     def validate_selection(form, field):
         """If the selection is for processing, then run is_processable on the
         selected files.
         If the selection is for structure mapping, then run reirect_to_tagger
-        """    
+        """
 
         if form.process_button.data == form.PROCESS:
-            is_processable(ids=form.selection.data)
-        
-        
+            is_processable(docs=form.selection.data,
+                structure_files=form.structure_file.data)
+        else:
+            if not form.selection.data and not form.structure_file.data:
+                raise ValidationError("You must select at least one file.")
         if form.structure_button.data == form.STRUCTURE:
             is_mappable(ids=form.selection.data)
-
 
 class ProjectCreateForm(Form, HiddenSubmitted):
     """Create new projects. This is simply a one-field form, requiring the
@@ -159,8 +147,10 @@ class ProjectProcessForm(ProcessForm):
         if form.process_button.data == form.PROCESS:
             for project_id in form.selection.data:
                 project = Project.query.filter(Project.id == project_id).one()
-                # TODO: change to Project.query.get(project_id)
-                is_processable(units=project.documents)
+                is_processable(project=project)
+        else:
+            if not form.selection.data:
+                raise ValidationError("You must select a project to delete.")
 
 class ConfirmDeleteForm(Form, HiddenSubmitted):
     """A form that will ask users to confirm their deletions.
@@ -172,6 +162,7 @@ class ConfirmDeleteForm(Form, HiddenSubmitted):
         value=DELETE)
     cancel_button = ButtonField(text="No, do not delete", name="action",
         value=CANCEL)
-        
+
 class MapDocumentForm(Form, HiddenSubmitted):
-    done  = 0
+    done = 0
+

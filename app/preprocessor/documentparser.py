@@ -1,7 +1,7 @@
 """The DocumentParser takes in a Document object and parses it by sending
 every sentence to the `StringProcessor`, which writes it to the database.
 """
-
+import pdb
 from datetime import datetime
 import logging
 
@@ -15,10 +15,11 @@ LATEST_SEQ_SENT = "latest_sequence_sentence"
 class DocumentParser(object):
     """Handle parsing a document.
     """
-    def __init__(self, parser):
+    def __init__(self, parser, project):
         self.pylogger = logging.getLogger(__name__)
         self.parser = parser
         self.sequence_processor = SequenceProcessor()
+        self.project = project
 
     def parse_document(self, document):
         """Parse a document and write it to the database.
@@ -29,24 +30,27 @@ class DocumentParser(object):
 
         :param Document document: The document to parse and record.
         """
+        #pdb.set_trace()
 
         start_time = datetime.now()
         count = 0
         products = []
 
         try:
-            current_max = int(logger.get(LATEST_SENT_ID))
+            current_max = int(logger.get(self.project, LATEST_SENT_ID))
         except ValueError:
             current_max = 0
-            logger.log(LATEST_SENT_ID, str(current_max), logger.REPLACE)
+            logger.log(self.project, LATEST_SENT_ID, str(current_max),
+                logger.REPLACE)
 
         relationships = dict()
         dependencies = dict()
         sequences = dict()
         sentence_count = len(document.all_sentences)
         for sentence in document.all_sentences:
-            if sentence.id > int(logger.get(LATEST_SENT_ID)):
-                parsed = self.parser.parse(sentence, relationships, dependencies)
+            if sentence.id > int(logger.get(self.project, LATEST_SENT_ID)):
+                parsed = self.parser.parse(sentence, relationships,
+                    dependencies)
                 self.sequence_processor.process(sentence, sequences)
                 products.append(parsed)
                 count += 1
@@ -61,7 +65,7 @@ class DocumentParser(object):
                     products = []
                     relationships = dict()
                     dependencies = dict()
-                    
+
                     db.session.commit()
         db.session.commit()
 

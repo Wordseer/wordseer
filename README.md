@@ -27,6 +27,23 @@ more maintainable python.
 
 ## Installation
 
+### Prerequisites
+
+The following packages must be installed before performing any setup:
+
+- [Python 2.7](https://python.org/download)
+- [libxml2 2.6.21 or later](http://xmlsoft.org/downloads.html)
+- [libxslt 1.1.15 or later](http://xmlsoft.org/XSLT/downloads.html)
+- [Java 1.6 or later](https://www.java.com/en/download/manual.jsp)
+- If on linux or mac, [unzip](http://www.info-zip.org/UnZip.html)
+
+We also recommend installing the python dependencies (discussed below) in a
+[virtual environment](https://pypi.python.org/pypi/virtualenv).
+
+    pip install virtualenv
+    virtualenv venv
+    source venv/bin/activate
+
 ### Linux/OSX quick install
 
 1. Run `install.sh`:
@@ -37,18 +54,8 @@ more maintainable python.
 
 ### Windows
 
-Follow the directions in the "Installing" sections found below.
-
-## Application
-
-### Installing
-1.  Create a virtualenv
-
-2.  On linux, run:
-
-        pip -r install requirements.txt
-
-    On windows, run:
+#### Installing the application
+1.  Run:
 
         pip -r install requirements_win.txt
 
@@ -64,10 +71,8 @@ Follow the directions in the "Installing" sections found below.
 
     to migrate the model schema into the database.
 
+### Installing the preprocessor
 
-## Pipeline
-
-### Installing
 1. `corenlp` must be installed manually. Clone the repository:
 
         git clone https://github.com/silverasm/stanford-corenlp-python.git
@@ -89,18 +94,20 @@ Follow the directions in the "Installing" sections found below.
 
     This should install `corenlp` to your system.
 
-    In order to complete the setup, version *3.2.0* of Stanford's CoreNLP
-    library must simply be in a directory accessible to the backend. From the
-    root directory of this repository:
+2. In order to complete the setup, version *3.2.0* of Stanford's CoreNLP
+library must simply be in a directory accessible to the backend. Download
+[this file](http://nlp.stanford.edu/software/stanford-corenlp-full-2013-06-20.zip)
+and move it to the root of the repository. Extract it and rename the folder
+from `stanford-corenlp-full-2013-06-20` to `stanford-corenlp`.
 
-        wget http://nlp.stanford.edu/software/stanford-corenlp-full-2013-06-20.zip
-        unzip stanford-corenlp-full-2013-06-20.zip
-        mv stanford-corenlp-full-2013-06-20 stanford-corenlp
-
-2. If you followed the above directions, then you shouldn't need to worry about
+3. If you followed the above directions, then you shouldn't need to worry about
 any configuration. If you installed Stanford's CoreNLP elsewhere, then make sure
 you edit `lib/wordseerbackend/wordseerbackend/config.py` for your setup.
 Particularly make sure to point `CORE_NLP_DIR` to the Stanford NLP library.
+
+4. Run the following command in the console:
+
+        python -m nltk.downloader punkt
 
     You should then be ready to parse files. Example XML and JSON files are
     included in `tests/data`.
@@ -118,5 +125,5 @@ Or, on windows, simply run `make.bat` in the same directory.
 ## Testing
 Simply run `runtests.py`:
 
-        python runtests.py
+    python runtests.py
 

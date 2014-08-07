@@ -33,11 +33,41 @@
 
 {% block list_header %}Existing documents{% endblock %}
 {% block list_form %}
-{% if process_form.selection.choices %}
-{{ macros.render_errors(process_form.selection.errors) }}
-<form method="POST" role="form">
-    {{ process_form.hidden_tag() }}
-    {{ macros.selection_table(process_form.selection, "document",
+    {% if process_form.selection.choices %}
+        {{ macros.render_errors(process_form.selection.errors) }}
+        <form method="POST" role="form">
+            <table class="table table-striped table-hover click-anywhere">
+                <thead>
+                    <tr>
+                        <th class="select">
+                            Select (<a href="#" class="check-all">All</a>)
+                        </th>
+                        <th>
+                            {{ heading }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for choice in process_form.structure_file %}
+                        <tr>
+                            <td>
+                                {{ choice }}
+                            </td>
+                            <td>
+                                <label for="{{ choice.id }}">
+
+                                    <a href="{{ url_for("uploader.document_show",
+                                        project_id=project.id,
+                                        document_file_id=choice.data) }}">
+                                     {{ choice.label.text }}
+                                </label>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {{ process_form.hidden_tag() }}
+            {{ macros.selection_table(process_form.selection, "document",
                 "table table-striped table-hover click-anywhere",
                 "File Name", "uploader.document_show", project_id=project.id) }}
 
@@ -48,8 +78,9 @@
                 icon="glyphicon-tasks") }}
     {{ process_form.delete_button(class="btn btn-danger",
                 icon="glyphicon-remove") }}
-</form>
-{% else %}
-<p>There are no files in this project.</p>
-{% endif %}
+        </form>
+    {% else %}
+        <p>There are no files in this project.</p>
+    {% endif %}
 {% endblock %}
+

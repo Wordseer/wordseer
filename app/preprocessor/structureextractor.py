@@ -2,9 +2,16 @@
 """
 
 import json
-from lxml import etree
+import logging
+import pdb
 
+from lxml import etree
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound
+
+from app.models.project import Project
 from app.models.document import Document
+from app.models.documentfile import DocumentFile
 from app.models.sentence import Sentence
 from app.models.unit import Unit
 from app.models.property import Property
@@ -26,21 +33,22 @@ class StructureExtractor(object):
         self.str_proc = str_proc
         self.structure_file = open(structure_file, "r")
         self.document_structure = json.load(self.structure_file)
+        self.logger = logging.getLogger(__name__)
 
     def extract(self, infile):
-        """Extract a list of Documents from a file. This method uses the
-        structure_file given in the constructor for rules to identify documents.
+        """Extract ``Document``\s from a ``DocumentFile``. This method uses the
+        structure_file given in the constructor for rules to identify
+        ``Document``\s.
 
-        :param file/str infile: The file to extract; readable objects or paths
-            as strings are acceptable.
-        :return list: A list of Document objects
+        :param str infile: The path to the file to extract.
+        :return list of DocumentFiles: The DocumentFile that contains the
+            extracted documents.
         """
+        doc = etree.parse(infile)
         documents = []
 
         # Check for unescaped special characters (tentative)
         doc = None
-
-        print(infile)
 
         try:
             doc = etree.parse(infile)
@@ -58,24 +66,38 @@ class StructureExtractor(object):
                 print("XML Error: " + str(e))
                 return documents
 
-        units = self.extract_unit_information(self.document_structure, doc)
-
+        extracted_units = self.extract_unit_information(self.document_structure,
+            doc)
+        #TODO: this doc_num isn't very helpful
         doc_num = 0
-        for extracted_unit in units:
-            d = Document(properties=extracted_unit.properties,
-                sentences=extracted_unit.sentences,
-                name=extracted_unit.name,
-                title=extracted_unit.name,    # TODO: should be the actual title
-                children=extracted_unit.children,
-                number = doc_num)
-            assign_sentences(d)
 
-            documents.append(d)
+        try:
+            document_file = DocumentFile.query.\
+                filter(DocumentFile.path == infile).one()
+        except NoResultFound:
+            self.logger.warning("Could not find file with path %s, making "
+                "new one", infile)
+            document_file = DocumentFile()
+        except MultipleResultsFound:
+            self.logger.error("Found multiple files with path %s, "
+                "skipping.", infile)
+            return DocumentFile()
+
+        for extracted_unit in extracted_units:
+            document = Document()
+            document.properties = extracted_unit.properties
+            document.sentences = extracted_unit.sentences
+            document.title = extracted_unit.name #FIXME: not actual title
+            document.children = extracted_unit.children
+            document.number = doc_num
+
+            assign_sentences(document)
+            document_file.documents.append(document)
+            document.save(False)
 
         db.session.commit()
 
-        return documents
-
+        return document_file
 
     def extract_unit_information(self, structure, parent_node):
         """Process the given node, according to the given structure, and return
@@ -100,7 +122,7 @@ class StructureExtractor(object):
                 # If there are child units, retrieve them and put them in a
                 # list, otherwise get the sentences
                 children = []
-                
+
                 if "units" in structure.keys():
                     for child_struc in structure["units"]:
                         children.extend(self.extract_unit_information(
