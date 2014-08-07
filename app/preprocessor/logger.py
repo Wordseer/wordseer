@@ -11,7 +11,7 @@ from app.models.log import Log
 REPLACE = "replace"
 UPDATE = "update"
 
-def log(item, value, replace_value):
+def log(project, item, value, replace_value):
     """Add a new log entry to the log table.
 
     :param str item: The item to log (think of it as a title).
@@ -23,32 +23,30 @@ def log(item, value, replace_value):
     :return None: None.
     """
 
-    entry = Log(log_item=item, item_value=value)
+    try:
+        entry = Log.query.\
+            filter(Log.log_item == item).\
+            filter(Log.project == project).one()
+    except NoResultFound:
+        entry = Log(project=project, log_item=item, item_value="")
 
     if REPLACE == replace_value:
-        entry = db.session.merge(entry)
+        entry.item_value = value
+        entry.save()
 
     elif UPDATE == replace_value:
-        try:
-            existing_entry = Log.query.\
-                filter(Log.log_item == item).one()
-        except NoResultFound:
-            existing_entry = Log(log_item=item, item_value="")
+        entry.item_value = entry.item_value + " [" + value + "] "
+        entry.save()
 
-        entry.item_value = existing_entry.item_value + " [" +\
-            entry.item_value + "] "
-        db.session.merge(entry)
-
-    db.session.commit()
-
-def get(item):
+def get(project, item):
     """Get the value for a specific log item.
 
     :param string item: The item to retrieve.
     :return string: The value of the given item, blank if the item does
         not exist, the first one if there are several instances.
     """
-    results = Log.query.filter(Log.log_item == item).first()
+    results = Log.query.filter(Log.log_item == item).\
+            filter(Log.project == project).first()
 
     if results:
         return results.item_value

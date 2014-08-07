@@ -26,9 +26,9 @@ sequences_in_sequencesets = db.Table("sequences_in_sequencesets",
     db.Column("sequenceset_id", db.Integer, db.ForeignKey("sequence_set.id")),
 )
 
-documents_in_projects = db.Table("documents_in_projects",
+document_files_in_projects = db.Table("document_files_in_projects",
     db.metadata,
-    db.Column("document_id", db.Integer, db.ForeignKey("document.id")),
+    db.Column("document_file_id", db.Integer, db.ForeignKey("document_file.id")),
     db.Column("project_id", db.Integer, db.ForeignKey("project.id"))
 )
 
