@@ -14,6 +14,42 @@ CORENLP_FINAL_NAME="stanford-corenlp"
 
 FILENAME=`basename $CORENLP`
 CORENLP_FINAL_PATH=$CORENLP_DESTINATION"/"$CORENLP_FINAL_NAME
+SUDO_COMMAND=""
+
+
+function usage {
+    # Print out documentation
+    echo "install.sh: Install WordSeer quickly to linux or mac."
+    echo "Arguments:"
+    echo "-h, --help: Print this help"
+    echo "--sudo: Install system dependencies using sudo"
+    echo "--su: Install system dependencies using su"
+}
+
+# Parse command line flags
+while [ "$1" != "" ]; do
+    case $1 in
+        -h | --help)
+            usage
+            exit
+            ;;
+        --sudo)
+            SUDO_COMMAND="sudo"
+            ;;
+        --su)
+            SUDO_COMMAND="su"
+            ;;
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+#if [ $SUDO_COMMAND == "su" ]
+#then
+
 
 # Install python requirements
 echo "Installing dependencies..."
