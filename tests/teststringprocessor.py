@@ -5,8 +5,8 @@ import unittest
 
 from app.models.sentence import Sentence
 from app.models.dependency import Dependency
-from app.models.parseproducts import ParseProducts
-from lib.wordseerbackend.wordseerbackend import stringprocessor
+from app.preprocessor import stringprocessor
+import database
 
 t = stringprocessor.StringProcessor()
 
@@ -16,6 +16,7 @@ class CommonTests(object):
     def setUp(self, text=""):
         """Set up some local variables.
         """
+        database.clean()
         self.example = text
         self.result = t.tokenize(self.example)
         self.raw = t.parser.raw_parse(self.example)
@@ -49,11 +50,7 @@ class TokenizeParagraphTests(CommonTests, unittest.TestCase):
             "been a time for such a word. Tomorrow, and tomorrow, and "
             "tomorrow, Creeps in this petty pace from day to day, To the "
             "last syllable of recorded time; And all our yesterdays have "
-            "lighted fools The way to dusty death. Out, out, brief candle! "
-            "Life's but a walking shadow, a poor player That struts and "
-            "frets his hour upon the stage And then is heard no more. It "
-            "is a tale Told by an idiot, full of sound and fury Signifying "
-            "nothing.")
+            "lighted fools The way to dusty death. Out, out, brief candle! ")
         super(TokenizeParagraphTests, self).setUp(text=example)
 
     def test_sentences(self):
@@ -63,7 +60,7 @@ class TokenizeParagraphTests(CommonTests, unittest.TestCase):
         for sent in self.result:
             self.failUnless(isinstance(sent, Sentence))
             self.failUnless(sent.words[-2].word in ["word", "death",
-                "candle", "more", "nothing"])
+                "candle"])
 
 class TokenizeSentenceTests(CommonTests, unittest.TestCase):
     """Test tokenize() given a single sentence.
@@ -100,7 +97,7 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
                     assert space == ""
 
 @mock.patch.object(stringprocessor, "tokenize_from_raw")
-@mock.patch("lib.wordseerbackend.wordseerbackend.stringprocessor.StanfordCoreNLP.raw_parse")
+@mock.patch("app.preprocessor.stringprocessor.StanfordCoreNLP.raw_parse")
 class ParseTests(unittest.TestCase):
     """Tests for the parse() method.
     """
@@ -108,10 +105,11 @@ class ParseTests(unittest.TestCase):
     def setUp(self):
         """Mock out the parser for testing.
         """
+        database.clean()
         #t.parser = mock.MagicMock()
 
-    @mock.patch("lib.wordseerbackend.wordseerbackend.stringprocessor.Word.query", autospec=True)
-    @mock.patch("lib.wordseerbackend.wordseerbackend.stringprocessor.Dependency.query", autospec=True)
+    @mock.patch("app.preprocessor.stringprocessor.Word.query", autospec=True)
+    @mock.patch("app.preprocessor.stringprocessor.Dependency.query", autospec=True)
     def test_parse(self, mock_dependency_query, mock_word_query, mock_parser, mock_tokenizer):
         """Test the parse method.
         """
@@ -150,7 +148,8 @@ class ParseTests(unittest.TestCase):
             expected_added_deps.append(mock.call(
                 dependency=mock_dependency_query.filter_by.return_value.one.return_value,
                 governor_index=gov_index,
-                dependent_index=dep_index))
+                dependent_index=dep_index,
+                force=False))
 
         sent.add_dependency.assert_has_calls(expected_added_deps)
 
@@ -169,15 +168,18 @@ class ParseTests(unittest.TestCase):
 
         self.assertRaises(ValueError, t.parse, sent)
 
-    @unittest.skip("Feature in limbo")
-    def test_parse_maxlength(self, mock_parser, mock_tokenizer):
-        """Check to make sure that parse() uses a rudimentary sentence length
-        check.
+class ParseWithErrorHandlingTest(unittest.TestCase):
+    """Test the parse_with_error_handling method.
+    """
+
+    def test_sanity(self):
+        """Method should output the same result as running raw_parse directly
+        when run on a normal sentence text.
         """
+        database.clean()
+        text = "The fox is brown."
+        result = t.parse_with_error_handling(text)
+        expected_result = t.parser.raw_parse(text)
 
-        sent = mock.MagicMock(name="sentence")
-
-        sent.split.return_value = range(0, 60)
-
-        self.assertRaises(ValueError, t.parse, sent)
+        self.failUnless(result == expected_result)
 

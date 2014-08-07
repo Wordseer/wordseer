@@ -10,4 +10,5 @@ pexpect==3.2
 sphinxcontrib-napoleon==0.2.8
 sqlalchemy-migrate==0.9.1
 stanford-corenlp-python
+nltk
 

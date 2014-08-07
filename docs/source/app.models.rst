@@ -60,10 +60,26 @@ app.models.flask_security module
     :undoc-members:
     :show-inheritance:
 
-app.models.grammatical_relationship module
-------------------------------------------
+app.models.grammaticalrelationship module
+-----------------------------------------
 
-.. automodule:: app.models.grammatical_relationship
+.. automodule:: app.models.grammaticalrelationship
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+app.models.log module
+---------------------
+
+.. automodule:: app.models.log
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+app.models.mixins module
+------------------------
+
+.. automodule:: app.models.mixins
     :members:
     :undoc-members:
     :show-inheritance:

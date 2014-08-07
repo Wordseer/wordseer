@@ -1,0 +1,27 @@
+<div id='title-<%=id%>' class='tagger-node'>
+    
+     <span>
+    <% if(units.length>0 || metadata.length>0){%>
+   
+        <span class="glyphicon glyphicon-plus-sign expand-node tagger-tooltip" title="Click to expand" style="display:none"></span>
+        <span class="glyphicon glyphicon-minus-sign collapse-node  tagger-tooltip" title="Click to collapse"  ></span>
+ 
+    <%} else {%> <span class="glyphicon glyphicon-minus-sign" style="color:white;"></span><%}%>
+       </span>
+    <button type='button' class='btn btn-sm tagger-tooltip 
+            <%=id%>
+            <% if(type==="subunit") 
+            {%> btn-primary <%} 
+            else if(type==="metadata") 
+            {%> btn-info <% }
+            else
+            { %> btn-success <%}%> title-node-tag title-node-tag-<%=type%>' 
+            data-id='<%= id %>' data-xpaths='<%= xpaths[0] %>' 
+            data-type='<%=type%>'
+            data-isattribute='<%if(isAttribute){%>1<% }else{ %>0<%}%>'
+            title='Click to preview' 
+            <% if(type==="subunit" && hasChildElements()){%>disabled<%}%>
+            ><%=tag%></button>
+
+    <div class='tagger-node-children'></div>
+</div>

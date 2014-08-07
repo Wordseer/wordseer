@@ -1,22 +1,27 @@
 # Virtual Environment
 venv
 
-# Vim
-*.sw[po]
-
 # Python
 *.py[cod]
 __pycache__
 
+
 # Database
-*.db
 db
+*.db
 
 # Documentation
 docs/build
+
+# Stanford
+stanford-corenlp
 
 # AWS
 .elasticbeanstalk/
 
 # line_profiler
 *.*prof
+
+# logs
+*.log
+

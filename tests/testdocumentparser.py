@@ -6,26 +6,29 @@ import pdb
 
 from app.models.document import Document
 from app.models.sentence import Sentence
-from app.models.parsedparagraph import ParsedParagraph
-from lib.wordseerbackend.wordseerbackend.parser import documentparser
-from lib.wordseerbackend.wordseerbackend.stringprocessor import StringProcessor
+from app.models.project import Project
+from app.preprocessor import documentparser
+from app.preprocessor.stringprocessor import StringProcessor
+import database
 
-@patch("lib.wordseerbackend.wordseerbackend.parser.documentparser.logger",
-    autospec=True)
+@patch("app.preprocessor.documentparser.logger", autospec=True)
 class DocumentParserTests(unittest.TestCase):
     """Run tests on the DocumentParser.
     """
     def setUp(self):
         """Get the documentparser instance.
         """
-        self.mock_reader_writer = MagicMock()
-        self.mock_str_proc = MagicMock()
-        with patch("lib.wordseerbackend.wordseerbackend.parser.documentparser.SequenceProcessor"):
-            self.docparser = documentparser.DocumentParser(
-                self.mock_reader_writer,
-                self.mock_str_proc)
+        database.clean()
+        self.project = Project()
+        self.project.save()
 
-    @patch("lib.wordseerbackend.wordseerbackend.parser.documentparser.db", autospec=True)
+        self.mock_str_proc = MagicMock()
+        with patch("app.preprocessor.documentparser.SequenceProcessor"):
+            self.docparser = documentparser.DocumentParser(
+                self.mock_str_proc,
+                self.project)
+
+    @patch("app.preprocessor.documentparser.db", autospec=True)
     def test_parse_document(self, mock_db, mock_logger):
         """Test the parse_document method.
 

@@ -32,11 +32,14 @@ class BaseConfig(object):
     UPLOAD_DIR = os.path.join(ROOT, 'uploads')
     ALLOWED_EXTENSIONS = ["xml", "json"]
     STRUCTURE_EXTENSION = "json"
+    DOCUMENT_EXTENSION = "xml"
 
     # Routing URLS
     PROJECT_ROUTE = "/projects/"
     DOCUMENT_ROUTE = "/documents/"
     UPLOAD_ROUTE = "/uploads/"
+    MAP_ROUTE = "/map/"
+    SAVE_MAP = "/save/"
 
     #Login settings
     SECURITY_REGISTERABLE = True
@@ -91,6 +94,8 @@ class BaseConfig(object):
     PUNCTUATION_NO_SPACE_BEFORE = list(u".,!`\\?';):—")
     PUNCTUATION_NO_SPACE_AFTER = list(u"`'\"(—")
 
+    SPLIT_CHARACTERS = [";", "--", ":", ","]
+
     # Number of rows to return for paginated queries
     PAGE_SIZE = 100
 
@@ -98,13 +103,18 @@ class BaseConfig(object):
     #WORDSEER_DIR = os.path.dirname(os.path.realpath(__file__))
 
     # NLP locations. Paths should be absolute.
-    CORE_NLP_DIR = os.path.join(ROOT, "lib/wordseerbackend/stanford-corenlp/")
+    CORE_NLP_DIR = os.path.join(ROOT, "stanford-corenlp/")
 
     # Processing options
     GRAMMATICAL_PROCESSING = True
     PART_OF_SPEECH_TAGGING = True
     WORD_TO_WORD_SIMILARITY = True
     SEQUENCE_INDEXING = True
+    SKIP_SENTENCE_ON_ERROR = False
+    SENTENCE_MAX_LENGTH = 40
+
+    # Logging config
+    LOG_SENTENCE_TRUNCATE_LENGTH = 140
 
 
 class Production(BaseConfig):
