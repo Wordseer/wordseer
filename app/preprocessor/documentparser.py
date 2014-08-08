@@ -52,7 +52,7 @@ class DocumentParser(object):
                 parsed = self.parser.parse(sentence, relationships,
                     dependencies)
                 self.sequence_processor.process(sentence, sequences)
-                products.append(parsed)
+                # products.append(parsed)
                 count += 1
                 current_max = sentence.id
 
@@ -62,9 +62,10 @@ class DocumentParser(object):
                         " %s seconds per sentence", str(count),
                         str(average_time / count))
 
-                    products = []
+                    # products = []
                     relationships = dict()
                     dependencies = dict()
+                    sequences = dict()
 
                     db.session.commit()
         db.session.commit()

@@ -32,11 +32,11 @@ def log(project, item, value, replace_value):
 
     if REPLACE == replace_value:
         entry.item_value = value
-        entry.save()
+        entry.save(False)
 
     elif UPDATE == replace_value:
         entry.item_value = entry.item_value + " [" + value + "] "
-        entry.save()
+        entry.save(False)
 
 def get(project, item):
     """Get the value for a specific log item.

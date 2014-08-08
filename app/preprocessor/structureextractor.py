@@ -44,7 +44,6 @@ class StructureExtractor(object):
         :return list of DocumentFiles: The DocumentFile that contains the
             extracted documents.
         """
-        doc = etree.parse(infile)
         documents = []
 
         # Check for unescaped special characters (tentative)
@@ -53,18 +52,9 @@ class StructureExtractor(object):
         try:
             doc = etree.parse(infile)
         except(etree.XMLSyntaxError):
-            file_string = None
-            with open(infile) as file:
-                file_string = "".join([line for line in file])
-
-            file_string = file_string.replace("&", "&amp;")
-
-            # If parsing still doesn't work, skip it
-            try:
-                doc = etree.fromstring(file_string)
-            except(etree.XMLSyntaxError) as e:
-                print("XML Error: " + str(e))
-                return documents
+            self.logger.error("XML Error: " + str(e))
+            self.logger.info(infile)
+            return documents
 
         extracted_units = self.extract_unit_information(self.document_structure,
             doc)
@@ -72,8 +62,9 @@ class StructureExtractor(object):
         doc_num = 0
 
         try:
-            document_file = DocumentFile.query.\
-                filter(DocumentFile.path == infile).one()
+            document_file = DocumentFile.query.filter(
+                DocumentFile.path == infile
+            ).one()
         except NoResultFound:
             self.logger.warning("Could not find file with path %s, making "
                 "new one", infile)
