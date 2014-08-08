@@ -8,6 +8,7 @@ import subprocess
 import urllib2
 import zipfile
 import gzip
+import glob
 
 # Config
 # Location of CoreNLP
@@ -34,16 +35,27 @@ def download_file(src, dest):
 def install_prerequisites():
     """Install requirements that we can't install in a virtual environment.
     """
+    system = subprocess.check_output(["uname", "-a"])
+
     if "Linux" in system:
+        print "Attempting to install prerequisites for linux."
         if "ARCH" in system:
             subprocess.call(["sudo pacman -S libxslt libxml2 jre7-openjdk"])
-        if "Ubuntu" in system:
+        elif "Ubuntu" in system:
             subprocess.call(["sudo apt-get install libxml2 libxslt1.1 openjdk-7-jre"])
-    if "Darwin" in system:
+    elif "Darwin" in system:
+        print "Installing prerequisites for mac."
         download_file(LIBXML_MAC, "libxml.dmg.gz")
-        with gzip.GzipFile("libxml.dmg.gz") as local_zip,
+        with gzip.GzipFile("libxml.dmg.gz") as local_zip,\
             open("libxml.dmg", "w") as local_dmg:
                 local_dmg.write(local_zip.read())
+        os.remove("libxml.dmg.gz")
+        mounting = subprocess.check_output(["hdiutil", "mount", "libxml.dmg"])
+        mountpoint = mounting.split("\n")[-2].split()[2]
+        frameworks = glob.glob(mountpoint + "/*.framework")
+        for framework in frameworks:
+            shutil.move(framework, "/Library/Frameworks")
+        subprocess.call(["hdiutil", "unmount", mountpoint])
 
 def main():
     """Perform the installation process.
@@ -53,8 +65,6 @@ def main():
     parser.add_argument("--sudo", action="store_true",
         help="Use sudo to install some dependencies")
     args = parser.parse_args()
-
-    system = subprocess.check_output("uname -a")
 
     if args.sudo:
         install_prerequisites()
