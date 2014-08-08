@@ -76,7 +76,7 @@ class SequenceProcessor(object):
                 length = len(sequence["words"])
                 position = sequence["start_position"]
 
-                key = (sequence_text, lemmatized, has_function_words, all_function_words)
+                key = sequence_text
 
                 if key in sequence_dict.keys():
                     sequence = sequence_dict[key]
@@ -84,10 +84,7 @@ class SequenceProcessor(object):
 
                     try:
                         sequence = Sequence.query.filter_by(
-                            sequence = sequence_text,
-                            lemmatized = lemmatized,
-                            has_function_words = has_function_words,
-                            all_function_words = all_function_words
+                            sequence = sequence_text
                         ).one()
                     except(MultipleResultsFound):
                         self.logger.error("duplicate records found for: %s",
