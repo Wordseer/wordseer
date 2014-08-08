@@ -51,8 +51,8 @@ class StructureExtractor(object):
 
         try:
             doc = etree.parse(infile)
-        except(etree.XMLSyntaxError):
-            self.logger.error("XML Error: " + str(e))
+        except(etree.XMLSyntaxError) as e:
+            self.logger.error("XML Error: " + str(e) + "; skipping file")
             self.logger.info(infile)
             return documents
 

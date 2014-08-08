@@ -35,6 +35,7 @@ class DocumentParser(object):
         start_time = datetime.now()
         count = 0
         products = []
+        current_max = 0
 
         try:
             current_max = int(logger.get(self.project, LATEST_SENT_ID))
@@ -48,7 +49,7 @@ class DocumentParser(object):
         sequences = dict()
         sentence_count = len(document.all_sentences)
         for sentence in document.all_sentences:
-            if sentence.id > int(logger.get(self.project, LATEST_SENT_ID)):
+            if sentence.id > current_max:
                 parsed = self.parser.parse(sentence, relationships,
                     dependencies)
                 self.sequence_processor.process(sentence, sequences)
