@@ -55,6 +55,11 @@ def install_prerequisites():
         frameworks = glob.glob(mountpoint + "/*.framework")
         for framework in frameworks:
             shutil.move(framework, "/Library/Frameworks")
+        executables = [os.path.join(mountpoint, "xmllint"),
+                os.path.join(mountpoint, "xsltproc"),
+                os.path.join(mountpoint, "xmlcatalog")]
+        for executable in executables:
+            shutil.move(executable, "/usr/bin")
         subprocess.call(["hdiutil", "unmount", mountpoint])
 
 def main():
