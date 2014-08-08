@@ -35,7 +35,6 @@ The following packages must be installed before performing any setup:
 - [libxml2 2.6.21 or later](http://xmlsoft.org/downloads.html)
 - [libxslt 1.1.15 or later](http://xmlsoft.org/XSLT/downloads.html)
 - [Java 1.6 or later](https://www.java.com/en/download/manual.jsp)
-- If on linux or mac, [unzip](http://www.info-zip.org/UnZip.html)
 
 We also recommend installing the python dependencies (discussed below) in a
 [virtual environment](https://pypi.python.org/pypi/virtualenv).
