@@ -8,8 +8,8 @@
 <link rel="stylesheet" href = "{{ url_for('uploader.static',filename='external_lib/jquery-ui.min.css') }}" type = "text/css"/>
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/jquery-1.11.1.min.js') }}"></script>
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/jquery-ui.min.js') }}"></script>
-<script type = 'text/javascript' src = "{{ url_for('uploader.static',filename='external_lib/jquery.tooltipster.min.js') }}">
-        < link rel = "stylesheet" href = "{{ url_for('uploader.static',filename='external_lib/tooltipster.css') }}" type = "text/css" / ></script>
+    <script type = 'text/javascript' src = "{{ url_for('uploader.static',filename='external_lib/jquery.tooltipster.min.js') }}">
+< link rel = "stylesheet" href = "{{ url_for('uploader.static',filename='external_lib/tooltipster.css') }}" type = "text/css" / ></script>
 
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/bootstrap.min.js') }}"></script>
 <script type='text/javascript' src="{{ url_for('uploader.static',filename='external_lib/jquery.xpath.js') }}"></script>
@@ -44,6 +44,7 @@
     <input type="hidden" id="filename" value="{{filename}}"/>
     <input type="hidden" id="templates-url" value="{{url_for('uploader.static', filename='tagger/templates')}}"/>
     <input type='button' id='show-intro'  class="btn btn-md btn-info" value='Show Intro'/>
+    <input type='button' id='preview-structure'  class="btn btn-md btn-info" value='Preview Structure File' onclick="previewStructureFile()"/>
     <input type="submit" id="save-structure-button" class="btn btn-md btn-success" name='action' value='Save and Return'/>
     <div id='tagger-previews'>
         <div id="tagger-node-preview" class="panel panel-default tagger-box"></div>
@@ -61,6 +62,7 @@
     </div>
     <div id="tagger-intro-box" class='hidden-box' style="display:none">
     </div>
+    <div id="json-preview-box" class="hidden-box" style="display:none"></div>
 
 </form>
 {% endblock %}

@@ -16,9 +16,6 @@ import database
 def run_tests():
     database.reset()
     database.cache()
-    #sys.path.insert(0, os.path.dirname(__file__))
-    #suite = unittest.TestLoader().discover('tests')
-    #results = unittest.TextTestRunner(verbosity=2).run(suite)
     results = main()
     pdb.set_trace()
     if results.wasSuccessful():

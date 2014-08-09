@@ -1,11 +1,11 @@
 """Tests for the ``app.wordseer.models`` module.
 """
-
 import unittest
 
 from app import db
 from app.models import Dependency
 from app.models import Document
+from app.models import DocumentFile
 from app.models import DocumentSet
 from app.models import Property
 from app.models import Project
@@ -14,6 +14,7 @@ from app.models import Set
 from app.models import Sequence
 from app.models import SequenceSet
 from app.models import SentenceSet
+from app.models import StructureFile
 from app.models import Unit
 from app.models import User
 from app.models import Word
@@ -25,7 +26,7 @@ class TestWordModel(unittest.TestCase):
     def setUp(self):
         """Clean the current database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_model_word(self):
         """Test to make sure that the atttributes of the Word model can be
@@ -63,7 +64,7 @@ class TestSentenceModel(unittest.TestCase):
     def setUp(self):
         """Clean the current database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_model_sentence(self):
         """Test to make sure that Sentence is working properly.
@@ -162,7 +163,7 @@ class TestDependencyModel(unittest.TestCase):
     def setUp(self):
         """Clean the current database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_model_dependency(self):
         """Test to make sure that Dependency is working properly.
@@ -185,7 +186,7 @@ class TestSequenceModel(unittest.TestCase):
     def setUp(self):
         """Clean the current database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_model_sequence(self):
         """Test to make sure that Sequence is working properly.
@@ -207,7 +208,7 @@ class TestUnitModels(unittest.TestCase):
     def setUp(self):
         """Clean the current database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_model_unit(self):
         """Test to make sure that Unit is working properly.
@@ -231,7 +232,7 @@ class TestUnitModels(unittest.TestCase):
         unit.properties.append(prop)
 
         assert unit.sentences == [sentence]
-        assert unit.properties == [unit_type, prop]
+        assert unit.properties.all() == [unit_type, prop]
 
         unit.save()
         prop.save()
@@ -246,7 +247,7 @@ class TestUnitModels(unittest.TestCase):
         """Test to make sure that Document is working properly.
         """
 
-        d1 = Document(title="test", path="/path/to/d1")
+        d1 = Document(title="test")
         d1.save()
 
         assert d1.type == "document"
@@ -266,14 +267,17 @@ class TestUnitModels(unittest.TestCase):
 
         user = User()
         project = Project()
+        document_file = DocumentFile()
         document = Document()
 
-        project.documents = [document]
+        project.document_files = [document_file]
+        document_file.documents = [document]
         user.projects = [project]
 
         user.save()
         project.save()
         document.save()
+        document_file.save()
 
         assert document.belongs_to(user)
 
@@ -283,7 +287,7 @@ class TestPropertyModel(unittest.TestCase):
     def setUp(self):
         """Clean the current database.
         """
-        database.restore_cache()
+        database.clean()
 
     def test_model_property(self):
         """Test to make sure that Property is working properly.
@@ -311,10 +315,9 @@ class TestPropertyModel(unittest.TestCase):
 class TestSetsModels(unittest.TestCase):
     """Test all the different ``Set`` models.
     """
-
     @classmethod
     def setUpClass(cls):
-        database.restore_cache()
+        database.clean()
 
         cls.set = Set()
         cls.sequenceset = SequenceSet()
@@ -370,4 +373,78 @@ class TestSetsModels(unittest.TestCase):
         assert len(sets) == 1
         assert self.documentset in sets
         assert sets[0].get_items() == []
+
+class TestStructureFileModel(unittest.TestCase):
+    """Test the StructureFile model.
+    """
+
+    def setUp(self):
+        database.clean()
+
+    def test_model_structure_file(self):
+        """Test to make sure that StructureFile is working properly.
+        """
+
+        structure_file1 = StructureFile(path="foo")
+        structure_file2 = StructureFile(path="bar")
+
+        project = Project()
+        project.structure_files = [structure_file1, structure_file2]
+        project.save()
+
+        assert Project.query.all()[0].structure_files == [structure_file1,
+            structure_file2]
+
+class TestProjectModel(unittest.TestCase):
+    """Tests for the Project model.
+    """
+
+    def setUp(self):
+        database.clean()
+
+    def test_get_documents(self):
+        """Test the get_documents method.
+        """
+        document_file1 = DocumentFile()
+        document_file2 = DocumentFile()
+
+        document1 = Document()
+        document2 = Document()
+        document3 = Document()
+
+        project = Project()
+
+        document_file1.documents = [document1, document2]
+        document_file2.documents = [document3]
+
+        project.document_files = [document_file1, document_file2]
+        project.save()
+
+        assert project.get_documents() == [document1, document2, document3]
+
+
+class TestDocumentFileModule(unittest.TestCase):
+    """Test the DocumentFile model.
+    """
+
+    def setUp(self):
+        database.clean()
+
+    def test_model_document_file(self):
+        """Test to make sure that DocumentFile is working properly.
+        """
+
+        documentfile = DocumentFile()
+        document1 = Document()
+        document2 = Document()
+        project1 = Project()
+        project2 = Project()
+
+        documentfile.path = "/foo/bar"
+        documentfile.documents = [document1, document2]
+        documentfile.projects = [project1, project2]
+        documentfile.save()
+
+        assert len(documentfile.documents) == 2
+        assert len(documentfile.projects) == 2
 

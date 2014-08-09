@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
 
     app.models
+    app.preprocessor
     app.uploader
     app.wordseer
 

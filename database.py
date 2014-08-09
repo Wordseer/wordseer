@@ -75,6 +75,12 @@ def restore_cache():
     shutil.copyfile(app.config["SQLALCHEMY_DATABASE_CACHE_PATH"],
         app.config["SQLALCHEMY_DATABASE_PATH"])
 
+def clean():
+    """Restore cache and roll back the session.
+    """
+    restore_cache()
+    db.session.rollback()
+
 if __name__ == "__main__":
 
     if argv[1] == "create":

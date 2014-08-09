@@ -6,11 +6,11 @@ import mock
 import unittest
 
 from app.models.document import Document
-from lib.wordseerbackend.wordseerbackend.database.readerwriter import ReaderWriter
 from app.models.word import Word
 from app.models.sentence import Sentence
-from lib.wordseerbackend.wordseerbackend.sequence.sequenceprocessor import (SequenceProcessor,
+from app.preprocessor.sequenceprocessor import (SequenceProcessor,
     join_tws, LEMMA, WORD)
+import database
 
 class SequenceProcessorTests(unittest.TestCase):
     """Tests for SequenceProcessor.
@@ -18,8 +18,8 @@ class SequenceProcessorTests(unittest.TestCase):
     def setUp(self):
         """Obtain a SequenceProcessor.
         """
-        mock_reader_writer = mock.create_autospec(ReaderWriter)
-        self.seq_proc = SequenceProcessor(mock_reader_writer)
+        database.clean()
+        self.seq_proc = SequenceProcessor()
 
         self.words = [Word(lemma="first", word="first"),
             Word(lemma="second", word="second"),

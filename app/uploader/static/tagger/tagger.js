@@ -1,18 +1,11 @@
-/* 
+/* This file contains all the UI interactions for the XML tagger
  * @Author = Hassan Jannah
- *//*
-  $(window).load(function() {
-  $('#tagger-loading-box').fadeOut("slow");
-  })*/
+ */
 $(document).ready(function() {
     console.log('ready');
     init_tagger();
-})/*.ajaxStart(function() {
- console.log('ajax start');
- $('#tagger-loading-box').show();
- }).ajaxStop(function() {
- $('#tagger-loading-box').hide();
- })*/;
+});
+
 var project_id, document_id, document_url, filename, kwargs, templates_url;
 var BODY_CHANGE_EVENT = 'bodyChange';
 var TEMPLATES = {
@@ -25,8 +18,10 @@ var TEMPLATES = {
     OUTPUT_PREVIEW: {filename: 'output_preview.html'},
     RENAME_FORM: {filename: 'rename_form.html'},
     COMBINE_FORM: {filename: 'combine_form.html'},
-    INTRO: {filename: 'intro.html'}
+    INTRO: {filename: 'intro.html'},
+    JSON_PREVIEW: {filename: 'json_preview.html'}
 };
+
 var buckets = {
     sentences: {id: 'sentence-bucket',
         header: 'Selected text nodes to analyze',
@@ -35,7 +30,11 @@ var buckets = {
         header: 'Selected analysis properties',
         help: 'Properties are additional information that help perform multi-propertyal analysis on the text.'}};
 
-var nodes;
+var nodes;//the node model 
+/**
+ * Initiate tagger
+ * @returns {undefined}
+ */
 function init_tagger()
 {
 //     
@@ -51,14 +50,10 @@ function init_tagger()
     addRootNode();
     loadIntro();
 }
-function test()
-{
-    var counter = 0;
-    _.each(nodes.map, function(item)
-    {
-        item.attributes.dataType = 'text ' + counter++;
-    });
-}
+/**
+ * render inital UI elements
+ * @returns {undefined}
+ */
 function render()
 {
     renderContainers();
@@ -67,6 +62,10 @@ function render()
     renderXMLPreview(nodes.attributes.xml, '#tagger-xml-preview .tagger-container-body');
 //    $('.tagger-container').resizable();
 }
+/**
+ * Load request params
+ * @returns {undefined}
+ */
 function loadRequestParams()
 {
     project_id = $('#project-id').val();
@@ -75,12 +74,13 @@ function loadRequestParams()
     document_url = $('#document-url').val();
     templates_url = $('#templates-url').val();
 }
+/**
+ * Load events related to submitting the form (save file) eents will prevent the form from refreshing
+ * @returns {undefined}
+ */
 function loadSubmitEvent()
 {
-//    $('#tagger').submit(function() {
-//        saveStructureFile();
-//        return false;
-//    });
+
     $('#tagger').submit(function() {
         return false;
     });
@@ -90,7 +90,10 @@ function loadSubmitEvent()
     });
 }
 
-
+/**
+ * Load introduction dialogue
+ * @returns {undefined}
+ */
 function loadIntro()
 {
     $('#tagger-loading-box').hide();
@@ -120,6 +123,7 @@ function saveStructureFile()
     var data = nodes.toActiveJSON(), token = $('#csrf_token').val();
     var url = S(window.location.href).chompRight('#').s + '/save/';
     console.log(url);
+    //Submit ajax request to Flask to save file
     $.ajax({
         type: "POST",
         url: url,
@@ -135,7 +139,7 @@ function saveStructureFile()
         var pieces = url.split('/'), temp = pieces.slice(0, pieces.length - 4), redirect_url = temp.join('/');
         if (text === 'ok')
         {
-
+            //if the save was successful, reirect to project main page
             window.location.replace(redirect_url);
             return false;
         }
@@ -147,10 +151,31 @@ function saveStructureFile()
         }
     });
 }
+
+function previewStructureFile()
+{
+    var json = nodes.toActiveJSON();
+    renderTemplate('#json-preview-box', TEMPLATES.JSON_PREVIEW, {json: JSON.stringify(json, undefined, 2)})
+    $('#json-preview-box').show().on('click', function() {
+        $(this).hide();
+    });
+    ;
+    console.log(json);
+
+    return false;
+}
+/**
+ * Hide the save file response dialogue
+ * @returns {undefined}
+ */
 function hideSaveFileResponse()
 {
     $('#tagger-save-file-result').hide();
 }
+/**
+ * Load all app templates locally (not render)
+ * @returns {undefined}
+ */
 function loadTemplates()
 {
     for (var template in TEMPLATES)
@@ -160,12 +185,20 @@ function loadTemplates()
         TEMPLATES[template]['render'] = _.template(TEMPLATES[template]['html']);
     }
 }
+/**
+ * Load a specific HTML template
+ * @param {string} filename filename of the template
+ * @returns {$@call;ajax.responseText}
+ */
 function loadTemplate(filename)
 {
     var jqxhr = $.ajax({url: filename, async: false});
     return jqxhr.responseText;
 }
-
+/**
+ * Load all tooltips associated with the tooltipster library 
+ * @returns {undefined}
+ */
 function loadTooltips()
 {
     try {
@@ -176,6 +209,15 @@ function loadTooltips()
 
     }
 }
+/*
+ * Render a specific HTML template
+ * @param {string} target target HTML element ID to render the template under
+ * @param {Object} template template  from TEMPLATES
+ * @param {Object} args arguments to pass to the templates
+ * @param {boolean} replace whether to replace the existing contents of the target
+ * @param {string} id the id to give the rendered template
+ * @returns {undefined}
+ */
 function renderTemplate(target, template, args, replace, id)
 {
     if (replace)
@@ -195,12 +237,21 @@ function renderTemplate(target, template, args, replace, id)
     }
     $(target).trigger(BODY_CHANGE_EVENT);
 }
+/**
+ * Remove a specific HTML element from its parent and refresh it
+ * @param {string} target HTML ID
+ * @returns {undefined}
+ */
 function removeNode(target) {
 
     var parent = $(target).parent();
     $(target).remove();
     parent.trigger(BODY_CHANGE_EVENT);
 }
+/**
+ * REnder the initial containers
+ * @returns {undefined}
+ */
 function renderContainers()
 {
     renderTemplate('#tagger-buckets', TEMPLATES.CONTAINER,
@@ -217,7 +268,10 @@ function renderContainers()
                 help: 'a preview of the source Output text and properties document'});
 }
 
-
+/**
+ * Render the bucket (sentences and properties)
+ * @returns {undefined}
+ */
 function renderBuckets() {
     $('#tagger-buckets-container .tagger-container-body').append('<table></table>');
     for (var bucket in buckets)
@@ -225,15 +279,35 @@ function renderBuckets() {
         renderTemplate('#tagger-buckets-container .tagger-container-body table', TEMPLATES.BUCKET, buckets[bucket]);
     }
 }
+/**
+ * Render the main tree nodes
+ * @param {NodeModel} node root node
+ * @param {string} target target HTML ID
+ * @returns {undefined}
+ */
 function renderTreeNodes(node, target)
 {
     renderNodes(node, TEMPLATES.TREE_NODE, target, 'tree');
 }
+/**
+ * Render the tree nodes in the select node title dialogue
+ * @param {NodeModel} node root node
+ * @param {string} target target HTML ID
+ * @returns {undefined}
+ */
 function renderTitleTreeNodes(node, target)
 {
     renderNodes(node, TEMPLATES.TITLE_TREE_NODE, target, 'title');
 }
 
+/**
+ * Recursively render node under a specific target
+ * @param {NodeModel} node the node to render
+ * @param {Object} template the template to use to render the nodes form TEMPLATES
+ * @param {string} target HTML target ID
+ * @param {string} target_prefix whether the target is a Tree node or a title tree node
+ * @returns {undefined}
+ */
 function renderNodes(node, template, target, target_prefix)
 {
     if (node) {
@@ -251,7 +325,13 @@ function renderNodes(node, template, target, target_prefix)
             }
     }
 }
-
+/**
+ * Recursively render the XML document preview
+ * @param {XML} xml
+ * @param {string} target HTML ID
+ * @param {string} parent_id the ID of the current XML element's parent
+ * @returns {undefined}
+ */
 function renderXMLPreview(xml, target, parent_id)
 {
     parent_id = (parent_id) ? parent_id : NODE_ID_PREFIX;
@@ -263,11 +343,15 @@ function renderXMLPreview(xml, target, parent_id)
     {
         _.each(children, function(child)
         {
+            //render the children of this node directly under it
             renderXMLPreview(child, '.' + node_id + ':last .xml-preview-children:first', node_id);
         });
     }
 }
-
+/**
+ * Add the root node to the property bucket by default
+ * @returns {undefined}
+ */
 function addRootNode()
 {
     var root_node = $('.node-tag-document');
@@ -277,31 +361,39 @@ function addRootNode()
 /********************
  *      EVENTS      *
  ********************/
+/**
+ * Load node tree vents
+ * @returns {undefined}
+ */
 function loadNodeTreeEvents()
 {
     loadGenericNodeTreeEvents();
+    //highlight the XML text when a node is clicked
     $('.node-tag').on('click', function() {
         var self = $(this), id = self.attr('data-id');
         enableHighlightNodes(id, false);
-        /* $('.xml-preview-node .highlighted-nodes').removeClass('highlighted-nodes');
-         $('.xml-preview-node .' + id).addClass('highlighted-nodes');
-         $('#tagger-xml-preview-container .tagger-container-body').scrollTop(0);
-         var top = $('#tagger-xml-preview-container .' + id + ":first").offset().top - $('#tagger-xml-preview-container .tagger-container-body').position().top - 25;
-         $('#tagger-xml-preview-container .tagger-container-body').scrollTop(top);*/
     });
+    //text node added
     $('.node-tag-action-text').on('click', function()
     {
         processElement(this);
 
     });
+    //property node added
     $('.node-tag-action-property').on('click', function()
     {
         processElement(this);
 
     });
 }
+
+/**
+ * Load generic events associated with tree nodes
+ * @returns {undefined}
+ */
 function loadGenericNodeTreeEvents()
 {
+    //Tree collapse events
     $('.tagger-node .collapse-node').unbind('click').on('click', function() {
         var self = $(this);
         self.parents('.tagger-node:first').children('.tagger-node-children:first').slideUp();
@@ -314,6 +406,7 @@ function loadGenericNodeTreeEvents()
         var self = $(this);
         self.parents('.tagger-node:first').children('.tagger-node-children:first').removeClass('highlighted-nodes');
     });
+    //Tree expand events
     $('.tagger-node .expand-node').unbind('click').on('click', function() {
         var self = $(this);
         self.parents('.tagger-node:first').children('.tagger-node-children:first').slideDown();
@@ -322,7 +415,13 @@ function loadGenericNodeTreeEvents()
     });
 }
 
+/**
+ * Add bucket tag events
+ * @param {string} id node id
+ * @returns {undefined}
+ */
 function addBucketTagEvents(id) {
+    //highlight xml and other elements when hovering
     $('.bucket-body > .' + id).on('mouseover', function()
     {
         enableHighlightNodes(id, true);
@@ -331,23 +430,31 @@ function addBucketTagEvents(id) {
     {
         disableHighlightNodes(id);
     });
+    //show rename dialogue when a property bucket node is clicked
     $('.bucket-body .bucket-tag-property.' + id).unbind('click').on('click', function()
     {
         var self = $(this), type = self.attr('data-type'), id = self.attr('data-id');
         showRenameDialogue(id);
     });
+    //show combine text dialogue when a property bucket node is clicked
     $('.bucket-body .bucket-tag-sentence.' + id).unbind('click').on('click', function()
     {
         var self = $(this), type = self.attr('data-type'), id = self.attr('data-id');
         showCombineForm(id);
     });
+    //removing a bucket node
     $('.bucket-tag-remove.' + id).on('click', function() {
         var myId = $(this).attr('data-id'), type = $(this).attr('data-node-type');
         removeElement(null, myId, type);
         disableHighlightNodes(myId);
     });
 }
-
+/*
+ * Highlight all instances of specifc node id in XML preview, tree node, and output preview
+ * @param {string} id node id to highlihgt
+ * @param {boolean} highlightTreeNodes highlight tree nodes or not
+ * @returns {undefined}
+ */
 function enableHighlightNodes(id, highlightTreeNodes)
 {
     if (highlightTreeNodes) {
@@ -365,6 +472,11 @@ function enableHighlightNodes(id, highlightTreeNodes)
         enableHighlightNodes(tid, highlightTreeNodes);
     }
 }
+/** 
+ * disable highlights
+ * @param {string} id node id
+ * @returns {undefined}
+ */
 function disableHighlightNodes(id)
 {
     $('#tagger-node-preview  .' + id).removeClass('highlighted-tag');
@@ -373,6 +485,12 @@ function disableHighlightNodes(id)
         disableHighlightNodes(nodes.map[id].attributes.titleId);
 
 }
+
+/**
+ * Process a tree node element (add or remove)
+ * @param {HTML} el HTML element to process
+ * @returns {undefined}
+ */
 function processElement(el)
 {
     var tag = $(el), id = tag.attr('data-id'), nodeType = tag.attr('data-node-type'), active = nodes.map[id].attributes.isActive;
@@ -382,6 +500,13 @@ function processElement(el)
     else
         addElement(tag, id, nodeType);
 }
+/**
+ * Remvoe an element from buckets
+ * @param {string} tag HTML tag
+ * @param {string} id node id
+ * @param {string} nodeType from NODE_TYPES
+ * @returns {undefined}
+ */
 function removeElement(tag, id, nodeType)
 {
     if (!tag)
@@ -392,6 +517,16 @@ function removeElement(tag, id, nodeType)
         removePropertyElement(id);
     refreshNodeTreeView();
 }
+
+/**
+ * Add and element to buckets
+ * @param {string} tag HTML tag
+ * @param {string} id node id
+ * @param {string} nodeType from NODE_TYPES
+ * @param {booelan} renameDialogue show the rename dialogue after adding
+ * @param {boolean} preventRender prevent render the UI after adding
+ * @returns {undefined}
+ */
 function addElement(tag, id, nodeType, renameDialogue, preventRender)
 {
     var bucket = $('.bucket-tag-' + nodeType + '.' + id);
@@ -417,6 +552,11 @@ function addElement(tag, id, nodeType, renameDialogue, preventRender)
     }
     refreshNodeTreeView();
 }
+/**
+ * Add a node to the sentence bucket
+ * @param {string} id node id
+ * @returns {undefined}
+ */
 function addTextElement(id)
 {
     removePropertyElement(id);
@@ -432,6 +572,13 @@ function addTextElement(id)
         alert('node already added');
     }
 }
+/**
+ * Add a node to the properties bucket
+ * @param {string} id node id
+ * @param {boolean} renameDialogue show the rename dialogue after adding
+ * @param {boolean} preventRender prvent UI refresh after adding
+ * @returns {undefined}
+ */
 function addPropertyElement(id, renameDialogue, preventRender)
 {
     removeTextElement(id);
@@ -449,6 +596,11 @@ function addPropertyElement(id, renameDialogue, preventRender)
     if (renameDialogue || node.attributes.type === SUBUNIT_TAG)
         showRenameDialogue(id);
 }
+/**
+ * Remvoe node form sentence bucket and deactivate it
+ * @param {string} id node id
+ * @returns {undefined}
+ */
 function removeTextElement(id)
 {
 
@@ -457,6 +609,11 @@ function removeTextElement(id)
     node.setAsSentence(false);
     removeNode('#sentence-bucket .bucket-body .' + id);
 }
+/**
+ * Remvoe node form properties bucket and deactivate it
+ * @param {string} id node id
+ * @returns {undefined}
+ */
 function removePropertyElement(id)
 {
     var node = nodes.map[id];
@@ -468,7 +625,11 @@ function removePropertyElement(id)
         titleNode.deactivate();
     }
 }
-
+/**
+ * Refresh the UI of a certain bucket node from node model
+ * @param {string} id node id
+ * @returns {undefined}
+ */
 function refreshElement(id) {
 
     var node = nodes.map[id], target = '.bucket-tag-group.' + id;
@@ -476,6 +637,11 @@ function refreshElement(id) {
     addBucketTagEvents(id);
 
 }
+/**
+ * Refresh the UI of the node tree preview based on the active node model nodes. 
+ * This will ensure proeper UI rendering instead of handling each event individually (add/remove)
+ * @returns {undefined}
+ */
 function refreshNodeTreeView()
 {
     $('.node-tag-action').removeClass('added-node');
@@ -496,33 +662,34 @@ function refreshNodeTreeView()
  *      Rename dialogue     *
  ***************************/
 /**
- * 
- * @param {type} id
+ * Show the rename/assign title dialogue
+ * @param {string} id
  * @returns {undefined}
  */
 function showRenameDialogue(id)
 {
-//    showLoading();
     hideRenameDialogue();
     var node = nodes.map[id];
     renderTemplate('#tagger-rename-dialogue', TEMPLATES.RENAME_FORM, node.attributes);
     if (node.attributes.type !== METADATA_TAG)
         renderTitleTreeNodes(node, '#rename-form #title-tree-nodes');
-//    renderXMLPreview(nodes.attributes.xml, '#title-tree-xml-preview', null, 'title-xml-preview-node');
     $('#tagger-xml-preview .xml-preview-node:first').clone().appendTo('#title-tree-xml-preview');
     $('#title-tree-xml-preview .xml-preview-node').addClass('title-xml-preview-node').removeClass('xml-preview-node');
     $('#tagger-rename-dialogue').fadeIn();
     loadRenameDialogueEvents();
     if (node.attributes.titleId !== '')
     {
-//        console.log('has title ' + node.attributes.titleId);
         $('.title-node-tag.' + node.attributes.titleId).trigger('click');
     }
-//    hideLoading();
 }
+/**
+ * Load the rename dialogue events
+ * @returns {undefined}
+ */
 function loadRenameDialogueEvents()
 {
     loadGenericNodeTreeEvents();
+    //tag click event to add as title, 
     $('.title-node-tag').unbind('click')
             .on('click', function()
             {
@@ -532,8 +699,8 @@ function loadRenameDialogueEvents()
                         .val(self.text());
                 $('.title-node-tag').removeClass('highlighted-tag');
                 self.addClass('highlighted-tag');
-
             })
+            //tag hover event to highlight XML
             .on('mouseover', function()
             {
                 var self = $(this), id = self.attr('data-id');
@@ -543,12 +710,13 @@ function loadRenameDialogueEvents()
                 var top = $('#title-tree-xml-preview .' + id + ":first").offset().top - $('#title-tree-xml-preview').position().top - 160;
                 $('#title-tree-xml-preview').scrollTop(top);
             });
-
+    //clear form event
     $('#rename-form-clear-title').unbind('click').on('click', function()
     {
         $('#selected-property-title').val('').attr('data-id', '');
         $('.title-node-tag.highlighted-tag').removeClass('highlighted-tag');
     });
+    //data type event
     $('#selected-property-data-type').dropdown();
     $('#selected-property-data-type-list li a').on('click', function() {
         var type = $(this).attr('data-type');
@@ -556,31 +724,35 @@ function loadRenameDialogueEvents()
         if (type === DATA_TYPES.DATE) {
             $('#selected-property-date-format').show();
             $('#selected-property-date-format-help').show();
-
         }
         else
         {
             $('#selected-property-date-format').hide();
             $('#selected-property-date-format-help').hide();
-
         }
-
     });
-
-
 }
+/**
+ * hide the rename dialogue
+ * @param {boolean} remove remove the added node from the bucket after hiding
+ * @param {string} id node id
+ * @param {string} nodeType node type from NODE_TYPES
+ * @returns {undefined}
+ */
 function hideRenameDialogue(remove, id, nodeType)
 {
     $('#tagger-rename-dialogue').hide();
     $('#tagger-rename-dialogue').empty();
-    if (remove && id)
-    {
-      /* if (nodes.map[id].attributes.type !== DOCUMENT_TAG)
-            removeElement(null, id, nodeType);*/
-    }
-//    loadRenameDialogueEvents();
-
+//    if (remove && id)
+//    {
+//        /* if (nodes.map[id].attributes.type !== DOCUMENT_TAG)
+//         removeElement(null, id, nodeType);*/
+//    }
 }
+/**
+ * Save the outcome of the rename dialogue to the node model
+ * @returns {undefined}
+ */
 function saveRenameDialogue()
 {
     var id = $('#title-tree-node-target').val(),
@@ -589,11 +761,13 @@ function saveRenameDialogue()
             data_type = $('#selected-property-data-type').attr('data-type'),
             date_format = $('#selected-property-date-format').val(),
             node = nodes.map[id];
+    //rename node
     if (new_name.length > 0)
         node.rename(new_name);
 
     if (nodes.map[new_target_id])
     {
+        //update node title and data type
         node.setTitleAsXPath(nodes.map[new_target_id].attributes.xpaths[0]);
         node.setTitleNode(new_target_id);
 
@@ -604,6 +778,7 @@ function saveRenameDialogue()
     }
     else
     {
+        //reset node title
         var tid = node.attributes.titleId;
         if (tid !== '')
         {
@@ -611,24 +786,27 @@ function saveRenameDialogue()
         }
     }
     node.setDataType(data_type);
-
-//    console.log(data_type + '\t' + date_format);
+//update date format for date dataType
     if (data_type === DATA_TYPES.DATE) {
         node.setDateFormat(date_format);
-//        console.log(date_format);
     }
-    refreshElement(id);
+    refreshElement(id);//refresh the node UI after updating the model
     hideRenameDialogue();
 }
 
 /****************************
  *      OUTPUT PREVIEW      *
  ****************************/
-
+//default sample size
 var sampleSize = DEFAULT_SAMPLE_SIZE, defaultIncrease = DEFAULT_SAMPLE_SIZE;
+/**
+ * Load the structure file output preview
+ * @returns {undefined}
+ */
 function loadOutputPreview()
 {
     //"DOMSubtreeModified"
+    //whenever the buckets are changed, reload the output preview
     $('.bucket-body').unbind(BODY_CHANGE_EVENT).on(BODY_CHANGE_EVENT, function()
     {
         var data = nodes.getSample(sampleSize);
@@ -643,14 +821,20 @@ function loadOutputPreview()
         }
     });
 }
-
+/**
+ * Show more outputs by increasing the smaple size 
+ * @returns {undefined}
+ */
 function showMoreOutput()
 {
     sampleSize += defaultIncrease;
     $('.bucket-body').trigger(BODY_CHANGE_EVENT);
 
 }
-
+/**
+ * Show less outputs by decreasing the smaple size 
+ * @returns {undefined}
+ */
 function showLessOutput()
 {
     sampleSize -= (sampleSize > defaultIncrease) ? defaultIncrease : 0;
@@ -661,8 +845,8 @@ function showLessOutput()
  *      COMBINE FORM         *
  ****************************/
 /**
- * 
- * @param {type} id
+ * Show the text combine form
+ * @param {string} id node id
  * @returns {undefined}
  */
 function showCombineForm(id)
@@ -674,6 +858,13 @@ function showCombineForm(id)
     loadCombineFormEvents();
     $('#tagger-combine-dialogue').show();
 }
+/**
+ * Hide the combine text form
+ * @param {booelan} remove remove element after hiding
+ * @param {string} id node id
+ * @param {string} nodeType from NODE_TYPES
+ * @returns {undefined}
+ */
 function hideCombineForm(remove, id, nodeType)
 {
     $('#tagger-combine-dialogue').empty();
@@ -683,25 +874,37 @@ function hideCombineForm(remove, id, nodeType)
         removeElement(null, id, nodeType);
     }
 }
-
+/**
+ * Load combine form events
+ * @returns {undefined}
+ */
 function loadCombineFormEvents()
 {
-
+//Place holder for events
 
 }
+/**
+ * Save the options selected in the combine form
+ * @returns {undefined}
+ */
 function saveCombineForm()
 {
     var id = $('#combine-form').attr('data-id'), node = nodes.map[id], combine = $('#select-text-display-modes>.active').attr('data-combine') === 'true';
-//    console.log(combine);
     node.setCombine(combine);
     refreshElement(id);
     hideCombineForm();
-
 }
-
+/**
+ * Show loading image
+ * @returns {undefined}
+ */
 function showLoading() {
     $('#tagger-loading-box').show();
 }
+/**
+ * Hide loading image
+ * @returns {undefined}
+ */
 function hideLoading() {
     $('#tagger-loading-box').fadeOut(200);
 }

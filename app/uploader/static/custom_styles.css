@@ -53,3 +53,9 @@ form + div.alert, input+div.alert, div.form-group+div.alert {
     display: block;
     padding: 15px 15px;
 }
+
+.table-striped .json-entry{
+    /*background-color:rgba(255, 250, 155,.7);*/ 
+    font-style: italic;
+    font-weight: bolder;
+}
