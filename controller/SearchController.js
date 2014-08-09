@@ -150,6 +150,9 @@ Ext.define('WordSeer.controller.SearchController', {
 				formValues.metadata.push(record);
 			}
 		}
+		// close the autosuggest menu
+		Ext.ComponentQuery.query("autosuggest-menu")[0].hide();
+
 		var target = values.target;
 		if (target == 'new') {
 			// Make a new history item from the values.
