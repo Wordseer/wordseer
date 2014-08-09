@@ -3,8 +3,9 @@
 
 from app import db
 from .base import Base
+from .mixins import NonPrimaryKeyEquivalenceMixin
 
-class DocumentFile(db.Model, Base):
+class DocumentFile(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     """Every file uploaded or present on the filesystem is stored in a
     ``DocumentFile``. Every ``DocumentFile`` can contain one or more
     ``Document``\s.
