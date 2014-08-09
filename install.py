@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Installtion script for WordSeer.
 """
 import argparse
