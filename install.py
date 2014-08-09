@@ -54,13 +54,47 @@ def install_prerequisites():
         mountpoint = mounting.split("\n")[-2].split()[2]
         frameworks = glob.glob(mountpoint + "/*.framework")
         for framework in frameworks:
-            shutil.move(framework, "/Library/Frameworks")
+            subprocess.call(["sudo", "cp", "-r", framework, "/Library/Frameworks"])
+            #shutil.move(framework, "/Library/Frameworks")
         executables = [os.path.join(mountpoint, "xmllint"),
                 os.path.join(mountpoint, "xsltproc"),
                 os.path.join(mountpoint, "xmlcatalog")]
         for executable in executables:
-            shutil.move(executable, "/usr/bin")
+            subprocess.call(["sudo", "cp", executable, "/usr/bin"])
+            #shutil.move(executable, "/usr/bin")
         subprocess.call(["hdiutil", "unmount", mountpoint])
+    else:
+        print ("Could not identify operating system, prerequisite installation "
+        "failed.")
+
+def install_interactively():
+    """Install while prompting the user.
+    """
+    print ("You can either perform a full install or a partial install, just "
+        "enough to run the interactive wordseer tool.")
+    while True:
+        install_libxml = raw_input("Perform full install? (y/n)").lower()
+        if install_libxml in ["y", "n"]:
+            break
+
+    if install_libxml == "y":
+        print "Performing full install."
+        install_prerequisites()
+
+    else:
+        print "Performing partial install."
+
+    print ("The python packages can be installed inside a virtual environment, "
+        "which is a cleaner way to install the dependencies.")
+    while True:
+        use_virtualenv = raw_input("Use virtualenv? (y/n)").lower()
+        if use_virtualenv in ["y", "n"]:
+            break
+
+    if use_virtualenv == "y":
+        print "Using virtualenv."
+
+
 
 def main():
     """Perform the installation process.
@@ -69,7 +103,14 @@ def main():
         description="Install wordseer's requirements.")
     parser.add_argument("--sudo", action="store_true",
         help="Use sudo to install some dependencies")
+    parser.add_argument("-i", "--interactive", action="store_true",
+        help="Run interactively. This supersedes all other options.")
+    parser.add_argument("-v", "--virtualenv", action="store_true",
+        help="Run interactively.")
     args = parser.parse_args()
+
+    if args.interactive:
+        install_interactively()
 
     if args.sudo:
         install_prerequisites()
