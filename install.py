@@ -24,6 +24,7 @@ CORENLP_LOCAL_NAME = "stanford-corenlp"
 
 CORENLP_LOCAL_PATH = os.path.join(CORENLP_LOCAL_DIR, CORENLP_LOCAL_NAME)
 CORENLP_ZIP_DIRECTORY = os.path.splitext(os.path.basename(CORENLP))[0]
+ROOT_DIRECTORY = os.path.abspath(os.path.dirname(__file__))
 
 def download_file(src, dest):
     """Download a file using urllib2.
@@ -92,7 +93,73 @@ def install_interactively():
             break
 
     if use_virtualenv == "y":
-        print "Using virtualenv."
+        make_virtualenv(True)
+
+def make_virtualenv(sudo_install=False):
+    """Install virtualenv if necessary and create a virtual environment.
+
+    Arguments:
+        sudo_install (boolean): If True, then it will run sudo to install
+        virtualenv via pip if it isn't installed already.
+    """
+    print "Setting up virtualenv."
+    venv_name = "venv"
+    packages = subprocess.check_output(["pip", "freeze"])
+
+    if not "virtualenv" in packages and sudo_install:
+        print "Installing virtualenv."
+        subprocess.call(["sudo", "pip", "install", "virtualenv"])
+    else:
+        print "Virtualenv not found, not installing."
+        return
+
+    subprocess.call(["virtualenv", "--python=python2.7", venv_name])
+    #subprocess.call(["source venv/bin/activate"], shell=True)
+    venv_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
+    os.environ["PATH"] = (os.path.join(ROOT_DIRECTORY, venv_name, "bin") + ":" +
+        os.environ["PATH"])
+
+def install_python_packages():
+    """Install the required python modules.
+    """
+    print "Installing python dependencies"
+    subprocess.call(["pip install -r " + REQUIREMENTS],
+        shell=True)
+
+    subprocess.call(["python -m nltk.downloader punkt"], shell=True)
+
+def setup_stanford_corenlp(force=False):
+    """Download and move Stanford CoreNLP to the expected place.
+
+    Arguments:
+        force (boolean): If ``False``, then don't download if
+        ``CORENLP_LOCAL_PATH`` exists. Otherwise, download anyway.
+    """
+    temp_corenlp_name = "corenlp.zip"
+
+    if not force:
+        if not os.path.isdir(CORENLP_LOCAL_PATH):
+            force = True
+
+    if force:
+        print "Installing CoreNLP"
+        source_file = urllib2.urlopen(CORENLP)
+
+        with open(temp_corenlp_name, "w") as local_file:
+            print "Downloading..."
+            local_file.write(source_file.read())
+
+        with zipfile.ZipFile(temp_corenlp_name, "r") as local_zip:
+            print "Extracting..."
+            local_zip.extractall()
+
+        shutil.move(CORENLP_ZIP_DIRECTORY, CORENLP_LOCAL_PATH)
+        print "Cleaning up..."
+        os.remove("corenlp.zip")
+        print "Done"
+
+    else:
+        print "CoreNLP seems to be installed, skipping"
 
 def main():
     """Perform the installation process.
@@ -108,11 +175,7 @@ def main():
     args = parser.parse_args()
 
     if args.virtualenv:
-        packages = subprocess.check_output(["pip", "freeze"])
-        if not "virtualenv" in packages:
-            subprocess.call(["pip", "install", "virtualenv"])
-        subprocess.call(["virtualenv", "--python=python2.7", "venv"])
-        subprocess.call(["source venv/bin/activate"], shell=True)
+        make_virtualenv()
 
     if args.interactive:
         install_interactively()
@@ -120,30 +183,12 @@ def main():
     if args.sudo:
         install_prerequisites()
 
-    # Install things
-    print "Installing python dependencies"
-    subprocess.call(["pip install -r " + REQUIREMENTS],
-        shell=True)
-
-    subprocess.call(["python -m nltk.downloader punkt"], shell=True)
+    install_python_packages()
 
     print "Setting up database..."
     subprocess.call(["python database.py reset"], shell=True)
 
-    print "Installing stanford-corenlp"
-    source_file = urllib2.urlopen(CORENLP)
-
-    with open("corenlp.zip", "w") as local_file:
-        local_file.write(source_file.read())
-
-    with zipfile.ZipFile("corenlp.zip", "r") as local_zip:
-        local_zip.extractall()
-
-    shutil.move(CORENLP_ZIP_DIRECTORY, CORENLP_LOCAL_PATH)
-
-    print "Cleaning up..."
-    os.remove("corenlp.zip")
-
+    setup_stanford_corenlp()
 
 if __name__ == "__main__":
     main()
