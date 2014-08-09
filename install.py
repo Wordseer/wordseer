@@ -94,8 +94,6 @@ def install_interactively():
     if use_virtualenv == "y":
         print "Using virtualenv."
 
-
-
 def main():
     """Perform the installation process.
     """
@@ -108,6 +106,13 @@ def main():
     parser.add_argument("-v", "--virtualenv", action="store_true",
         help="Run interactively.")
     args = parser.parse_args()
+
+    if args.virtualenv:
+        packages = subprocess.check_output(["pip", "freeze"])
+        if not "virtualenv" in packages:
+            subprocess.call(["pip", "install", "virtualenv"])
+        subprocess.call(["virtualenv", "--python=python2.7", "venv"])
+        subprocess.call(["source venv/bin/activate"], shell=True)
 
     if args.interactive:
         install_interactively()
