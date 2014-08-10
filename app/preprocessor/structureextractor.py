@@ -78,7 +78,7 @@ class StructureExtractor(object):
             document = Document()
             document.properties = extracted_unit.properties
             document.sentences = extracted_unit.sentences
-            document.title = _get_title(extracted_unit.properties)
+            document.title = _get_title(document.properties)
             document.children = extracted_unit.children
             document.number = doc_num
 
