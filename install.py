@@ -68,7 +68,8 @@ def install_prerequisites():
                 shell=True)
 
     elif "Darwin" in system:
-        print "Mac detected, no prerequisites to install yet."
+        print "Mac detected. Compiling requirements for lxml."
+        subprocess.call(["STATIC_DEPS=true pip install lxml"], shell=True)
 #        print "Installing prerequisites for mac."
         
 #        download_file(LIBXML_MAC, "libxml.dmg.gz")
@@ -99,6 +100,14 @@ def install_prerequisites():
 def install_interactively():
     """Install while prompting the user.
     """
+    print ("The python packages can be installed inside a virtual environment, "
+        "which is a cleaner way to install the dependencies. If you do not "
+        "have virtualenv installed, you will need admin access to install it.")
+    use_virtualenv = prompt_user("Use virtualenv?", ["y", "n"])
+
+    if use_virtualenv == "y":
+        make_virtualenv(True)
+    
     print ("You can either perform a full install or a partial install. A "
         "partial install includes just enough to run the interactive wordseer "
         "tool. A full install lets you parse custom collections into the "
@@ -109,23 +118,11 @@ def install_interactively():
         print "Performing full install."
         #install_prerequisites()
         setup_stanford_corenlp()
-
-    else:
-        print "Performing partial install."
-
-    print ("The python packages can be installed inside a virtual environment, "
-        "which is a cleaner way to install the dependencies. If you do not "
-        "have virtualenv installed, you will need admin access to install it.")
-    use_virtualenv = prompt_user("Use virtualenv?", ["y", "n"])
-
-    if use_virtualenv == "y":
-        make_virtualenv(True)
-
-    if full_install == "y":
         install_python_packages()
     else:
+        print "Performing partial install."
         install_python_packages(REQUIREMENTS_MIN)
-
+    
     sys.exit(0)
 
 def make_virtualenv(sudo_install=False):
@@ -161,10 +158,6 @@ def install_python_packages(reqs=REQUIREMENTS_FULL):
     """
     print "Installing python dependencies from " + reqs
     system = subprocess.check_output(["uname", "-a"])
-    
-    if reqs == REQUIREMENTS_FULL and "Darwin" in system:
-        print "Compiling requirements for lxml."
-        subprocess.call(["STATIC_DEPS=true pip install lxml"], shell=True)
     
     subprocess.call(["pip install -r " + REQUIREMENTS_FULL],
         shell=True)
@@ -244,6 +237,8 @@ def main():
         setup_stanford_corenlp()
     else:
         install_python_packages(REQUIREMENTS_MIN)
+
+    setup_database()
 
 if __name__ == "__main__":
     main()
