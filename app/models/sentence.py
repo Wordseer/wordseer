@@ -4,6 +4,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from app import db
 from .base import Base
+from .project import Project
 from .association_objects import DependencyInSentence
 from .association_objects import SequenceInSentence
 from .association_objects import WordInSentence
@@ -65,7 +66,7 @@ class Sentence(db.Model, Base):
         return "<Sentence: " + str(self.text) + ">"
 
     def add_word(self, word, position=None, space_before="",
-        part_of_speech="", force=True):
+        part_of_speech="", project=None, force=True):
         """Add a word to the sentence by explicitly creating the association
         object.
 
@@ -77,25 +78,31 @@ class Sentence(db.Model, Base):
                 ``Sentence``.
             space_before (str): The space before ``word``, if any.
             part_of_speech (str): The part of speech of ``word``.
+            project (Project): The ``Project`` that scopes this relationship
 
         Returns:
             WordInSentence: The association object that associates this
                 ``Sentence`` and ``word``.
         """
 
+        # project argument assigned active_project if not present
+        if project == None: project = Project.active_project
+
         word_in_sentence = WordInSentence(
             word=word,
+            project=project,
             sentence=self,
             position=position,
             space_before=space_before,
-            part_of_speech=part_of_speech
+            part_of_speech=part_of_speech,
         )
+        
         word_in_sentence.save(force=force)
 
         return word_in_sentence
 
     def add_dependency(self, dependency, governor_index=None,
-        dependent_index=None, force=True):
+        dependent_index=None, project=None, force=True):
         """Add a dependency to the sentence by explicitly creating the
         association object.
 
@@ -113,18 +120,27 @@ class Sentence(db.Model, Base):
                 ``Sentence`` and ``dependency``.
         """
 
+        # project argument assigned active_project if not present
+        if project == None: project = Project.active_project
+
         dependency_in_sentence = DependencyInSentence(
             dependency=dependency,
             sentence=self,
+            project=project,
             governor_index=governor_index,
             dependent_index=dependent_index
         )
+
+        if not dependency.sentence_count:
+            dependency.sentence_count = 1
+        else:
+            dependency.sentence_count += 1
 
         dependency_in_sentence.save(force=force)
 
         return dependency_in_sentence
 
-    def add_sequence(self, sequence, position=None, force=True):
+    def add_sequence(self, sequence, position=None, project=None, force=True):
         """Add a ``Sequence`` to the ``Sentence`` by explicitly creating the
         association object.
 
@@ -140,12 +156,20 @@ class Sentence(db.Model, Base):
             SequenceInSentence: The association object that associates this
             ``Sentence`` and ``sequence``.
         """
+        # project argument assigned active_project if not present
+        if project == None: project = Project.active_project
 
         sequence_in_sentence = SequenceInSentence(
             sequence=sequence,
             sentence=self,
+            project=project,
             position=position
         )
+
+        if not sequence.sentence_count:
+            sequence.sentence_count = 1
+        else:
+            sequence.sentence_count += 1
 
         sequence_in_sentence.save(force=force)
 

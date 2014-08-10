@@ -17,12 +17,13 @@ class StringProcessor(object):
     """Tokenize or parse a string.
     """
 
-    def __init__(self):
+    def __init__(self, project):
         """Instantiate and ready the parser. Note that readying the parser takes
         some time.
         """
         self.logger = logging.getLogger(__name__)
         self.parser = StanfordCoreNLP(app.config["CORE_NLP_DIR"])
+        self.project = project
 
     def tokenize(self, txt):
         """Turn a string of one or more ``Sentence``\s into a list of
@@ -36,7 +37,7 @@ class StringProcessor(object):
 
         for sentence_text in split_sentences(txt):
             sentence = self.parse_with_error_handling(sentence_text)
-            sentences.extend(tokenize_from_raw(sentence, sentence_text))
+            sentences.extend(tokenize_from_raw(sentence, sentence_text, self.project))
 
         return sentences
 
@@ -158,6 +159,7 @@ class StringProcessor(object):
                         dependency = dependency,
                         governor_index = governor_index,
                         dependent_index = dependent_index,
+                        project = self.project,
                         force = False
                     )
 
@@ -303,7 +305,7 @@ def split_sentences(text):
 
     return sentences
 
-def tokenize_from_raw(parsed_text, txt):
+def tokenize_from_raw(parsed_text, txt, project):
     """Given the output of a call to raw_parse, produce a list of Sentences
     and find the PoS, lemmas, and space_befores of each word in each sentence.
 
@@ -373,6 +375,7 @@ def tokenize_from_raw(parsed_text, txt):
                 position = position,
                 space_before = space_before, # word["space_before"],
                 part_of_speech = word.part_of_speech,
+                project = project,
                 force=False
             )
 

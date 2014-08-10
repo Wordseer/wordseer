@@ -21,7 +21,7 @@ class CollectionProcessor(object):
     """Process a collection of files.
     """
     def __init__(self, project):
-        self.str_proc = StringProcessor()
+        self.str_proc = StringProcessor(project)
         self.pylogger = logging.getLogger(__name__)
         self.project = project
 
@@ -194,7 +194,7 @@ class CollectionProcessor(object):
 
             documents_parsed += 1
 
-        counter.count(self.project)
+        # counter.count(self.project)
 
 def cp_run(collection_dir, structure_file, extension, project):
     """Run the collection processor.

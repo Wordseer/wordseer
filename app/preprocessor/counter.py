@@ -26,10 +26,10 @@ def count(project):
 
                 dependency.save(False)
 
-            # Calculate counts for sequences
-            for sequence in sentence.sequences:
+            # # Calculate counts for sequences
+            # for sequence in sentence.sequences:
 
-                if not sequence.sentence_count:
-                    sequence.sentence_count = len(sequence.sentences)
+            #     if not sequence.sentence_count:
+            #         sequence.sentence_count = len(sequence.sentences)
 
         db.session.commit()
