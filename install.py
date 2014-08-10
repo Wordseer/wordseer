@@ -68,28 +68,30 @@ def install_prerequisites():
                 shell=True)
 
     elif "Darwin" in system:
-        print "Installing prerequisites for mac."
-        download_file(LIBXML_MAC, "libxml.dmg.gz")
+        print "Mac detected, no prerequisites to install yet."
+#        print "Installing prerequisites for mac."
+        
+#        download_file(LIBXML_MAC, "libxml.dmg.gz")
 
-        with gzip.GzipFile("libxml.dmg.gz") as local_zip,\
-            open("libxml.dmg", "w") as local_dmg:
-                local_dmg.write(local_zip.read())
-        os.remove("libxml.dmg.gz")
-        mounting = subprocess.check_output(["hdiutil", "mount", "libxml.dmg"])
-        mountpoint = mounting.split("\n")[-2].split()[2]
-
-        frameworks = glob.glob(mountpoint + "/*.framework")
-        for framework in frameworks:
-            subprocess.call(["sudo", "cp", "-r", framework,
-                "/Library/Frameworks"])
-
-        executables = [os.path.join(mountpoint, "xmllint"),
-                os.path.join(mountpoint, "xsltproc"),
-                os.path.join(mountpoint, "xmlcatalog")]
-        for executable in executables:
-            subprocess.call(["sudo", "cp", executable, "/usr/bin"])
-        subprocess.call(["hdiutil", "unmount", mountpoint])
-
+#        with gzip.GzipFile("libxml.dmg.gz") as local_zip,\
+#            open("libxml.dmg", "w") as local_dmg:
+#                local_dmg.write(local_zip.read())
+#        os.remove("libxml.dmg.gz")
+#        mounting = subprocess.check_output(["hdiutil", "mount", "libxml.dmg"])
+#        mountpoint = mounting.split("\n")[-2].split()[2]
+#
+#        frameworks = glob.glob(mountpoint + "/*.framework")
+#        for framework in frameworks:
+#            subprocess.call(["sudo", "cp", "-r", framework,
+#                "/Library/Frameworks"])
+#
+#        executables = [os.path.join(mountpoint, "xmllint"),
+#                os.path.join(mountpoint, "xsltproc"),
+#                os.path.join(mountpoint, "xmlcatalog")]
+#        for executable in executables:
+#            subprocess.call(["sudo", "cp", executable, "/usr/bin"])
+#        subprocess.call(["hdiutil", "unmount", mountpoint])
+#
     else:
         print ("Could not identify operating system, prerequisite installation "
         "failed.")
@@ -105,7 +107,7 @@ def install_interactively():
 
     if full_install == "y":
         print "Performing full install."
-        install_prerequisites()
+        #install_prerequisites()
         setup_stanford_corenlp()
 
     else:
@@ -145,7 +147,6 @@ def make_virtualenv(sudo_install=False):
             return
     else:
         print "Virtualenv already installed."
-
     subprocess.call(["virtualenv", "--python=python2.7", venv_name])
     #subprocess.call(["source venv/bin/activate"], shell=True)
     venv_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
@@ -159,6 +160,11 @@ def install_python_packages(reqs=REQUIREMENTS_FULL):
         reqs (str): The requirements file to install from.
     """
     print "Installing python dependencies from " + reqs
+
+    if reqs == REQUIREMENTS_FULL:
+        print "Compiling requirements for lxml."
+        subprocess.call(["STATIC_DEPS=true pip install lxml"], shell=True)
+    
     subprocess.call(["pip install -r " + REQUIREMENTS_FULL],
         shell=True)
 
