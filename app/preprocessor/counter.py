@@ -20,15 +20,16 @@ def count(project):
         for sentence in document.all_sentences:
             # Calculate counts for dependencies
             for dependency in sentence.dependencies:
-                dependency.sentence_count = len(dependency.sentences)
-                dependency.document_count = len(set([sentence.document
-                    for sentence in dependency.sentences]))
+
+                if not dependency.sentence_count:
+                    dependency.sentence_count = len(dependency.sentences)
+
                 dependency.save(False)
 
-            # # Calculate counts for sequences
-            # for sequence in sentence.sequences:
-            #     sequence.sentence_count = len(sequence.sentences)
-            #     sequence.document_count = len(set([sentence.document
-            #         for sentence in sequence.sentences]))
-            #     sequence.save(False)
-    db.session.commit()
+            # Calculate counts for sequences
+            for sequence in sentence.sequences:
+
+                if not sequence.sentence_count:
+                    sequence.sentence_count = len(sequence.sentences)
+
+        db.session.commit()
