@@ -160,8 +160,9 @@ def install_python_packages(reqs=REQUIREMENTS_FULL):
         reqs (str): The requirements file to install from.
     """
     print "Installing python dependencies from " + reqs
-
-    if reqs == REQUIREMENTS_FULL:
+    system = subprocess.check_output(["uname", "-a"])
+    
+    if reqs == REQUIREMENTS_FULL and "Darwin" in system:
         print "Compiling requirements for lxml."
         subprocess.call(["STATIC_DEPS=true pip install lxml"], shell=True)
     
