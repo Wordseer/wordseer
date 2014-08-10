@@ -7,7 +7,6 @@ import json
 from lxml import etree
 import mock
 
-import pdb
 from app.models.property import Property
 from app.models.sentence import Sentence
 from app.models.documentfile import DocumentFile
@@ -91,7 +90,6 @@ class PostTests(CommonTests, unittest.TestCase):
 
         self.failUnless(unit_sentences == extract_sentences)
         # Only two sentences in this doc
-        pdb.set_trace()
         self.failUnless(len(document.children[0].sentences) == 2)
         for sent in document.children[0].sentences:
             self.failUnless(sent.text in self.sentence_contents)
@@ -145,7 +143,6 @@ class PostTests(CommonTests, unittest.TestCase):
         sentences = fileinfo[0].children[0].sentences
 
         actual_sentences = [sentence.text for sentence in sentences]
-        pdb.set_trace()
         assert actual_sentences == expected_sentences
 
     def test_get_metadata(self):
