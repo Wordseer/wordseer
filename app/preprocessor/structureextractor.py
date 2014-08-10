@@ -355,7 +355,7 @@ def _get_title(properties):
 
     for prop in properties:
         if prop.name == "title":
-            return value
+            return prop.value
 
     # If there's no title property, return empty string
     return ""
