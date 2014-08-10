@@ -3,8 +3,11 @@
 
 import unittest
 import json
-from lxml import etree
 
+from lxml import etree
+import mock
+
+import pdb
 from app.models.property import Property
 from app.models.sentence import Sentence
 from app.models.documentfile import DocumentFile
@@ -12,7 +15,7 @@ from app.preprocessor.structureextractor import *
 from app.preprocessor.stringprocessor import StringProcessor
 import database
 
-t = StringProcessor()
+string_processor = StringProcessor(Project())
 
 class CommonTests(object):
     """Functionality common to all extractor test cases.
@@ -32,6 +35,8 @@ class CommonTests(object):
         self.structure_file = path + structure_file
         self.input_file = path + input_file
 
+        string_processor.project = Project()
+
         self.input_project = Project()
         self.input_project.document_files.append(
             DocumentFile(path=self.input_file))
@@ -41,7 +46,8 @@ class CommonTests(object):
             self.json = json.load(f)
 
         self.xml = etree.parse(self.input_file)
-        self.extractor = StructureExtractor(t, self.structure_file)
+        self.extractor = StructureExtractor(string_processor,
+            self.structure_file)
 
 class PostTests(CommonTests, unittest.TestCase):
     """Run tests based on a single post from the articles directory.
@@ -85,6 +91,7 @@ class PostTests(CommonTests, unittest.TestCase):
 
         self.failUnless(unit_sentences == extract_sentences)
         # Only two sentences in this doc
+        pdb.set_trace()
         self.failUnless(len(document.children[0].sentences) == 2)
         for sent in document.children[0].sentences:
             self.failUnless(sent.text in self.sentence_contents)
@@ -125,18 +132,20 @@ class PostTests(CommonTests, unittest.TestCase):
             self.failUnless(sent.text in self.sentence_contents)
 
     def test_combine(self):
-        """Test that items are properly combined when processing.
-        """
+        expected_sentences = ["This is the text of post 3.",
+            "I love blogs, but I also love debugging.",
+            "Debugging is the best."]
+        mock_get_sentences_dict = {"This is the text of post 3. I love blogs, "
+            "but I also love debugging. Debugging is the best":
+                expected_sentences}
+
         fileinfo = self.extractor.extract_unit_information(self.json,
             etree.parse(self.path + "post2.xml"))
 
         sentences = fileinfo[0].children[0].sentences
 
-        expected_sentences = ["This is the text of post 3.",
-            "I love blogs, but I also love debugging.",
-            "Debugging is the best."]
-
         actual_sentences = [sentence.text for sentence in sentences]
+        pdb.set_trace()
         assert actual_sentences == expected_sentences
 
     def test_get_metadata(self):
