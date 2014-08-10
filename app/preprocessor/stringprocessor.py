@@ -61,8 +61,9 @@ class StringProcessor(object):
         parsed_sentence = parsed["sentences"][0]
 
         if len(parsed["sentences"]) > 1:
-            raise ValueError("More than one sentences passed in to"
+            self.logger.warning("More than one sentences passed in to"
                 " StringProcessor.parse().")
+            # TODO: combine sentence
 
         for dependency in parsed_sentence["dependencies"]:
             # We don't want to make a dependency involving ROOT
