@@ -99,13 +99,14 @@ class SequenceProcessor(object):
                         )
 
                     sequence_dict[key] = sequence
-                    sequence.save(False)
 
-                    sentence.add_sequence(
-                        sequence = sequence,
-                        position = position,
-                        force = False
-                    )
+                sentence.add_sequence(
+                    sequence = sequence,
+                    position = position,
+                    force = False
+                )
+
+                sequence.save(False)
 
         return sequences
 
