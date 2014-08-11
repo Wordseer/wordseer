@@ -41,7 +41,8 @@ class StringProcessor(object):
 
         return sentences
 
-    def parse(self, sentence, relationships=None, dependencies=None, max_length=30):
+    def parse(self, sentence, relationships=None, dependencies=None,
+            max_length=30):
         """Parse a ``Sentence`` and extract dependencies, parse trees, etc.
 
         Note that for max_length, a "word" is defined as something with a space
@@ -62,7 +63,7 @@ class StringProcessor(object):
         parsed_sentence = parsed["sentences"][0]
 
         if len(parsed["sentences"]) > 1:
-            self.logger.warning("More than one sentences passed in to"
+            self.logger.warning("More than one sentence passed in to"
                 " StringProcessor.parse().")
             # TODO: combine sentence
 
@@ -92,20 +93,20 @@ class StringProcessor(object):
                     else:
 
                         try:
-                            relationship = GrammaticalRelationship.query.filter_by(
-                                name = grammatical_relationship
-                            ).one()
+                            relationship = GrammaticalRelationship.query.\
+                                filter_by(name = grammatical_relationship).\
+                                one()
                         except(MultipleResultsFound):
                             self.logger.error("duplicate records found for: %s",
                                 str(key))
                         except(NoResultFound):
                             relationship = GrammaticalRelationship(
-                                name = grammatical_relationship
-                            )
+                                name = grammatical_relationship)
 
                         relationships[key] = relationship
 
-                    # Read the data for the governor, and find the corresponding word
+                    # Read the data for the governor, and find the
+                    # corresponding word
                     governor = Word.query.filter_by(
                         word = governor,
                         lemma = governor_lemma,
@@ -126,7 +127,8 @@ class StringProcessor(object):
                         governor.id
                         dependent.id
                     except:
-                        self.logger.error("Governor or dependent not found; giving up on parse.")
+                        self.logger.error("Governor or dependent not found; "
+                            "giving up on parse.")
                         self.logger.info(sentence)
                         return sentence
 
@@ -198,8 +200,8 @@ class StringProcessor(object):
             try:
                 text = unicode(text)
             except(UnicodeDecodeError):
-                self.logger.warning("The following sentence text is not unicode; " +
-                    "convertion failed.")
+                self.logger.warning("The following sentence text is not "
+                    "unicode; convertion failed.")
                 self.logger.info(text)
 
                 # Skip sentence if flag is True
@@ -207,7 +209,8 @@ class StringProcessor(object):
                     return None
                 else:
                     # Try to parse the sentence anyway
-                    self.logger.warning("Attempting to parse non-unicode sentence.")
+                    self.logger.warning("Attempting to parse non-unicode "
+                        "sentence.")
 
         # Check for empty or nonexistent text
         if text == "" or text == None:
@@ -255,12 +258,13 @@ def split_sentences(text):
 
         # Check length of sentence
         max_length = app.config["SENTENCE_MAX_LENGTH"]
+        truncate_length = app.config["LOG_SENTENCE_TRUNCATE_LENGTH"]
         approx_sentence_length = len(sentence_text.split(" "))
 
         if approx_sentence_length > max_length:
             logger.warning("Sentence appears to be too long, max length " +
                 "is " + str(max_length))
-            logger.info(sentence_text[:app.config["LOG_SENTENCE_TRUNCATE_LENGTH"]] + "...")
+            logger.info(sentence_text[:truncate_length] + "...")
 
             # Attempt to split on a suitable punctuation mark
             # Order (tentative): semicolon, double-dash, colon, comma
@@ -295,7 +299,8 @@ def split_sentences(text):
                 index = 0
                 # Join every max_length number of words
                 while index < approx_sentence_length:
-                    subsentences.append(" ".join(split_sentence[index:index+max_length]))
+                    subsentences.append(" ".join(
+                        split_sentence[index:index+max_length]))
                     index += max_length
 
             sentences.extend(subsentences)

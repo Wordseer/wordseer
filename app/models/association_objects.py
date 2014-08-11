@@ -47,10 +47,12 @@ class SequenceInSentence(db.Model, Base):
 
     sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
+    document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
     position = db.Column(db.Integer)
 
     project = db.relationship("Project")
+    document = db.relationship("Document")
 
     sequence = db.relationship("Sequence",
         backref=db.backref(
@@ -99,6 +101,7 @@ class DependencyInSentence(db.Model, Base):
 
     dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id"))
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
+    document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
     governor_index = db.Column(db.Integer)
     dependent_index = db.Column(db.Integer)
@@ -106,6 +109,7 @@ class DependencyInSentence(db.Model, Base):
     dependent_part_of_speech = db.Column(db.String)
 
     project = db.relationship("Project")
+    document = db.relationship("Document")
 
     dependency = db.relationship("Dependency",
         backref=db.backref(

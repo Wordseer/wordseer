@@ -127,6 +127,7 @@ class Sentence(db.Model, Base):
             dependency=dependency,
             sentence=self,
             project=project,
+            document=self.document,
             governor_index=governor_index,
             dependent_index=dependent_index
         )
@@ -163,6 +164,7 @@ class Sentence(db.Model, Base):
             sequence=sequence,
             sentence=self,
             project=project,
+            document=self.document,
             position=position
         )
 

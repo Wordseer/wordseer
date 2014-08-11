@@ -158,9 +158,10 @@ class ParseTests(unittest.TestCase):
 
         sent.add_dependency.assert_has_calls(expected_added_deps)
 
-    @unittest.skip("changing implementation")
-    def test_parse_twosentences(self, mock_parser, mock_tokenizer):
-        """Check to make sure that parse() will only parse a single sentence.
+    @mock.patch.object(t, "logger", autospec=True)
+    def test_parse_twosentences(self, mock_logger, mock_parser, mock_tokenizer):
+        """Check to make sure that parse() will log a warning on multiple
+        sentences.
         """
 
         sent = Sentence(text="The fox is brown.")
@@ -172,7 +173,9 @@ class ParseTests(unittest.TestCase):
         mock_result.__setitem__.side_effect = parsed_dict.__setitem__
         mock_parser.return_value = mock_result
 
-        self.assertRaises(ValueError, t.parse, sent)
+        t.parse(sent)
+        mock_logger.warning.assert_called_with("More than one sentence passed "
+            "in to StringProcessor.parse().")
 
 class ParseWithErrorHandlingTest(unittest.TestCase):
     """Test the parse_with_error_handling method.
