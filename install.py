@@ -109,7 +109,7 @@ def install_interactively():
         install_python_packages()
     else:
         print "Performing partial install."
-        install_python_packages(REQUIREMENTS_MIN)
+        install_python_packages(REQUIREMENTS_MIN, False)
 
     sys.exit(0)
 
@@ -227,7 +227,7 @@ def install_pip(sudo):
         subprocess.call(["pip2.7", "-V"])
     except OSError:
         print "Pip not in PATH, attempting to add."
-        os.environ["PATH"] = "/usr/bin/" + ":" + os.environ["PATH"])
+        os.environ["PATH"] = "/usr/bin/" + ":" + os.environ["PATH"]
 
 def main():
     """Perform the installation process.
