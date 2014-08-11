@@ -222,6 +222,13 @@ def install_pip(sudo):
         print "Pip not installed, not set to install. Quitting."
         sys.exit(1)
 
+    # Macs like to not have pip accessible, so we need to manipulate PATH
+    try:
+        subprocess.call(["pip2.7", "-V"])
+    except OSError:
+        print "Pip not in PATH, attempting to add."
+        os.environ["PATH"] = "/usr/bin/" + ":" + os.environ["PATH"])
+
 def main():
     """Perform the installation process.
     """
