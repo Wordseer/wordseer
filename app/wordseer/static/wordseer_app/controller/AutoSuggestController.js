@@ -44,7 +44,8 @@ Ext.define('WordSeer.controller.AutoSuggestController', {
 			// true for one-word phrases and phrase sets
 			Ext.Ajax.request({
 				method: 'GET',
-				url: '../../src/php/search-suggestions/grammatical-relation-phrases.php',
+				url: ws_api_path +
+					'search-suggestions/grammatical-relation-phrases/',
 				params: {
 					instance: getInstance(),
 					user: getUsername(),

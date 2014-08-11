@@ -7,7 +7,7 @@
     storeId: 'SentenceSetListStore',
     proxy: {
       type: 'ajax',
-      url:'../../src/php/subsets/crud.php',
+      url: ws_api_path + 'sets/',
       extraParams:{
          type:'listflat',
          collectiontype:'sentence',
