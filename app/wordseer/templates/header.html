@@ -44,6 +44,11 @@
 <script type='text/javascript' src='{{ url_for('wordseer.static', filename='base64/base64.js')}}'></script>
 
 <!-- Ext -->
+<script charset="utf-8">
+    // pass some variables from flask to JS
+    var ws_path = "{{ url_for('.static', filename='Wordseer') }}";
+    var project_id = {{ project_id }};
+</script>
 <script type='text/javascript' src='{{ url_for('wordseer.static',
     filename='util.js')}}'></script>
 <script type='text/javascript' src='{{ url_for('wordseer.static',
