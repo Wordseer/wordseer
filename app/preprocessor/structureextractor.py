@@ -3,7 +3,6 @@
 
 import json
 import logging
-import pdb
 
 from lxml import etree
 from sqlalchemy.orm.exc import NoResultFound
