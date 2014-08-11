@@ -1,6 +1,8 @@
 from app import db
-from base import Base
-from association_objects import WordInSequence, SequenceInSentence
+from .base import Base
+from .project import Project
+from .sentence import Sentence
+from .association_objects import WordInSequence, SequenceInSentence
 from sqlalchemy.ext.associationproxy import association_proxy
 
 class Sequence(db.Model, Base):
@@ -33,14 +35,41 @@ class Sequence(db.Model, Base):
     has_function_words = db.Column(db.Boolean, index=True)
     all_function_words = db.Column(db.Boolean, index=True)
     length = db.Column(db.Integer, index=True)
-    sentence_count = db.Column(db.Integer, index=True)
-    document_count = db.Column(db.Integer, index=True)
+    sentence_count = db.Column(db.Integer, index=True, default=0)
+    document_count = db.Column(db.Integer, index=True, default=0)
 
     # Relationships
-
-    sentences = association_proxy("sequence_in_sentence", "sentence",
-        creator=lambda sentence: SequenceInSentence(sentence=sentence))
 
     words = association_proxy("word_in_sequence", "word",
         creator=lambda word: WordInSequence(word=word))
 
+    # Scoped Pseudo-relationships
+
+    @property
+    def sentences(self):
+        """Retrieves sentences that contain this sequence within the scope of
+        the current active project.
+        """
+
+        return Sentence.query.join(SequenceInSentence).join(Sequence).\
+            filter(SequenceInSentence.project==Project.active_project).\
+            filter(SequenceInSentence.sequence_id==self.id).all()
+
+    def add_word(self, word, project=None, force=True):
+        """Add a word to this sequence within the scope of the project
+        """
+
+        # project argument assigned active_project if not present
+        if project == None: project = Project.active_project
+
+        word_in_sequence = WordInSequence(
+            word = word,
+            sequence = self,
+            project = project
+        )
+        word_in_sequence.save(force=force)
+        
+        return word_in_sequence
+
+    def __repr__(self):
+        return "<Sequence {0}>".format(self.sequence)

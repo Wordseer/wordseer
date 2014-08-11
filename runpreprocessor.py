@@ -5,7 +5,7 @@ from app.preprocessor.collectionprocessor import cp_run
 import os
 import database
 
-collection_dir = os.path.join("tests", "data", "articles")
+collection_dir = os.path.join("tests", "data", "personals")
 extension = ".xml"
 structure_file = os.path.join(collection_dir, "structure.json")
 
@@ -25,4 +25,3 @@ for file_name in files:
 
 
 cp_run(collection_dir, structure_file, extension, project)
-
