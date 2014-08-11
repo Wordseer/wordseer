@@ -9,7 +9,7 @@ Ext.define("WordSeer.store.MetadataListStore", {
 	proxy: {
 		type: 'ajax',
 		noCache: false,
-		url: '../../src/php/document/get-metadata.php',
+		url: ws_api_path + 'documents/get_properties/',
 		extraParams: {
 			instance: getInstance(),
 			user: getUsername(),

@@ -10,7 +10,7 @@ Ext.define('WordSeer.store.DocumentSetStore', {
     autoLoad: true,
     proxy: {
         type: 'ajax',
-        url: '../../src/php/subsets/crud.php',
+        url: ws_api_path + 'sets/',
         extraParams: {
             user: getUsername(),
             collectiontype: 'document',

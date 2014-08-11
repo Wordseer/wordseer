@@ -38,7 +38,7 @@ Ext.define('WordSeer.controller.SearchController', {
 	init: function() {
 //		console.log("Initialized search controller");
 		Ext.Ajax.request({
-			url:'../../src/php/document/get-metadata-fields.php',
+			url: ws_api_path + 'documents/get_property_fields/',
 			method:'GET',
 			disableCaching: false,
 			params:{
