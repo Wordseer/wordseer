@@ -7,7 +7,7 @@ goog.require('goog.string.StringBuffer');
 
 // Begin ExjtJS initialization.
 Ext.Loader.setPath({
-    'WordSeer': '../../src/js'
+    'WordSeer': ws_static_path
 });
 
 Ext.Loader.setConfig({
@@ -16,7 +16,7 @@ Ext.Loader.setConfig({
 
 Ext.application({
     name: 'WordSeer',
-    appFolder: '../../src/js',
+    appFolder: ws_static_path,
     requires: [
         'WordSeer.view.windowing.viewport.Viewport',
         'WordSeer.view.table.Table',
