@@ -81,9 +81,9 @@ def install_interactively():
     if not pip_is_installed():
         print ("Pip does not seem to be installed. Pip is required to install "
             "Wordseer. Installing pip requires admin access.")
-        install_pip = prompt_user("Install pip?", ["y", "n"])
+        get_pip = prompt_user("Install pip?", ["y", "n"])
 
-        if install_pip == "y":
+        if get_pip == "y":
             install_pip(True)
         else:
             install_pip(False)
@@ -215,7 +215,6 @@ def install_pip(sudo):
             exit.
     """
     pip_name = "get-pip.py"
-
     if sudo:
         download_file(PIP, pip_name)
         subprocess.call("sudo python2.7 get-pip.py", shell=True)
