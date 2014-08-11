@@ -70,29 +70,7 @@ def install_prerequisites():
     elif "Darwin" in system:
         print "Mac detected. Compiling requirements for lxml."
         subprocess.call(["STATIC_DEPS=true pip install lxml"], shell=True)
-#        print "Installing prerequisites for mac."
-        
-#        download_file(LIBXML_MAC, "libxml.dmg.gz")
 
-#        with gzip.GzipFile("libxml.dmg.gz") as local_zip,\
-#            open("libxml.dmg", "w") as local_dmg:
-#                local_dmg.write(local_zip.read())
-#        os.remove("libxml.dmg.gz")
-#        mounting = subprocess.check_output(["hdiutil", "mount", "libxml.dmg"])
-#        mountpoint = mounting.split("\n")[-2].split()[2]
-#
-#        frameworks = glob.glob(mountpoint + "/*.framework")
-#        for framework in frameworks:
-#            subprocess.call(["sudo", "cp", "-r", framework,
-#                "/Library/Frameworks"])
-#
-#        executables = [os.path.join(mountpoint, "xmllint"),
-#                os.path.join(mountpoint, "xsltproc"),
-#                os.path.join(mountpoint, "xmlcatalog")]
-#        for executable in executables:
-#            subprocess.call(["sudo", "cp", executable, "/usr/bin"])
-#        subprocess.call(["hdiutil", "unmount", mountpoint])
-#
     else:
         print ("Could not identify operating system, prerequisite installation "
         "failed.")
@@ -107,7 +85,7 @@ def install_interactively():
 
     if use_virtualenv == "y":
         make_virtualenv(True)
-    
+
     print ("You can either perform a full install or a partial install. A "
         "partial install includes just enough to run the interactive wordseer "
         "tool. A full install lets you parse custom collections into the "
@@ -122,7 +100,7 @@ def install_interactively():
     else:
         print "Performing partial install."
         install_python_packages(REQUIREMENTS_MIN)
-    
+
     sys.exit(0)
 
 def make_virtualenv(sudo_install=False):
@@ -158,11 +136,13 @@ def install_python_packages(reqs=REQUIREMENTS_FULL):
     """
     print "Installing python dependencies from " + reqs
     system = subprocess.check_output(["uname", "-a"])
-    
+
     subprocess.call(["pip install -r " + REQUIREMENTS_FULL],
         shell=True)
 
-    subprocess.call(["python -m nltk.downloader punkt"], shell=True)
+    packages = subprocess.call(["pip", "freeze"])
+    if "nltk" in packages:
+        subprocess.call(["python -m nltk.downloader punkt"], shell=True)
 
 def setup_stanford_corenlp(force=False):
     """Download and move Stanford CoreNLP to the expected place.
