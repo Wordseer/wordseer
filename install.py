@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 """Installtion script for WordSeer.
 """
 import argparse
@@ -14,8 +14,8 @@ import glob
 # Config
 # Location of CoreNLP
 CORENLP = "http://nlp.stanford.edu/software/stanford-corenlp-full-2013-06-20.zip"
-# Location of libxml for macs
-LIBXML_MAC = "http://www.explain.com.au/download/combo-2007-10-07.dmg.gz"
+# Location of pip
+PIP = "https://bootstrap.pypa.io/get-pip.py"
 # Path to requirements file
 REQUIREMENTS_FULL = "requirements.txt"
 REQUIREMENTS_MIN = "requirements_min.txt"
@@ -69,7 +69,7 @@ def install_prerequisites():
 
     elif "Darwin" in system:
         print "Mac detected. Compiling requirements for lxml."
-        subprocess.call(["STATIC_DEPS=true pip install lxml"], shell=True)
+        subprocess.call(["STATIC_DEPS=true pip2.7 install lxml"], shell=True)
 
     else:
         print ("Could not identify operating system, prerequisite installation "
@@ -78,6 +78,16 @@ def install_prerequisites():
 def install_interactively():
     """Install while prompting the user.
     """
+    if not pip_is_installed():
+        print ("Pip does not seem to be installed. Pip is required to install "
+            "Wordseer. Installing pip requires admin access.")
+        install_pip = prompt_user("Install pip?", ["y", "n"])
+
+        if install_pip == "y":
+            install_pip(True)
+        else:
+            install_pip(False)
+
     print ("The python packages can be installed inside a virtual environment, "
         "which is a cleaner way to install the dependencies. If you do not "
         "have virtualenv installed, you will need admin access to install it.")
@@ -112,11 +122,11 @@ def make_virtualenv(sudo_install=False):
     """
     print "Setting up virtualenv."
     venv_name = "venv"
-    packages = subprocess.check_output(["pip", "freeze"])
+    packages = subprocess.check_output(["pip2.7", "freeze"])
     if not "virtualenv" in packages:
         if sudo_install:
             print "Installing virtualenv."
-            subprocess.call(["sudo", "pip", "install", "virtualenv"])
+            subprocess.call(["sudo", "pip2.7", "install", "virtualenv"])
         else:
             print "Virtualenv not found, not installing."
             return
@@ -128,20 +138,20 @@ def make_virtualenv(sudo_install=False):
     os.environ["PATH"] = (os.path.join(ROOT_DIRECTORY, venv_name, "bin") + ":" +
         os.environ["PATH"])
 
-def install_python_packages(reqs=REQUIREMENTS_FULL):
+def install_python_packages(reqs=REQUIREMENTS_FULL, full=True):
     """Install the required python modules.
 
     Arguments:
         reqs (str): The requirements file to install from.
+        full (boolean): ``True`` if a full installation, ``False`` otherwise.
     """
     print "Installing python dependencies from " + reqs
     system = subprocess.check_output(["uname", "-a"])
 
-    subprocess.call(["pip install -r " + REQUIREMENTS_FULL],
+    subprocess.call(["pip2.7 install -r " + REQUIREMENTS_FULL],
         shell=True)
 
-    packages = subprocess.call(["pip", "freeze"])
-    if "nltk" in packages:
+    if full:
         subprocess.call(["python -m nltk.downloader punkt"], shell=True)
 
 def setup_stanford_corenlp(force=False):
@@ -183,6 +193,36 @@ def setup_database():
     print "Setting up database..."
     subprocess.call(["python database.py reset"], shell=True)
 
+def pip_is_installed():
+    """Check if the correct version of pip is installed.
+
+    Returns:
+        boolean: ``False`` if pip is not installed or installed for the wrong
+            version, ``True`` otherwise.
+    """
+    try:
+        pip_version = subprocess.check_output(["pip2.7", "-V"])
+    except OSError:
+        return False
+
+    return True
+
+def install_pip(sudo):
+    """Install pip.
+
+    Arguments:
+        sudo (boolean): If ``True``, install pip. Otherwise, the script will
+            exit.
+    """
+    pip_name = "get-pip.py"
+
+    if sudo:
+        download_file(PIP, pip_name)
+        subprocess.call("sudo python2.7 get-pip.py", shell=True)
+    else:
+        print "Pip not installed, not set to install. Quitting."
+        sys.exit(1)
+
 def main():
     """Perform the installation process.
     """
@@ -203,20 +243,23 @@ def main():
 
     args = parser.parse_args()
 
-    if args.virtualenv:
-        make_virtualenv(args.sudo)
-
     if args.interactive:
         install_interactively()
+
+    if not pip_is_installed():
+        check_install_pip(args.sudo)
+
+    if args.virtualenv:
+        make_virtualenv(args.sudo)
 
     if args.sudo and args.full:
         install_prerequisites()
 
     if args.full:
-        install_python_packages(REQUIREMENTS_FULL)
+        install_python_packages(REQUIREMENTS_FULL, True)
         setup_stanford_corenlp()
     else:
-        install_python_packages(REQUIREMENTS_MIN)
+        install_python_packages(REQUIREMENTS_MIN, False)
 
     setup_database()
 
