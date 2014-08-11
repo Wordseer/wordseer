@@ -68,28 +68,31 @@ def install_prerequisites():
                 shell=True)
 
     elif "Darwin" in system:
-        print "Installing prerequisites for mac."
-        download_file(LIBXML_MAC, "libxml.dmg.gz")
+        print "Mac detected. Compiling requirements for lxml."
+        subprocess.call(["STATIC_DEPS=true pip install lxml"], shell=True)
+#        print "Installing prerequisites for mac."
+        
+#        download_file(LIBXML_MAC, "libxml.dmg.gz")
 
-        with gzip.GzipFile("libxml.dmg.gz") as local_zip,\
-            open("libxml.dmg", "w") as local_dmg:
-                local_dmg.write(local_zip.read())
-        os.remove("libxml.dmg.gz")
-        mounting = subprocess.check_output(["hdiutil", "mount", "libxml.dmg"])
-        mountpoint = mounting.split("\n")[-2].split()[2]
-
-        frameworks = glob.glob(mountpoint + "/*.framework")
-        for framework in frameworks:
-            subprocess.call(["sudo", "cp", "-r", framework,
-                "/Library/Frameworks"])
-
-        executables = [os.path.join(mountpoint, "xmllint"),
-                os.path.join(mountpoint, "xsltproc"),
-                os.path.join(mountpoint, "xmlcatalog")]
-        for executable in executables:
-            subprocess.call(["sudo", "cp", executable, "/usr/bin"])
-        subprocess.call(["hdiutil", "unmount", mountpoint])
-
+#        with gzip.GzipFile("libxml.dmg.gz") as local_zip,\
+#            open("libxml.dmg", "w") as local_dmg:
+#                local_dmg.write(local_zip.read())
+#        os.remove("libxml.dmg.gz")
+#        mounting = subprocess.check_output(["hdiutil", "mount", "libxml.dmg"])
+#        mountpoint = mounting.split("\n")[-2].split()[2]
+#
+#        frameworks = glob.glob(mountpoint + "/*.framework")
+#        for framework in frameworks:
+#            subprocess.call(["sudo", "cp", "-r", framework,
+#                "/Library/Frameworks"])
+#
+#        executables = [os.path.join(mountpoint, "xmllint"),
+#                os.path.join(mountpoint, "xsltproc"),
+#                os.path.join(mountpoint, "xmlcatalog")]
+#        for executable in executables:
+#            subprocess.call(["sudo", "cp", executable, "/usr/bin"])
+#        subprocess.call(["hdiutil", "unmount", mountpoint])
+#
     else:
         print ("Could not identify operating system, prerequisite installation "
         "failed.")
@@ -97,6 +100,14 @@ def install_prerequisites():
 def install_interactively():
     """Install while prompting the user.
     """
+    print ("The python packages can be installed inside a virtual environment, "
+        "which is a cleaner way to install the dependencies. If you do not "
+        "have virtualenv installed, you will need admin access to install it.")
+    use_virtualenv = prompt_user("Use virtualenv?", ["y", "n"])
+
+    if use_virtualenv == "y":
+        make_virtualenv(True)
+    
     print ("You can either perform a full install or a partial install. A "
         "partial install includes just enough to run the interactive wordseer "
         "tool. A full install lets you parse custom collections into the "
@@ -105,25 +116,13 @@ def install_interactively():
 
     if full_install == "y":
         print "Performing full install."
-        install_prerequisites()
+        #install_prerequisites()
         setup_stanford_corenlp()
-
-    else:
-        print "Performing partial install."
-
-    print ("The python packages can be installed inside a virtual environment, "
-        "which is a cleaner way to install the dependencies. If you do not "
-        "have virtualenv installed, you will need admin access to install it.")
-    use_virtualenv = prompt_user("Use virtualenv?", ["y", "n"])
-
-    if use_virtualenv == "y":
-        make_virtualenv(True)
-
-    if full_install == "y":
         install_python_packages()
     else:
+        print "Performing partial install."
         install_python_packages(REQUIREMENTS_MIN)
-
+    
     sys.exit(0)
 
 def make_virtualenv(sudo_install=False):
@@ -145,7 +144,6 @@ def make_virtualenv(sudo_install=False):
             return
     else:
         print "Virtualenv already installed."
-
     subprocess.call(["virtualenv", "--python=python2.7", venv_name])
     #subprocess.call(["source venv/bin/activate"], shell=True)
     venv_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
@@ -159,6 +157,8 @@ def install_python_packages(reqs=REQUIREMENTS_FULL):
         reqs (str): The requirements file to install from.
     """
     print "Installing python dependencies from " + reqs
+    system = subprocess.check_output(["uname", "-a"])
+    
     subprocess.call(["pip install -r " + REQUIREMENTS_FULL],
         shell=True)
 
@@ -237,6 +237,8 @@ def main():
         setup_stanford_corenlp()
     else:
         install_python_packages(REQUIREMENTS_MIN)
+
+    setup_database()
 
 if __name__ == "__main__":
     main()
