@@ -46,12 +46,12 @@
 <!-- Ext -->
 <script charset="utf-8">
     // pass some variables from flask to JS
-    var ws_path = "{{ url_for('.static', filename='Wordseer') }}";
+    var ws_static_path = "{{ url_for('.static', filename='wordseer_app') }}";
     var project_id = {{ project_id }};
 </script>
 <script type='text/javascript' src='{{ url_for('wordseer.static',
-    filename='util.js')}}'></script>
+    filename='wordseer_app/util.js')}}'></script>
 <script type='text/javascript' src='{{ url_for('wordseer.static',
     filename='extjs/ext-all-debug.js')}}'></script>
 <script type='text/javascript' src='{{ url_for('wordseer.static',
-    filename='new-ui.js')}}'></script>
+    filename='wordseer_app/new-ui.js')}}'></script>
