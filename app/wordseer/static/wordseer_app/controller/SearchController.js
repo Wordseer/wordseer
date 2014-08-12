@@ -38,7 +38,7 @@ Ext.define('WordSeer.controller.SearchController', {
 	init: function() {
 //		console.log("Initialized search controller");
 		Ext.Ajax.request({
-			url: ws_api_path + 'documents/get_property_fields/',
+			url: ws_api_path + 'projects/' + project_id + '/properties',
 			method:'GET',
 			disableCaching: false,
 			params:{

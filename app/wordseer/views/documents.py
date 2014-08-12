@@ -4,14 +4,15 @@ from flask import abort
 from flask import request
 from flask.json import jsonify
 from flask.views import View
-from flask.ext.sqlalchemy.sqlalchemy import func
 
+from app import app
 from app.models.document import Document
 from app.models.property import Property
 from app.models.property_metadata import PropertyMetadata
 from app.models.sequence import Sequence
 from app.wordseer import wordseer, views
 
+from flask import request
 
 
 class DocumentView(View):
@@ -309,7 +310,7 @@ class DocumentView(View):
 
         return results
 
-    def get_property_fields(self):
+    def get_property_fields(self, **kwargs):
         """Outputs a JSON-encoded list of metadata columns for the Document 
         Browser in the format: 
              [ { 'propertyName':metadata1Name,
@@ -317,11 +318,11 @@ class DocumentView(View):
                  'type':metadata1Type }, ... ]
         """
 
-        if not self.unit:
-            abort(400)
+        print("\n\n\n\n\n")
+        print(kwargs)
+        print("\n\n\n\n\n")
 
-#         TODO: how to get a list of properties associated with different Unit
-#         types generically?
+
         properties = []
 
         result = []
@@ -372,6 +373,7 @@ class DocumentView(View):
         return {"documents": docs}
 
     def dispatch_request(self):
+        print("\n\n\n\n\n" + str(self) + "\n\n\n\n\n")
         operations = {
             "get_document": self.get_document,
             "get_property_fields": self.get_property_fields,
@@ -384,15 +386,14 @@ class DocumentView(View):
 
 
 # routing instructions
-wordseer.add_url_rule("/api/documents/single/",
+wordseer.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/api/documents/single/",
     view_func=DocumentView.as_view("doc_single", "get_document"))
 
-wordseer.add_url_rule("/api/documents/get_property_fields/",
-    view_func=DocumentView.as_view("doc_property_fields",
-    "get_property_fields"))
+wordseer.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/api/documents/get_property_fields/",
+    view_func=DocumentView.as_view("get_property_fields", "get_property_fields"))
 
-wordseer.add_url_rule("/api/documents/get_properties",
+wordseer.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/api/documents/get_properties",
     view_func=DocumentView.as_view("doc_properties", "get_properties"))
 
-wordseer.add_url_rule("/api/documents/search_results", 
+wordseer.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/api/documents/search_results", 
     view_func=DocumentView.as_view("doc_search_results", "get_search_results"))

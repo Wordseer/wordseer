@@ -8,7 +8,7 @@ Ext.define('WordSeer.store.PhrasesStore', {
 		type: 'ajax',
 		noCache: false,
 		timeout: 9000000,
-		url: ws_api_path + 'sequences/get_sequences/',
+		url: ws_api_path + 'projects/' + project_id + '/sequences',
 		extraParams: {
 			instance: getInstance(),
 			length: 2,
