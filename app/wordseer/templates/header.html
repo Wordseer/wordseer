@@ -1,28 +1,58 @@
-<link href='http://fonts.googleapis.com/css?family=Bitter:400,700'
-    rel='stylesheet' type='text/css'>
+<!-- stylesheets -->
+<link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
+    filename='fonts/bitter/stylesheet.css')}}'>
+
 <link rel='stylesheet' type='text/css'
-    href='../../extjs/resources/css/ext-all.css'>
-<script>
-    // set wordseer collection"
-    var path = window.location.pathname.split('/');
-    sessionStorage.setItem('INSTANCE', path[path.length -2])
+    href="{{ url_for('wordseer.static',
+        filename='extjs/resources/css/ext-all.css')}}">
+
+<link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
+    filename='style/new-ui.css')}}'>
+<link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
+    filename='style/main.css')}}'>
+<link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
+    filename='style/d3.css')}}'>
+
+<!-- scripts -->
+<!-- libraries -->
+<script type='text/javascript' src='{{ url_for('wordseer.static',
+    filename='closure/goog/base.js')}}'></script>
+
+<script src='{{ url_for('wordseer.static',
+    filename='jquery/jquery.js')}}'></script>
+<script type='text/javascript' src='{{ url_for('wordseer.static',
+    filename='jquery/jquery.scrollTo.js')}}'></script>
+<script type='text/javascript' src='{{ url_for('wordseer.static',
+    filename='jquery/jquery.resizableColumns.js')}}'></script>
+
+<script type='text/javascript' src='{{ url_for('wordseer.static',
+    filename='raphael.js')}}'></script>
+
+<script type='text/javascript' src='{{ url_for('wordseer.static',
+    filename='wordtree.js')}}'></script>
+
+<script src="{{ url_for('wordseer.static',
+    filename='d3/d3.v3.min.js')}}" charset="utf-8"></script>
+<script type='text/javascript' src='{{ url_for('wordseer.static',
+    filename='d3/crossfilter.v1.js')}}'></script>
+
+<script type="text/javascript" src='{{ url_for('wordseer.static',
+    filename='canvg/canvg.js')}}'></script>
+<script type="text/javascript" src='{{ url_for('wordseer.static',
+    filename='canvg/rgbcolor.js')}}'></script>
+
+<script type='text/javascript' src='{{ url_for('wordseer.static', filename='base64/base64.js')}}'></script>
+
+<!-- Ext -->
+<script charset="utf-8">
+    // pass some variables from flask to JS
+    var ws_static_path = "{{ url_for('.static', filename='wordseer_app') }}";
+    var project_id = {{ project_id }};
+    var ws_api_path = "{{ config.PROJECT_ROUTE }}" + project_id + "/api/";
 </script>
-<link rel='stylesheet' type='text/css' href='../../style/new-ui.css'>
-<link rel='stylesheet' type='text/css' href='../../style/main.css'>
-<link rel='stylesheet' type='text/css' href='../../style/d3.css'>
-<script type='text/javascript' src='../../lib/closure/goog/base.js'></script>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script type='text/javascript' src='../../lib/jquery/jquery.scrollTo.js'>
-</script>
-<script type='text/javascript' 
-src='../../lib/jquery/jquery.resizableColumns.js'></script>
-<script type='text/javascript' src='../../lib/raphael.js'></script>
-<script type='text/javascript' src='../../lib/wordtree.js'></script>
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script type='text/javascript' src='../../lib/d3/crossfilter.v1.js'></script>
-<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
-<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
-<script type='text/javascript' src='../../lib/base64/base64.js'></script>
-<script type='text/javascript' src='../../src/js/util.js'></script>
-<script type='text/javascript' src='../../extjs/ext-all-debug.js'></script>
-<script type='text/javascript' src='../../src/js/new-ui.js'></script>
+<script type='text/javascript' src='{{ url_for('wordseer.static',
+    filename='wordseer_app/util.js')}}'></script>
+<script type='text/javascript' src='{{ url_for('wordseer.static',
+    filename='extjs/ext-all-debug.js')}}'></script>
+<script type='text/javascript' src='{{ url_for('wordseer.static',
+    filename='wordseer_app/new-ui.js')}}'></script>

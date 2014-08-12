@@ -9,6 +9,6 @@ static_url = os.path.dirname(__file__)#Problem with this static absolute path. c
 wordseer = Blueprint('wordseer', __name__,
     template_folder='templates',
     static_folder="static",
-    static_url_path="/app/wordseer/")
+    static_url_path="/app/wordseer")
 
 from .views import *
