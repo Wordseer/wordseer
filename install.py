@@ -237,7 +237,7 @@ def install_pip(sudo):
     if not pip_is_installed():
         print "Pip not in PATH, attempting to find."
         for possible_path in possible_paths:
-            if "pip" in os.listdir(possible_paths):
+            if "pip" in os.listdir(possible_path):
                 print "Found pip in " + possible_path + ", adding to PATH."
                 os.environ["PATH"] = possible_path + ":" + os.environ["PATH"]
 
