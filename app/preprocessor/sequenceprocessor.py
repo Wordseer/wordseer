@@ -21,12 +21,13 @@ class SequenceProcessor(object):
     """Process given input into Sequences.
     """
 
-    def __init__(self):
+    def __init__(self, project):
         """Set up local variables for the SequenceProcessor.
 
         :param boolean grammatical_info_exists: ??
         """
 
+        self.project = project
         self.previously_indexed = []
 
     def remove_stops(self, words):
@@ -99,13 +100,13 @@ class SequenceProcessor(object):
                         )
 
                     sequence_dict[key] = sequence
-                    sequence.save(False)
 
-                    sentence.add_sequence(
-                        sequence = sequence,
-                        position = position,
-                        force = False
-                    )
+                sentence.add_sequence(
+                    sequence = sequence,
+                    position = position,
+                    project = self.project,
+                    force = False
+                )
 
         return sequences
 

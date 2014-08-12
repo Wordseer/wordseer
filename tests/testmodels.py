@@ -27,6 +27,7 @@ class TestWordModel(unittest.TestCase):
         """Clean the current database.
         """
         database.clean()
+        Project.active_project = Project()
 
     def test_model_word(self):
         """Test to make sure that the atttributes of the Word model can be
@@ -45,18 +46,19 @@ class TestWordModel(unittest.TestCase):
         assert word_1.word == string_1
         assert word_2.word == string_2
 
-        word_1.save()
-        word_2.save()
+        # NOTE: skipping because sentences should not be added like this
+        # word_1.save()
+        # word_2.save()
 
-        sen1 = Sentence()
-        sen2 = Sentence()
+        # sen1 = Sentence()
+        # sen2 = Sentence()
 
-        word_2.sentences = [sen1, sen2]
+        # word_2.sentences = [sen1, sen2]
 
-        db.session.add_all([sen1, sen2])
-        db.session.commit()
+        # db.session.add_all([sen1, sen2])
+        # db.session.commit()
 
-        assert word_2.sentences == [sen1, sen2]
+        # assert word_2.sentences == [sen1, sen2]
 
 class TestSentenceModel(unittest.TestCase):
     """Tests for the ``Sentence`` model.
@@ -173,11 +175,12 @@ class TestDependencyModel(unittest.TestCase):
         dependency.save()
 
         # Test with sentences
-        sentence1 = Sentence()
-        sentence2 = Sentence()
-        dependency.sentences = [sentence1, sentence2]
+        # NOTE: skipping because we should never add sentences like this
+        # sentence1 = Sentence()
+        # sentence2 = Sentence()
+        # dependency.sentences = [sentence1, sentence2]
 
-        db.session.add_all([sentence1, sentence2])
+        # db.session.add_all([sentence1, sentence2])
         db.session.commit()
 
 class TestSequenceModel(unittest.TestCase):
@@ -196,11 +199,13 @@ class TestSequenceModel(unittest.TestCase):
         sequence.save()
 
         # Test with Sentences
-        sentence1 = Sentence()
-        sentence2 = Sentence()
-        sequence.sentences = [sentence1, sentence2]
+        # NOTE: skipping because we should never add sentences like this
+        # sentence1 = Sentence()
+        # sentence2 = Sentence()
+        # sequence.sentences = [sentence1, sentence2]
 
-        db.session.add_all([sentence1, sentence2])
+        # db.session.add_all([sentence1, sentence2])
+        db.session.commit()
 
 class TestUnitModels(unittest.TestCase):
     """Tests for ``Unit`` and all models that inherit from ``Unit``.

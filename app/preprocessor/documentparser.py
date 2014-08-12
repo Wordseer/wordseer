@@ -18,7 +18,7 @@ class DocumentParser(object):
     def __init__(self, parser, project):
         self.pylogger = logging.getLogger(__name__)
         self.parser = parser
-        self.sequence_processor = SequenceProcessor()
+        self.sequence_processor = SequenceProcessor(project)
         self.project = project
 
     def parse_document(self, document):

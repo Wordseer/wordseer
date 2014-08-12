@@ -1,4 +1,6 @@
-from association_objects import DependencyInSentence
+from .sentence import Sentence
+from .project import Project
+from .association_objects import DependencyInSentence
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from app import db
@@ -40,14 +42,21 @@ class Dependency(db.Model, Base):
     grammatical_relationship = db.relationship(
         "GrammaticalRelationship", backref="dependency")
 
-    governor = db.relationship(
-        "Word", foreign_keys=[governor_id], backref="governor_dependencies")
+    governor = db.relationship("Word", foreign_keys=[governor_id])
 
-    dependent = db.relationship(
-        "Word", foreign_keys=[dependent_id], backref="dependent_dependencies")
+    dependent = db.relationship("Word", foreign_keys=[dependent_id])
 
-    sentences = association_proxy("dependency_in_sentence", "sentence",
-        creator=lambda sentence: DependencyInSentence(sentence=sentence))
+    # Scoped Pseudo-relationships
+
+    @property
+    def sentences(self):
+        """Retrieves all sentences that contain this dependency, within
+        the scope of the current active project.
+        """
+
+        return Sentence.query.join(DependencyInSentence).join(Dependency).\
+            filter(DependencyInSentence.project==Project.active_project).\
+            filter(DependencyInSentence.dependency==self).all()
 
     def __repr__(self):
         """Representation string for the dependency

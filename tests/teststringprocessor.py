@@ -5,18 +5,21 @@ import unittest
 
 from app.models.sentence import Sentence
 from app.models.dependency import Dependency
+from app.models.project import Project
 from app.preprocessor import stringprocessor
 import database
 
-t = stringprocessor.StringProcessor()
+t = stringprocessor.StringProcessor(Project())
 
 class CommonTests(object):
     """Tests and variables common to several test cases.
     """
-    def setUp(self, text=""):
+    @classmethod
+    def setUpClass(self, text=""):
         """Set up some local variables.
         """
         database.clean()
+        t.project = Project()
         self.example = text
         self.result = t.tokenize(self.example)
         self.raw = t.parser.raw_parse(self.example)
@@ -43,7 +46,8 @@ class CommonTests(object):
 class TokenizeParagraphTests(CommonTests, unittest.TestCase):
     """Test tokenize() using a paragraph of text.
     """
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         """Set up the local variables.
         """
         example = ("She should have died hereafter; There would have "
@@ -51,7 +55,7 @@ class TokenizeParagraphTests(CommonTests, unittest.TestCase):
             "tomorrow, Creeps in this petty pace from day to day, To the "
             "last syllable of recorded time; And all our yesterdays have "
             "lighted fools The way to dusty death. Out, out, brief candle! ")
-        super(TokenizeParagraphTests, self).setUp(text=example)
+        super(TokenizeParagraphTests, self).setUpClass(text=example)
 
     def test_sentences(self):
         """Make sure it's a list of all the sentences.
@@ -65,11 +69,12 @@ class TokenizeParagraphTests(CommonTests, unittest.TestCase):
 class TokenizeSentenceTests(CommonTests, unittest.TestCase):
     """Test tokenize() given a single sentence.
     """
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         """Set up the example text.
         """
         example = "The quick brown fox jumped over the lazy dog."
-        super(TokenizeSentenceTests, self).setUp(text=example)
+        super(TokenizeSentenceTests, self).setUpClass(text=example)
 
     def test_sentences(self):
         """Make sure it's a list of the given sentence.
@@ -145,7 +150,7 @@ class ParseTests(unittest.TestCase):
         for dep in deps[0:3]:
             dep_index = int(dep[4]) - 1
             gov_index = int(dep[2]) - 1
-            expected_added_deps.append(mock.call(
+            expected_added_deps.append(mock.call(project=t.project,
                 dependency=mock_dependency_query.filter_by.return_value.one.return_value,
                 governor_index=gov_index,
                 dependent_index=dep_index,
