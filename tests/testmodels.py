@@ -112,18 +112,21 @@ class TestSentenceModel(unittest.TestCase):
 
         sentence = Sentence(text="foo")
         word = Word(word="foo")
+        project = Project()
 
+        project.save()
         sentence.save()
         word.save()
 
         rel = sentence.add_word(word, position=4, space_before=" ",
-            part_of_speech="ADF")
+            part_of_speech="ADF", project=project)
 
         assert rel.word == word
         assert rel.sentence == sentence
         assert rel.position == 4
         assert rel.space_before == " "
         assert rel.part_of_speech == "ADF"
+        assert rel.project == project
 
     def test_add_dependency(self):
         """Test the ``add_dependency()`` method of ``Sentence``.
@@ -131,17 +134,20 @@ class TestSentenceModel(unittest.TestCase):
 
         sentence = Sentence(text="foo")
         dependency = Dependency(sentence_count=4)
+        project = Project()
 
+        project.save()
         sentence.save()
         dependency.save()
 
         rel = sentence.add_dependency(dependency, governor_index=1,
-            dependent_index=2)
+            dependent_index=2, project=project)
 
         assert rel.dependency == dependency
         assert rel.sentence == sentence
         assert rel.governor_index == 1
         assert rel.dependent_index == 2
+        assert rel.project == project
 
     def test_add_sequence(self):
         """Test the ``add_sequence()`` method of ``Sentence``.
@@ -149,15 +155,18 @@ class TestSentenceModel(unittest.TestCase):
 
         sentence = Sentence(text="foo")
         sequence = Sequence(lemmatized=False)
+        project = Project()
 
+        project.save()
         sentence.save()
         sequence.save()
 
-        rel = sentence.add_sequence(sequence, position=1)
+        rel = sentence.add_sequence(sequence, position=1, project=project)
 
         assert rel.sequence == sequence
         assert rel.sentence == sentence
         assert rel.position == 1
+        assert rel.project == project
 
 class TestDependencyModel(unittest.TestCase):
     """Tests for the ``Depenedency`` model.
