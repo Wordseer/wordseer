@@ -21,7 +21,7 @@ class CollectionProcessor(object):
     """Process a collection of files.
     """
     def __init__(self, project):
-        self.str_proc = StringProcessor()
+        self.str_proc = StringProcessor(project)
         self.pylogger = logging.getLogger(__name__)
         self.project = project
 

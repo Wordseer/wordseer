@@ -4,6 +4,9 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from app import db
 from .base import Base
+from .project import Project
+from .sentence import Sentence
+from .sequence import Sequence
 from .association_objects import WordInSentence
 from .association_objects import WordInSequence
 from .mixins import NonPrimaryKeyEquivalenceMixin
@@ -36,13 +39,27 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     lemma = db.Column(db.String, index=True)
     part_of_speech = db.Column(db.String, index=True)
 
-    # Relationships
+    # Scoped Pseudo-relationships
 
-    sentences = association_proxy("word_in_sentence", "sentence",
-        creator=lambda sentence: WordInSentence(sentence=sentence))
+    @property
+    def sentences(self):
+        """Retrieves sentences that contain this word within the scope of the
+        current active project.
+        """
 
-    sequences = association_proxy("word_in_sequence", "sequence",
-        creator=lambda sequence: WordInSequence(sequence=sequence))
+        return Sentence.query.join(WordInSentence).join(Word).\
+            filter(WordInSentence.project==Project.active_project).\
+            filter(WordInSentence.word==self).all()
+
+    @property
+    def sequences(self):
+        """Retrieves sequences that contain this word within the scope of the
+        current active project.
+        """
+
+        return Sequence.query.join(WordInSequence).join(Word).\
+            filter(WordInSequence.project==Project.active_project).\
+            filter(WordInSequence.word==self).all()
 
     def __repr__(self):
         """Representation string for words, showing the word.

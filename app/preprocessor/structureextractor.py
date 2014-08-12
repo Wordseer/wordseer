@@ -3,7 +3,6 @@
 
 import json
 import logging
-import pdb
 
 from lxml import etree
 from sqlalchemy.orm.exc import NoResultFound
@@ -78,7 +77,7 @@ class StructureExtractor(object):
             document = Document()
             document.properties = extracted_unit.properties
             document.sentences = extracted_unit.sentences
-            document.title = extracted_unit.name #FIXME: not actual title
+            document.title = _get_title(document.properties)
             document.children = extracted_unit.children
             document.number = doc_num
 
@@ -347,6 +346,18 @@ def get_nodes_from_xpath(xpath, nodes):
     if len(xpath.strip()) == 0 or nodes in nodes.xpath("../" + xpath):
         return [nodes]
     return nodes.xpath(xpath)
+
+def _get_title(properties):
+    """From a list of properties, retrieve the title property and return the
+    value.
+    """
+
+    for prop in properties:
+        if prop.name == "title":
+            return prop.value
+
+    # If there's no title property, return empty string
+    return ""
 
 def assign_sentences(document):
     """Populates the all_sentences relationship for the document.
