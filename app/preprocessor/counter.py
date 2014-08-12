@@ -21,7 +21,7 @@ def count(project):
 
     # Calculate document counts for dependencies
     count_query = db.session.execute("""
-        SELECT dependency_id, count(document_id) AS count
+        SELECT dependency_id, COUNT(DISTINCT document_id) AS count
         FROM dependency_in_sentence
         GROUP BY dependency_id
     """)
@@ -36,7 +36,7 @@ def count(project):
 
     # Calculate document counts for sequences
     count_query = db.session.execute("""
-        SELECT sequence_id, count(document_id) AS count
+        SELECT sequence_id, COUNT(DISTINCT document_id) AS count
         FROM sequence_in_sentence
         GROUP BY sequence_id
     """)
