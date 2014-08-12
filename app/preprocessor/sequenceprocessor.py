@@ -100,14 +100,13 @@ class SequenceProcessor(object):
                         )
 
                     sequence_dict[key] = sequence
-                    sequence.save(False)
 
-                    sentence.add_sequence(
-                        sequence = sequence,
-                        position = position,
-                        project = self.project,
-                        force = False
-                    )
+                sentence.add_sequence(
+                    sequence = sequence,
+                    position = position,
+                    project = self.project,
+                    force = False
+                )
 
         return sequences
 
