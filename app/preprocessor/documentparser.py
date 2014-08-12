@@ -18,7 +18,7 @@ class DocumentParser(object):
     def __init__(self, parser, project):
         self.pylogger = logging.getLogger(__name__)
         self.parser = parser
-        self.sequence_processor = SequenceProcessor()
+        self.sequence_processor = SequenceProcessor(project)
         self.project = project
 
     def parse_document(self, document):
@@ -35,6 +35,7 @@ class DocumentParser(object):
         start_time = datetime.now()
         count = 0
         products = []
+        current_max = 0
 
         try:
             current_max = int(logger.get(self.project, LATEST_SENT_ID))
@@ -48,11 +49,11 @@ class DocumentParser(object):
         sequences = dict()
         sentence_count = len(document.all_sentences)
         for sentence in document.all_sentences:
-            if sentence.id > int(logger.get(self.project, LATEST_SENT_ID)):
+            if sentence.id > current_max:
                 parsed = self.parser.parse(sentence, relationships,
                     dependencies)
                 self.sequence_processor.process(sentence, sequences)
-                products.append(parsed)
+                # products.append(parsed)
                 count += 1
                 current_max = sentence.id
 
@@ -62,9 +63,10 @@ class DocumentParser(object):
                         " %s seconds per sentence", str(count),
                         str(average_time / count))
 
-                    products = []
+                    # products = []
                     relationships = dict()
                     dependencies = dict()
+                    sequences = dict()
 
                     db.session.commit()
         db.session.commit()

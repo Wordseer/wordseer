@@ -18,9 +18,13 @@ class Project(db.Model, Base):
     path = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
+    # Active project indicator
+    active_project = None
+
     # Relationships
     document_files = db.relationship("DocumentFile",
-            secondary="document_files_in_projects", backref="projects")
+        secondary="document_files_in_projects", backref="projects"
+    )
     structure_files = db.relationship("StructureFile", backref="project")
     logs = db.relationship("Log", backref="project")
 
