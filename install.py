@@ -52,6 +52,7 @@ def prompt_user(prompt, choices):
 def download_file(src, dest):
     """Download a file using urllib2.
     """
+    #TODO: if possible, use a secure downloader from the console
     source_file = urllib2.urlopen(src)
     with open(dest, "w") as local_file:
         local_file.write(source_file.read())
@@ -62,6 +63,7 @@ def install_prerequisites(sudo):
     Arguments:
         sudo (boolean): If ``True``, use sudo.
     """
+    #TODO: this is unix-specific
     system = subprocess.check_output(["uname", "-a"])
 
     if "Linux" in system and sudo:
@@ -137,6 +139,7 @@ def make_virtualenv(sudo_install=False):
         print "Virtualenv already installed."
     subprocess.call(["virtualenv", "--python=python2.7", venv_name])
     venv_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
+    #TODO: this is unix-specific
     os.environ["PATH"] = (os.path.join(ROOT_DIRECTORY, venv_name, "bin") + ":" +
         os.environ["PATH"])
 
@@ -217,6 +220,7 @@ def install_pip(sudo):
             exit.
     """
     pip_name = "get-pip.py"
+    #TODO: windows-specific
     possible_paths = [os.path.join(sys.prefix + "/bin"),
         "/usr/local/bin"]
 
