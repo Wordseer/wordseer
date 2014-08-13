@@ -3,10 +3,8 @@ Flask-SQLAlchemy==1.0
 Flask-Security==1.7.3
 SQLAlchemy==0.9.4
 #Sphinx==1.2.2
-Unidecode==0.04.16
 lxml==3.3.5
 mock==1.0.1
-pexpect==3.2
 sphinxcontrib-napoleon==0.2.8
 sqlalchemy-migrate==0.9.1
 stanford-corenlp-python
