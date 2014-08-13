@@ -220,7 +220,8 @@ class StructureExtractor(object):
     def log_error(self, msg, *args, **kwargs):
         """Shortcut for helpers.log_error.
         """
-        helpers.log_error(self.logger, self.project, msg, *args, **kwargs)
+        helpers.log_error(self.logger, self.str_proc.project, msg, *args,
+            **kwargs)
 
 def get_metadata(structure, node):
     """Return a list of Property objects of the metadata of the Tags in

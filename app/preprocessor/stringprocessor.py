@@ -269,8 +269,8 @@ def split_sentences(text):
 
         if approx_sentence_length > max_length:
             logger.warning("Sentence appears to be too long, max length " +
-                "is " + str(max_length))
-            logger.info(sentence_text[:truncate_length] + "...")
+                "is %s: %s", str(max_length),
+                sentence_text[:truncate_length] + "...")
 
             # Attempt to split on a suitable punctuation mark
             # Order (tentative): semicolon, double-dash, colon, comma
