@@ -5,8 +5,9 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from app import db
 from .base import Base
 from .unit import Unit
+from .mixins import NonPrimaryKeyEquivalenceMixin
 
-class Document(Unit):
+class Document(Unit, NonPrimaryKeyEquivalenceMixin):
     """A model for a single document file.
 
     Documents are top-level Units. See the description in the Unit model for
