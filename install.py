@@ -11,6 +11,7 @@ import zipfile
 import gzip
 import glob
 import pdb
+import json
 # Config
 # Location of CoreNLP
 CORENLP = "http://nlp.stanford.edu/software/stanford-corenlp-full-2013-06-20.zip"
@@ -23,6 +24,10 @@ REQUIREMENTS_MIN = "requirements_min.txt"
 CORENLP_LOCAL_DIR = "./"
 # Directory name for the corenlp tree
 CORENLP_LOCAL_NAME = "stanford-corenlp"
+# JSON preferences file
+PREFERENCES_PATH = "./preferences.json"
+FULL_INSTALL_TYPE = "full"
+PARTIAL_INSTALL_TYPE = "partial"
 
 CORENLP_LOCAL_PATH = os.path.join(CORENLP_LOCAL_DIR, CORENLP_LOCAL_NAME)
 CORENLP_ZIP_DIRECTORY = os.path.splitext(os.path.basename(CORENLP))[0]
@@ -66,7 +71,7 @@ def install_prerequisites(sudo):
     #TODO: this is unix-specific
     system = sys.platform
 
-    if "Linux" in system and sudo:
+    if "linux" in system and sudo:
         print "Attempting to install prerequisites for linux."
         uname = subprocess.call(["uname -a"], shell=True)
         if "ARCH" in system:
@@ -77,7 +82,7 @@ def install_prerequisites(sudo):
                 ["sudo apt-get install libxml2 libxslt1.1 openjdk-7-jre"],
                 shell=True)
 
-    elif "Darwin" in system:
+    elif "darwin" in system:
         print "Mac detected. Compiling requirements for lxml."
         subprocess.call(["STATIC_DEPS=true pip2.7 install lxml"], shell=True)
 
@@ -113,9 +118,11 @@ def install_interactively():
         install_prerequisites(True)
         setup_stanford_corenlp()
         install_python_packages()
+        set_install_type(FULL_INSTALL_TYPE)
     else:
         print "Performing partial install."
         install_python_packages(REQUIREMENTS_MIN, False)
+        set_install_type(FULL_INSTALL_TYPE)
 
     sys.exit(0)
 
@@ -213,6 +220,19 @@ def pip_is_installed():
 
     return True
 
+def set_install_type(install_type):
+    """Write the install type to ``PREFERENCES_PATH``. This affects whether or
+    not the pipeline will be imported in the code.
+
+    Arguments:
+        install_type (str): ``full`` or ``partial``.
+    """
+    print "Setting install type to " + install_type
+    preferences_dict = {"INSTALL_TYPE": install_type}
+    with open(PREFERENCES_PATH, "w") as preferences_file:
+         json.dump(preferences_dict, preferences_file, indent=1)
+         preferences_file.write("\n")
+
 def install_pip(sudo):
     """Install pip.
 
@@ -285,8 +305,10 @@ def main():
         install_prerequisites(args.sudo)
         install_python_packages(REQUIREMENTS_FULL, True)
         setup_stanford_corenlp()
+        set_install_type(FULL_INSTALL_TYPE)
     else:
         install_python_packages(REQUIREMENTS_MIN, False)
+        set_install_type(PARTIAL_INSTALL_TYPE)
 
     setup_database()
 
