@@ -115,6 +115,7 @@ div.databox {
 div.databox-header {
 	display: block;
 	width: 100%;
+    margin-top: 10px;
 	background-color: white;
 	z-index: 1000;
 }
@@ -569,7 +570,7 @@ div.overlay {
 	span.nav-button-pinned, span.nav-button-close {
 		position: absolute;
 		top: 0;
-		right: 0;
+		left: 0;
 		z-index: 10000;
 	}
 	span.overlay-title {
@@ -883,5 +884,3 @@ div.rangefacets {
 		}
 	}
 }
-
-
