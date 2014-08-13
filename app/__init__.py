@@ -31,7 +31,7 @@ try:
     for key, value in preferences.items():
         app.config[key] = value
 except ValueError:
-    pass
+    app.config["INSTALL_TYPE"] = "full"
 
 """
 ===============
