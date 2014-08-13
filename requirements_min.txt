@@ -6,4 +6,5 @@ Unidecode==0.04.16
 pexpect==3.2
 sqlalchemy-migrate==0.9.1
 stanford-corenlp-python
+mock==1.0.1
 

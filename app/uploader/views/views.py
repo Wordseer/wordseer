@@ -10,6 +10,7 @@ import json
 from string import ascii_letters, digits
 from cStringIO import StringIO
 import logging
+import pdb
 
 from flask import config
 from flask import redirect, url_for
@@ -448,8 +449,9 @@ def process_files(collection_dir, structure_file, project):
     of files or bad things will happen - exactly one structure file, several
     document files.
     """
+    pdb.set_trace()
     logger = logging.getLogger()
-    if app.config["INSTALL_TYPE"] == "full":
+    if app.config["INSTALL_TYPE"] == "partial":
         logger.info("Not processing as per config.")
         return
     args = (collection_dir, structure_file, app.config["DOCUMENT_EXTENSION"],

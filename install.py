@@ -122,7 +122,7 @@ def install_interactively():
     else:
         print "Performing partial install."
         install_python_packages(REQUIREMENTS_MIN, False)
-        set_install_type(FULL_INSTALL_TYPE)
+        set_install_type(PARTIAL_INSTALL_TYPE)
 
     sys.exit(0)
 
