@@ -1,0 +1,1101 @@
+/*******************************************************************************
+Padding and Spacing
+*******************************************************************************/
+/*******************************************************************************
+Colors
+*******************************************************************************/
+/*******************************************************************************
+Fonts
+*******************************************************************************/
+/* line 56, new-ui.scss */
+body {
+  font-family: helvetica, arial, sans-serif !important;
+  font-size: 10px;
+}
+
+/* line 60, new-ui.scss */
+.background {
+  background-color: #526b84;
+}
+
+/*******************************************************************************
+Buttons
+*******************************************************************************/
+/* line 73, new-ui.scss */
+.button, .action-button-see-more, .action-button-save, .action-button-save-picture, .action-button-toggle-expand, .action-button-toggle-contract, span.nav-button-move, span.nav-button-save, span.nav-button-close, span.nav-button-back, span.nav-button-forward, span.nav-button-pinned, span.switch-button {
+  width: 21px;
+  height: 21px;
+  display: inline-block;
+}
+/* line 77, new-ui.scss */
+.button:hover, .action-button-see-more:hover, .action-button-save:hover, .action-button-save-picture:hover, .action-button-toggle-expand:hover, .action-button-toggle-contract:hover, span.nav-button-move:hover, span.nav-button-save:hover, span.nav-button-close:hover, span.nav-button-back:hover, span.nav-button-forward:hover, span.nav-button-pinned:hover, span.switch-button:hover {
+  cursor: pointer;
+}
+
+/* line 83, new-ui.scss */
+.action-button-see-more {
+  position: relative;
+  top: 5px;
+  margin: 1.5px;
+  background-image: url("icons/action-button-see-more.png");
+  background-repeat: no-repeat;
+}
+/* line 92, new-ui.scss */
+.action-button-see-more:hover {
+  cursor: pointer;
+}
+
+/* line 83, new-ui.scss */
+.action-button-save {
+  position: relative;
+  top: 5px;
+  margin: 1.5px;
+  background-image: url("icons/action-button-save.png");
+  background-repeat: no-repeat;
+}
+/* line 92, new-ui.scss */
+.action-button-save:hover {
+  cursor: pointer;
+}
+
+/* line 83, new-ui.scss */
+.action-button-save-picture {
+  position: relative;
+  top: 5px;
+  margin: 1.5px;
+  background-image: url("icons/action-button-save-picture.png");
+  background-repeat: no-repeat;
+}
+/* line 92, new-ui.scss */
+.action-button-save-picture:hover {
+  cursor: pointer;
+}
+
+/* line 83, new-ui.scss */
+.action-button-toggle-expand {
+  position: relative;
+  top: 5px;
+  margin: 1.5px;
+  background-image: url("icons/action-button-toggle-expand.png");
+  background-repeat: no-repeat;
+}
+/* line 92, new-ui.scss */
+.action-button-toggle-expand:hover {
+  cursor: pointer;
+}
+
+/* line 83, new-ui.scss */
+.action-button-toggle-contract {
+  position: relative;
+  top: 5px;
+  margin: 1.5px;
+  background-image: url("icons/action-button-toggle-contract.png");
+  background-repeat: no-repeat;
+}
+/* line 92, new-ui.scss */
+.action-button-toggle-contract:hover {
+  cursor: pointer;
+}
+
+/*******************************************************************************
+Base components: Data Box
+*******************************************************************************/
+/* line 108, new-ui.scss */
+div.databox, ul.multitable, div.range-facet {
+  padding: 0;
+  background-color: white;
+  margin-top: 12.288px;
+  margin-bottom: 7.68px;
+}
+
+/* line 115, new-ui.scss */
+div.databox-header {
+  display: block;
+  width: 100%;
+  background-color: white;
+  z-index: 1000;
+}
+
+/* line 122, new-ui.scss */
+h2.databox-header {
+  display: inline-block;
+  font-family: "Bitter", serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: 18px;
+  padding-top: 4.8px;
+  padding-bottom: 3px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 6px;
+}
+
+/*******************************************************************************
+Base components: Options Data Box
+*******************************************************************************/
+/* line 144, new-ui.scss */
+div.databox-options {
+  display: block;
+  top: 32px;
+  font-size: 10px;
+}
+/* line 147, new-ui.scss */
+div.databox-options span.databox-option {
+  margin-right: 7.68px;
+}
+/* line 149, new-ui.scss */
+div.databox-options span.databox-option span.databox-option-label {
+  margin-right: 4.8px;
+}
+/* line 152, new-ui.scss */
+div.databox-options span.databox-option span.button, div.databox-options span.databox-option span.action-button-see-more, div.databox-options span.databox-option span.action-button-save, div.databox-options span.databox-option span.action-button-save-picture, div.databox-options span.databox-option span.action-button-toggle-expand, div.databox-options span.databox-option span.action-button-toggle-contract, div.databox-options span.databox-option span.nav-button-move, div.databox-options span.databox-option span.nav-button-save, div.databox-options span.databox-option span.nav-button-close, div.databox-options span.databox-option span.nav-button-back, div.databox-options span.databox-option span.nav-button-forward, div.databox-options span.databox-option span.nav-button-pinned, div.databox-options span.databox-option span.switch-button {
+  padding: 4.8px;
+  cursor: pointer;
+  width: auto;
+}
+/* line 156, new-ui.scss */
+div.databox-options span.databox-option span.button:hover, div.databox-options span.databox-option span.action-button-see-more:hover, div.databox-options span.databox-option span.action-button-save:hover, div.databox-options span.databox-option span.action-button-save-picture:hover, div.databox-options span.databox-option span.action-button-toggle-expand:hover, div.databox-options span.databox-option span.action-button-toggle-contract:hover, div.databox-options span.databox-option span.nav-button-move:hover, div.databox-options span.databox-option span.nav-button-save:hover, div.databox-options span.databox-option span.nav-button-close:hover, div.databox-options span.databox-option span.nav-button-back:hover, div.databox-options span.databox-option span.nav-button-forward:hover, div.databox-options span.databox-option span.nav-button-pinned:hover, div.databox-options span.databox-option span.switch-button:hover {
+  text-decoration: underline;
+}
+/* line 160, new-ui.scss */
+div.databox-options span.databox-option span.disabled {
+  color: #eeeeee;
+}
+/* line 162, new-ui.scss */
+div.databox-options span.databox-option span.disabled:hover {
+  text-decoration: none;
+}
+/* line 167, new-ui.scss */
+div.databox-options div.databox-body {
+  top: 55px;
+}
+
+/* line 172, new-ui.scss */
+span.checkbox {
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  position: relative;
+  top: 3px;
+  background-image: url("icons/checkbox.png");
+}
+/* line 179, new-ui.scss */
+span.checkbox.checked {
+  background-image: url("icons/checkbox-checked.png");
+}
+
+/*******************************************************************************
+Other Component Styling
+*******************************************************************************/
+/*****************
+Things with selectable rows: Tables, multitables.
+*******************/
+/*****************
+Tag List
+*******************/
+/* line 228, new-ui.scss */
+div.overview div.tag-list {
+  position: static !important;
+  background-color: transparent;
+  display: block;
+}
+/* line 222, new-ui.scss */
+div.overview div.tag-list div.databox-header {
+  color: white;
+  background-color: transparent;
+}
+
+/* line 233, new-ui.scss */
+ul.tag-list-body {
+  width: 100%;
+  list-style-type: none;
+  padding-left: 3px;
+}
+
+/* line 241, new-ui.scss */
+li.tag-list {
+  display: inline-block;
+  margin: 3px;
+  padding: 3px;
+  font-weight: bold;
+  background-color: #eeeeee;
+  -webkit-border-radius: 4.8px;
+  -moz-border-radius: 4.8px;
+  -ms-border-radius: 4.8px;
+  -o-border-radius: 4.8px;
+  border-radius: 4.8px;
+  cursor: pointer;
+}
+/* line 249, new-ui.scss */
+li.tag-list:hover {
+  background-color: #f7d04a;
+}
+
+/* line 254, new-ui.scss */
+span.tag-list-number {
+  padding-left: 3px;
+}
+
+/*****************
+Table
+*******************/
+/* line 265, new-ui.scss */
+table.table {
+  border-collapse: collapse;
+  width: 100%;
+}
+/* line 268, new-ui.scss */
+table.table thead {
+  text-align: left;
+  font-weight: bold;
+}
+/* line 275, new-ui.scss */
+table.table thead tr th {
+  padding-left: 4.8px;
+  padding-right: 4.8px;
+  border-bottom: 1px solid #eeeeee;
+  cursor: pointer;
+  padding-bottom: 4.8px;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 9px;
+}
+/* line 282, new-ui.scss */
+table.table tbody {
+  font-size: 12px;
+  overflow: scroll;
+}
+/* line 286, new-ui.scss */
+table.table tbody tr:nth-child(1) td {
+  padding-top: 4.8px;
+}
+/* line 290, new-ui.scss */
+table.table tbody tr {
+  cursor: default;
+}
+/* line 195, new-ui.scss */
+table.table tbody tr.selected {
+  background-color: #f7d04a;
+}
+/* line 198, new-ui.scss */
+table.table tbody tr.selected:hover {
+  background-color: #f7d04a;
+}
+/* line 201, new-ui.scss */
+table.table tbody tr:hover {
+  background-color: #eeeeee;
+}
+/* line 292, new-ui.scss */
+table.table tbody tr.hovered {
+  background-color: #eeeeee;
+  color: black;
+}
+/* line 296, new-ui.scss */
+table.table tbody tr td {
+  padding-left: 4.8px;
+  cursor: default;
+  max-width: 350px;
+  overflow: auto;
+}
+/* line 299, new-ui.scss */
+tr.selected table.table tbody tr td {
+  color: black;
+}
+
+/* line 311, new-ui.scss */
+span.table-header-sorter {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  position: relative;
+  top: 7.68px;
+  margin-left: 7.68px;
+}
+/* line 319, new-ui.scss */
+span.table-header-sorter.ascending {
+  background-image: url("icons/ascending.png");
+  background-repeat: no-repeat;
+}
+/* line 319, new-ui.scss */
+span.table-header-sorter.descending {
+  background-image: url("icons/descending.png");
+  background-repeat: no-repeat;
+}
+
+/*
+For jquery.resizableColumns.js
+*/
+/* line 331, new-ui.scss */
+.rc-handle-container {
+  position: relative;
+}
+
+/* line 335, new-ui.scss */
+.rc-handle {
+  position: absolute;
+  width: 7px;
+  cursor: ew-resize;
+  margin-left: -3px;
+  z-index: 2;
+}
+/* line 341, new-ui.scss */
+.rc-handle:hover {
+  border-left: 1px dotted #1d3040;
+}
+
+/* line 346, new-ui.scss */
+table.rc-table-resizing {
+  cursor: ew-resize;
+}
+/* line 349, new-ui.scss */
+table.rc-table-resizing thead, table.rc-table-resizing thead > th, table.rc-table-resizing thead > th > a {
+  cursor: ew-resize;
+}
+
+/*******************************************************************************
+Base components: Layout panel
+*******************************************************************************/
+/* line 376, new-ui.scss */
+div.panel {
+  position: absolute;
+  margin: 4.8px;
+  padding: 3px;
+}
+/* line 380, new-ui.scss */
+div.panel div.panel-render-target {
+  position: absolute;
+  top: 126.576px;
+  left: 3px;
+  right: 3px;
+  bottom: 4.8px;
+  padding: 3px;
+  background-color: white;
+}
+/* line 387, new-ui.scss */
+div.panel div.panel-render-target div.inner {
+  max-height: 100%;
+  max-width: 100%;
+}
+/* line 393, new-ui.scss */
+div.panel.active {
+  background-color: #f7d04a;
+}
+
+/* line 398, new-ui.scss */
+div.panelheader {
+  height: 51px;
+  width: 100%;
+}
+/* line 401, new-ui.scss */
+div.panelheader span.panel-header-menubutton {
+  -webkit-border-radius: 4.8px;
+  -moz-border-radius: 4.8px;
+  -ms-border-radius: 4.8px;
+  -o-border-radius: 4.8px;
+  border-radius: 4.8px;
+  font-family: "Bitter";
+  font-weight: 700;
+  text-transform: uppercase;
+  float: left;
+  padding: 7.68px;
+  padding-top: 4.68px;
+  margin-top: 2.8px;
+  margin-bottom: 4.8px;
+  margin-left: 2.4px;
+  margin-right: 2.4px;
+  height: 41.4px;
+  background-color: #1d3040;
+  color: white;
+}
+/* line 418, new-ui.scss */
+div.panelheader span.panel-header-menubutton.open {
+  background-color: white;
+  color: black;
+}
+/* line 422, new-ui.scss */
+div.panelheader span.panel-header-menubutton:hover {
+  background-color: white;
+  color: #1d3040;
+  cursor: pointer;
+}
+/* line 428, new-ui.scss */
+div.panelheader select.panel-header-widget-select {
+  margin: 9.77136px;
+  height: 31.45728px;
+}
+/* line 433, new-ui.scss */
+div.panelheader div.panel-header-navcontrols {
+  float: right;
+  clear: right;
+  width: 92px;
+  height: 51px;
+  padding: 3px;
+  background-color: white;
+  -moz-border-radius-topleft: 4.8px;
+  -webkit-border-top-left-radius: 4.8px;
+  border-top-left-radius: 4.8px;
+  -moz-border-radius-topright: 4.8px;
+  -webkit-border-top-right-radius: 4.8px;
+  border-top-right-radius: 4.8px;
+}
+
+/* line 444, new-ui.scss */
+div.breadcrumbs {
+  height: 75.576px;
+  width: 100%;
+  padding: 3px;
+  background-color: white;
+  padding-left: 4.8px;
+  padding-top: 4.8px;
+}
+/* line 451, new-ui.scss */
+div.breadcrumbs span.breadcrumb {
+  float: left;
+  min-height: 66.576px;
+  -webkit-border-radius: 4.8px;
+  -moz-border-radius: 4.8px;
+  -ms-border-radius: 4.8px;
+  -o-border-radius: 4.8px;
+  border-radius: 4.8px;
+  background-color: #eeeeee;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 7.68px;
+  min-width: 100px;
+  margin-right: 7.68px;
+}
+/* line 461, new-ui.scss */
+div.breadcrumbs span.breadcrumb span.breadcrumb-contents {
+  display: inline-block;
+  width: 80%;
+  padding-right: 7.68px;
+}
+/* line 465, new-ui.scss */
+div.breadcrumbs span.breadcrumb span.breadcrumb-contents span.relation, div.breadcrumbs span.breadcrumb span.breadcrumb-contents span.property {
+  font-weight: normal;
+  width: 100%;
+  display: block;
+  font-size: 10px;
+}
+/* line 472, new-ui.scss */
+div.breadcrumbs span.breadcrumb span.breadcrumb-controls {
+  float: right;
+  clear: right;
+  width: 10px;
+  height: 50%;
+  z-index: 100;
+}
+
+/* line 483, new-ui.scss */
+span.breadcrumb-close {
+  float: right;
+  clear: right;
+  height: 12px;
+  width: 12px;
+  cursor: pointer;
+  margin-bottom: 5px;
+  background-image: url("icons/breadcrumb-close.png");
+  background-repeat: no-repeat;
+}
+
+/* line 483, new-ui.scss */
+span.breadcrumb-toggle-on {
+  float: right;
+  clear: right;
+  height: 12px;
+  width: 12px;
+  cursor: pointer;
+  margin-bottom: 5px;
+  background-image: url("icons/breadcrumb-toggle-on.png");
+  background-repeat: no-repeat;
+}
+
+/* line 483, new-ui.scss */
+span.breadcrumb-toggle-off {
+  float: right;
+  clear: right;
+  height: 12px;
+  width: 12px;
+  cursor: pointer;
+  margin-bottom: 5px;
+  background-image: url("icons/breadcrumb-toggle-off.png");
+  background-repeat: no-repeat;
+}
+
+/* line 498, new-ui.scss */
+span.nav-button-move {
+  float: right;
+  margin: 3px;
+  background-image: url("icons/nav-button-move.png");
+  background-repeat: no-repeat;
+}
+/* line 506, new-ui.scss */
+span.nav-button-move[enabled=false], span.nav-button-move.disabled {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
+  opacity: 0.2;
+  cursor: default;
+}
+
+/* line 498, new-ui.scss */
+span.nav-button-save {
+  float: right;
+  margin: 3px;
+  background-image: url("icons/nav-button-save.png");
+  background-repeat: no-repeat;
+}
+/* line 506, new-ui.scss */
+span.nav-button-save[enabled=false], span.nav-button-save.disabled {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
+  opacity: 0.2;
+  cursor: default;
+}
+
+/* line 498, new-ui.scss */
+span.nav-button-close {
+  float: right;
+  margin: 3px;
+  background-image: url("icons/nav-button-close.png");
+  background-repeat: no-repeat;
+}
+/* line 506, new-ui.scss */
+span.nav-button-close[enabled=false], span.nav-button-close.disabled {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
+  opacity: 0.2;
+  cursor: default;
+}
+
+/* line 498, new-ui.scss */
+span.nav-button-back {
+  float: right;
+  margin: 3px;
+  background-image: url("icons/nav-button-back.png");
+  background-repeat: no-repeat;
+}
+/* line 506, new-ui.scss */
+span.nav-button-back[enabled=false], span.nav-button-back.disabled {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
+  opacity: 0.2;
+  cursor: default;
+}
+
+/* line 498, new-ui.scss */
+span.nav-button-forward {
+  float: right;
+  margin: 3px;
+  background-image: url("icons/nav-button-forward.png");
+  background-repeat: no-repeat;
+}
+/* line 506, new-ui.scss */
+span.nav-button-forward[enabled=false], span.nav-button-forward.disabled {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
+  opacity: 0.2;
+  cursor: default;
+}
+
+/* line 498, new-ui.scss */
+span.nav-button-pinned {
+  float: right;
+  margin: 3px;
+  background-image: url("icons/nav-button-pinned.png");
+  background-repeat: no-repeat;
+}
+/* line 506, new-ui.scss */
+span.nav-button-pinned[enabled=false], span.nav-button-pinned.disabled {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
+  opacity: 0.2;
+  cursor: default;
+}
+
+/* line 520, new-ui.scss */
+span.switch-button {
+  width: 10.8px;
+  height: 10.8px;
+  position: absolute;
+  top: 50%;
+  right: -7.8px;
+  background-image: url("icons/switch-button.png");
+  background-repeat: no-repeat;
+}
+/* line 531, new-ui.scss */
+span.switch-button:hover {
+  background-image: url("icons/switch-button-hover.png");
+  background-repeat: no-repeat;
+}
+/* line 537, new-ui.scss */
+span.switch-button.invisible {
+  display: none;
+}
+
+/* line 542, new-ui.scss */
+span.word:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* line 546, new-ui.scss */
+span.menu-word {
+  background-color: #f7d04a;
+}
+
+/* line 549, new-ui.scss */
+span.word.search {
+  background-color: #fffaa5;
+}
+
+/* line 552, new-ui.scss */
+span.word.match {
+  background-color: #FFDAB9;
+}
+
+/*******************************************************************************
+Base Components: Overlay
+*******************************************************************************/
+/* line 560, new-ui.scss */
+div.overlay {
+  padding: 7.68px;
+  position: absolute;
+  width: 400px;
+  background-color: white;
+}
+/* line 565, new-ui.scss */
+div.overlay div.overlay-render-target {
+  width: 100%;
+  height: 100%;
+}
+/* line 569, new-ui.scss */
+div.overlay span.nav-button-pinned, div.overlay span.nav-button-close {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+}
+/* line 575, new-ui.scss */
+div.overlay span.overlay-title {
+  font-family: "Bitter";
+  font-weight: 300;
+  font-size: 18px;
+  text-transform: uppercase;
+  position: absolute;
+  top: 7.68px;
+  left: 7.68px;
+}
+/* line 584, new-ui.scss */
+div.overlay div.x-box-inner {
+  margin-top: 32px;
+}
+
+/*******************************************************************************
+Derived Components: FrequentWordsList
+*******************************************************************************/
+/* line 606, new-ui.scss */
+div.frequent-words-list {
+  float: left;
+  padding: 10px;
+}
+/* line 594, new-ui.scss */
+div.frequent-words-list table.table tbody {
+  overflow: auto;
+  display: block;
+  height: 300px;
+  width: 270;
+}
+/* line 600, new-ui.scss */
+div.frequent-words-list table.table thead > tr {
+  display: block;
+}
+
+/* line 612, new-ui.scss */
+td.frequent-word-word {
+  min-width: 120px;
+  max-width: 120px;
+  overflow: hidden;
+  font-weight: bold;
+  color: #64839f;
+}
+
+/* line 619, new-ui.scss */
+td.frequent-word-count {
+  min-width: 60px;
+  padding-right: 7.68px;
+}
+
+/* line 624, new-ui.scss */
+th.frequent-word-word {
+  min-width: 120px;
+}
+
+/* line 627, new-ui.scss */
+th.frequent-word-count {
+  min-width: 60px;
+  padding-right: 7.68px;
+  font-size: 12px;
+}
+
+/*******************************************************************************
+Derived Components: RelatedWordsList
+*******************************************************************************/
+/* line 594, new-ui.scss */
+div.related-words-list table.table tbody {
+  overflow: auto;
+  display: block;
+  height: 300px;
+  width: 220px;
+}
+/* line 600, new-ui.scss */
+div.related-words-list table.table thead > tr {
+  display: block;
+}
+
+/*******************************************************************************
+Derived Components: Treepanel
+*******************************************************************************/
+/* line 647, new-ui.scss */
+tr[level='1'] td.content:nth-of-type(1) {
+  padding-left: 7.68px;
+}
+
+/* line 647, new-ui.scss */
+tr[level='2'] td.content:nth-of-type(1) {
+  padding-left: 15.36px;
+}
+
+/* line 647, new-ui.scss */
+tr[level='3'] td.content:nth-of-type(1) {
+  padding-left: 23.04px;
+}
+
+/* line 647, new-ui.scss */
+tr[level='4'] td.content:nth-of-type(1) {
+  padding-left: 30.72px;
+}
+
+/* line 647, new-ui.scss */
+tr[level='5'] td.content:nth-of-type(1) {
+  padding-left: 38.4px;
+}
+
+/* line 647, new-ui.scss */
+tr[level='6'] td.content:nth-of-type(1) {
+  padding-left: 46.08px;
+}
+
+/* line 647, new-ui.scss */
+tr[level='7'] td.content:nth-of-type(1) {
+  padding-left: 53.76px;
+}
+
+/* line 647, new-ui.scss */
+tr[level='8'] td.content:nth-of-type(1) {
+  padding-left: 61.44px;
+}
+
+/* line 647, new-ui.scss */
+tr[level='9'] td.content:nth-of-type(1) {
+  padding-left: 69.12px;
+}
+
+/* line 647, new-ui.scss */
+tr[level='10'] td.content:nth-of-type(1) {
+  padding-left: 76.8px;
+}
+
+/*******************************************************************************
+Derived Components: Set List
+*******************************************************************************/
+/* line 594, new-ui.scss */
+div.sets-list table.table tbody {
+  overflow: auto;
+  display: block;
+  height: 150px;
+  width: 400px;
+}
+/* line 600, new-ui.scss */
+div.sets-list table.table thead > tr {
+  display: block;
+}
+
+/*******************************************************************************
+Base Components: MultiTable
+*******************************************************************************/
+/* line 665, new-ui.scss */
+ul.multitable {
+  margin: 0px;
+  padding: 0px;
+}
+/* line 669, new-ui.scss */
+ul.multitable li {
+  list-style-type: none;
+}
+/* line 671, new-ui.scss */
+ul.multitable li.collapsed ul {
+  display: none;
+}
+/* line 674, new-ui.scss */
+ul.multitable li.expanded ul {
+  display: visible;
+}
+/* line 678, new-ui.scss */
+ul.multitable ul {
+  padding-left: 0px;
+  max-height: 200px;
+  overflow: auto;
+}
+/* line 683, new-ui.scss */
+ul.multitable li.multitable-header {
+  border-bottom: 1px solid #eeeeee;
+  cursor: pointer;
+  padding-bottom: 4.8px;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 9px;
+}
+/* line 686, new-ui.scss */
+ul.multitable span.multitable-row {
+  display: block;
+}
+/* line 689, new-ui.scss */
+ul.multitable span.multitable-cell {
+  display: inline-block;
+  padding-left: 4.8px;
+  padding-right: 4.8px;
+}
+/* line 694, new-ui.scss */
+ul.multitable li.multitable-level-2 {
+  cursor: default;
+  padding-top: 4.8px;
+  padding-bottom: 4.8px;
+}
+/* line 195, new-ui.scss */
+ul.multitable li.multitable-level-2.selected {
+  background-color: #f7d04a;
+}
+/* line 198, new-ui.scss */
+ul.multitable li.multitable-level-2.selected:hover {
+  background-color: #f7d04a;
+}
+/* line 201, new-ui.scss */
+ul.multitable li.multitable-level-2:hover {
+  background-color: #eeeeee;
+}
+
+/*******************************************************************************
+Derived Components: Metadata multitable
+*******************************************************************************/
+/* line 720, new-ui.scss */
+li span.metadata-count {
+  max-width: 60px;
+  min-width: 60px;
+}
+
+/* line 724, new-ui.scss */
+li span.metadata-value {
+  max-width: 120px;
+  min-width: 120px;
+}
+/* line 727, new-ui.scss */
+li span.metadata-value.multitable-cell, li span.metadata-value.multitable-header-cell {
+  color: #64839f;
+  font-weight: bold;
+}
+
+/* line 732, new-ui.scss */
+li span.multitable-level-1 {
+  font-weight: bold;
+  color: #64839f;
+  font-size: 12px;
+  font-family: helvetica, arial, sans-serif;
+  margin-bottom: 12.288px;
+  text-transform: capitalize;
+}
+/* line 711, new-ui.scss */
+li span.multitable-level-1 span.action-button-toggle-expand, li span.multitable-level-1 span.action-button-toggle-contract {
+  top: 8px;
+}
+/* line 714, new-ui.scss */
+li span.multitable-level-1 span.metadata-category {
+  padding-left: 4.8px;
+  padding-right: 4.8px;
+}
+
+/*******************************************************************************
+Base Components: Landing Page
+*******************************************************************************/
+/* line 743, new-ui.scss */
+div.landing-page {
+  overflow: scroll;
+  background-color: #64839f;
+  position: absolute;
+  margin: 4.8px;
+  padding: 3px;
+}
+/* line 749, new-ui.scss */
+div.landing-page div.landingpage-render-target {
+  position: absolute;
+  top: 109px;
+  left: 3px;
+  right: 3px;
+  bottom: 4.8px;
+}
+/* line 756, new-ui.scss */
+div.landing-page div.main-header {
+  height: 109px;
+  width: 100%;
+  font-family: "Bitter";
+  font-weight: 700;
+  color: white;
+  font-size: 40;
+}
+/* line 763, new-ui.scss */
+div.landing-page div.main-header h1 {
+  margin: 0px;
+}
+
+/*******************************************************************************
+Base Components: Menu
+*******************************************************************************/
+/* line 774, new-ui.scss */
+.menu, .autosuggest-menu {
+  padding: 1px;
+  border: 2px solid #f7d04a;
+  background: #fff;
+}
+
+/* creates the larger triangle */
+/* line 781, new-ui.scss */
+.menu:before, .autosuggest-menu:before {
+  top: 10px;
+  /* controls vertical position */
+  bottom: auto;
+  left: -30px;
+  /* value = - border-left-width - border-right-width */
+  border-width: 15px 30px 15px 0;
+  border-color: transparent #f7d04a;
+}
+
+/* creates the smaller  triangle */
+/* line 790, new-ui.scss */
+.menu:after, .autosuggest-menu:after {
+  top: 16px;
+  /* value = (:before top) + (:before border-top) - (:after border-top) */
+  bottom: auto;
+  left: -21px;
+  /* value = - border-left-width - border-right-width */
+  border-width: 9px 21px 9px 0;
+  border-color: transparent #fff;
+}
+
+/* line 798, new-ui.scss */
+.menuitem, .autosuggest-menuitem {
+  cursor: pointer;
+  display: block;
+  padding: 7.68px;
+}
+/* line 801, new-ui.scss */
+.menuitem.hovered, .hovered.autosuggest-menuitem {
+  background: #f7d04a;
+}
+
+/*******************************************************************************
+Derived Components: AutoSuggest Menu
+*******************************************************************************/
+/* line 811, new-ui.scss */
+.autosuggest-menu {
+  border: 0px;
+  -webkit-box-shadow: 10px, 0px, 5px;
+  -moz-box-shadow: 10px, 0px, 5px;
+  box-shadow: 10px, 0px, 5px;
+}
+
+/*******************************************************************************
+Base Components: Overviews
+*******************************************************************************/
+/* line 825, new-ui.scss */
+div.overview {
+  position: static;
+  margin: 4.8px;
+  padding: 3px;
+  margin-right: 50px;
+}
+/* line 830, new-ui.scss */
+div.overview div.overview-render-target {
+  position: absolute;
+  top: 100px;
+  left: 3px;
+  right: 3px;
+  bottom: 4.8px;
+}
+/* line 837, new-ui.scss */
+div.overview div.overview-header {
+  height: 109px;
+  width: 100%;
+  font-family: "Bitter";
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+}
+/* line 845, new-ui.scss */
+div.overview div.range-facet {
+  position: static !important;
+  background-color: transparent;
+  display: block;
+}
+/* line 222, new-ui.scss */
+div.overview div.range-facet div.databox-header {
+  color: white;
+  background-color: transparent;
+}
+/* line 847, new-ui.scss */
+div.overview div.range-facet .axis text {
+  fill: #eeeeee;
+}
+/* line 850, new-ui.scss */
+div.overview div.range-facet .axis line, div.overview div.range-facet .axis path {
+  stroke: #eeeeee;
+}
+/* line 853, new-ui.scss */
+div.overview div.range-facet .brush rect.extent {
+  fill: #000000;
+}
+/* line 856, new-ui.scss */
+div.overview div.range-facet .background.bar {
+  stroke: #eeeeee;
+}
+/* line 859, new-ui.scss */
+div.overview div.range-facet .title span {
+  color: #eeeeee;
+}
+
+/*******************************************************************************
+Derived Components: Range Facets
+*******************************************************************************/
+/* line 868, new-ui.scss */
+div.range-facet {
+  height: 100px;
+}
+/* line 871, new-ui.scss */
+div.range-facet.x-box-item {
+  position: static !important;
+}
+/* line 874, new-ui.scss */
+div.range-facet div.chart.collapsed {
+  display: none;
+}
+
+/* line 881, new-ui.scss */
+div.rangefacets div.range-facet div.databox-header {
+  font-weight: bold;
+  color: #64839f;
+  font-size: 12px;
+  font-family: helvetica, arial, sans-serif;
+  margin-bottom: 12.288px;
+  text-transform: capitalize;
+}
+/* line 711, new-ui.scss */
+div.rangefacets div.range-facet div.databox-header span.action-button-toggle-expand, div.rangefacets div.range-facet div.databox-header span.action-button-toggle-contract {
+  top: 8px;
+}
+/* line 714, new-ui.scss */
+div.rangefacets div.range-facet div.databox-header span.metadata-category {
+  padding-left: 4.8px;
+  padding-right: 4.8px;
+}
