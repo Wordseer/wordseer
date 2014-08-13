@@ -12,7 +12,30 @@ class Log(db.Model, Base):
         item_value (string): The value of the logged entry.
     """
 
+    id = db.Column(db.Integer, primary_key=True)
     log_item = db.Column(db.String(100), nullable=False, index=True)
     item_value = db.Column(db.Text, nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    type = db.Column(db.String)
+
+    __mapper_args__ = {
+        "polymorphic_on": type,
+        "polymorphic_identity": "log"
+    }
+
+class ErrorLog(Log):
+    """An error log.
+    """
+
+    __mapper_args__ = {
+        "polymorphic_identity": "error"
+    }
+
+class InfoLog(Log):
+    """An info log.
+    """
+
+    __mapper_args__ = {
+        "polymorphic_identity": "info"
+    }
 

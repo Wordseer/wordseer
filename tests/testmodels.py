@@ -18,6 +18,9 @@ from app.models import StructureFile
 from app.models import Unit
 from app.models import User
 from app.models import Word
+from app.models import Log
+from app.models import InfoLog
+from app.models import ErrorLog
 import database
 
 class TestWordModel(unittest.TestCase):
@@ -452,4 +455,30 @@ class TestDocumentFileModule(unittest.TestCase):
 
         assert len(documentfile.documents) == 2
         assert len(documentfile.projects) == 2
+
+class TestProjectModel(unittest.TestCase):
+    """Test the Project model.
+    """
+
+    def setUp(self):
+        database.clean()
+
+    def test_logs(self):
+        """Test that logs work right.
+        """
+        project = Project()
+
+        info_logs = [InfoLog(item_value="foo", log_item="foo is bar'd"),
+            InfoLog(item_value="bar", log_item="Fooing the bar"),
+            InfoLog(item_value="foo", log_item="Still fooing")]
+
+        error_logs = [ErrorLog(item_value="Failed to foo", log_item="Bar"),
+            ErrorLog(item_value="Failed to foo", log_item="bar")]
+
+        project.logs = info_logs + error_logs
+
+        project.save()
+
+        assert project.logs == info_logs + error_logs
+        assert project.get_errors() == error_logs
 
