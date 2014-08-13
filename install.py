@@ -64,10 +64,11 @@ def install_prerequisites(sudo):
         sudo (boolean): If ``True``, use sudo.
     """
     #TODO: this is unix-specific
-    system = subprocess.check_output(["uname", "-a"])
+    system = sys.platform
 
     if "Linux" in system and sudo:
         print "Attempting to install prerequisites for linux."
+        uname = subprocess.call(["uname -a"], shell=True)
         if "ARCH" in system:
             subprocess.call(["sudo pacman -S libxslt libxml2 jre7-openjdk"],
                 shell=True)
