@@ -14,6 +14,8 @@ from app.models.sequence import Sequence
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 
+from . import helpers
+
 LEMMA = "lemma"
 WORD = "word"
 
@@ -88,7 +90,7 @@ class SequenceProcessor(object):
                             sequence = sequence_text
                         ).one()
                     except(MultipleResultsFound):
-                        self.logger.error("duplicate records found for: %s",
+                        self.log_error("Duplicate records found for: %s",
                             str(key))
                     except(NoResultFound):
                         sequence = Sequence(
@@ -207,6 +209,11 @@ class SequenceProcessor(object):
         #TODO: reader_writer
         #self.reader_writer.finish_indexing_sequences()
         pass
+
+    def log_error(self, msg, *args, **kwargs):
+        """Shortcut for helpers.log_error.
+        """
+        helpers.log_error(self.logger, self.project, msg, *args, **kwargs)
 
 def join_tws(words, delimiter, attr):
     """Join either the lemmas or text of words with the delimiter.

@@ -12,6 +12,7 @@ from app.models.grammaticalrelationship import GrammaticalRelationship
 from app import db
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
+import helpers
 
 class StringProcessor(object):
     """Tokenize or parse a string.
@@ -97,7 +98,7 @@ class StringProcessor(object):
                                 filter_by(name = grammatical_relationship).\
                                 one()
                         except(MultipleResultsFound):
-                            self.logger.error("duplicate records found for: %s",
+                            self.log_error("duplicate records found for: %s",
                                 str(key))
                         except(NoResultFound):
                             relationship = GrammaticalRelationship(
@@ -127,7 +128,7 @@ class StringProcessor(object):
                         governor.id
                         dependent.id
                     except:
-                        self.logger.error("Governor or dependent not found; "
+                        self.log_error("Governor or dependent not found; "
                             "giving up on parse.")
                         self.logger.info(sentence)
                         return sentence
@@ -145,8 +146,8 @@ class StringProcessor(object):
                                 dependent = dependent
                             ).one()
                         except(MultipleResultsFound):
-                            self.logger.error("duplicate records found for: %s",
-                                str(key))
+                            self.logg_error(("duplicate records found for: %s",
+                                str(key)))
                         except(NoResultFound):
                             dependency = Dependency(
                                 grammatical_relationship = relationship,
@@ -226,17 +227,22 @@ class StringProcessor(object):
         # TODO: handle all errors properly
         # ProcessError, TimeoutError, OutOfMemoryError
         except TimeoutError as e:
-            self.logger.error("Got a TimeoutError: " + str(e))
+            self.log_error("Got a TimeoutError: %s", str(e))
             return None
         except ProcessError as e:
-            self.logger.error("Got a ProcessError: " + str(e))
+            self.log_error("Got a ProcessError: %s", str(e))
             return None
         except:
-            self.logger.error("Unknown error")
+            self.log_error("Unknown error")
             return None
 
         # Parse successful, return parsed text
         return parsed_text
+
+    def log_error(self, msg, *args, **kwargs):
+        """Shortcut for helpers.log_error.
+        """
+        helpers.log_error(self.logger, self.project, msg, *args, **kwargs)
 
 def split_sentences(text):
     """Split the string into sentences.

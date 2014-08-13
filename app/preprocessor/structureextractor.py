@@ -15,6 +15,7 @@ from app.models.sentence import Sentence
 from app.models.unit import Unit
 from app.models.property import Property
 from app import db
+from . import helpers
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
@@ -51,7 +52,7 @@ class StructureExtractor(object):
         try:
             doc = etree.parse(infile)
         except(etree.XMLSyntaxError) as e:
-            self.logger.error("XML Error: " + str(e) + "; skipping file")
+            self.log_error("XML Error: " + str(e) + "; skipping file")
             self.logger.info(infile)
             return documents
 
@@ -69,7 +70,7 @@ class StructureExtractor(object):
                 "new one", infile)
             document_file = DocumentFile()
         except MultipleResultsFound:
-            self.logger.error("Found multiple files with path %s, "
+            self.log_error("Found multiple files with path %s, "
                 "skipping.", infile)
             return DocumentFile()
 
@@ -215,6 +216,11 @@ class StructureExtractor(object):
             result_sentences.append(sentence)
 
         return result_sentences
+
+    def log_error(self, msg, *args, **kwargs):
+        """Shortcut for helpers.log_error.
+        """
+        helpers.log_error(self.logger, self.project, msg, *args, **kwargs)
 
 def get_metadata(structure, node):
     """Return a list of Property objects of the metadata of the Tags in
