@@ -3,8 +3,9 @@
 
 from app import db
 from .base import Base
+from .mixins import NonPrimaryKeyEquivalenceMixin
 
-class Log(db.Model, Base):
+class Log(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     """A log entry, which is recorded in the database.
 
     Attributes:
@@ -44,6 +45,6 @@ class InfoLog(Log):
     """
 
     __mapper_args__ = {
-        "polymorphic_identity": "warning"
+        "polymorphic_identity": "info"
     }
 

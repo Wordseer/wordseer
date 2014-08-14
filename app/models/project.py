@@ -49,3 +49,15 @@ class Project(db.Model, Base):
         return Log.query.filter(Log.project == self).\
             filter(Log.type == "error").all()
 
+    def get_warnings(self):
+        """Return all ``WarningLogs`` attached to this project.
+        """
+        return Log.query.filter(Log.project == self).\
+            filter(Log.type == "warning").all()
+
+    def get_infos(self):
+        """Return all ``InfoLogs`` attached to this project.
+        """
+        return Log.query.filter(Log.project == self).\
+            filter(Log.type == "info").all()
+
