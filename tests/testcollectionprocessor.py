@@ -19,10 +19,13 @@ import database
 def setUpModule():
     global project
     project = Project()
+    global mock_project_logger
     with mock.patch("app.preprocessor.collectionprocessor.StringProcessor",
+            autospec=True), mock.patch("app.preprocessor.collectionprocessor.logger.ProjectLogger",
             autospec=True):
         global colproc
         colproc = collectionprocessor.CollectionProcessor(project)
+
 
 @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=logger)
 class TestCollectionProcessor(unittest.TestCase):
@@ -30,7 +33,6 @@ class TestCollectionProcessor(unittest.TestCase):
     """
     def setUp(self):
         database.clean()
-        colproc.project = Project()
 
     @mock.patch("app.preprocessor.collectionprocessor.structureextractor",
         autospec=True)

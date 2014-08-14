@@ -136,14 +136,12 @@ class CollectionProcessor(object):
                     filename))
                 seconds_elapsed = (datetime.now() - start_time).total_seconds()
 
-                self.project_logger.info("Time to extract and record metadata: %ss",
-                    seconds_elapsed)
+                self.project_logger.info("Finished extracting and recording "
+                    "metadata for %s. Time: %ss (%s/%s).", filename,
+                    seconds_elapsed, str(num_files_done), str(len(contents)))
 
-                self.project_logger.info("%s/%s %s", str(num_files_done),
-                    str(len(contents)), filename)
                 logger.log(self.project, "text_and_metadata_recorded",
                     str(num_files_done), logger.UPDATE)
-
 
             num_files_done += 1
 

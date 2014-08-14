@@ -42,8 +42,10 @@ def count(project):
     project_logger.info("Calculating counts for dependencies")
     count = 1
     for row in dependencies_in_sentences:
-        project_logger.info("Calculating count for dependency %s/%s", count,
-            len(dependencies_in_sentences))
+        if count % 100 == 0:
+            project_logger.info("Calculating count for dependency %s/%s", count,
+                len(dependencies_in_sentences))
+
         dependency = Dependency.query.get(row.dependency_id)
         dependency.document_count = row.count
 
@@ -62,8 +64,10 @@ def count(project):
     project_logger.info("Calculating counts for sequences")
     count = 1
     for row in sequences_in_sentences:
-        project_logger.info("Calculating count for dependency %s/%s", count,
-            len(sequences_in_sentences))
+        if count % 100 == 0:
+            project_logger.info("Calculating count for dependency %s/%s", count,
+                len(sequences_in_sentences))
+
         sequence = Sequence.query.get(row.sequence_id)
         sequence.document_count = row.count
 
