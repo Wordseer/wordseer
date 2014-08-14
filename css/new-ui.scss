@@ -48,7 +48,8 @@ $background-lightblue: #64839f;
 Fonts
 *******************************************************************************/
 $slab-serif: 'Bitter';
-$sans-serif: helvetica, arial, sans-serif;
+$sans-serif: Helvetica, Arial, sans-serif;
+$sans-serif-alt: 'Open Sans', Helvetica, Arial, sans-serif;
 $small-font-size: 10px;
 $medium-font-size: 12px;
 $large-font-size: 18px;
@@ -883,4 +884,45 @@ div.rangefacets {
 			@include metadata-category
 		}
 	}
+}
+
+/*******************************************************************************
+Base Components: Sentence List Widget
+*******************************************************************************/
+div.sentence {
+    font-family: $slab-serif;
+    line-height: 1.5;
+    font-size: $large-font-size;
+    margin-bottom: 12px;
+}
+
+div.metatag {
+    font-family: $sans-serif-alt;
+    float:left;
+    margin-right: 16px;
+    margin-bottom: 16px;
+    height: 28px;
+    border: 1px solid #808080;
+    span {
+        display: inline-block;
+        height: 28px;
+        padding: 0 10px;
+        color: #808080;
+        &.key {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 13px;
+            line-height: 26px;
+            border-right: 1px solid #808080;
+            height: 27px;
+        }
+        &.value {
+            font-size: 15px;
+            line-height: 24px;
+            font-weight: 300;
+        }
+    }
+    &:last-child {
+        margin-bottom: 36px;
+    }
 }

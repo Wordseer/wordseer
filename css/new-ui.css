@@ -7,13 +7,13 @@ Colors
 /*******************************************************************************
 Fonts
 *******************************************************************************/
-/* line 56, new-ui.scss */
+/* line 57, new-ui.scss */
 body {
-  font-family: helvetica, arial, sans-serif !important;
+  font-family: Helvetica, Arial, sans-serif !important;
   font-size: 10px;
 }
 
-/* line 60, new-ui.scss */
+/* line 61, new-ui.scss */
 .background {
   background-color: #526b84;
 }
@@ -21,18 +21,18 @@ body {
 /*******************************************************************************
 Buttons
 *******************************************************************************/
-/* line 73, new-ui.scss */
+/* line 74, new-ui.scss */
 .button, .action-button-see-more, .action-button-save, .action-button-save-picture, .action-button-toggle-expand, .action-button-toggle-contract, span.nav-button-move, span.nav-button-save, span.nav-button-close, span.nav-button-back, span.nav-button-forward, span.nav-button-pinned, span.switch-button {
   width: 21px;
   height: 21px;
   display: inline-block;
 }
-/* line 77, new-ui.scss */
+/* line 78, new-ui.scss */
 .button:hover, .action-button-see-more:hover, .action-button-save:hover, .action-button-save-picture:hover, .action-button-toggle-expand:hover, .action-button-toggle-contract:hover, span.nav-button-move:hover, span.nav-button-save:hover, span.nav-button-close:hover, span.nav-button-back:hover, span.nav-button-forward:hover, span.nav-button-pinned:hover, span.switch-button:hover {
   cursor: pointer;
 }
 
-/* line 83, new-ui.scss */
+/* line 84, new-ui.scss */
 .action-button-see-more {
   position: relative;
   top: 5px;
@@ -40,12 +40,12 @@ Buttons
   background-image: url("icons/action-button-see-more.png");
   background-repeat: no-repeat;
 }
-/* line 92, new-ui.scss */
+/* line 93, new-ui.scss */
 .action-button-see-more:hover {
   cursor: pointer;
 }
 
-/* line 83, new-ui.scss */
+/* line 84, new-ui.scss */
 .action-button-save {
   position: relative;
   top: 5px;
@@ -53,12 +53,12 @@ Buttons
   background-image: url("icons/action-button-save.png");
   background-repeat: no-repeat;
 }
-/* line 92, new-ui.scss */
+/* line 93, new-ui.scss */
 .action-button-save:hover {
   cursor: pointer;
 }
 
-/* line 83, new-ui.scss */
+/* line 84, new-ui.scss */
 .action-button-save-picture {
   position: relative;
   top: 5px;
@@ -66,12 +66,12 @@ Buttons
   background-image: url("icons/action-button-save-picture.png");
   background-repeat: no-repeat;
 }
-/* line 92, new-ui.scss */
+/* line 93, new-ui.scss */
 .action-button-save-picture:hover {
   cursor: pointer;
 }
 
-/* line 83, new-ui.scss */
+/* line 84, new-ui.scss */
 .action-button-toggle-expand {
   position: relative;
   top: 5px;
@@ -79,12 +79,12 @@ Buttons
   background-image: url("icons/action-button-toggle-expand.png");
   background-repeat: no-repeat;
 }
-/* line 92, new-ui.scss */
+/* line 93, new-ui.scss */
 .action-button-toggle-expand:hover {
   cursor: pointer;
 }
 
-/* line 83, new-ui.scss */
+/* line 84, new-ui.scss */
 .action-button-toggle-contract {
   position: relative;
   top: 5px;
@@ -92,7 +92,7 @@ Buttons
   background-image: url("icons/action-button-toggle-contract.png");
   background-repeat: no-repeat;
 }
-/* line 92, new-ui.scss */
+/* line 93, new-ui.scss */
 .action-button-toggle-contract:hover {
   cursor: pointer;
 }
@@ -100,7 +100,7 @@ Buttons
 /*******************************************************************************
 Base components: Data Box
 *******************************************************************************/
-/* line 108, new-ui.scss */
+/* line 109, new-ui.scss */
 div.databox, ul.multitable, div.range-facet {
   padding: 0;
   background-color: white;
@@ -108,7 +108,7 @@ div.databox, ul.multitable, div.range-facet {
   margin-bottom: 7.68px;
 }
 
-/* line 115, new-ui.scss */
+/* line 116, new-ui.scss */
 div.databox-header {
   display: block;
   width: 100%;
@@ -117,7 +117,7 @@ div.databox-header {
   z-index: 1000;
 }
 
-/* line 123, new-ui.scss */
+/* line 124, new-ui.scss */
 h2.databox-header {
   display: inline-block;
   font-family: "Bitter", serif;
@@ -134,44 +134,44 @@ h2.databox-header {
 /*******************************************************************************
 Base components: Options Data Box
 *******************************************************************************/
-/* line 145, new-ui.scss */
+/* line 146, new-ui.scss */
 div.databox-options {
   display: block;
   top: 32px;
   font-size: 10px;
 }
-/* line 148, new-ui.scss */
+/* line 149, new-ui.scss */
 div.databox-options span.databox-option {
   margin-right: 7.68px;
 }
-/* line 150, new-ui.scss */
+/* line 151, new-ui.scss */
 div.databox-options span.databox-option span.databox-option-label {
   margin-right: 4.8px;
 }
-/* line 153, new-ui.scss */
+/* line 154, new-ui.scss */
 div.databox-options span.databox-option span.button, div.databox-options span.databox-option span.action-button-see-more, div.databox-options span.databox-option span.action-button-save, div.databox-options span.databox-option span.action-button-save-picture, div.databox-options span.databox-option span.action-button-toggle-expand, div.databox-options span.databox-option span.action-button-toggle-contract, div.databox-options span.databox-option span.nav-button-move, div.databox-options span.databox-option span.nav-button-save, div.databox-options span.databox-option span.nav-button-close, div.databox-options span.databox-option span.nav-button-back, div.databox-options span.databox-option span.nav-button-forward, div.databox-options span.databox-option span.nav-button-pinned, div.databox-options span.databox-option span.switch-button {
   padding: 4.8px;
   cursor: pointer;
   width: auto;
 }
-/* line 157, new-ui.scss */
+/* line 158, new-ui.scss */
 div.databox-options span.databox-option span.button:hover, div.databox-options span.databox-option span.action-button-see-more:hover, div.databox-options span.databox-option span.action-button-save:hover, div.databox-options span.databox-option span.action-button-save-picture:hover, div.databox-options span.databox-option span.action-button-toggle-expand:hover, div.databox-options span.databox-option span.action-button-toggle-contract:hover, div.databox-options span.databox-option span.nav-button-move:hover, div.databox-options span.databox-option span.nav-button-save:hover, div.databox-options span.databox-option span.nav-button-close:hover, div.databox-options span.databox-option span.nav-button-back:hover, div.databox-options span.databox-option span.nav-button-forward:hover, div.databox-options span.databox-option span.nav-button-pinned:hover, div.databox-options span.databox-option span.switch-button:hover {
   text-decoration: underline;
 }
-/* line 161, new-ui.scss */
+/* line 162, new-ui.scss */
 div.databox-options span.databox-option span.disabled {
   color: #eeeeee;
 }
-/* line 163, new-ui.scss */
+/* line 164, new-ui.scss */
 div.databox-options span.databox-option span.disabled:hover {
   text-decoration: none;
 }
-/* line 168, new-ui.scss */
+/* line 169, new-ui.scss */
 div.databox-options div.databox-body {
   top: 55px;
 }
 
-/* line 173, new-ui.scss */
+/* line 174, new-ui.scss */
 span.checkbox {
   display: inline-block;
   height: 16px;
@@ -180,7 +180,7 @@ span.checkbox {
   top: 3px;
   background-image: url("icons/checkbox.png");
 }
-/* line 180, new-ui.scss */
+/* line 181, new-ui.scss */
 span.checkbox.checked {
   background-image: url("icons/checkbox-checked.png");
 }
@@ -194,26 +194,26 @@ Things with selectable rows: Tables, multitables.
 /*****************
 Tag List
 *******************/
-/* line 229, new-ui.scss */
+/* line 230, new-ui.scss */
 div.overview div.tag-list {
   position: static !important;
   background-color: transparent;
   display: block;
 }
-/* line 223, new-ui.scss */
+/* line 224, new-ui.scss */
 div.overview div.tag-list div.databox-header {
   color: white;
   background-color: transparent;
 }
 
-/* line 234, new-ui.scss */
+/* line 235, new-ui.scss */
 ul.tag-list-body {
   width: 100%;
   list-style-type: none;
   padding-left: 3px;
 }
 
-/* line 242, new-ui.scss */
+/* line 243, new-ui.scss */
 li.tag-list {
   display: inline-block;
   margin: 3px;
@@ -227,12 +227,12 @@ li.tag-list {
   border-radius: 4.8px;
   cursor: pointer;
 }
-/* line 250, new-ui.scss */
+/* line 251, new-ui.scss */
 li.tag-list:hover {
   background-color: #f7d04a;
 }
 
-/* line 255, new-ui.scss */
+/* line 256, new-ui.scss */
 span.tag-list-number {
   padding-left: 3px;
 }
@@ -240,17 +240,17 @@ span.tag-list-number {
 /*****************
 Table
 *******************/
-/* line 266, new-ui.scss */
+/* line 267, new-ui.scss */
 table.table {
   border-collapse: collapse;
   width: 100%;
 }
-/* line 269, new-ui.scss */
+/* line 270, new-ui.scss */
 table.table thead {
   text-align: left;
   font-weight: bold;
 }
-/* line 276, new-ui.scss */
+/* line 277, new-ui.scss */
 table.table thead tr th {
   padding-left: 4.8px;
   padding-right: 4.8px;
@@ -261,49 +261,49 @@ table.table thead tr th {
   font-weight: bold;
   font-size: 9px;
 }
-/* line 283, new-ui.scss */
+/* line 284, new-ui.scss */
 table.table tbody {
   font-size: 12px;
   overflow: scroll;
 }
-/* line 287, new-ui.scss */
+/* line 288, new-ui.scss */
 table.table tbody tr:nth-child(1) td {
   padding-top: 4.8px;
 }
-/* line 291, new-ui.scss */
+/* line 292, new-ui.scss */
 table.table tbody tr {
   cursor: default;
 }
-/* line 196, new-ui.scss */
+/* line 197, new-ui.scss */
 table.table tbody tr.selected {
   background-color: #f7d04a;
 }
-/* line 199, new-ui.scss */
+/* line 200, new-ui.scss */
 table.table tbody tr.selected:hover {
   background-color: #f7d04a;
 }
-/* line 202, new-ui.scss */
+/* line 203, new-ui.scss */
 table.table tbody tr:hover {
   background-color: #eeeeee;
 }
-/* line 293, new-ui.scss */
+/* line 294, new-ui.scss */
 table.table tbody tr.hovered {
   background-color: #eeeeee;
   color: black;
 }
-/* line 297, new-ui.scss */
+/* line 298, new-ui.scss */
 table.table tbody tr td {
   padding-left: 4.8px;
   cursor: default;
   max-width: 350px;
   overflow: auto;
 }
-/* line 300, new-ui.scss */
+/* line 301, new-ui.scss */
 tr.selected table.table tbody tr td {
   color: black;
 }
 
-/* line 312, new-ui.scss */
+/* line 313, new-ui.scss */
 span.table-header-sorter {
   display: inline-block;
   width: 16px;
@@ -312,12 +312,12 @@ span.table-header-sorter {
   top: 7.68px;
   margin-left: 7.68px;
 }
-/* line 320, new-ui.scss */
+/* line 321, new-ui.scss */
 span.table-header-sorter.ascending {
   background-image: url("icons/ascending.png");
   background-repeat: no-repeat;
 }
-/* line 320, new-ui.scss */
+/* line 321, new-ui.scss */
 span.table-header-sorter.descending {
   background-image: url("icons/descending.png");
   background-repeat: no-repeat;
@@ -326,12 +326,12 @@ span.table-header-sorter.descending {
 /*
 For jquery.resizableColumns.js
 */
-/* line 332, new-ui.scss */
+/* line 333, new-ui.scss */
 .rc-handle-container {
   position: relative;
 }
 
-/* line 336, new-ui.scss */
+/* line 337, new-ui.scss */
 .rc-handle {
   position: absolute;
   width: 7px;
@@ -339,16 +339,16 @@ For jquery.resizableColumns.js
   margin-left: -3px;
   z-index: 2;
 }
-/* line 342, new-ui.scss */
+/* line 343, new-ui.scss */
 .rc-handle:hover {
   border-left: 1px dotted #1d3040;
 }
 
-/* line 347, new-ui.scss */
+/* line 348, new-ui.scss */
 table.rc-table-resizing {
   cursor: ew-resize;
 }
-/* line 350, new-ui.scss */
+/* line 351, new-ui.scss */
 table.rc-table-resizing thead, table.rc-table-resizing thead > th, table.rc-table-resizing thead > th > a {
   cursor: ew-resize;
 }
@@ -356,13 +356,13 @@ table.rc-table-resizing thead, table.rc-table-resizing thead > th, table.rc-tabl
 /*******************************************************************************
 Base components: Layout panel
 *******************************************************************************/
-/* line 377, new-ui.scss */
+/* line 378, new-ui.scss */
 div.panel {
   position: absolute;
   margin: 4.8px;
   padding: 3px;
 }
-/* line 381, new-ui.scss */
+/* line 382, new-ui.scss */
 div.panel div.panel-render-target {
   position: absolute;
   top: 126.576px;
@@ -372,22 +372,22 @@ div.panel div.panel-render-target {
   padding: 3px;
   background-color: white;
 }
-/* line 388, new-ui.scss */
+/* line 389, new-ui.scss */
 div.panel div.panel-render-target div.inner {
   max-height: 100%;
   max-width: 100%;
 }
-/* line 394, new-ui.scss */
+/* line 395, new-ui.scss */
 div.panel.active {
   background-color: #f7d04a;
 }
 
-/* line 399, new-ui.scss */
+/* line 400, new-ui.scss */
 div.panelheader {
   height: 51px;
   width: 100%;
 }
-/* line 402, new-ui.scss */
+/* line 403, new-ui.scss */
 div.panelheader span.panel-header-menubutton {
   -webkit-border-radius: 4.8px;
   -moz-border-radius: 4.8px;
@@ -408,23 +408,23 @@ div.panelheader span.panel-header-menubutton {
   background-color: #1d3040;
   color: white;
 }
-/* line 419, new-ui.scss */
+/* line 420, new-ui.scss */
 div.panelheader span.panel-header-menubutton.open {
   background-color: white;
   color: black;
 }
-/* line 423, new-ui.scss */
+/* line 424, new-ui.scss */
 div.panelheader span.panel-header-menubutton:hover {
   background-color: white;
   color: #1d3040;
   cursor: pointer;
 }
-/* line 429, new-ui.scss */
+/* line 430, new-ui.scss */
 div.panelheader select.panel-header-widget-select {
   margin: 9.77136px;
   height: 31.45728px;
 }
-/* line 434, new-ui.scss */
+/* line 435, new-ui.scss */
 div.panelheader div.panel-header-navcontrols {
   float: right;
   clear: right;
@@ -440,7 +440,7 @@ div.panelheader div.panel-header-navcontrols {
   border-top-right-radius: 4.8px;
 }
 
-/* line 445, new-ui.scss */
+/* line 446, new-ui.scss */
 div.breadcrumbs {
   height: 75.576px;
   width: 100%;
@@ -449,7 +449,7 @@ div.breadcrumbs {
   padding-left: 4.8px;
   padding-top: 4.8px;
 }
-/* line 452, new-ui.scss */
+/* line 453, new-ui.scss */
 div.breadcrumbs span.breadcrumb {
   float: left;
   min-height: 66.576px;
@@ -465,20 +465,20 @@ div.breadcrumbs span.breadcrumb {
   min-width: 100px;
   margin-right: 7.68px;
 }
-/* line 462, new-ui.scss */
+/* line 463, new-ui.scss */
 div.breadcrumbs span.breadcrumb span.breadcrumb-contents {
   display: inline-block;
   width: 80%;
   padding-right: 7.68px;
 }
-/* line 466, new-ui.scss */
+/* line 467, new-ui.scss */
 div.breadcrumbs span.breadcrumb span.breadcrumb-contents span.relation, div.breadcrumbs span.breadcrumb span.breadcrumb-contents span.property {
   font-weight: normal;
   width: 100%;
   display: block;
   font-size: 10px;
 }
-/* line 473, new-ui.scss */
+/* line 474, new-ui.scss */
 div.breadcrumbs span.breadcrumb span.breadcrumb-controls {
   float: right;
   clear: right;
@@ -487,7 +487,7 @@ div.breadcrumbs span.breadcrumb span.breadcrumb-controls {
   z-index: 100;
 }
 
-/* line 484, new-ui.scss */
+/* line 485, new-ui.scss */
 span.breadcrumb-close {
   float: right;
   clear: right;
@@ -499,7 +499,7 @@ span.breadcrumb-close {
   background-repeat: no-repeat;
 }
 
-/* line 484, new-ui.scss */
+/* line 485, new-ui.scss */
 span.breadcrumb-toggle-on {
   float: right;
   clear: right;
@@ -511,7 +511,7 @@ span.breadcrumb-toggle-on {
   background-repeat: no-repeat;
 }
 
-/* line 484, new-ui.scss */
+/* line 485, new-ui.scss */
 span.breadcrumb-toggle-off {
   float: right;
   clear: right;
@@ -523,91 +523,91 @@ span.breadcrumb-toggle-off {
   background-repeat: no-repeat;
 }
 
-/* line 499, new-ui.scss */
+/* line 500, new-ui.scss */
 span.nav-button-move {
   float: right;
   margin: 3px;
   background-image: url("icons/nav-button-move.png");
   background-repeat: no-repeat;
 }
-/* line 507, new-ui.scss */
+/* line 508, new-ui.scss */
 span.nav-button-move[enabled=false], span.nav-button-move.disabled {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
   opacity: 0.2;
   cursor: default;
 }
 
-/* line 499, new-ui.scss */
+/* line 500, new-ui.scss */
 span.nav-button-save {
   float: right;
   margin: 3px;
   background-image: url("icons/nav-button-save.png");
   background-repeat: no-repeat;
 }
-/* line 507, new-ui.scss */
+/* line 508, new-ui.scss */
 span.nav-button-save[enabled=false], span.nav-button-save.disabled {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
   opacity: 0.2;
   cursor: default;
 }
 
-/* line 499, new-ui.scss */
+/* line 500, new-ui.scss */
 span.nav-button-close {
   float: right;
   margin: 3px;
   background-image: url("icons/nav-button-close.png");
   background-repeat: no-repeat;
 }
-/* line 507, new-ui.scss */
+/* line 508, new-ui.scss */
 span.nav-button-close[enabled=false], span.nav-button-close.disabled {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
   opacity: 0.2;
   cursor: default;
 }
 
-/* line 499, new-ui.scss */
+/* line 500, new-ui.scss */
 span.nav-button-back {
   float: right;
   margin: 3px;
   background-image: url("icons/nav-button-back.png");
   background-repeat: no-repeat;
 }
-/* line 507, new-ui.scss */
+/* line 508, new-ui.scss */
 span.nav-button-back[enabled=false], span.nav-button-back.disabled {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
   opacity: 0.2;
   cursor: default;
 }
 
-/* line 499, new-ui.scss */
+/* line 500, new-ui.scss */
 span.nav-button-forward {
   float: right;
   margin: 3px;
   background-image: url("icons/nav-button-forward.png");
   background-repeat: no-repeat;
 }
-/* line 507, new-ui.scss */
+/* line 508, new-ui.scss */
 span.nav-button-forward[enabled=false], span.nav-button-forward.disabled {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
   opacity: 0.2;
   cursor: default;
 }
 
-/* line 499, new-ui.scss */
+/* line 500, new-ui.scss */
 span.nav-button-pinned {
   float: right;
   margin: 3px;
   background-image: url("icons/nav-button-pinned.png");
   background-repeat: no-repeat;
 }
-/* line 507, new-ui.scss */
+/* line 508, new-ui.scss */
 span.nav-button-pinned[enabled=false], span.nav-button-pinned.disabled {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
   opacity: 0.2;
   cursor: default;
 }
 
-/* line 521, new-ui.scss */
+/* line 522, new-ui.scss */
 span.switch-button {
   width: 10.8px;
   height: 10.8px;
@@ -617,33 +617,33 @@ span.switch-button {
   background-image: url("icons/switch-button.png");
   background-repeat: no-repeat;
 }
-/* line 532, new-ui.scss */
+/* line 533, new-ui.scss */
 span.switch-button:hover {
   background-image: url("icons/switch-button-hover.png");
   background-repeat: no-repeat;
 }
-/* line 538, new-ui.scss */
+/* line 539, new-ui.scss */
 span.switch-button.invisible {
   display: none;
 }
 
-/* line 543, new-ui.scss */
+/* line 544, new-ui.scss */
 span.word:hover {
   cursor: pointer;
   text-decoration: underline;
 }
 
-/* line 547, new-ui.scss */
+/* line 548, new-ui.scss */
 span.menu-word {
   background-color: #f7d04a;
 }
 
-/* line 550, new-ui.scss */
+/* line 551, new-ui.scss */
 span.word.search {
   background-color: #fffaa5;
 }
 
-/* line 553, new-ui.scss */
+/* line 554, new-ui.scss */
 span.word.match {
   background-color: #FFDAB9;
 }
@@ -651,26 +651,26 @@ span.word.match {
 /*******************************************************************************
 Base Components: Overlay
 *******************************************************************************/
-/* line 561, new-ui.scss */
+/* line 562, new-ui.scss */
 div.overlay {
   padding: 7.68px;
   position: absolute;
   width: 400px;
   background-color: white;
 }
-/* line 566, new-ui.scss */
+/* line 567, new-ui.scss */
 div.overlay div.overlay-render-target {
   width: 100%;
   height: 100%;
 }
-/* line 570, new-ui.scss */
+/* line 571, new-ui.scss */
 div.overlay span.nav-button-pinned, div.overlay span.nav-button-close {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 10000;
 }
-/* line 576, new-ui.scss */
+/* line 577, new-ui.scss */
 div.overlay span.overlay-title {
   font-family: "Bitter";
   font-weight: 300;
@@ -680,7 +680,7 @@ div.overlay span.overlay-title {
   top: 7.68px;
   left: 7.68px;
 }
-/* line 585, new-ui.scss */
+/* line 586, new-ui.scss */
 div.overlay div.x-box-inner {
   margin-top: 32px;
 }
@@ -688,24 +688,24 @@ div.overlay div.x-box-inner {
 /*******************************************************************************
 Derived Components: FrequentWordsList
 *******************************************************************************/
-/* line 607, new-ui.scss */
+/* line 608, new-ui.scss */
 div.frequent-words-list {
   float: left;
   padding: 10px;
 }
-/* line 595, new-ui.scss */
+/* line 596, new-ui.scss */
 div.frequent-words-list table.table tbody {
   overflow: auto;
   display: block;
   height: 300px;
   width: 270;
 }
-/* line 601, new-ui.scss */
+/* line 602, new-ui.scss */
 div.frequent-words-list table.table thead > tr {
   display: block;
 }
 
-/* line 613, new-ui.scss */
+/* line 614, new-ui.scss */
 td.frequent-word-word {
   min-width: 120px;
   max-width: 120px;
@@ -714,18 +714,18 @@ td.frequent-word-word {
   color: #64839f;
 }
 
-/* line 620, new-ui.scss */
+/* line 621, new-ui.scss */
 td.frequent-word-count {
   min-width: 60px;
   padding-right: 7.68px;
 }
 
-/* line 625, new-ui.scss */
+/* line 626, new-ui.scss */
 th.frequent-word-word {
   min-width: 120px;
 }
 
-/* line 628, new-ui.scss */
+/* line 629, new-ui.scss */
 th.frequent-word-count {
   min-width: 60px;
   padding-right: 7.68px;
@@ -735,14 +735,14 @@ th.frequent-word-count {
 /*******************************************************************************
 Derived Components: RelatedWordsList
 *******************************************************************************/
-/* line 595, new-ui.scss */
+/* line 596, new-ui.scss */
 div.related-words-list table.table tbody {
   overflow: auto;
   display: block;
   height: 300px;
   width: 220px;
 }
-/* line 601, new-ui.scss */
+/* line 602, new-ui.scss */
 div.related-words-list table.table thead > tr {
   display: block;
 }
@@ -750,52 +750,52 @@ div.related-words-list table.table thead > tr {
 /*******************************************************************************
 Derived Components: Treepanel
 *******************************************************************************/
-/* line 648, new-ui.scss */
+/* line 649, new-ui.scss */
 tr[level='1'] td.content:nth-of-type(1) {
   padding-left: 7.68px;
 }
 
-/* line 648, new-ui.scss */
+/* line 649, new-ui.scss */
 tr[level='2'] td.content:nth-of-type(1) {
   padding-left: 15.36px;
 }
 
-/* line 648, new-ui.scss */
+/* line 649, new-ui.scss */
 tr[level='3'] td.content:nth-of-type(1) {
   padding-left: 23.04px;
 }
 
-/* line 648, new-ui.scss */
+/* line 649, new-ui.scss */
 tr[level='4'] td.content:nth-of-type(1) {
   padding-left: 30.72px;
 }
 
-/* line 648, new-ui.scss */
+/* line 649, new-ui.scss */
 tr[level='5'] td.content:nth-of-type(1) {
   padding-left: 38.4px;
 }
 
-/* line 648, new-ui.scss */
+/* line 649, new-ui.scss */
 tr[level='6'] td.content:nth-of-type(1) {
   padding-left: 46.08px;
 }
 
-/* line 648, new-ui.scss */
+/* line 649, new-ui.scss */
 tr[level='7'] td.content:nth-of-type(1) {
   padding-left: 53.76px;
 }
 
-/* line 648, new-ui.scss */
+/* line 649, new-ui.scss */
 tr[level='8'] td.content:nth-of-type(1) {
   padding-left: 61.44px;
 }
 
-/* line 648, new-ui.scss */
+/* line 649, new-ui.scss */
 tr[level='9'] td.content:nth-of-type(1) {
   padding-left: 69.12px;
 }
 
-/* line 648, new-ui.scss */
+/* line 649, new-ui.scss */
 tr[level='10'] td.content:nth-of-type(1) {
   padding-left: 76.8px;
 }
@@ -803,14 +803,14 @@ tr[level='10'] td.content:nth-of-type(1) {
 /*******************************************************************************
 Derived Components: Set List
 *******************************************************************************/
-/* line 595, new-ui.scss */
+/* line 596, new-ui.scss */
 div.sets-list table.table tbody {
   overflow: auto;
   display: block;
   height: 150px;
   width: 400px;
 }
-/* line 601, new-ui.scss */
+/* line 602, new-ui.scss */
 div.sets-list table.table thead > tr {
   display: block;
 }
@@ -818,30 +818,30 @@ div.sets-list table.table thead > tr {
 /*******************************************************************************
 Base Components: MultiTable
 *******************************************************************************/
-/* line 666, new-ui.scss */
+/* line 667, new-ui.scss */
 ul.multitable {
   margin: 0px;
   padding: 0px;
 }
-/* line 670, new-ui.scss */
+/* line 671, new-ui.scss */
 ul.multitable li {
   list-style-type: none;
 }
-/* line 672, new-ui.scss */
+/* line 673, new-ui.scss */
 ul.multitable li.collapsed ul {
   display: none;
 }
-/* line 675, new-ui.scss */
+/* line 676, new-ui.scss */
 ul.multitable li.expanded ul {
   display: visible;
 }
-/* line 679, new-ui.scss */
+/* line 680, new-ui.scss */
 ul.multitable ul {
   padding-left: 0px;
   max-height: 200px;
   overflow: auto;
 }
-/* line 684, new-ui.scss */
+/* line 685, new-ui.scss */
 ul.multitable li.multitable-header {
   border-bottom: 1px solid #eeeeee;
   cursor: pointer;
@@ -850,31 +850,31 @@ ul.multitable li.multitable-header {
   font-weight: bold;
   font-size: 9px;
 }
-/* line 687, new-ui.scss */
+/* line 688, new-ui.scss */
 ul.multitable span.multitable-row {
   display: block;
 }
-/* line 690, new-ui.scss */
+/* line 691, new-ui.scss */
 ul.multitable span.multitable-cell {
   display: inline-block;
   padding-left: 4.8px;
   padding-right: 4.8px;
 }
-/* line 695, new-ui.scss */
+/* line 696, new-ui.scss */
 ul.multitable li.multitable-level-2 {
   cursor: default;
   padding-top: 4.8px;
   padding-bottom: 4.8px;
 }
-/* line 196, new-ui.scss */
+/* line 197, new-ui.scss */
 ul.multitable li.multitable-level-2.selected {
   background-color: #f7d04a;
 }
-/* line 199, new-ui.scss */
+/* line 200, new-ui.scss */
 ul.multitable li.multitable-level-2.selected:hover {
   background-color: #f7d04a;
 }
-/* line 202, new-ui.scss */
+/* line 203, new-ui.scss */
 ul.multitable li.multitable-level-2:hover {
   background-color: #eeeeee;
 }
@@ -882,37 +882,37 @@ ul.multitable li.multitable-level-2:hover {
 /*******************************************************************************
 Derived Components: Metadata multitable
 *******************************************************************************/
-/* line 721, new-ui.scss */
+/* line 722, new-ui.scss */
 li span.metadata-count {
   max-width: 60px;
   min-width: 60px;
 }
 
-/* line 725, new-ui.scss */
+/* line 726, new-ui.scss */
 li span.metadata-value {
   max-width: 120px;
   min-width: 120px;
 }
-/* line 728, new-ui.scss */
+/* line 729, new-ui.scss */
 li span.metadata-value.multitable-cell, li span.metadata-value.multitable-header-cell {
   color: #64839f;
   font-weight: bold;
 }
 
-/* line 733, new-ui.scss */
+/* line 734, new-ui.scss */
 li span.multitable-level-1 {
   font-weight: bold;
   color: #64839f;
   font-size: 12px;
-  font-family: helvetica, arial, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
   margin-bottom: 12.288px;
   text-transform: capitalize;
 }
-/* line 712, new-ui.scss */
+/* line 713, new-ui.scss */
 li span.multitable-level-1 span.action-button-toggle-expand, li span.multitable-level-1 span.action-button-toggle-contract {
   top: 8px;
 }
-/* line 715, new-ui.scss */
+/* line 716, new-ui.scss */
 li span.multitable-level-1 span.metadata-category {
   padding-left: 4.8px;
   padding-right: 4.8px;
@@ -921,7 +921,7 @@ li span.multitable-level-1 span.metadata-category {
 /*******************************************************************************
 Base Components: Landing Page
 *******************************************************************************/
-/* line 744, new-ui.scss */
+/* line 745, new-ui.scss */
 div.landing-page {
   overflow: scroll;
   background-color: #64839f;
@@ -929,7 +929,7 @@ div.landing-page {
   margin: 4.8px;
   padding: 3px;
 }
-/* line 750, new-ui.scss */
+/* line 751, new-ui.scss */
 div.landing-page div.landingpage-render-target {
   position: absolute;
   top: 109px;
@@ -937,7 +937,7 @@ div.landing-page div.landingpage-render-target {
   right: 3px;
   bottom: 4.8px;
 }
-/* line 757, new-ui.scss */
+/* line 758, new-ui.scss */
 div.landing-page div.main-header {
   height: 109px;
   width: 100%;
@@ -946,7 +946,7 @@ div.landing-page div.main-header {
   color: white;
   font-size: 40;
 }
-/* line 764, new-ui.scss */
+/* line 765, new-ui.scss */
 div.landing-page div.main-header h1 {
   margin: 0px;
 }
@@ -954,7 +954,7 @@ div.landing-page div.main-header h1 {
 /*******************************************************************************
 Base Components: Menu
 *******************************************************************************/
-/* line 775, new-ui.scss */
+/* line 776, new-ui.scss */
 .menu, .autosuggest-menu {
   padding: 1px;
   border: 2px solid #f7d04a;
@@ -962,7 +962,7 @@ Base Components: Menu
 }
 
 /* creates the larger triangle */
-/* line 782, new-ui.scss */
+/* line 783, new-ui.scss */
 .menu:before, .autosuggest-menu:before {
   top: 10px;
   /* controls vertical position */
@@ -974,7 +974,7 @@ Base Components: Menu
 }
 
 /* creates the smaller  triangle */
-/* line 791, new-ui.scss */
+/* line 792, new-ui.scss */
 .menu:after, .autosuggest-menu:after {
   top: 16px;
   /* value = (:before top) + (:before border-top) - (:after border-top) */
@@ -985,13 +985,13 @@ Base Components: Menu
   border-color: transparent #fff;
 }
 
-/* line 799, new-ui.scss */
+/* line 800, new-ui.scss */
 .menuitem, .autosuggest-menuitem {
   cursor: pointer;
   display: block;
   padding: 7.68px;
 }
-/* line 802, new-ui.scss */
+/* line 803, new-ui.scss */
 .menuitem.hovered, .hovered.autosuggest-menuitem {
   background: #f7d04a;
 }
@@ -999,7 +999,7 @@ Base Components: Menu
 /*******************************************************************************
 Derived Components: AutoSuggest Menu
 *******************************************************************************/
-/* line 812, new-ui.scss */
+/* line 813, new-ui.scss */
 .autosuggest-menu {
   border: 0px;
   -webkit-box-shadow: 10px, 0px, 5px;
@@ -1010,14 +1010,14 @@ Derived Components: AutoSuggest Menu
 /*******************************************************************************
 Base Components: Overviews
 *******************************************************************************/
-/* line 826, new-ui.scss */
+/* line 827, new-ui.scss */
 div.overview {
   position: static;
   margin: 4.8px;
   padding: 3px;
   margin-right: 50px;
 }
-/* line 831, new-ui.scss */
+/* line 832, new-ui.scss */
 div.overview div.overview-render-target {
   position: absolute;
   top: 100px;
@@ -1025,7 +1025,7 @@ div.overview div.overview-render-target {
   right: 3px;
   bottom: 4.8px;
 }
-/* line 838, new-ui.scss */
+/* line 839, new-ui.scss */
 div.overview div.overview-header {
   height: 109px;
   width: 100%;
@@ -1034,34 +1034,34 @@ div.overview div.overview-header {
   font-weight: 700;
   color: white;
 }
-/* line 846, new-ui.scss */
+/* line 847, new-ui.scss */
 div.overview div.range-facet {
   position: static !important;
   background-color: transparent;
   display: block;
 }
-/* line 223, new-ui.scss */
+/* line 224, new-ui.scss */
 div.overview div.range-facet div.databox-header {
   color: white;
   background-color: transparent;
 }
-/* line 848, new-ui.scss */
+/* line 849, new-ui.scss */
 div.overview div.range-facet .axis text {
   fill: #eeeeee;
 }
-/* line 851, new-ui.scss */
+/* line 852, new-ui.scss */
 div.overview div.range-facet .axis line, div.overview div.range-facet .axis path {
   stroke: #eeeeee;
 }
-/* line 854, new-ui.scss */
+/* line 855, new-ui.scss */
 div.overview div.range-facet .brush rect.extent {
   fill: #000000;
 }
-/* line 857, new-ui.scss */
+/* line 858, new-ui.scss */
 div.overview div.range-facet .background.bar {
   stroke: #eeeeee;
 }
-/* line 860, new-ui.scss */
+/* line 861, new-ui.scss */
 div.overview div.range-facet .title span {
   color: #eeeeee;
 }
@@ -1069,34 +1069,81 @@ div.overview div.range-facet .title span {
 /*******************************************************************************
 Derived Components: Range Facets
 *******************************************************************************/
-/* line 869, new-ui.scss */
+/* line 870, new-ui.scss */
 div.range-facet {
   height: 100px;
 }
-/* line 872, new-ui.scss */
+/* line 873, new-ui.scss */
 div.range-facet.x-box-item {
   position: static !important;
 }
-/* line 875, new-ui.scss */
+/* line 876, new-ui.scss */
 div.range-facet div.chart.collapsed {
   display: none;
 }
 
-/* line 882, new-ui.scss */
+/* line 883, new-ui.scss */
 div.rangefacets div.range-facet div.databox-header {
   font-weight: bold;
   color: #64839f;
   font-size: 12px;
-  font-family: helvetica, arial, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
   margin-bottom: 12.288px;
   text-transform: capitalize;
 }
-/* line 712, new-ui.scss */
+/* line 713, new-ui.scss */
 div.rangefacets div.range-facet div.databox-header span.action-button-toggle-expand, div.rangefacets div.range-facet div.databox-header span.action-button-toggle-contract {
   top: 8px;
 }
-/* line 715, new-ui.scss */
+/* line 716, new-ui.scss */
 div.rangefacets div.range-facet div.databox-header span.metadata-category {
   padding-left: 4.8px;
   padding-right: 4.8px;
+}
+
+/*******************************************************************************
+Base Components: Sentence List Widget
+*******************************************************************************/
+/* line 892, new-ui.scss */
+div.sentence {
+  font-family: "Bitter";
+  line-height: 1.5;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+/* line 899, new-ui.scss */
+div.metatag {
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  float: left;
+  margin-right: 16px;
+  margin-bottom: 16px;
+  height: 28px;
+  border: 1px solid #808080;
+}
+/* line 906, new-ui.scss */
+div.metatag span {
+  display: inline-block;
+  height: 28px;
+  padding: 0 10px;
+  color: #808080;
+}
+/* line 911, new-ui.scss */
+div.metatag span.key {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 13px;
+  line-height: 26px;
+  border-right: 1px solid #808080;
+  height: 27px;
+}
+/* line 919, new-ui.scss */
+div.metatag span.value {
+  font-size: 15px;
+  line-height: 24px;
+  font-weight: 300;
+}
+/* line 925, new-ui.scss */
+div.metatag:last-child {
+  margin-bottom: 36px;
 }
