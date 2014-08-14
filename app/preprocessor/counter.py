@@ -65,7 +65,7 @@ def count(project):
     count = 1
     for row in sequences_in_sentences:
         if count % 100 == 0:
-            project_logger.info("Calculating count for dependency %s/%s", count,
+            project_logger.info("Calculating count for sequence %s/%s", count,
                 len(sequences_in_sentences))
 
         sequence = Sequence.query.get(row.sequence_id)
