@@ -158,7 +158,7 @@ class ParseTests(unittest.TestCase):
 
         sent.add_dependency.assert_has_calls(expected_added_deps)
 
-    @mock.patch.object(t, "logger", autospec=True)
+    @mock.patch.object(t, "project_logger", autospec=True)
     def test_parse_twosentences(self, mock_logger, mock_parser, mock_tokenizer):
         """Check to make sure that parse() will log a warning on multiple
         sentences.
