@@ -31,11 +31,19 @@ class ErrorLog(Log):
         "polymorphic_identity": "error"
     }
 
+class WarningLog(Log):
+    """A warning log.
+    """
+
+    __mapper_args__ = {
+        "polymorphic_identity": "warning"
+    }
+
 class InfoLog(Log):
     """An info log.
     """
 
     __mapper_args__ = {
-        "polymorphic_identity": "info"
+        "polymorphic_identity": "warning"
     }
 
