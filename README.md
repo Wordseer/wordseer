@@ -1,7 +1,8 @@
 wordseer_extjs
 ==============
 
-[![Stories in Ready](https://badge.waffle.io/Wordseer/wordseer_extjs.svg?label=In%20Progress&title=In%20Progress)](http://waffle.io/Wordseer/wordseer_extjs)
+[![Stories in Ready](https://badge.waffle.io/Wordseer/wordseer_extjs.svg?label=ready&title=Ready)](http://waffle.io/Wordseer/wordseer_extjs) 
+[![Stories in progress](https://badge.waffle.io/Wordseer/wordseer_extjs.svg?label=In%20Progress&title=In%20Progress)](http://waffle.io/Wordseer/wordseer_extjs)
 
 Ext JS-powered frontend app for Wordseer
 
