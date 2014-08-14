@@ -24,7 +24,6 @@ from app.models import InfoLog
 from app.models import ErrorLog
 from app.models import WarningLog
 import database
-import pdb
 
 class TestWordModel(unittest.TestCase):
     """Tests for the ``Word`` model.
