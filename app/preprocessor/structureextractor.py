@@ -15,7 +15,7 @@ from app.models.sentence import Sentence
 from app.models.unit import Unit
 from app.models.property import Property
 from app import db
-from . import helpers
+from . import logger
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
@@ -34,6 +34,8 @@ class StructureExtractor(object):
         self.structure_file = open(structure_file, "r")
         self.document_structure = json.load(self.structure_file)
         self.logger = logging.getLogger(__name__)
+        self.project_logger = logger.ProjectLogger(self.logger,
+                str_proc.project)
 
     def extract(self, infile):
         """Extract ``Document``\s from a ``DocumentFile``. This method uses the
@@ -52,8 +54,8 @@ class StructureExtractor(object):
         try:
             doc = etree.parse(infile)
         except(etree.XMLSyntaxError) as e:
-            self.log_error("XML Error: " + str(e) + "; skipping file")
-            self.logger.info(infile)
+            self.project_logger.error("XML Error: %s; skipping file", str(e))
+            self.project_logger.info(infile)
             return documents
 
         extracted_units = self.extract_unit_information(self.document_structure,
@@ -66,11 +68,11 @@ class StructureExtractor(object):
                 DocumentFile.path == infile
             ).one()
         except NoResultFound:
-            self.logger.warning("Could not find file with path %s, making "
+            self.project_logger.warning("Could not find file with path %s, making "
                 "new one", infile)
             document_file = DocumentFile()
         except MultipleResultsFound:
-            self.log_error("Found multiple files with path %s, "
+            self.project_logger.error("Found multiple files with path %s, "
                 "skipping.", infile)
             return DocumentFile()
 
@@ -216,12 +218,6 @@ class StructureExtractor(object):
             result_sentences.append(sentence)
 
         return result_sentences
-
-    def log_error(self, msg, *args, **kwargs):
-        """Shortcut for helpers.log_error.
-        """
-        helpers.log_error(self.logger, self.str_proc.project, msg, *args,
-            **kwargs)
 
 def get_metadata(structure, node):
     """Return a list of Property objects of the metadata of the Tags in

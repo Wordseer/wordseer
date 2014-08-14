@@ -12,7 +12,7 @@ from app.models.grammaticalrelationship import GrammaticalRelationship
 from app import db
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
-import helpers
+from .logger import ProjectLogger
 
 class StringProcessor(object):
     """Tokenize or parse a string.
@@ -25,6 +25,7 @@ class StringProcessor(object):
         self.logger = logging.getLogger(__name__)
         self.parser = StanfordCoreNLP(app.config["CORE_NLP_DIR"])
         self.project = project
+        self.project_logger = ProjectLogger(self.logger, project)
 
     def tokenize(self, txt):
         """Turn a string of one or more ``Sentence``\s into a list of
@@ -38,7 +39,8 @@ class StringProcessor(object):
 
         for sentence_text in split_sentences(txt):
             sentence = self.parse_with_error_handling(sentence_text)
-            sentences.extend(tokenize_from_raw(sentence, sentence_text, self.project))
+            sentences.extend(tokenize_from_raw(sentence, sentence_text,
+                self.project))
 
         return sentences
 
@@ -64,7 +66,7 @@ class StringProcessor(object):
         parsed_sentence = parsed["sentences"][0]
 
         if len(parsed["sentences"]) > 1:
-            self.logger.warning("More than one sentence passed in to"
+            self.project_logger.warning("More than one sentence passed in to"
                 " StringProcessor.parse().")
             # TODO: combine sentence
 
@@ -98,8 +100,8 @@ class StringProcessor(object):
                                 filter_by(name = grammatical_relationship).\
                                 one()
                         except(MultipleResultsFound):
-                            self.log_error("duplicate records found for: %s",
-                                str(key))
+                            self.project_logger.error("duplicate records found "
+                                "for: %s", str(key))
                         except(NoResultFound):
                             relationship = GrammaticalRelationship(
                                 name = grammatical_relationship)
@@ -128,9 +130,9 @@ class StringProcessor(object):
                         governor.id
                         dependent.id
                     except:
-                        self.log_error("Governor or dependent not found; "
-                            "giving up on parse.")
-                        self.logger.info(sentence)
+                        self.project_logger.error("Governor or dependent not "
+                            "found; giving up on parse.")
+                        self.project_logger.info(sentence)
                         return sentence
 
                     key = (relationship.name, governor.id, dependent.id)
@@ -187,8 +189,8 @@ class StringProcessor(object):
 
         # Check for non-string
         if not isinstance(text, str) and not isinstance(text, unicode):
-            self.logger.warning("Parser got a non-string argument")
-            self.logger.info(text)
+            self.project_logger.warning("Parser got a non-string argument: %s",
+                text)
             return None
 
         # Check for non-unicode
@@ -201,17 +203,17 @@ class StringProcessor(object):
             try:
                 text = unicode(text)
             except(UnicodeDecodeError):
-                self.logger.warning("The following sentence text is not "
-                    "unicode; convertion failed.")
-                self.logger.info(text)
+                self.project_logger.warning("The following sentence text is "
+                    "not unicode; convertion failed.")
+                self.project_logger.info(text)
 
                 # Skip sentence if flag is True
                 if app.config["SKIP_SENTENCE_ON_ERROR"]:
                     return None
                 else:
                     # Try to parse the sentence anyway
-                    self.logger.warning("Attempting to parse non-unicode "
-                        "sentence.")
+                    self.project_logger.warning("Attempting to parse "
+                        "non-unicode sentence.")
 
         # Check for empty or nonexistent text
         if text == "" or text == None:
@@ -227,22 +229,17 @@ class StringProcessor(object):
         # TODO: handle all errors properly
         # ProcessError, TimeoutError, OutOfMemoryError
         except TimeoutError as e:
-            self.log_error("Got a TimeoutError: %s", str(e))
+            self.project_logger.error("Got a TimeoutError: %s", str(e))
             return None
         except ProcessError as e:
-            self.log_error("Got a ProcessError: %s", str(e))
+            self.project_logger.error("Got a ProcessError: %s", str(e))
             return None
         except:
-            self.log_error("Unknown error")
+            self.project_logger.error("Unknown error")
             return None
 
         # Parse successful, return parsed text
         return parsed_text
-
-    def log_error(self, msg, *args, **kwargs):
-        """Shortcut for helpers.log_error.
-        """
-        helpers.log_error(self.logger, self.project, msg, *args, **kwargs)
 
 def split_sentences(text):
     """Split the string into sentences.
