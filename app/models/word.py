@@ -66,4 +66,3 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         """
 
         return "<Word: " + str(self.word) + ">"
-

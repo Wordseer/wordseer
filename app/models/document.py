@@ -30,12 +30,17 @@ class Document(Unit, NonPrimaryKeyEquivalenceMixin):
     id = db.Column(db.Integer, db.ForeignKey("unit.id"), primary_key=True)
     title = db.Column(db.String, index=True)
     sentence_count = db.Column(db.Integer)
+    document_file_id = db.Column(db.Integer, db.ForeignKey("document_file.id"))
 
-    # Relationships
+    # Documents should not have parents
     parent_id = None
     parent = None
-    #children = db.relationship("Unit", backref="parent") FIXME: No parents
-    document_file_id = db.Column(db.Integer, db.ForeignKey("document_file.id"))
+
+    # Relationships
+    sequence_in_sentence = db.relationship("SequenceInSentence",
+        backref="document", lazy="dynamic")
+    dependency_in_sentence = db.relationship("DependencyInSentence",
+        backref="document", lazy="dynamic")
 
     __mapper_args__ = {
         "polymorphic_identity": "document",

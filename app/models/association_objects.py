@@ -25,8 +25,6 @@ class WordInSentence(db.Model, Base):
     part_of_speech = db.Column(db.String)
     surface = db.Column(db.String)
 
-    project = db.relationship("Project")
-
     sentence = db.relationship("Sentence",
         backref=db.backref(
             "word_in_sentence", cascade="all, delete-orphan"))
@@ -51,9 +49,6 @@ class SequenceInSentence(db.Model, Base):
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
     position = db.Column(db.Integer)
 
-    project = db.relationship("Project")
-    document = db.relationship("Document")
-
     sequence = db.relationship("Sequence",
         backref=db.backref(
             "sequence_in_sentence", cascade="all, delete-orphan"))
@@ -73,8 +68,6 @@ class WordInSequence(db.Model, Base):
     word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
     sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
-
-    project = db.relationship("Project")
 
     word = db.relationship("Word",
         backref=db.backref(
@@ -107,9 +100,6 @@ class DependencyInSentence(db.Model, Base):
     dependent_index = db.Column(db.Integer)
     governor_part_of_speech = db.Column(db.String)
     dependent_part_of_speech = db.Column(db.String)
-
-    project = db.relationship("Project")
-    document = db.relationship("Document")
 
     dependency = db.relationship("Dependency",
         backref=db.backref(

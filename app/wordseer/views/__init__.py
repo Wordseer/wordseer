@@ -1,1 +1,1 @@
-__all__ = ["ext_app", "documents", "properties_view", "sequences_view"]
+__all__ = ["ext_app", "documents", "properties_view", "sequences_view", "words_view"]

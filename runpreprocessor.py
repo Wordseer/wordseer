@@ -8,7 +8,7 @@ import database
 
 collection_name = "articles"
 
-if sys.argv[1]:
+if len(sys.argv) > 1 and sys.argv[1]:
     collection_name = sys.argv[1]
 
 collection_dir = os.path.join("tests", "data", collection_name)

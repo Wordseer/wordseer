@@ -20,7 +20,7 @@ Ext.define('WordSeer.store.FrequentWordsStore', {
 		type: 'ajax',
 		noCache: false,
 		timeout: 9000000,
-		url: ws_api_path + 'associated-words/get-frequent-words/',
+		url: ws_api_path + 'projects/' + project_id + '/words',
 		extraParams: {
 			instance: getInstance(),
 			user: getUsername()

@@ -8,28 +8,30 @@ from app.models import *
 
 from app.helpers.application_view import register_rest_view
 
-class SequencesView(MethodView):
+class WordsView(MethodView):
 
     def get(self, **kwargs):
         params = dict(kwargs, **request.args)
         keys = params.keys()
+        
+        if "project_id" in keys:
 
-        if "project_id" in keys: 
             project = Project.query.get(params["project_id"])
-            position = int(params["start"][0])
-            length = int(params["length"][0])
-            limit = int(params["limit"][0])
+            part_of_speech = params["pos"][0]
+            position = params["start"][0]
+            limit = params["limit"][0]
+
+            words = project.frequent_words(part_of_speech, position, limit)
 
             results = []
 
-            sequences = project.frequent_sequences(position, length, limit)
-
-            for sequence in sequences:
+            for word in words:
                 results.append({
-                    "count": sequence.sentence_count,
-                    "sequence": sequence.sequence,
+                    "word": word.word,
+                    "count": 0
                 })
 
+            print(results)
             return jsonify(results = results)
 
     def post(self):
@@ -41,11 +43,10 @@ class SequencesView(MethodView):
     def put(self, property_id):
         pass
         
-
 register_rest_view(
-    SequencesView,
+    WordsView,
     wordseer,
-    'sequences_view',
-    'sequence',
+    'words_view',
+    'word',
     parents=["project"],
 )
