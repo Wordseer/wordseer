@@ -168,3 +168,16 @@ non-functional. #}
     </table>
 {% endmacro %}
 
+{% macro show_logs(logs, div_class) %}
+    {# Print a list of errors. #}
+    {% if logs %}
+        <div class="{{div_class}}">
+            <ul>
+                {% for log in logs %}
+                <li><em>{{log.log_item}}</em>: {{log.item_value}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endmacro %}
+

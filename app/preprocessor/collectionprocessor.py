@@ -7,6 +7,7 @@ import logging
 import os
 
 from app import app
+from app.models import Project
 import database
 from . import logger
 from .documentparser import DocumentParser
@@ -14,17 +15,16 @@ from .sequenceprocessor import SequenceProcessor
 from . import structureextractor
 from .stringprocessor import StringProcessor
 from . import counter
-
 from app.models import Document, Base
 
 class CollectionProcessor(object):
     """Process a collection of files.
     """
-    def __init__(self, project):
-        self.str_proc = StringProcessor(project)
+    def __init__(self, project_id):
+        self.project = Project.query.get(project_id)
+        self.str_proc = StringProcessor(self.project)
         self.pylogger = logging.getLogger(__name__)
-        self.project_logger = logger.ProjectLogger(self.pylogger, project)
-        self.project = project
+        self.project_logger = logger.ProjectLogger(self.pylogger, self.project)
 
     def process(self, collection_dir, docstruc_filename,
         filename_extension, start_from_scratch):
@@ -52,7 +52,6 @@ class CollectionProcessor(object):
 	    # Set up database if necessary
         if start_from_scratch is True:
             database.reset()
-
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
         if not "true" in logger.get(self.project,

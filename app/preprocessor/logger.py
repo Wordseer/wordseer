@@ -61,6 +61,7 @@ class ProjectLogger(object):
         Keyword Arguments:
             force (boolean): Commit immediately if ``True`` (default ``True``).
         """
+        kwargs["log_item"] = kwargs.get("log_item", "Info")
         self.log(self.logger.info, message, InfoLog, *args, **kwargs)
 
     def warning(self, message, *args, **kwargs):
@@ -74,6 +75,7 @@ class ProjectLogger(object):
         Keyword Arguments:
             force (boolean): Commit immediately if ``True`` (default ``True``).
         """
+        kwargs["log_item"] = kwargs.get("log_item", "Warning")
         self.log(self.logger.warning, message, WarningLog, *args, **kwargs)
 
     def error(self, message, *args, **kwargs):
@@ -87,6 +89,7 @@ class ProjectLogger(object):
         Keyword Arguments:
             force (boolean): Commit immediately if ``True`` (default ``True``).
         """
+        kwargs["log_item"] = kwargs.get("log_item", "Error")
         self.log(self.logger.error, message, ErrorLog, *args, **kwargs)
 
 def log(project, item, value, replace_value):

@@ -70,7 +70,9 @@
             {{ macros.selection_table(process_form.selection, "document",
                 "table table-striped table-hover click-anywhere",
                 "File Name", "uploader.document_show", project_id=project.id) }}
-
+            {{ macros.show_logs(project_errors, "alert alert-danger") }}
+            {{ macros.show_logs(project_warnings, "alert, alert-warnings") }}
+            {{ macros.show_logs(project_infos, "alert alert-info") }}
     <h3>Selected file actions:</h3>
     {{ process_form.structure_button(class="btn btn-info",
                 icon="glyphicon-list", id='structure-button') }}
