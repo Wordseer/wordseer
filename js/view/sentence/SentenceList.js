@@ -72,7 +72,6 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
 
         this.columns = [
             {
-                headerTitle:'Sentence',
                 field:'sentence',
                 cls:'word-wrap',
                 flex:5,
@@ -80,19 +79,11 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
             }
         ];
 
-        var model = this.getStore().model;
-        var base_field_names = model.getBaseFieldNames();
-        var all_fields = model.getFields();
-        for (var i = 0; i < all_fields.length; i++) {
-            var field = all_fields[i];
-            if (!base_field_names.contains(field.name)) {
-                this.columns.push({
-                    headerTitle: field.text.length > 0 ? field.text: field.name,
-                    field: field.name,
-                    flex: 1,
-                });
-            }
-        }
+        // store this data in instance for sentence renderer metadata
+        this.model = this.getStore().model;
+        this.base_field_names = this.model.getBaseFieldNames();
+        this.all_fields = this.model.getFields();
+
         this.callParent(arguments);
 
     },
@@ -117,7 +108,17 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
     */
     renderSentence: function(record, field, view){
         var sentence = record.get(field);
-        var html = sentence.words;
+        var html = "<div class='sentence'>" + sentence.words + "</div>";
+        for (var i = 0; i < view.all_fields.length; i++) {
+            var metafield = view.all_fields[i];
+            if (!view.base_field_names.contains(metafield.name)) {
+                var key = metafield.text;
+                var value = record.get(metafield.name);
+                html = html + "<div class='metatag'><span class='key'>" + key +
+                    "</span><span class='value'>" + value + "</span></div>";
+            }
+        }
+
         var me = view;
         if (html && html.length > 0) {
             var sentence_sets = record.get('sentence_set');
@@ -155,21 +156,4 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
             return null;
         }
     },
-    // listeners: {
-    //     afterrender: function( eOpts ) {
-    //         view = this.getView();
-    //         view.tip = Ext.create('Ext.tip.ToolTip', {
-    //             target: view.el,
-    //             delegate: view.itemSelector,
-    //             trackMouse: true,
-    //             renderTo: Ext.getBody(),
-    //             listeners: {
-    //                 beforeshow: function updateTipBody(tip) {
-    //                     tip.update(
-    //                         "Double click to see this sentence in context.");
-    //                 }
-    //             }
-    //         });
-    //     }
-    // }
 });
