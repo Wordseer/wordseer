@@ -30,6 +30,7 @@ class TestCollectionProcessor(unittest.TestCase):
     """
     def setUp(self):
         database.clean()
+        colproc.project = Project()
 
     @mock.patch("app.preprocessor.collectionprocessor.structureextractor",
         autospec=True)
