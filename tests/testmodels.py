@@ -135,10 +135,12 @@ class TestSentenceModel(unittest.TestCase):
         """
 
         sentence = Sentence(text="foo")
-        dependency = Dependency(sentence_count=4)
+        word = Word(word="foo")
+        dependency = Dependency(governor=word)
 
         sentence.save()
         dependency.save()
+        word.save()
 
         rel = sentence.add_dependency(dependency, governor_index=1,
             dependent_index=2)
