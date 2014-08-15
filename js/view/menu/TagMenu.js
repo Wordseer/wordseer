@@ -31,7 +31,7 @@ Ext.define('WordSeer.view.menu.TagMenu', {
         me.key = tag.attr('metaname');
         me.value = tag.children('.value').text();
         me.key_display = tag.children('.key').text();
-        me.tag_display = me.key_display + " = " + me.value;
+        me.tag_display = me.key_display + " = " + String(me.value).trim();
 
         me.items = [
             {
