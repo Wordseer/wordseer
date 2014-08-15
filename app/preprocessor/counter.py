@@ -18,14 +18,12 @@ def count(project):
     """
 
     logger = logging.getLogger(__name__)
+    project_logger = ProjectLogger(logger, project)
 
     count = 0
     commit_interval = 500
 
     # Calculate counts for documents
-    logger = logging.getLogger(__name__)
-    project_logger = ProjectLogger(logger, project)
-
     documents = project.get_documents()
 
     project_logger.info("Calculating counts for documents")
@@ -41,7 +39,7 @@ def count(project):
                 len(documents))
 
     db.session.commit()
-    project_logger.info('Counted %s documents.' % total_count)
+    project_logger.info('Counted %s documents.', len(documents))
 
     # Calculate counts for dependencies
     dependencies_in_sentences = db.session.execute("""

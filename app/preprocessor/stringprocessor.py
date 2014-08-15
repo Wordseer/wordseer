@@ -22,10 +22,12 @@ class StringProcessor(object):
         """Instantiate and ready the parser. Note that readying the parser takes
         some time.
         """
-        self.logger = logging.getLogger(__name__)
         self.parser = StanfordCoreNLP(app.config["CORE_NLP_DIR"])
         self.project = project
-        self.project_logger = ProjectLogger(self.logger, project)
+
+        logger = logging.getLogger(__name__)
+        global project_logger
+        project_logger = ProjectLogger(logger, project)
 
     def tokenize(self, txt):
         """Turn a string of one or more ``Sentence``\s into a list of
@@ -66,7 +68,7 @@ class StringProcessor(object):
         parsed_sentence = parsed["sentences"][0]
 
         if len(parsed["sentences"]) > 1:
-            self.project_logger.warning("More than one sentence passed in to"
+            project_logger.warning("More than one sentence passed in to"
                 " StringProcessor.parse().")
             # TODO: combine sentence
 
@@ -100,7 +102,7 @@ class StringProcessor(object):
                                 filter_by(name = grammatical_relationship).\
                                 one()
                         except(MultipleResultsFound):
-                            self.project_logger.error("duplicate records found "
+                            project_logger.error("duplicate records found "
                                 "for: %s", str(key))
                         except(NoResultFound):
                             relationship = GrammaticalRelationship(
@@ -130,9 +132,9 @@ class StringProcessor(object):
                         governor.id
                         dependent.id
                     except:
-                        self.project_logger.error("Governor or dependent not "
+                        project_logger.error("Governor or dependent not "
                             "found; giving up on parse.")
-                        self.project_logger.info(sentence)
+                        project_logger.info(sentence)
                         return sentence
 
                     key = (relationship.name, governor.id, dependent.id)
@@ -189,7 +191,7 @@ class StringProcessor(object):
 
         # Check for non-string
         if not isinstance(text, str) and not isinstance(text, unicode):
-            self.project_logger.warning("Parser got a non-string argument: %s",
+            project_logger.warning("Parser got a non-string argument: %s",
                 text)
             return None
 
@@ -203,16 +205,16 @@ class StringProcessor(object):
             try:
                 text = unicode(text)
             except(UnicodeDecodeError):
-                self.project_logger.warning("The following sentence text is "
+                project_logger.warning("The following sentence text is "
                     "not unicode; convertion failed.")
-                self.project_logger.info(text)
+                project_logger.info(text)
 
                 # Skip sentence if flag is True
                 if app.config["SKIP_SENTENCE_ON_ERROR"]:
                     return None
                 else:
                     # Try to parse the sentence anyway
-                    self.project_logger.warning("Attempting to parse "
+                    project_logger.warning("Attempting to parse "
                         "non-unicode sentence.")
 
         # Check for empty or nonexistent text
@@ -229,13 +231,13 @@ class StringProcessor(object):
         # TODO: handle all errors properly
         # ProcessError, TimeoutError, OutOfMemoryError
         except TimeoutError as e:
-            self.project_logger.error("Got a TimeoutError: %s", str(e))
+            project_logger.error("Got a TimeoutError: %s", str(e))
             return None
         except ProcessError as e:
-            self.project_logger.error("Got a ProcessError: %s", str(e))
+            project_logger.error("Got a ProcessError: %s", str(e))
             return None
         except:
-            self.project_logger.error("Unknown error")
+            project_logger.error("Unknown error")
             return None
 
         # Parse successful, return parsed text
@@ -250,8 +252,6 @@ def split_sentences(text):
     :param str text: The text to split
     """
 
-    logger = logging.getLogger(__name__)
-
     sentences = []
 
     # Split sentences using NLTK
@@ -265,8 +265,8 @@ def split_sentences(text):
         approx_sentence_length = len(sentence_text.split(" "))
 
         if approx_sentence_length > max_length:
-            logger.warning("Sentence appears to be too long, max length " +
-                "is %s: %s", str(max_length),
+            project_logger.warning("Sentence appears to be too long, max "
+                "length is %s: %s", str(max_length),
                 sentence_text[:truncate_length] + "...")
 
             # Attempt to split on a suitable punctuation mark
@@ -284,8 +284,8 @@ def split_sentences(text):
                 if all([len(subsentence.split(" ")) <= max_length
                     for subsentence in subsentences]):
 
-                    logger.info("Splitting sentence around %s to fit length "
-                        "limit.", character)
+                    project_logger.info("Splitting sentence around %s to fit "
+                        "length limit.", character)
                     break
 
                 # Otherwise, reset subsentences and try again
@@ -294,8 +294,8 @@ def split_sentences(text):
 
             # If none of the split characters worked, force split on max_length
             if not subsentences:
-                logger.warning("No suitable punctuation for splitting; " +
-                    "forcing split on max_length number of words")
+                project_logger.warning("No suitable punctuation for " +
+                    "splitting; forcing split on max_length number of words")
                 subsentences = []
                 split_sentence = sentence_text.split(" ")
 
@@ -328,8 +328,6 @@ def tokenize_from_raw(parsed_text, txt, project):
     # If parsed_text is the result of a failed parse, return with an empty list
     if not parsed_text:
         return []
-
-    logger = logging.getLogger(__name__)
 
     paragraph = [] # a list of Sentences
     words = dict()
@@ -367,7 +365,8 @@ def tokenize_from_raw(parsed_text, txt, project):
                         part_of_speech = part_of_speech
                     ).one()
                 except(MultipleResultsFound):
-                    logger.warning("Duplicate records found for: %s", str(key))
+                    project_logger.warning("Duplicate records found for: %s",
+                        str(key))
                 except(NoResultFound):
                     word = Word(
                         word = word,

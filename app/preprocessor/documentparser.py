@@ -16,10 +16,11 @@ class DocumentParser(object):
     """Handle parsing a document.
     """
     def __init__(self, parser, project):
-        self.pylogger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(__name__)
         self.parser = parser
         self.sequence_processor = SequenceProcessor(project)
         self.project = project
+        self.project_logger = logging.ProjectLogger(self.logger, self.project)
 
     def parse_document(self, document):
         """Parse a document and write it to the database.
@@ -59,8 +60,8 @@ class DocumentParser(object):
 
                 if count % 50 == 0 or count == sentence_count:
                     average_time = (datetime.now() - start_time).total_seconds()
-                    self.pylogger.info("Average parse speed after %s sentences:"
-                        " %s seconds per sentence", str(count),
+                    self.project_logger.info("Average parse speed after %s "
+                        "sentences: %s seconds per sentence", str(count),
                         str(average_time / count))
 
                     # products = []
