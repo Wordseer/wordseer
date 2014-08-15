@@ -36,8 +36,6 @@ class Sequence(db.Model, Base):
     has_function_words = db.Column(db.Boolean, index=True)
     all_function_words = db.Column(db.Boolean, index=True)
     length = db.Column(db.Integer, index=True)
-    sentence_count = db.Column(db.Integer, index=True, default=0)
-    document_count = db.Column(db.Integer, index=True, default=0)
 
     # Relationships
 
