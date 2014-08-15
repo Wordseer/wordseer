@@ -25,6 +25,9 @@ Ext.define('WordSeer.controller.TagMenuController', {
             },
             'tagmenu > wordseer-menuitem[action=filter]': {
                 click: this.applyFilter,
+            },
+            'tagmenu > wordseer-menuitem[action=sort]': {
+                click: this.sortSentences,
             }
         });
     },
@@ -68,7 +71,6 @@ Ext.define('WordSeer.controller.TagMenuController', {
     **/
     applyFilter: function(menuitem, e){
         var menu = menuitem.up('tagmenu');
-        console.log(menu);
         var panel = menu.view.up('layout-panel');
         var filter_record = Ext.create('WordSeer.model.MetadataModel', {
             text: menu.value,
@@ -79,5 +81,10 @@ Ext.define('WordSeer.controller.TagMenuController', {
         panel.down('widget').setFormValues(panel.formValues);
         this.getController('SearchController').searchParamsChanged(panel,
             panel.formValues);
+    },
+
+    sortSentences: function(menuitem, e){
+        var menu = menuitem.up('tagmenu');
+        menu.view.getStore().sort(menu.key, menuitem.direction);
     }
 });

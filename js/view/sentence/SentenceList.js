@@ -74,7 +74,7 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
             {
                 field:'sentence',
                 cls:'word-wrap',
-                flex:5,
+                flex:10,
                 renderer: this.renderSentence
             }
         ];
@@ -83,7 +83,6 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
         this.model = this.getStore().model;
         this.base_field_names = this.model.getBaseFieldNames();
         this.all_fields = this.model.getFields();
-        this.metastore = null;
 
         this.callParent(arguments);
 

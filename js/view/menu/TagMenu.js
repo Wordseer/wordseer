@@ -42,10 +42,14 @@ Ext.define('WordSeer.view.menu.TagMenu', {
             {
                 xtype: 'wordseer-menuitem',
                 text: 'sort by "' + me.key_display + '" (asc)',
+                action: 'sort',
+                direction: 'ASC',
             },
             {
                 xtype: 'wordseer-menuitem',
                 text: 'sort by "' + me.key_display + '" (desc)',
+                action: 'sort',
+                direction: 'DESC',
             },
             {
                 xtype: 'wordseer-menuitem',
