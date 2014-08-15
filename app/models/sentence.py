@@ -8,6 +8,7 @@ from .project import Project
 from .association_objects import DependencyInSentence
 from .association_objects import SequenceInSentence
 from .association_objects import WordInSentence
+from .counts import WordCount, DependencyCount, SequenceCount
 
 class Sentence(db.Model, Base):
     """A model representing a sentence.
@@ -96,7 +97,7 @@ class Sentence(db.Model, Base):
             space_before=space_before,
             part_of_speech=part_of_speech,
         )
-        
+
         word_in_sentence.save(force=force)
 
         return word_in_sentence
@@ -132,11 +133,6 @@ class Sentence(db.Model, Base):
             dependent_index=dependent_index
         )
 
-        if not dependency.sentence_count:
-            dependency.sentence_count = 1
-        else:
-            dependency.sentence_count += 1
-
         dependency_in_sentence.save(force=force)
 
         return dependency_in_sentence
@@ -167,11 +163,6 @@ class Sentence(db.Model, Base):
             document=self.document,
             position=position
         )
-
-        if not sequence.sentence_count:
-            sequence.sentence_count = 1
-        else:
-            sequence.sentence_count += 1
 
         sequence_in_sentence.save(force=force)
 

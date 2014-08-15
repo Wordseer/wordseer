@@ -94,6 +94,7 @@ class Base(object):
             match = cls.query.filter_by(**kwargs).one()
         except NoResultFound:
             new_record = cls(**kwargs)
+            new_record.save(force=False)
             return new_record
         except MultipleResultsFound:
             return False
