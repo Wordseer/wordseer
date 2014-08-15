@@ -3,6 +3,7 @@ from .base import Base
 from .project import Project
 from .sentence import Sentence
 from .association_objects import WordInSequence, SequenceInSentence
+from .counts import SequenceCount
 from sqlalchemy.ext.associationproxy import association_proxy
 
 class Sequence(db.Model, Base):
@@ -54,6 +55,16 @@ class Sequence(db.Model, Base):
         return Sentence.query.join(SequenceInSentence).join(Sequence).\
             filter(SequenceInSentence.project==Project.active_project).\
             filter(SequenceInSentence.sequence_id==self.id).all()
+
+    def get_counts(self, project=None):
+
+        # project argument assigned active_project if not present
+        if project == None: project = Project.active_project
+
+        return SequenceCount.find_or_create(
+            sequence_id = self.id,
+            project_id = project.id,
+        )
 
     def add_word(self, word, project=None, force=True):
         """Add a word to this sequence within the scope of the project

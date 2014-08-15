@@ -9,6 +9,7 @@ from .sentence import Sentence
 from .sequence import Sequence
 from .association_objects import WordInSentence
 from .association_objects import WordInSequence
+from .counts import WordCount
 from .mixins import NonPrimaryKeyEquivalenceMixin
 
 class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
@@ -60,6 +61,16 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         return Sequence.query.join(WordInSequence).join(Word).\
             filter(WordInSequence.project==Project.active_project).\
             filter(WordInSequence.word==self).all()
+
+    def get_counts(self, project=None):
+
+        # project argument assigned active_project if not present
+        if project == None: project = Project.active_project
+
+        return WordCount.find_or_create(
+            word_id = self.id,
+            project_id = project.id,
+        )
 
     def __repr__(self):
         """Representation string for words, showing the word.
