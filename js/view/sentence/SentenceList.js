@@ -116,13 +116,15 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
             if (!me.base_field_names.contains(metafield.name)) {
                 var key = metafield.text;
                 var value = record.get(metafield.name);
-                html = html + "<div class='metatag'";
-                var onclick = 'Ext.getCmp("' + me.id + '").fireEvent("tagclicked",'
-                    + 'this, Ext.getCmp("' + me.id + '"));';
-                html = html + " onclick='" + onclick + "'";
-                html = html + " metaname='" + metafield.name + "'";
-                html = html + "><span class='key'>" + key +
-                    "</span><span class='value'>" + value + "</span></div>";
+                if (value) {
+                    html = html + "<div class='metatag'";
+                    var onclick = 'Ext.getCmp("' + me.id + '").fireEvent("tagclicked",'
+                        + 'this, Ext.getCmp("' + me.id + '"));';
+                    html = html + " onclick='" + onclick + "'";
+                    html = html + " metaname='" + metafield.name + "'";
+                    html = html + "><span class='key'>" + key +
+                        "</span><span class='value'>" + value + "</span></div>";
+                }
             }
         }
 
