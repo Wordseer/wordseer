@@ -901,12 +901,10 @@ div.metatag {
     float:left;
     margin-right: 16px;
     margin-bottom: 16px;
-    height: 28px;
     border: 1px solid #808080;
     cursor: pointer;
     span {
-        display: inline-block;
-        height: 28px;
+        display: table-cell;
         padding: 0 10px;
         color: #808080;
         &.key {
@@ -915,7 +913,6 @@ div.metatag {
             font-size: 13px;
             line-height: 26px;
             border-right: 1px solid #808080;
-            height: 27px;
         }
         &.value {
             font-size: 15px;

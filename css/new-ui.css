@@ -1118,37 +1118,34 @@ div.metatag {
   float: left;
   margin-right: 16px;
   margin-bottom: 16px;
-  height: 28px;
   border: 1px solid #808080;
   cursor: pointer;
 }
-/* line 907, new-ui.scss */
+/* line 906, new-ui.scss */
 div.metatag span {
-  display: inline-block;
-  height: 28px;
+  display: table-cell;
   padding: 0 10px;
   color: #808080;
 }
-/* line 912, new-ui.scss */
+/* line 910, new-ui.scss */
 div.metatag span.key {
   font-weight: 700;
   text-transform: uppercase;
   font-size: 13px;
   line-height: 26px;
   border-right: 1px solid #808080;
-  height: 27px;
 }
-/* line 920, new-ui.scss */
+/* line 917, new-ui.scss */
 div.metatag span.value {
   font-size: 15px;
   line-height: 24px;
   font-weight: 300;
 }
-/* line 926, new-ui.scss */
+/* line 923, new-ui.scss */
 div.metatag:last-child {
   margin-bottom: 36px;
 }
-/* line 929, new-ui.scss */
+/* line 926, new-ui.scss */
 div.metatag.active {
   background-color: #f7d04a;
 }
