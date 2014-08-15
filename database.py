@@ -80,6 +80,7 @@ def clean():
     """
     restore_cache()
     db.session.rollback()
+    db.session.expunge_all()
 
 if __name__ == "__main__":
 

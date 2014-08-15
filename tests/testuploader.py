@@ -71,7 +71,7 @@ class ViewsTests(unittest.TestCase):
         assert "no projects" in result.data
         assert "You must provide a name" in result.data
 
-    @mock.patch("app.uploader.views.os", autospec=os)
+    @mock.patch("app.uploader.views.views.os", autospec=os)
     def test_projects_valid_create_post(self, mock_os):
         """Test POSTing with a valid project name.
 
@@ -87,8 +87,8 @@ class ViewsTests(unittest.TestCase):
         assert "test project" in result.data
         assert "/projects/1" in result.data
 
-    @mock.patch("app.uploader.views.shutil", autospec=shutil)
-    @mock.patch("app.uploader.views.os", autospec=os)
+    @mock.patch("app.uploader.views.views.shutil", autospec=shutil)
+    @mock.patch("app.uploader.views.views.os", autospec=os)
     def test_projects_delete_post(self, mock_os, mock_shutil):
         """Test project deletion.
         """
@@ -130,7 +130,7 @@ class ViewsTests(unittest.TestCase):
         assert "/projects/1" in result.data
         assert "/projects/2" in result.data
 
-    @mock.patch("app.uploader.views.process_files", autospec=True)
+    @mock.patch("app.uploader.views.views.process_files", autospec=True)
     def test_projects_bad_process(self, mock_process_files):
         """Test processing an unprocessable project.
         """
@@ -146,7 +146,7 @@ class ViewsTests(unittest.TestCase):
 
         assert "include exactly one json file" in result.data
 
-    @mock.patch("app.uploader.views.process_files", autospec=True)
+    @mock.patch("app.uploader.views.views.process_files", autospec=True)
     def test_projects_process(self, mock_process_files):
         """Test processing a processable project.
         """
@@ -257,7 +257,7 @@ class ViewsTests(unittest.TestCase):
 
         assert "You must select at least one document file"
 
-    @mock.patch("app.uploader.views.os", autospec=os)
+    @mock.patch("app.uploader.views.views.os", autospec=os)
     def test_project_show_delete(self, mock_os):
         """Test file deletion.
         """
@@ -305,7 +305,7 @@ class ViewsTests(unittest.TestCase):
         assert "/projects/1/documents/1" in result.data
         assert "/projects/1/documents/2" in result.data
 
-    @mock.patch("app.uploader.views.process_files", autospec=True)
+    @mock.patch("app.uploader.views.views.process_files", autospec=True)
     def test_project_show_process(self, mock_process_files):
         """Test processing a processable group of files.
         """
@@ -327,7 +327,7 @@ class ViewsTests(unittest.TestCase):
 
         assert "Errors have occurred" not in result.data
 
-    @mock.patch("app.uploader.views.process_files", autospec=True)
+    @mock.patch("app.uploader.views.views.process_files", autospec=True)
     def test_project_show_bad_process(self, mock_process_files):
         """Test processing an unprocessable group of files.
         """

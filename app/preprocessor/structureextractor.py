@@ -3,7 +3,6 @@
 
 import json
 import logging
-import pdb
 
 from lxml import etree
 from sqlalchemy.orm.exc import NoResultFound
@@ -44,7 +43,6 @@ class StructureExtractor(object):
         :return list of DocumentFiles: The DocumentFile that contains the
             extracted documents.
         """
-        doc = etree.parse(infile)
         documents = []
 
         # Check for unescaped special characters (tentative)
@@ -52,19 +50,10 @@ class StructureExtractor(object):
 
         try:
             doc = etree.parse(infile)
-        except(etree.XMLSyntaxError):
-            file_string = None
-            with open(infile) as file:
-                file_string = "".join([line for line in file])
-
-            file_string = file_string.replace("&", "&amp;")
-
-            # If parsing still doesn't work, skip it
-            try:
-                doc = etree.fromstring(file_string)
-            except(etree.XMLSyntaxError) as e:
-                print("XML Error: " + str(e))
-                return documents
+        except(etree.XMLSyntaxError) as e:
+            self.logger.error("XML Error: " + str(e) + "; skipping file")
+            self.logger.info(infile)
+            return documents
 
         extracted_units = self.extract_unit_information(self.document_structure,
             doc)
@@ -72,8 +61,9 @@ class StructureExtractor(object):
         doc_num = 0
 
         try:
-            document_file = DocumentFile.query.\
-                filter(DocumentFile.path == infile).one()
+            document_file = DocumentFile.query.filter(
+                DocumentFile.path == infile
+            ).one()
         except NoResultFound:
             self.logger.warning("Could not find file with path %s, making "
                 "new one", infile)
@@ -87,7 +77,7 @@ class StructureExtractor(object):
             document = Document()
             document.properties = extracted_unit.properties
             document.sentences = extracted_unit.sentences
-            document.title = extracted_unit.name #FIXME: not actual title
+            document.title = _get_title(document.properties)
             document.children = extracted_unit.children
             document.number = doc_num
 
@@ -249,14 +239,10 @@ def get_metadata(structure, node):
     metadata_list = [] # A list of Property
 
     for spec in metadata_structure:
-        try:
-            xpaths = spec["xpaths"]
-        except KeyError:
-            xpaths = []
-        try:
-            attribute = spec["attr"]
-        except KeyError:
-            attribute = None
+        xpaths = spec.get("xpaths", [])
+        attribute = spec.get("attr")
+        data_type = spec.get("dataType")
+        date_format = spec.get("dateFormat")
 
         extracted = [] # A list of strings
 
@@ -270,7 +256,9 @@ def get_metadata(structure, node):
                 metadata_list.append(Property(
                     value=val,
                     name=spec["propertyName"],
-                ))
+                    data_type=data_type,
+                    date_format=date_format))
+
     return metadata_list
 
 def get_xpath_attribute(xpath_pattern, attribute, node):
@@ -356,6 +344,18 @@ def get_nodes_from_xpath(xpath, nodes):
     if len(xpath.strip()) == 0 or nodes in nodes.xpath("../" + xpath):
         return [nodes]
     return nodes.xpath(xpath)
+
+def _get_title(properties):
+    """From a list of properties, retrieve the title property and return the
+    value.
+    """
+
+    for prop in properties:
+        if prop.name == "title":
+            return prop.value
+
+    # If there's no title property, return empty string
+    return ""
 
 def assign_sentences(document):
     """Populates the all_sentences relationship for the document.
