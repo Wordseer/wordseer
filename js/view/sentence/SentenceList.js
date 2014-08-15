@@ -68,7 +68,7 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
             sentence-id: the id of the sentence in which the word appears
         The text of the HTML span is the word.
         */
-        this.addEvents('search', 'wordclicked');
+        this.addEvents('search', 'wordclicked', 'tagclicked');
 
         this.columns = [
             {
@@ -83,6 +83,7 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
         this.model = this.getStore().model;
         this.base_field_names = this.model.getBaseFieldNames();
         this.all_fields = this.model.getFields();
+        this.metastore = null;
 
         this.callParent(arguments);
 
@@ -108,18 +109,25 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
     */
     renderSentence: function(record, field, view){
         var sentence = record.get(field);
+        var me = view;
         var html = "<div class='sentence'>" + sentence.words + "</div>";
-        for (var i = 0; i < view.all_fields.length; i++) {
-            var metafield = view.all_fields[i];
-            if (!view.base_field_names.contains(metafield.name)) {
+
+        for (var i = 0; i < me.all_fields.length; i++) {
+            var metafield = me.all_fields[i];
+            if (!me.base_field_names.contains(metafield.name)) {
                 var key = metafield.text;
                 var value = record.get(metafield.name);
-                html = html + "<div class='metatag'><span class='key'>" + key +
+                html = html + "<div class='metatag'";
+                var onclick = 'Ext.getCmp("' + me.id + '").fireEvent("tagclicked",'
+                    + 'this, Ext.getCmp("' + me.id + '"));';
+                html = html + " onclick='" + onclick + "'";
+                html = html + " metaname='" + metafield.name + "'";
+                html = html + "><span class='key'>" + key +
                     "</span><span class='value'>" + value + "</span></div>";
             }
         }
 
-        var me = view;
+
         if (html && html.length > 0) {
             var sentence_sets = record.get('sentence_set');
             if (sentence_sets && sentence_sets.trim().length > 0) {

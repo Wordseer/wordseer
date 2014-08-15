@@ -1120,15 +1120,16 @@ div.metatag {
   margin-bottom: 16px;
   height: 28px;
   border: 1px solid #808080;
+  cursor: pointer;
 }
-/* line 906, new-ui.scss */
+/* line 907, new-ui.scss */
 div.metatag span {
   display: inline-block;
   height: 28px;
   padding: 0 10px;
   color: #808080;
 }
-/* line 911, new-ui.scss */
+/* line 912, new-ui.scss */
 div.metatag span.key {
   font-weight: 700;
   text-transform: uppercase;
@@ -1137,13 +1138,17 @@ div.metatag span.key {
   border-right: 1px solid #808080;
   height: 27px;
 }
-/* line 919, new-ui.scss */
+/* line 920, new-ui.scss */
 div.metatag span.value {
   font-size: 15px;
   line-height: 24px;
   font-weight: 300;
 }
-/* line 925, new-ui.scss */
+/* line 926, new-ui.scss */
 div.metatag:last-child {
   margin-bottom: 36px;
+}
+/* line 929, new-ui.scss */
+div.metatag.active {
+  background-color: #f7d04a;
 }

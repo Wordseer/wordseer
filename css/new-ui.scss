@@ -903,6 +903,7 @@ div.metatag {
     margin-bottom: 16px;
     height: 28px;
     border: 1px solid #808080;
+    cursor: pointer;
     span {
         display: inline-block;
         height: 28px;
@@ -924,5 +925,8 @@ div.metatag {
     }
     &:last-child {
         margin-bottom: 36px;
+    }
+    &.active {
+        background-color: $yellow;
     }
 }

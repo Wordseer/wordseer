@@ -37,6 +37,7 @@ Ext.application({
         'SentenceListController',
         'WindowingController',
         'WordMenuController',
+        'TagMenuController',
         'PhraseSetsController',
         'WordTreeController',
         'WordFrequenciesController',
