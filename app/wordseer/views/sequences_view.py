@@ -30,6 +30,8 @@ class SequencesView(MethodView):
                     "sequence": sequence.sequence,
                 })
 
+            print(results)
+
             return jsonify(results = results)
 
     def post(self):

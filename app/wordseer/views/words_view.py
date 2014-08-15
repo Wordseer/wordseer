@@ -28,7 +28,7 @@ class WordsView(MethodView):
             for word in words:
                 results.append({
                     "word": word.lemma,
-                    "count": 0,
+                    "count": word.sentence_count,
                     "is_lemmatized": 1
                 })
 

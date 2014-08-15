@@ -52,28 +52,68 @@ class Project(db.Model, Base):
     def frequent_sequences(self, position, length, limit, lemmatized = False):
         """Return the most frequently occurring sequences with the given
         parameters.
+
+        Unfortunately, for the sake of performance, we had to use a literal SQL
+        query instead of ORM calls. Here is the breakdown of the query:
+        - The SELECT statement gets the id and text of the sequence, as well as
+          the sentence count from the count model associated with the sequence.
+        - The INNER JOINs in the FROM clause serve simply to join together all
+          relevant tables. There is a join for both count and sequence_count
+          because of single-table inheritence that would normally be hidden
+        - The WHERE conditionals are straightforward - they take the parameters
+          from this method and filter the results by them
+        - The GROUP BY serves to return entries that correspond to a sequence
+        - Finally, we order by the counts and limit the results
         """
 
-        seq_sents = self.sequence_in_sentence.\
-            filter_by(position=position).\
-            join("sequence").\
-            filter_by(length=length).\
-            filter_by(lemmatized=lemmatized).\
-            group_by("sequence_id").\
-            order_by("sentence_count DESC").\
-            limit(limit)
-
-        return [seq_sent.sequence for seq_sent in seq_sents]
+        return db.session.execute(
+            """SELECT sequence.id, sequence.sequence, count.sentence_count
+            FROM sequence INNER JOIN sequence_in_sentence
+                ON sequence.id = sequence_in_sentence.sequence_id
+                INNER JOIN sequence_count
+                ON sequence.id = sequence_count.sequence_id
+                INNER JOIN count ON sequence_count.id = count.id
+            WHERE sequence_in_sentence.position = {position} AND
+                sequence.length = {length} AND
+                sequence.lemmatized = {lemmatized} AND
+                count.project_id = {project_id}
+            GROUP BY sequence.id
+            ORDER BY count.sentence_count DESC
+            LIMIT {limit}
+        """.format(
+            position = position,
+            length = length,
+            lemmatized = int(lemmatized),
+            project_id = self.id,
+            limit = limit
+        )).fetchall()
 
     def frequent_words(self, part_of_speech, position, limit):
-        """Return the most frequently occurring words with the given parameters
+        """Return the most frequently occurring words with the given parameters.
+
+        This query is similar to the one above; see above for explanation.
+
+        Because this query groups by the lemma, some words get lost because they
+        have the same lemma as another word. This doesn't make sense but it seems
+        to be what the application wants.
         """
 
-        word_sents = self.word_in_sentence.\
-            filter_by(position=position).\
-            join("word").\
-            filter("Word.part_of_speech like '{0}%'".format(part_of_speech)).\
-            group_by("word_id").\
-            limit(limit)
-
-        return [word_sent.word for word_sent in word_sents]
+        return db.session.execute(
+            """SELECT word.id, word.lemma, count.sentence_count
+            FROM word INNER JOIN word_in_sentence
+                ON word.id = word_in_sentence.word_id
+                INNER JOIN word_count
+                ON word.id = word_count.word_id
+                INNER JOIN count ON word_count.id = count.id
+            WHERE word_in_sentence.position = {position} AND
+                word.part_of_speech LIKE '{part_of_speech}%' AND
+                count.project_id = {project_id}
+            GROUP BY word.lemma
+            ORDER BY count.sentence_count DESC
+            LIMIT {limit}
+        """.format(
+            position = position,
+            part_of_speech = part_of_speech,
+            project_id = self.id,
+            limit = limit
+        )).fetchall()
