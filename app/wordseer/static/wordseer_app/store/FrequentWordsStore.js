@@ -21,10 +21,14 @@ Ext.define('WordSeer.store.FrequentWordsStore', {
 		noCache: false,
 		timeout: 9000000,
 		url: ws_api_path + 'projects/' + project_id + '/words',
+		reader: {
+			type: 'json',
+			root: 'results'
+		},
 		extraParams: {
 			instance: getInstance(),
 			user: getUsername()
-		}
+		},
 	},
 	constructor: function(config) {
 		this.callParent(arguments);
