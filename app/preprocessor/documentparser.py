@@ -20,7 +20,7 @@ class DocumentParser(object):
         self.parser = parser
         self.sequence_processor = SequenceProcessor(project)
         self.project = project
-        self.project_logger = logging.ProjectLogger(self.logger, self.project)
+        self.project_logger = logger.ProjectLogger(self.logger, self.project)
 
     def parse_document(self, document):
         """Parse a document and write it to the database.
