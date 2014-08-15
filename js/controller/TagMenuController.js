@@ -23,6 +23,9 @@ Ext.define('WordSeer.controller.TagMenuController', {
             'sentence-list': {
                 tagclicked: this.showTagMenu,
             },
+            'tagmenu > wordseer-menuitem[action=filter]': {
+                click: this.applyFilter,
+            }
         });
     },
 
@@ -51,7 +54,7 @@ Ext.define('WordSeer.controller.TagMenuController', {
 
     /**
     Destroys the current word menu.
-    */
+    **/
     destroyMenu: function(view, record, element) {
         var candidates = Ext.ComponentQuery.query('wordseer-menu');
         var me = this;
@@ -59,4 +62,22 @@ Ext.define('WordSeer.controller.TagMenuController', {
                 c.close(10);
         });
     },
+
+    /**
+    Applies the selected filter to the current panel and triggers a new search
+    **/
+    applyFilter: function(menuitem, e){
+        var menu = menuitem.up('tagmenu');
+        console.log(menu);
+        var panel = menu.view.up('layout-panel');
+        var filter_record = Ext.create('WordSeer.model.MetadataModel', {
+            text: menu.value,
+            value: menu.value,
+            propertyName: menu.key,
+        });
+        panel.formValues.metadata.push(filter_record);
+        panel.down('widget').setFormValues(panel.formValues);
+        this.getController('SearchController').searchParamsChanged(panel,
+            panel.formValues);
+    }
 });

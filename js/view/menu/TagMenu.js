@@ -28,27 +28,28 @@ Ext.define('WordSeer.view.menu.TagMenu', {
         var me = this;
         var tag = $(me.shownBy);
         // retrieve metadata details
-        var key = tag.attr('metaname');
-        var value = tag.children('.value').text();
-        var key_display = tag.children('.key').text();
-        var tag_display = key_display + " = " + value;
+        me.key = tag.attr('metaname');
+        me.value = tag.children('.value').text();
+        me.key_display = tag.children('.key').text();
+        me.tag_display = me.key_display + " = " + me.value;
 
         me.items = [
             {
                 xtype: 'wordseer-menuitem',
-                text: 'filter by "' + tag_display + '"',
+                text: 'filter by "' + me.tag_display + '"',
+                action: 'filter',
             },
             {
                 xtype: 'wordseer-menuitem',
-                text: 'sort by "' + key_display + '" (asc)',
+                text: 'sort by "' + me.key_display + '" (asc)',
             },
             {
                 xtype: 'wordseer-menuitem',
-                text: 'sort by "' + key_display + '" (desc)',
+                text: 'sort by "' + me.key_display + '" (desc)',
             },
             {
                 xtype: 'wordseer-menuitem',
-                text: 'search for "' + tag_display + '" (in new tab)',
+                text: 'search for "' + me.tag_display + '" (in new tab)',
             },
 
         ];
