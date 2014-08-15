@@ -1,6 +1,7 @@
 from .sentence import Sentence
 from .project import Project
 from .association_objects import DependencyInSentence
+from .counts import DependencyCount
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from app import db
@@ -34,8 +35,6 @@ class Dependency(db.Model, Base):
         db.Integer, db.ForeignKey("grammatical_relationship.id"))
     governor_id = db.Column(db.Integer, db.ForeignKey("word.id"))
     dependent_id = db.Column(db.Integer, db.ForeignKey("word.id"))
-    sentence_count = db.Column(db.Integer, index=True)
-    document_count = db.Column(db.Integer, index=True)
 
     # Relationships
 
@@ -57,6 +56,16 @@ class Dependency(db.Model, Base):
         return Sentence.query.join(DependencyInSentence).join(Dependency).\
             filter(DependencyInSentence.project==Project.active_project).\
             filter(DependencyInSentence.dependency==self).all()
+
+    def get_counts(self, project=None):
+
+        # project argument assigned active_project if not present
+        if project == None: project = Project.active_project
+
+        return DependencyCount.find_or_create(
+            dependency_id = self.id,
+            project_id = project.id,
+        )
 
     def __repr__(self):
         """Representation string for the dependency
