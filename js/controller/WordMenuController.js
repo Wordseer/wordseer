@@ -435,4 +435,3 @@ Ext.define('WordSeer.controller.WordMenuController',{
 		);
 	}
 });
-

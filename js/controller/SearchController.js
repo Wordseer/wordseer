@@ -233,7 +233,16 @@ Ext.define('WordSeer.controller.SearchController', {
 		var values = Ext.create('WordSeer.model.FormValues');
 		values.widget_xtype = widget_info.widget_xtype;
 		var okToSearch = false;
-		if(item.getClass() == 'word'){
+		if (item.class == 'metadata'){
+			console.log('metadata searchwith')
+			values.metadata = item.metadata;
+
+			var history_item = this.getController('HistoryController')
+				.newHistoryItem(values);
+			history_item.set('widget_xtype', widget_info.widget_xtype);
+			this.getController('WindowingController')
+				.playHistoryItemInNewPanel(history_item.get('id'));
+		} else if(item.getClass() == 'word'){
 			values.gov = item.get('word');
 			okToSearch = true;
 		}
@@ -256,6 +265,8 @@ Ext.define('WordSeer.controller.SearchController', {
 			values.govtype = 'phrase-set';
 			okToSearch = true;
 		}
+
+
 		// TODO: implement searchWith for phrases.
 		if(okToSearch){
 			values.search = [{

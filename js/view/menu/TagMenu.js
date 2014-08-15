@@ -54,6 +54,7 @@ Ext.define('WordSeer.view.menu.TagMenu', {
             {
                 xtype: 'wordseer-menuitem',
                 text: 'search for "' + me.tag_display + '" (in new tab)',
+                action: 'search',
             },
 
         ];

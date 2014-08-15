@@ -28,6 +28,9 @@ Ext.define('WordSeer.controller.TagMenuController', {
             },
             'tagmenu > wordseer-menuitem[action=sort]': {
                 click: this.sortSentences,
+            },
+            'tagmenu > wordseer-menuitem[action=search]': {
+                click: this.newSearch,
             }
         });
     },
@@ -86,5 +89,21 @@ Ext.define('WordSeer.controller.TagMenuController', {
     sortSentences: function(menuitem, e){
         var menu = menuitem.up('tagmenu');
         menu.view.getStore().sort(menu.key, menuitem.direction);
+    },
+
+    newSearch: function(menuitem, e) {
+        var menu = menuitem.up('tagmenu');
+        var meta_record = Ext.create('WordSeer.model.MetadataModel', {
+            text: menu.value,
+            value: menu.value,
+            propertyName: menu.key,
+        });
+        var newsearch = {
+            class: 'metadata',
+            metadata: [meta_record],
+        };
+
+        this.getController('SearchController').searchWith(
+            {widget_xtype: 'sentence-list-widget'}, newsearch);
     }
 });
