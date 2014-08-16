@@ -30,7 +30,10 @@ Ext.define('WordSeer.view.menu.TagMenu', {
         // retrieve metadata details
         me.key = tag.attr('metaname');
         me.value = tag.children('.value').text();
-        me.key_display = me.key;
+        me.key_display = tag.children('.key').contents().filter(function(){
+            // text nodes only, not spans etc.
+            return this.nodeType === 3;
+        }).text().trim();
         me.tag_display = me.key_display + " = " + String(me.value).trim();
 
         me.items = [
