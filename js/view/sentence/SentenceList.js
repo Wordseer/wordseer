@@ -115,6 +115,7 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
             var metafield = me.all_fields[i];
             if (!me.base_field_names.contains(metafield.name)) {
                 var key = metafield.text;
+                if (key == '') { key = metafield.name; }
                 var value = record.get(metafield.name);
                 if (value) {
                     html = html + "<div class='metatag'";
