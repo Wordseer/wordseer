@@ -31,7 +31,10 @@ Ext.define('WordSeer.controller.TagMenuController', {
             },
             'tagmenu > wordseer-menuitem[action=search]': {
                 click: this.newSearch,
-            }
+            },
+            'tagmenu > wordseer-menuitem[action=clearsort]': {
+                click: this.clearSort,
+            },
         });
     },
 
@@ -87,8 +90,21 @@ Ext.define('WordSeer.controller.TagMenuController', {
     },
 
     sortSentences: function(menuitem, e){
+        $('.sorting .dir').remove();
+        $('.metatag.sorting').removeClass('sorting');
         var menu = menuitem.up('tagmenu');
         menu.view.getStore().sort(menu.key, menuitem.direction);
+        $('.metatag[metaname=' + menu.key + ']').addClass('sorting');
+        $('.sorting .key').append(' <span class="dir">[sort <i class="fa ' +
+            'fa-sort-amount-' + menuitem.direction.toLowerCase() +
+            '"></i> ]</span>');
+    },
+
+    clearSort: function(menuitem, e){
+        $('.sorting .dir').remove();
+        $('.metatag.sorting').removeClass('sorting');
+        var menu = menuitem.up('tagmenu');
+        menu.view.getStore().sort('id');
     },
 
     newSearch: function(menuitem, e) {

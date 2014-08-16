@@ -917,11 +917,17 @@ div.metatag {
             font-size: 12px;
             font-weight: 400;
         }
+        &.dir {
+            display: inline;
+        }
     }
     &:last-child {
         margin-bottom: 36px;
     }
     &.active {
         background-color: $yellow;
+    }
+    &.sorting {
+        background-color: #ffd8fc;
     }
 }

@@ -30,7 +30,7 @@ Ext.define('WordSeer.view.menu.TagMenu', {
         // retrieve metadata details
         me.key = tag.attr('metaname');
         me.value = tag.children('.value').text();
-        me.key_display = tag.children('.key').text();
+        me.key_display = me.key;
         me.tag_display = me.key_display + " = " + String(me.value).trim();
 
         me.items = [
@@ -50,6 +50,11 @@ Ext.define('WordSeer.view.menu.TagMenu', {
                 text: 'sort by "' + me.key_display + '" (desc)',
                 action: 'sort',
                 direction: 'DESC',
+            },
+            {
+                xtype: 'wordseer-menuitem',
+                text: 'clear all sorting options',
+                action: 'clearsort',
             },
             {
                 xtype: 'wordseer-menuitem',

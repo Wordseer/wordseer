@@ -1139,11 +1139,19 @@ div.metatag span.value {
   font-size: 12px;
   font-weight: 400;
 }
-/* line 921, new-ui.scss */
+/* line 920, new-ui.scss */
+div.metatag span.dir {
+  display: inline;
+}
+/* line 924, new-ui.scss */
 div.metatag:last-child {
   margin-bottom: 36px;
 }
-/* line 924, new-ui.scss */
+/* line 927, new-ui.scss */
 div.metatag.active {
   background-color: #f7d04a;
+}
+/* line 930, new-ui.scss */
+div.metatag.sorting {
+  background-color: #ffd8fc;
 }
