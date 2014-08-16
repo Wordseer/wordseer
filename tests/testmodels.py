@@ -51,20 +51,6 @@ class TestWordModel(unittest.TestCase):
         assert word_1.word == string_1
         assert word_2.word == string_2
 
-        # NOTE: skipping because sentences should not be added like this
-        # word_1.save()
-        # word_2.save()
-
-        # sen1 = Sentence()
-        # sen2 = Sentence()
-
-        # word_2.sentences = [sen1, sen2]
-
-        # db.session.add_all([sen1, sen2])
-        # db.session.commit()
-
-        # assert word_2.sentences == [sen1, sen2]
-
 class TestSentenceModel(unittest.TestCase):
     """Tests for the ``Sentence`` model.
     """
@@ -117,18 +103,21 @@ class TestSentenceModel(unittest.TestCase):
 
         sentence = Sentence(text="foo")
         word = Word(word="foo")
+        project = Project()
 
+        project.save()
         sentence.save()
         word.save()
 
         rel = sentence.add_word(word, position=4, space_before=" ",
-            part_of_speech="ADF")
+            part_of_speech="ADF", project=project)
 
         assert rel.word == word
         assert rel.sentence == sentence
         assert rel.position == 4
         assert rel.space_before == " "
         assert rel.part_of_speech == "ADF"
+        assert rel.project == project
 
     def test_add_dependency(self):
         """Test the ``add_dependency()`` method of ``Sentence``.
@@ -137,18 +126,21 @@ class TestSentenceModel(unittest.TestCase):
         sentence = Sentence(text="foo")
         word = Word(word="foo")
         dependency = Dependency(governor=word)
+        project = Project()
 
+        project.save()
         sentence.save()
         dependency.save()
         word.save()
 
         rel = sentence.add_dependency(dependency, governor_index=1,
-            dependent_index=2)
+            dependent_index=2, project=project)
 
         assert rel.dependency == dependency
         assert rel.sentence == sentence
         assert rel.governor_index == 1
         assert rel.dependent_index == 2
+        assert rel.project == project
 
     def test_add_sequence(self):
         """Test the ``add_sequence()`` method of ``Sentence``.
@@ -156,15 +148,18 @@ class TestSentenceModel(unittest.TestCase):
 
         sentence = Sentence(text="foo")
         sequence = Sequence(lemmatized=False)
+        project = Project()
 
+        project.save()
         sentence.save()
         sequence.save()
 
-        rel = sentence.add_sequence(sequence, position=1)
+        rel = sentence.add_sequence(sequence, position=1, project=project)
 
         assert rel.sequence == sequence
         assert rel.sentence == sentence
         assert rel.position == 1
+        assert rel.project == project
 
 class TestDependencyModel(unittest.TestCase):
     """Tests for the ``Depenedency`` model.
@@ -181,13 +176,6 @@ class TestDependencyModel(unittest.TestCase):
         dependency = Dependency()
         dependency.save()
 
-        # Test with sentences
-        # NOTE: skipping because we should never add sentences like this
-        # sentence1 = Sentence()
-        # sentence2 = Sentence()
-        # dependency.sentences = [sentence1, sentence2]
-
-        # db.session.add_all([sentence1, sentence2])
         db.session.commit()
 
 class TestSequenceModel(unittest.TestCase):
@@ -205,13 +193,6 @@ class TestSequenceModel(unittest.TestCase):
         sequence = Sequence()
         sequence.save()
 
-        # Test with Sentences
-        # NOTE: skipping because we should never add sentences like this
-        # sentence1 = Sentence()
-        # sentence2 = Sentence()
-        # sequence.sentences = [sentence1, sentence2]
-
-        # db.session.add_all([sentence1, sentence2])
         db.session.commit()
 
 class TestUnitModels(unittest.TestCase):
