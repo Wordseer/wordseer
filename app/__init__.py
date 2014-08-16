@@ -28,10 +28,11 @@ try:
     preferences_path = os.path.join(app.config["ROOT"], "preferences.json")
     with open(preferences_path) as preferences_file:
         preferences = json.load(preferences_file)
-    for key, value in preferences.items():
-        app.config[key] = value
-except ValueError:
-    app.config["INSTALL_TYPE"] = "full"
+except (ValueError, IOError):
+    preferences = {"INSTALL_TYPE": "full"}
+
+for key, value in preferences.items():
+    app.config[key] = value
 
 """
 ===============
