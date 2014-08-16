@@ -43,6 +43,7 @@ $black: #000000;
 $darkblue: #1D3040;
 $background-blue: #526b84;
 $background-lightblue: #64839f;
+$pink: #ffd8fc;
 
 /*******************************************************************************
 Fonts
@@ -928,6 +929,15 @@ div.metatag {
         background-color: $yellow;
     }
     &.sorting {
-        background-color: #ffd8fc;
+        background-color: lighten($pink, 5%);
+        &.lev0 {
+            background-color: $pink;
+        }
+        &.lev1 {
+            background-color: lighten($pink, 3%);
+        }
+        &.lev2 {
+            background-color: lighten($pink, 5%);
+        }
     }
 }
