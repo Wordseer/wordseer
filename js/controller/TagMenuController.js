@@ -124,12 +124,12 @@ Ext.define('WordSeer.controller.TagMenuController', {
         menu.view.getStore().sorters.clear();
         menu.view.getStore().sort(newsort);
         for (var i=0; i<newsort.length; i++){
-            var tag = $('.metatag[metaname=' + newsort[i].property + ']');
+            var tag = $('.metatag[metaname="' + newsort[i].property + '"]');
             tag.each(function(){
                 $(this).addClass('sorting lev' + i)
                     .insertBefore($(this).siblings('.metatag').get(i));
                 $(this).find('.key')
-                    .html(' <span class="dir">[sort <i class="fa ' +
+                    .append(' <span class="dir">[sort <i class="fa ' +
                     'fa-sort-amount-' + newsort[i].direction.toLowerCase() +
                     '"></i> '+(i+1)+']</span>');
             });
@@ -170,12 +170,12 @@ Ext.define('WordSeer.controller.TagMenuController', {
         menu.view.getStore().sorters.clear();
         menu.view.getStore().sort(newsort);
         for (var i=0; i<newsort.length; i++){
-            var tag = $('.metatag[metaname=' + newsort[i].property + ']');
+            var tag = $('.metatag[metaname="' + newsort[i].property + '"]');
             tag.each(function(){
                 $(this).addClass('sorting lev' + i)
                     .insertBefore($(this).siblings('.metatag').get(i));
                 $(this).find('.key')
-                    .html(' <span class="dir">[sort <i class="fa ' +
+                    .append(' <span class="dir">[sort <i class="fa ' +
                     'fa-sort-amount-' + newsort[i].direction.toLowerCase() +
                     '"></i> '+(i+1)+']</span>');
             });
