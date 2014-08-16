@@ -119,3 +119,18 @@ class DependencyInSentence(db.Model, Base):
         backref=db.backref(
             "dependency_in_sentence", cascade="all, delete-orphan"))
 
+class ProjectsUsers(db.Model, Base):
+    """Associate Users with Projects.
+
+    Attributes:
+        user (User): The ``User`` in this relationship.
+        project (Project): The ``Project`` in this relationship.
+        permissions (int): The permissions of this ``User`` in this ``Project``.
+    """
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id")),
+    project_id = db.Column(db.Integer(), db.ForeignKey("project.id")),
+    permissions = db.Column(db.Integer()))
+
+    user = db.relationship("User")
+    project = db.relationship("Project")
+

@@ -5,6 +5,7 @@ from flask.ext.security import UserMixin
 
 from app import db
 from .base import Base
+from . import association_tables
 
 class Role(db.Model, Base, RoleMixin):
     """Represents a flask-security user role.
@@ -38,7 +39,10 @@ class User(db.Model, Base, UserMixin):
         backref=db.backref('users', lazy='dynamic'))
 
     sets = db.relationship("Set", backref="user")
-    projects = db.relationship("Project", backref="user")
+    projects = db.relationship("ProjectsUsers", backref="user")
+
+    def add_project(self, project, role):
+        """Add this user to ownership of a project.
 
     def has_document_file(self, document_file):
         """Check if this user owns this `DocumentFile`.

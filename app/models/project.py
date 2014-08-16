@@ -17,7 +17,6 @@ class Project(db.Model, Base):
     # Attributes
     name = db.Column(db.String)
     path = db.Column(db.String)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     # Active project indicator
     active_project = None
