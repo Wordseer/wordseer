@@ -1,6 +1,6 @@
 language: python
 python:
     - "2.7"
-install: "bash ./install.sh"
+install: "python install.py"
 script: "python runtests.py"
 
