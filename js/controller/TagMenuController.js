@@ -92,10 +92,13 @@ Ext.define('WordSeer.controller.TagMenuController', {
     sortSentences: function(menuitem, e){
         var menu = menuitem.up('tagmenu');
         menu.view.getStore().sort(menu.key, menuitem.direction);
-        $('.metatag[metaname="' + menu.key + '"]').addClass('sorting');
-        $('.sorting .key').append(' <span class="dir">[sort <i class="fa ' +
-            'fa-sort-amount-' + menuitem.direction.toLowerCase() +
-            '"></i> ]</span>');
+        var sentencelist = $(menu.view.el.dom);
+        sentencelist.find('.metatag[metaname="' + menu.key +
+            '"]').addClass('sorting');
+        sentencelist.find('.sorting .key')
+            .append(' <span class="dir">[sort <i class="fa ' +
+                'fa-sort-amount-' + menuitem.direction.toLowerCase() +
+                '"></i> ]</span>');
     },
 
     clearSort: function(menuitem, e){
