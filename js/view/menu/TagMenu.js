@@ -53,7 +53,7 @@ Ext.define('WordSeer.view.menu.TagMenu', {
             },
             {
                 xtype: 'wordseer-menuitem',
-                text: 'clear all sorting options',
+                text: 'reset to collection order',
                 action: 'clearsort',
             },
             {
