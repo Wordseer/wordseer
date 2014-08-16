@@ -19,10 +19,13 @@ import database
 def setUpModule():
     global project
     project = Project()
+    project.save()
+    global mock_project_logger
     with mock.patch("app.preprocessor.collectionprocessor.StringProcessor",
+            autospec=True), mock.patch("app.preprocessor.collectionprocessor.logger.ProjectLogger",
             autospec=True):
         global colproc
-        colproc = collectionprocessor.CollectionProcessor(project)
+        colproc = collectionprocessor.CollectionProcessor(project.id)
 
 @mock.patch("app.preprocessor.collectionprocessor.logger", autospec=logger)
 class TestCollectionProcessor(unittest.TestCase):

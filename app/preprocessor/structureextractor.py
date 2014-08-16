@@ -15,6 +15,7 @@ from app.models.sentence import Sentence
 from app.models.unit import Unit
 from app.models.property import Property
 from app import db
+from . import logger
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
@@ -33,6 +34,8 @@ class StructureExtractor(object):
         self.structure_file = open(structure_file, "r")
         self.document_structure = json.load(self.structure_file)
         self.logger = logging.getLogger(__name__)
+        self.project_logger = logger.ProjectLogger(self.logger,
+                str_proc.project)
 
     def extract(self, infile):
         """Extract ``Document``\s from a ``DocumentFile``. This method uses the
@@ -51,8 +54,8 @@ class StructureExtractor(object):
         try:
             doc = etree.parse(infile)
         except(etree.XMLSyntaxError) as e:
-            self.logger.error("XML Error: " + str(e) + "; skipping file")
-            self.logger.info(infile)
+            self.project_logger.error("XML Error: %s; skipping file", str(e))
+            self.project_logger.info(infile)
             return documents
 
         extracted_units = self.extract_unit_information(self.document_structure,
@@ -65,11 +68,11 @@ class StructureExtractor(object):
                 DocumentFile.path == infile
             ).one()
         except NoResultFound:
-            self.logger.warning("Could not find file with path %s, making "
+            self.project_logger.warning("Could not find file with path %s, making "
                 "new one", infile)
             document_file = DocumentFile()
         except MultipleResultsFound:
-            self.logger.error("Found multiple files with path %s, "
+            self.project_logger.error("Found multiple files with path %s, "
                 "skipping.", infile)
             return DocumentFile()
 

@@ -249,6 +249,10 @@ class ProjectCLPD(CLPDView):
             # NOTE: handle access to nonexistent objects globally
 
         self.template_kwargs["project"] = self.project
+        self.template_kwargs["project_errors"] = self.project.get_errors()
+        self.template_kwargs["project_warnings"] = self.project.get_warnings()
+        self.template_kwargs["project_infos"] = self.project.get_infos()
+
         if self.project not in current_user.projects:
             return app.login_manager.unauthorized()
 
@@ -445,7 +449,7 @@ def process_files(collection_dir, structure_file, project):
     document files.
     """
     args = (collection_dir, structure_file, app.config["DOCUMENT_EXTENSION"],
-        project)
+        project.id)
     preprocessing_process = threading.Thread(target=cp_run, args=args)
     preprocessing_process.start()
 

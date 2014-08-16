@@ -1,6 +1,7 @@
 """Tests for the ``app.wordseer.models`` module.
 """
 import unittest
+import copy
 
 from app import db
 from app.models import Dependency
@@ -18,6 +19,10 @@ from app.models import StructureFile
 from app.models import Unit
 from app.models import User
 from app.models import Word
+from app.models import Log
+from app.models import InfoLog
+from app.models import ErrorLog
+from app.models import WarningLog
 import database
 
 class TestWordModel(unittest.TestCase):
@@ -130,10 +135,12 @@ class TestSentenceModel(unittest.TestCase):
         """
 
         sentence = Sentence(text="foo")
-        dependency = Dependency(sentence_count=4)
+        word = Word(word="foo")
+        dependency = Dependency(governor=word)
 
         sentence.save()
         dependency.save()
+        word.save()
 
         rel = sentence.add_dependency(dependency, governor_index=1,
             dependent_index=2)
@@ -452,4 +459,37 @@ class TestDocumentFileModule(unittest.TestCase):
 
         assert len(documentfile.documents) == 2
         assert len(documentfile.projects) == 2
+
+class TestProjectModel(unittest.TestCase):
+    """Test the Project model.
+    """
+
+    def setUp(self):
+        database.clean()
+
+    def test_logs(self):
+        """Test that logs work right.
+        """
+        project = Project()
+
+        info_logs = [InfoLog(item_value="foo", log_item="foo is",
+                project=project),
+            InfoLog(item_value="bar", log_item="Fooing the bar",
+                project=project),
+            InfoLog(item_value="foo", log_item="Still fooing",
+                project=project)]
+
+        error_logs = [ErrorLog(item_value="F", log_item="Bar",
+                project=project),
+            ErrorLog(item_value="Failed to foo", log_item="bar",
+                project=project)]
+
+        warning_logs = [WarningLog(item_value="W", log_item="bar",
+            project=project)]
+
+        project.save()
+
+        assert project.get_infos() == info_logs
+        assert project.get_errors() == error_logs
+        assert project.get_warnings() == warning_logs
 
