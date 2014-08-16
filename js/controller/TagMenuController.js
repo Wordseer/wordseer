@@ -97,7 +97,8 @@ Ext.define('WordSeer.controller.TagMenuController', {
         var menu = menuitem.up('tagmenu'),
             addnew = true,
             sorters = menu.view.getStore().sorters
-            newsort = [];
+            newsort = [],
+            sentencelist = $(menu.view.el.dom);
         for (var i=0; i<sorters.items.length; i++){
             // check for direction change and duplication, and prevent a new
             // sorter from being added if either is found
@@ -124,7 +125,8 @@ Ext.define('WordSeer.controller.TagMenuController', {
         menu.view.getStore().sorters.clear();
         menu.view.getStore().sort(newsort);
         for (var i=0; i<newsort.length; i++){
-            var tag = $('.metatag[metaname="' + newsort[i].property + '"]');
+            var tag = sentencelist.find('.metatag[metaname="' +
+                newsort[i].property + '"]');
             tag.each(function(){
                 $(this).addClass('sorting lev' + i)
                     .insertBefore($(this).siblings('.metatag').get(i));
@@ -145,7 +147,8 @@ Ext.define('WordSeer.controller.TagMenuController', {
     removeSort: function(menuitem, e){
         var menu = menuitem.up('tagmenu'),
             sorters = menu.view.getStore().sorters
-            newsort = [];
+            newsort = [],
+            sentencelist = $(menu.view.el.dom);
         for (var i=0; i<sorters.items.length; i++){
             // check for direction change and duplication, and prevent a new
             // sorter from being added if either is found
@@ -170,7 +173,8 @@ Ext.define('WordSeer.controller.TagMenuController', {
         menu.view.getStore().sorters.clear();
         menu.view.getStore().sort(newsort);
         for (var i=0; i<newsort.length; i++){
-            var tag = $('.metatag[metaname="' + newsort[i].property + '"]');
+            var tag = sentencelist.find('.metatag[metaname="' +
+                newsort[i].property + '"]');
             tag.each(function(){
                 $(this).addClass('sorting lev' + i)
                     .insertBefore($(this).siblings('.metatag').get(i));
