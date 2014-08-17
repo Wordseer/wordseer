@@ -69,7 +69,7 @@
             {{ process_form.hidden_tag() }}
             {{ macros.selection_table(process_form.selection, "document",
                 "table table-striped table-hover click-anywhere",
-                "File Name", "uploader.document_show", project_id=project.id) }}
+                "File Name", "uploader.document_show") }}
             {{ macros.show_logs(project_errors, "alert alert-danger") }}
             {{ macros.show_logs(project_warnings, "alert alert-warning") }}
             {{ macros.show_logs(project_infos, "alert alert-info") }}

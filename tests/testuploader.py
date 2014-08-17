@@ -43,7 +43,7 @@ class ViewsTests(unittest.TestCase):
     def test_projects(self):
         """Test the projects view with a project present.
         """
-        new_project = Project(name="test", user=self.user)
+        new_project = Project(name="test", users=[self.user])
         new_project.save()
         result = self.client.get("/projects/")
         assert "/projects/1" in result.data
@@ -51,7 +51,7 @@ class ViewsTests(unittest.TestCase):
     def test_projects_bad_create(self):
         """Test creating an existing project.
         """
-        project = Project(name="test", user=self.user)
+        project = Project(name="test", users=[self.user])
         project.save()
 
         result = self.client.post("/projects/", data={
@@ -96,9 +96,9 @@ class ViewsTests(unittest.TestCase):
         mock_os.path.isdir.return_value = True
 
         project1 = Project(name="test1", path=application.config["UPLOAD_DIR"],
-            user=self.user)
+            users=[self.user])
         project2 = Project(name="test2", path=application.config["UPLOAD_DIR"],
-            user=self.user)
+            users=[self.user])
         project1.save()
         project2.save()
 
@@ -117,8 +117,8 @@ class ViewsTests(unittest.TestCase):
         """Test deleting without a selection.
         """
 
-        project1 = Project(name="test1", user=self.user)
-        project2 = Project(name="test2", user=self.user)
+        project1 = Project(name="test1", users=[self.user])
+        project2 = Project(name="test2", users=[self.user])
         project1.save()
         project2.save()
 
@@ -136,7 +136,7 @@ class ViewsTests(unittest.TestCase):
         """Test processing an unprocessable project.
         """
 
-        project1 = Project(name="test1", user=self.user)
+        project1 = Project(name="test1", users=[self.user])
         project1.save()
 
         result = self.client.post("/projects/", data={
@@ -151,7 +151,7 @@ class ViewsTests(unittest.TestCase):
     def test_projects_process(self, mock_process_files):
         """Test processing a processable project.
         """
-        project = Project(name="test", user=self.user)
+        project = Project(name="test", users=[self.user])
         project.save()
 
         document_file1 = DocumentFile(projects=[project],
@@ -172,7 +172,7 @@ class ViewsTests(unittest.TestCase):
     def test_no_project_show(self):
         """Make sure project_show says that there are no files.
         """
-        project = Project(name="test", user=self.user)
+        project = Project(name="test", users=[self.user])
         project.save()
         result = self.client.get("/projects/1")
 
@@ -182,7 +182,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show(self):
         """Make sure project_show shows files.
         """
-        project = Project(name="test", user=self.user)
+        project = Project(name="test", users=[self.user])
         project.save()
         document_file1 = DocumentFile(path="/test/doc1.xml", projects=[project])
         document_file2 = DocumentFile(path="/test/doc2.xml", projects=[project])
@@ -192,13 +192,13 @@ class ViewsTests(unittest.TestCase):
 
         assert "doc1.xml" in result.data
         assert "doc2.xml" in result.data
-        assert "/projects/1/documents/1" in result.data
-        assert "/projects/1/documents/2" in result.data
+        assert "/documents/1" in result.data
+        assert "/documents/2" in result.data
 
     def test_project_show_upload(self):
         """Try uploading a file to the project_show view.
         """
-        project = Project(name="test", user=self.user)
+        project = Project(name="test", users=[self.user])
         project.save()
 
         upload_dir = tempfile.mkdtemp()
@@ -211,7 +211,7 @@ class ViewsTests(unittest.TestCase):
             })
 
         assert os.path.exists(os.path.join(upload_dir, "1", "test.xml"))
-        assert "/projects/1/documents/1" in result.data
+        assert "/documents/1" in result.data
         assert "test.xml" in result.data
 
         uploaded_file = open(os.path.join(upload_dir, "1", "test.xml"))
@@ -221,7 +221,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_double_upload(self):
         """Try uploading two files with the same name to the project_show view.
         """
-        project = Project(name="test", user=self.user)
+        project = Project(name="test", users=[self.user])
         project.save()
 
         upload_dir = tempfile.mkdtemp()
@@ -243,7 +243,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_no_post(self):
         """Try sending an empty post to project_show.
         """
-        project = Project(name="test", user=self.user)
+        project = Project(name="test", users=[self.user])
         project.save()
 
         result = self.client.post("/projects/1", data={
@@ -264,7 +264,7 @@ class ViewsTests(unittest.TestCase):
         """
         mock_os.path.isdir.return_value = False
 
-        project = Project(name="test", user=self.user)
+        project = Project(name="test", users=[self.user])
         project.save()
 
         document_file1 = DocumentFile(projects=[project],
@@ -287,7 +287,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_bad_delete(self):
         """Test a bad file delete request.
         """
-        project = Project(name="test", user=self.user)
+        project = Project(name="test", users=[self.user])
         project.save()
 
         document_file1 = DocumentFile(projects=[project],
@@ -303,14 +303,14 @@ class ViewsTests(unittest.TestCase):
             })
 
         assert "must select" in result.data
-        assert "/projects/1/documents/1" in result.data
-        assert "/projects/1/documents/2" in result.data
+        assert "/documents/1" in result.data
+        assert "/documents/2" in result.data
 
     @mock.patch("app.uploader.views.views.process_files", autospec=True)
     def test_project_show_process(self, mock_process_files):
         """Test processing a processable group of files.
         """
-        project = Project(name="test", user=self.user)
+        project = Project(name="test", users=[self.user])
         project.save()
 
         document_file1 = DocumentFile(projects=[project],
@@ -332,7 +332,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_bad_process(self, mock_process_files):
         """Test processing an unprocessable group of files.
         """
-        project = Project(name="test", user=self.user, path="/foo")
+        project = Project(name="test", users=[self.user], path="/foo")
         project.save()
 
         document_file1 = DocumentFile(projects=[project],
@@ -367,7 +367,7 @@ class ViewsTests(unittest.TestCase):
         file_handle = os.fdopen(file_handle, "r+")
         file_handle.write("foobar")
 
-        project = Project(user=self.user)
+        project = Project(users=[self.user])
 
         document_file = DocumentFile(path=file_path, projects=[project])
         document_file.save()
@@ -380,7 +380,7 @@ class ViewsTests(unittest.TestCase):
         """Test the detail document view.
         """
         projxyz = Project(name="test project", path="/test-path/",
-            user=self.user)
+            users=[self.user])
         docxyz = DocumentFile(path="/test-path/test-file.xml",
             projects=[projxyz])
 
@@ -390,7 +390,7 @@ class ViewsTests(unittest.TestCase):
         #TODO: why is this necessary? why does sqlalchemy complain otherwise
         docid = docxyz.id
 
-        result = self.client.get("/projects/1/documents/1")
+        result = self.client.get("/documents/1")
         assert "/uploads/" + str(docid) in result.data
         assert "test-file.xml" in result.data
 
@@ -399,9 +399,9 @@ class ViewsTests(unittest.TestCase):
         """
 
         project1 = Project(name="foo", path="/test-path",
-            user=self.user)
+            users=[self.user])
         project2 = Project(name="foob", path="/foobar",
-            user=self.user)
+            users=[self.user])
 
         logs = [WarningLog(log_item="a", item_value="a", project=project1),
             InfoLog(log_item="b", item_value="b", project=project1),
@@ -438,7 +438,7 @@ class AuthTests(unittest.TestCase):
             sess["user_id"] = self.user1.get_id()
             sess["_fresh"] = True
 
-        self.project = Project(name="Bars project", user=self.user2)
+        self.project = Project(name="Bars project", users=[self.user2])
         self.project.save()
 
         file_handle, file_path = tempfile.mkstemp()
@@ -492,7 +492,7 @@ class LoggedOutTests(unittest.TestCase):
         user = User()
         db.session.add(user)
         db.session.commit()
-        project = Project(name="Bars project", user=user)
+        project = Project(name="Bars project", users=[user])
         project.save()
 
         self.file_handle, self.file_path = tempfile.mkstemp()

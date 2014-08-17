@@ -125,12 +125,21 @@ class ProjectsUsers(db.Model, Base):
     Attributes:
         user (User): The ``User`` in this relationship.
         project (Project): The ``Project`` in this relationship.
-        permissions (int): The permissions of this ``User`` in this ``Project``.
+        role (int): The permissions of this ``User`` in this ``Project``.
+        ROLE_USER (int): The integer that represents a user role for
+            ``permissions``.
+        ROLE_ADMIN (int): Represents an admin role for ``permissions``.
     """
-    user_id = db.Column(db.Integer(), db.ForeignKey("user.id")),
-    project_id = db.Column(db.Integer(), db.ForeignKey("project.id")),
-    permissions = db.Column(db.Integer()))
+    ROLE_USER = 0
+    ROLE_ADMIN = 1
 
-    user = db.relationship("User")
-    project = db.relationship("Project")
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"))
+    project_id = db.Column(db.Integer(), db.ForeignKey("project.id"))
+    role = db.Column(db.Integer())
+
+    user = db.relationship("User", backref=db.backref("user_projects",
+        cascade="all, delete-orphan"))
+
+    project = db.relationship("Project", backref=db.backref("project_users",
+        cascade="all, delete-orphan"))
 

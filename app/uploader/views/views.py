@@ -33,6 +33,7 @@ from ...models import Project
 from ...models import StructureFile
 from ...models import Unit
 from ...models import User
+from ...models import ProjectsUsers
 from app import app
 from app import db
 from app.models import User
@@ -203,9 +204,8 @@ class ProjectsCLPD(CLPDView):
         and a path. Their path is also created.
         """
         project = Project(
-            name=self.create_form.name.data,
-            user=current_user)
-        project.save()
+            name=self.create_form.name.data)
+        current_user.add_project(project, role=ProjectsUsers.ROLE_ADMIN)
         project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
         project.save()
         os.mkdir(project.path)
@@ -354,14 +354,9 @@ class ProjectCLPD(CLPDView):
 uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
     view_func=ProjectCLPD.as_view("project_show"))
 
-# NOTE: It should not be necessary to include the project_id in the URL if this
-# just shows information about a document. The only reason it might need it is
-# if it's a page that shows information about the relationship between the
-# document and the project, which should probably be on a separate page anyway.
-@uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" +
-    app.config["DOCUMENT_ROUTE"] + '<int:document_file_id>')
+@uploader.route(app.config["DOCUMENT_ROUTE"] + '<int:document_file_id>')
 @login_required
-def document_show(project_id, document_file_id):
+def document_show(document_file_id):
     """The show action, which shows details for a particular DocumentFile.
 
     :param int document_file_id: The DocumentFile to retrieve details for.
@@ -383,16 +378,10 @@ def document_show(project_id, document_file_id):
     filename = os.path.split(document_file.path)[1]
     #TODO: move to objects
 
-    project = Project.query.join(User).filter(User.id == current_user.id).\
-        filter(DocumentFile.id == document_file_id).one()
-    # NOTE: do you mean projects? why do you only load one project when
-    # documents can be part of more than one project? This should likely
-    # just be document.projects
-
     return render_template("document_show.html",
         document_file=document_file,
-        project=project,
         filename=filename)
+
 @csrf.exempt
 @uploader.route(app.config["PROJECT_ROUTE"]+"<int:project_id>"+
     app.config["MAP_ROUTE"] + '<int:document_file_id>')
