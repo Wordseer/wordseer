@@ -1,12 +1,8 @@
 """Models for projects.
 """
 from app import db
-<<<<<<< HEAD
-from .base import Base
-=======
 from base import Base
 from .log import Log
->>>>>>> development
 
 class Project(db.Model, Base):
     """A WordSeer project for a collection of documents.
@@ -54,7 +50,6 @@ class Project(db.Model, Base):
 
         return documents
 
-<<<<<<< HEAD
     def frequent_sequences(self, position, length, limit, lemmatized = False):
         """Return the most frequently occurring sequences with the given
         parameters.
@@ -105,7 +100,7 @@ class Project(db.Model, Base):
         """
 
         return db.session.execute(
-            """SELECT word.id, word.lemma, count.sentence_count
+            """SELECT word.id, word.word, count.sentence_count
             FROM word INNER JOIN word_in_sentence
                 ON word.id = word_in_sentence.word_id
                 INNER JOIN word_count
@@ -114,7 +109,7 @@ class Project(db.Model, Base):
             WHERE word_in_sentence.position = {position} AND
                 word.part_of_speech LIKE '{part_of_speech}%' AND
                 count.project_id = {project_id}
-            GROUP BY word.lemma
+            GROUP BY word.id
             ORDER BY count.sentence_count DESC
             LIMIT {limit}
         """.format(
