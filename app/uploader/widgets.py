@@ -32,7 +32,7 @@ class DropdownWidget(object):
         output = "<select class='form-control' id='%s' name='%s'>" % (field.id, field.id)
 
         for choice in field.choices:
-            output += "<option value='%s'>%s</option>" % (choice[1], choice[0])
+            output += "<option value='%s'>%s</option>" % (choice[0], choice[1])
 
         output += "</select>"
 
