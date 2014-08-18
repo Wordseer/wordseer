@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "macros.html" import breadcrumbs, render_errors %}
+{% from "macros.html" import breadcrumbs, render_errors, render_field %}
 {% block title %}Project permissions{% endblock %}
 {% block scripts %}
     <script src="{{ url_for('uploader.static',
@@ -39,15 +39,20 @@
                     <td>{{ permission.label.text.get_role_name() }}</td>
                 </tr>
                 {% endfor %}
+                <tr>
+                    <td>{{ form.create_button(class="btn btn-primary") }}</td>
+                    <td>{{ render_field(form.new_collaborator, label_class="sr-only") }}</td>
+                    <td>{{ form.permissions() }}</td>
+                </tr>
             </tbody>
         </table>
         <p>Use the dropdown list to select a permission to apply to the checked
             users.</p>
         <div class="col-sm-4">
-            {{ form.permissions(foo="bar") }}
+            {{ form.permissions() }}
         </div>
         {{ form.update_button(class="btn btn-info",
-                    icon="glyphicon-save", id='structure-button') }}
+                    icon="glyphicon-save") }}
         {{ form.delete_button(class="btn btn-danger",
                     icon="glyphicon-remove") }}
     </form>
