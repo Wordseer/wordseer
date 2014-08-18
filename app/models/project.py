@@ -1,7 +1,12 @@
 """Models for projects.
 """
 from app import db
+<<<<<<< HEAD
 from .base import Base
+=======
+from base import Base
+from .log import Log
+>>>>>>> development
 
 class Project(db.Model, Base):
     """A WordSeer project for a collection of documents.
@@ -49,6 +54,7 @@ class Project(db.Model, Base):
 
         return documents
 
+<<<<<<< HEAD
     def frequent_sequences(self, position, length, limit, lemmatized = False):
         """Return the most frequently occurring sequences with the given
         parameters.
@@ -117,3 +123,21 @@ class Project(db.Model, Base):
             project_id = self.id,
             limit = limit
         )).fetchall()
+
+    def get_errors(self):
+        """Return all ``ErrorLogs`` attached to this project.
+        """
+        return Log.query.filter(Log.project == self).\
+            filter(Log.type == "error").all()
+
+    def get_warnings(self):
+        """Return all ``WarningLogs`` attached to this project.
+        """
+        return Log.query.filter(Log.project == self).\
+            filter(Log.type == "warning").all()
+
+    def get_infos(self):
+        """Return all ``InfoLogs`` attached to this project.
+        """
+        return Log.query.filter(Log.project == self).\
+            filter(Log.type == "info").all()

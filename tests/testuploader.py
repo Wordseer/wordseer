@@ -17,6 +17,7 @@ from app.models.documentfile import DocumentFile
 from app.models.flask_security import User
 from app.models.project import Project
 from app.models.structurefile import StructureFile
+from app.models.log import *
 import database
 
 class ViewsTests(unittest.TestCase):
@@ -71,7 +72,7 @@ class ViewsTests(unittest.TestCase):
         assert "no projects" in result.data
         assert "You must provide a name" in result.data
 
-    @mock.patch("app.uploader.views.os", autospec=os)
+    @mock.patch("app.uploader.views.views.os", autospec=os)
     def test_projects_valid_create_post(self, mock_os):
         """Test POSTing with a valid project name.
 
@@ -87,8 +88,8 @@ class ViewsTests(unittest.TestCase):
         assert "test project" in result.data
         assert "/projects/1" in result.data
 
-    @mock.patch("app.uploader.views.shutil", autospec=shutil)
-    @mock.patch("app.uploader.views.os", autospec=os)
+    @mock.patch("app.uploader.views.views.shutil", autospec=shutil)
+    @mock.patch("app.uploader.views.views.os", autospec=os)
     def test_projects_delete_post(self, mock_os, mock_shutil):
         """Test project deletion.
         """
@@ -130,7 +131,7 @@ class ViewsTests(unittest.TestCase):
         assert "/projects/1" in result.data
         assert "/projects/2" in result.data
 
-    @mock.patch("app.uploader.views.process_files", autospec=True)
+    @mock.patch("app.uploader.views.views.process_files", autospec=True)
     def test_projects_bad_process(self, mock_process_files):
         """Test processing an unprocessable project.
         """
@@ -146,7 +147,7 @@ class ViewsTests(unittest.TestCase):
 
         assert "include exactly one json file" in result.data
 
-    @mock.patch("app.uploader.views.process_files", autospec=True)
+    @mock.patch("app.uploader.views.views.process_files", autospec=True)
     def test_projects_process(self, mock_process_files):
         """Test processing a processable project.
         """
@@ -257,7 +258,7 @@ class ViewsTests(unittest.TestCase):
 
         assert "You must select at least one document file"
 
-    @mock.patch("app.uploader.views.os", autospec=os)
+    @mock.patch("app.uploader.views.views.os", autospec=os)
     def test_project_show_delete(self, mock_os):
         """Test file deletion.
         """
@@ -305,7 +306,7 @@ class ViewsTests(unittest.TestCase):
         assert "/projects/1/documents/1" in result.data
         assert "/projects/1/documents/2" in result.data
 
-    @mock.patch("app.uploader.views.process_files", autospec=True)
+    @mock.patch("app.uploader.views.views.process_files", autospec=True)
     def test_project_show_process(self, mock_process_files):
         """Test processing a processable group of files.
         """
@@ -327,7 +328,7 @@ class ViewsTests(unittest.TestCase):
 
         assert "Errors have occurred" not in result.data
 
-    @mock.patch("app.uploader.views.process_files", autospec=True)
+    @mock.patch("app.uploader.views.views.process_files", autospec=True)
     def test_project_show_bad_process(self, mock_process_files):
         """Test processing an unprocessable group of files.
         """
@@ -393,7 +394,32 @@ class ViewsTests(unittest.TestCase):
         assert "/uploads/" + str(docid) in result.data
         assert "test-file.xml" in result.data
 
+    def test_logs(self):
+        """Test to make sure that logs are being displayed.
+        """
 
+        project1 = Project(name="foo", path="/test-path",
+            user=self.user)
+        project2 = Project(name="foob", path="/foobar",
+            user=self.user)
+
+        logs = [WarningLog(log_item="a", item_value="a", project=project1),
+            InfoLog(log_item="b", item_value="b", project=project1),
+            ErrorLog(log_item="c", item_value="c", project=project1)]
+
+        project1.document_files = [DocumentFile(path="foo")]
+        project2.document_files = [DocumentFile(path="foo")]
+        project1.save()
+        project2.save()
+
+        result = self.client.get("/projects/1")
+
+        assert "alert alert-warning" in result.data
+        assert "alert alert-info" in result.data
+        assert "alert alert-danger" in result.data
+        assert "<em>a</em>: a" in result.data
+        assert "<em>b</em>: b" in result.data
+        assert "<em>c</em>: c" in result.data
 
 class AuthTests(unittest.TestCase):
     """Make sure that users can only see the pages and such that they
