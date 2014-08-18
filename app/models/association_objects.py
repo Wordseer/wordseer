@@ -133,6 +133,16 @@ class ProjectsUsers(db.Model, Base):
     ROLE_USER = 0
     ROLE_ADMIN = 1
 
+    ROLE_DESCRIPTIONS = {
+        ROLE_USER: "Can view",
+        ROLE_ADMIN: "Can edit"
+    }
+
+    def get_role_name(self):
+        """Return a human-readable role name.
+        """
+        return self.ROLE_DESCRIPTIONS[self.role]
+
     user_id = db.Column(db.Integer(), db.ForeignKey("user.id"))
     project_id = db.Column(db.Integer(), db.ForeignKey("project.id"))
     role = db.Column(db.Integer())
