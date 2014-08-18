@@ -7,12 +7,13 @@ import os
 from flask_wtf import Form
 from flask import redirect
 from flask_wtf.file import FileAllowed, FileField, FileRequired
+from sqlalchemy.orm.exc import NoResultFound
 from wtforms.fields import StringField, HiddenField
 from wtforms.validators import Required, ValidationError
 
 from app import app
 from .fields import ButtonField, MultiCheckboxField, MultiRadioField, DropdownField
-from ..models import Unit, Project, DocumentFile, ProjectsUsers
+from ..models import Unit, Project, DocumentFile, ProjectsUsers, User
 
 class HiddenSubmitted(object):
     """A mixin to provide a hidden field called "submitted" which has a default
@@ -170,17 +171,52 @@ class ProjectPermissionsForm(Form, HiddenSubmitted):
     """List and change project permissions.
     """
     UPDATE = "0"
-    DELETE = "1"
+    DELETE = "-1"
+    CREATE = "1"
+
     selection = MultiCheckboxField("Select",
         coerce=int,
         choices=[])
 
-    possible_permissions = [(id, name) for name, id in ProjectsUsers.ROLE_DESCRIPTIONS.items()]
-    permissions = DropdownField("Permissions...", choices=possible_permissions)
+    new_collaborator = StringField("Add new user")
+    possible_permissions = [(str(id), name) for id, name in
+        ProjectsUsers.ROLE_DESCRIPTIONS.items()]
+    permissions = DropdownField("Permissions...", default="1",
+        choices=possible_permissions)
+    create_button = ButtonField("Add collaborator", name="action", value=CREATE)
     update_button = ButtonField("Set permissions", name="action", value=UPDATE)
     delete_button = ButtonField("Delete", name="action", value=DELETE)
 
-    def validate(self):
-        if self.selection.data:
-            return True
+    def validate_selection(form, field):
+        """Validate the selection. This only does anything if the UPDATE
+        or DELETE buttons have been pressed.
+        """
+        action = form.create_button.data # All buttons have the same data
+        if action == form.UPDATE or action == form.DELETE:
+            if field.data:
+                return True
+            else:
+                raise ValidationError("You must make a selection")
+        return True
+
+    def validate_new_collaborator(form, field):
+        """Validate the new_collaborator field. Only does anything if CREATE
+        button has been pressed.
+        """
+        action = form.create_button.data # All buttons have the same data
+        if action == form.CREATE:
+            users = User.query.all()
+            user_emails = [user.email for user in users]
+            existing_collaborators = [choice[1].user.id for choice in
+                form.selection.choices]
+
+            try:
+                new_user = User.query.filter_by(email = field.data).one()
+            except NoResultFound:
+                raise ValidationError("No such user exists.")
+
+            if new_user.id in existing_collaborators:
+                raise ValidationError("This user is already on this project.")
+
+        return True
 
