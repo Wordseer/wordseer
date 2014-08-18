@@ -16,6 +16,7 @@ from app.models.document import Document
 from app.models.documentfile import DocumentFile
 from app.models.flask_security import User
 from app.models.project import Project
+from app.models.association_objects import ProjectsUsers
 from app.models.structurefile import StructureFile
 from app.models.log import *
 import database
@@ -421,6 +422,105 @@ class ViewsTests(unittest.TestCase):
         assert "<em>b</em>: b" in result.data
         assert "<em>c</em>: c" in result.data
 
+class ProjectPermissionsTests(unittest.TestCase):
+    """Tests for the ProjectPermissions view.
+    """
+    def setUp(self):
+        database.clean()
+        self.client = application.test_client()
+        self.user1 = user_datastore.create_user(email="foo@foo.com",
+            password="password")
+        self.user2 = user_datastore.create_user(email="bar@bar.com",
+            password="password")
+        db.session.commit()
+        with self.client.session_transaction() as sess:
+            sess["user_id"] = self.user1.get_id()
+            sess["_fresh"] = True
+        self.project1 = Project(name="Foos project")
+        self.project2 = Project(name="Bars project")
+        self.user1.add_project(self.project1, ProjectsUsers.ROLE_ADMIN)
+        self.user2.add_project(self.project2, ProjectsUsers.ROLE_ADMIN)
+        self.project1.save()
+        self.project2.save()
+
+    def test_permissions_access(self):
+        """Make sure users can only access their own permissions.
+        """
+        result = self.client.get("/projects/2/permissions")
+        assert "Permissions" not in result.data
+        result = self.client.get("/projects/1/permissions")
+        assert "Permissions" in result.data
+
+    def test_create_nonexistent(self):
+        """Add a nonexistent user.
+        """
+
+        result = self.client.post("/projects/1/permissions", data={
+            "permissions-submitted": "true",
+            "action": "1",
+            "permissions-new_collaborator": "gjie"
+            })
+
+        assert "No such user exists" in result.data
+
+    def test_create_existing(self):
+        """Add an existing user.
+        """
+        result = self.client.post("/projects/1/permissions", data={
+            "permissions-submitted": "true",
+            "action": "1",
+            "permissions-new_collaborator": "foo@foo.com"
+            })
+
+        assert "This user is already on this project" in result.data
+
+    def test_create_proper(self):
+        """Do a proper add.
+        """
+
+        result = self.client.post("/projects/1/permissions", data={
+            "permissions-submitted": "true",
+            "action": "1",
+            "permissions-new_collaborator": "bar@bar.com",
+            "permissions-permissions": "1"
+            })
+        assert "bar@bar.com</label>" in result.data
+
+    def test_delete_nonexistant(self):
+        """Try to delete without a selection.
+        """
+
+        result = self.client.post("/projects/1/permissions", data={
+            "permissions-submitted": "true",
+            "action": "-1",
+            })
+        assert "must make a selection" in result.data
+
+    def test_delete(self):
+        """Try to delete a selection.
+        """
+        rel = self.user2.add_project(self.project1, ProjectsUsers.ROLE_ADMIN)
+        result = self.client.post("/projects/1/permissions", data={
+            "permissions-submitted": "true",
+            "action": "-1",
+            "permissions-selection": [str(rel.id)]
+            })
+
+        assert "bar@bar.com" not in result.data
+
+    def test_update(self):
+        """Try to update a user's permissions.
+        """
+        rel = self.user2.add_project(self.project1, ProjectsUsers.ROLE_USER)
+        result = self.client.post("/projects/1/permissions", data={
+            "permissions-submitted": "true",
+            "action": "0",
+            "permissions-selection": [str(rel.id)],
+            "permissions-permission": ["1"]
+            })
+
+        assert "Can view</td>" not in result.data
+
 class AuthTests(unittest.TestCase):
     """Make sure that users can only see the pages and such that they
     should be seeing.
@@ -454,7 +554,6 @@ class AuthTests(unittest.TestCase):
         """Test to make sure that bar's projects aren't listed for foo.
         """
         result = self.client.get("/projects/")
-
         assert "Bars project" not in result.data
 
     def test_view_project(self):
