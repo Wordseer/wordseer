@@ -125,15 +125,14 @@ class StringProcessor(object):
                         part_of_speech = dependent_pos
                     ).first()
 
-                    # Temporary skip if one of the words is not found;
-                    # see issue #128 on Github.
-                    # TODO: remove
                     try:
                         governor.id
                         dependent.id
                     except:
                         project_logger.error("Governor or dependent not "
-                            "found; giving up on parse.")
+                            "found; giving up on parse. This likely indicates"
+                            " an error in the preprocessing; rerunning the "
+                            "preprocessor is recommended.")
                         project_logger.info(sentence)
                         return sentence
 
