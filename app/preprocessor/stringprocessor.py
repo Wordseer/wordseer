@@ -70,7 +70,7 @@ class StringProcessor(object):
         if len(parsed["sentences"]) > 1:
             project_logger.warning("More than one sentence passed in to"
                 " StringProcessor.parse().")
-            # TODO: combine sentence
+            parsed_sentence["text"] += parsed["sentences"][1]["text"]
 
         for dependency in parsed_sentence["dependencies"]:
             # We don't want to make a dependency involving ROOT
