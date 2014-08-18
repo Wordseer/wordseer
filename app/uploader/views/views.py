@@ -354,6 +354,57 @@ class ProjectCLPD(CLPDView):
 uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
     view_func=ProjectCLPD.as_view("project_show"))
 
+class ProjectPermissions(View):
+    """View and modify a project's permissions.
+    """
+    decorators = [login_required]
+    methods = ["GET", "POST"]
+    def __init__(self):
+        self.form = forms.ProjectPermissionsForm(prefix="permissions")
+
+    def handle_form(self):
+        """Handle the form actions.
+        """
+        selected_rels = request.form.getlist("permissions-selection")
+        ownerships = [ProjectsUsers.query.get(id) for id in selected_rels]
+        if request.form["action"] == self.form.DELETE:
+            pass
+
+        if request.form["action"] == self.form.MODIFY:
+            pass
+
+    def set_choices(self):
+        """Get the possible choices.
+        """
+        ownerships = ProjectsUsers.query.filter_by(project = self.project).all()
+
+        self.form.selection.choices = []
+        for ownership in ownerships:
+            self.form.selection.add_choice(ownership.id, ownership)
+
+    def dispatch_request(self, project_id):
+        """Render the template with the correct data.
+        """
+        self.project = Project.query.get(project_id)
+        if (not self.project or
+                self.project not in current_user.projects or
+                ProjectsUsers.query.filter_by(project = self.project).\
+                    filter_by(user = current_user).one().role is not
+                    ProjectsUsers.ROLE_ADMIN):
+            return app.login_manager.unauthorized()
+
+        self.set_choices()
+        if helpers.really_submitted(self.form):
+            self.handle_form()
+
+        return render_template("project_permissions.html",
+            project=self.project,
+            form=self.form)
+
+uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/permissions",
+    view_func=ProjectPermissions.as_view("project_permissions"))
+
+
 @uploader.route(app.config["DOCUMENT_ROUTE"] + '<int:document_file_id>')
 @login_required
 def document_show(document_file_id):
@@ -392,7 +443,6 @@ def document_map(project_id, document_file_id):
 
     :param int doc_id: The document to retrieve details for.
     """
-    print "DOC MAP"
     try:
         document = DocumentFile.query.get(document_file_id)
     except TypeError:
