@@ -24,3 +24,17 @@ class ButtonWidget(object):
             icon_span,
             escape(field._value())
             ))
+
+class DropdownWidget(object):
+    """A widget display dropdowns.
+    """
+    def __call__(self, field, **kwargs):
+        output = "<select class='form-control' id='%s' name='%s'>" % (field.id, field.id)
+
+        for choice in field.choices:
+            output += "<option value='%s'>%s</option>" % (choice[1], choice[0])
+
+        output += "</select>"
+
+        return HTMLString(output)
+

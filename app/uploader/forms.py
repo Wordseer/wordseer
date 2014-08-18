@@ -11,8 +11,8 @@ from wtforms.fields import StringField, HiddenField
 from wtforms.validators import Required, ValidationError
 
 from app import app
-from .fields import ButtonField, MultiCheckboxField, MultiRadioField
-from ..models import Unit, Project, DocumentFile
+from .fields import ButtonField, MultiCheckboxField, MultiRadioField, DropdownField
+from ..models import Unit, Project, DocumentFile, ProjectsUsers
 
 class HiddenSubmitted(object):
     """A mixin to provide a hidden field called "submitted" which has a default
@@ -165,4 +165,22 @@ class ConfirmDeleteForm(Form, HiddenSubmitted):
 
 class MapDocumentForm(Form, HiddenSubmitted):
     done = 0
+
+class ProjectPermissionsForm(Form, HiddenSubmitted):
+    """List and change project permissions.
+    """
+    UPDATE = "0"
+    DELETE = "1"
+    selection = MultiCheckboxField("Select",
+        coerce=int,
+        choices=[])
+
+    possible_permissions = [(id, name) for name, id in ProjectsUsers.ROLE_DESCRIPTIONS.items()]
+    permissions = DropdownField("Permissions...", choices=possible_permissions)
+    update_button = ButtonField("Set permissions", name="action", value=UPDATE)
+    delete_button = ButtonField("Delete", name="action", value=DELETE)
+
+    def validate(self):
+        if self.selection.data:
+            return True
 
