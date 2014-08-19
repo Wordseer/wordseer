@@ -134,8 +134,8 @@ class ProjectsUsers(db.Model, Base):
     ROLE_ADMIN = 1
 
     ROLE_DESCRIPTIONS = {
-        ROLE_USER: "Can view",
-        ROLE_ADMIN: "Can edit"
+        ROLE_USER: "User",
+        ROLE_ADMIN: "Admin"
     }
 
     def get_role_name(self):
