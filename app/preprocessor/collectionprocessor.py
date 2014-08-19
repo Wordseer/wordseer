@@ -69,12 +69,6 @@ class CollectionProcessor(object):
             self.project_logger.info("Parsing documents")
             self.parse_documents()
 
-        # Calculate word-in-sentence counts and TF-IDFs
-        if not "true" in logger.get(self.project, "word_counts_done").lower():
-            self.project_logger.info("Calculating word counts")
-            # TODO: implement a method to do word counts for sentences
-            logger.log(self.project, "word_counts_done", "true", logger.REPLACE)
-
         # Calculate word TFIDFs
         if not "true" in logger.get(self.project, "tfidf_done").lower():
             self.project_logger.info("Calculating TF IDF's")
