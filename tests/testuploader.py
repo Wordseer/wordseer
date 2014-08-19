@@ -96,12 +96,10 @@ class ViewsTests(unittest.TestCase):
         """
         mock_os.path.isdir.return_value = True
 
-        project1 = Project(name="test1", path=application.config["UPLOAD_DIR"],
-            users=[self.user])
-        project2 = Project(name="test2", path=application.config["UPLOAD_DIR"],
-            users=[self.user])
-        project1.save()
-        project2.save()
+        project1 = Project(name="test1", path=application.config["UPLOAD_DIR"])
+        project2 = Project(name="test2", path=application.config["UPLOAD_DIR"])
+        self.user.add_project(project1, role=ProjectsUsers.ROLE_ADMIN)
+        self.user.add_project(project2, role=ProjectsUsers.ROLE_ADMIN)
 
         result = self.client.post("/projects/", data={
             "action": "-1",
@@ -152,23 +150,65 @@ class ViewsTests(unittest.TestCase):
     def test_projects_process(self, mock_process_files):
         """Test processing a processable project.
         """
-        project = Project(name="test", users=[self.user])
+        project = Project(name="test")
+        rel = self.user.add_project(project, role=ProjectsUsers.ROLE_ADMIN)
         project.save()
 
         document_file1 = DocumentFile(projects=[project],
             path="/test-path/1.xml")
-        document_file2 = DocumentFile(projects=[project],
+        structure_file1 = StructureFile(project=project,
             path="/test-path/2.json")
         document_file1.save()
-        document_file2.save()
+        structure_file1.save()
 
         result = self.client.post("/projects/", data={
             "process-submitted": "true",
             "action": "0",
-            "process-selection": ["1"]
+            "process-selection": ["1"],
+            "process-structure_file": "2"
             })
 
-        assert "Errors have occurred" not in result.data
+        assert mock_process_files.call_count == 1
+        assert "alert alert-danger" not in result.data
+
+    @mock.patch("app.uploader.views.views.process_files", autospec=True)
+    def test_projects_process_no_perms(self, mock_process_files):
+        """Test processing without permissions.
+        """
+        project = Project(name="test")
+        rel = self.user.add_project(project, role=ProjectsUsers.ROLE_USER)
+        project.save()
+
+        document_file1 = DocumentFile(projects=[project],
+            path="/test-path/1.xml")
+        structure_file1 = StructureFile(project=project,
+            path="/test-path/2.json")
+        document_file1.save()
+        structure_file1.save()
+
+        result = self.client.post("/projects/", data={
+            "process-submitted": "true",
+            "action": "0",
+            "process-selection": ["1"],
+            "process-structure-file": "2"
+            })
+
+        assert "Not authorized" in result.data
+
+    def test_projects_delete_no_perms(self):
+        """Delete projects without proper permissions.
+        """
+        project = Project(name="foo")
+        rel = self.user.add_project(project, role=ProjectsUsers.ROLE_USER)
+        project.save()
+
+        result = self.client.post("/projects/", data={
+            "process-submitted": "true",
+            "action": "-1",
+            "process-selection": [str(project.id)],
+            })
+
+        assert "Not authorized" in result.data
 
     def test_no_project_show(self):
         """Make sure project_show says that there are no files.
@@ -199,7 +239,9 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_upload(self):
         """Try uploading a file to the project_show view.
         """
-        project = Project(name="test", users=[self.user])
+
+        project = Project(name="test")
+        self.user.add_project(project, role=ProjectsUsers.ROLE_ADMIN)
         project.save()
 
         upload_dir = tempfile.mkdtemp()
@@ -222,7 +264,8 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_double_upload(self):
         """Try uploading two files with the same name to the project_show view.
         """
-        project = Project(name="test", users=[self.user])
+        project = Project(name="test")
+        self.user.add_project(project, role=ProjectsUsers.ROLE_ADMIN)
         project.save()
 
         upload_dir = tempfile.mkdtemp()
@@ -244,7 +287,8 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_no_post(self):
         """Try sending an empty post to project_show.
         """
-        project = Project(name="test", users=[self.user])
+        project = Project(name="test")
+        self.user.add_project(project, role=ProjectsUsers.ROLE_ADMIN)
         project.save()
 
         result = self.client.post("/projects/1", data={
@@ -265,8 +309,8 @@ class ViewsTests(unittest.TestCase):
         """
         mock_os.path.isdir.return_value = False
 
-        project = Project(name="test", users=[self.user])
-        project.save()
+        project = Project(name="test")
+        self.user.add_project(project, role=ProjectsUsers.ROLE_ADMIN)
 
         document_file1 = DocumentFile(projects=[project],
             path="/test-path/1.xml")
@@ -280,6 +324,7 @@ class ViewsTests(unittest.TestCase):
             "action": "-1",
             "process-selection": ["1", "2"]
             })
+
         assert "no files in this project" in result.data
         mock_os.remove.assert_any_call(document_file1.path)
         mock_os.remove.assert_any_call(document_file2.path)
@@ -311,6 +356,7 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_process(self, mock_process_files):
         """Test processing a processable group of files.
         """
+        #TODO: why is this passing?
         project = Project(name="test", users=[self.user])
         project.save()
 
@@ -328,6 +374,43 @@ class ViewsTests(unittest.TestCase):
             })
 
         assert "Errors have occurred" not in result.data
+
+    def test_project_show_process_no_perms(self):
+        """Process files without proper permissions.
+        """
+        project = Project(name="foo")
+        rel = self.user.add_project(project, role=ProjectsUsers.ROLE_USER)
+        document_file = DocumentFile(projects=[project], path="/foo/bar.xml")
+        structure_file = StructureFile(project=project, path="/foo/bar.json")
+        document_file.save()
+        structure_file.save()
+        project.save()
+
+        result = self.client.post("/projects/1", data={
+            "process-submitted": "true",
+            "action": "0",
+            "process-selection": [str(document_file.id)],
+            "process-structure_file": str(structure_file.id)
+            })
+
+        assert "You can&#39;t do that" in result.data
+
+    def test_project_show_process_no_perms(self):
+        """Delete files without proper permissions.
+        """
+        project = Project(name="foo")
+        rel = self.user.add_project(project, role=ProjectsUsers.ROLE_USER)
+        document_file1 = DocumentFile(projects=[project], path="/foo/bar.xml")
+        structure_file1 = StructureFile(project=project, path="/foo/bar.json")
+        project.save()
+
+        result = self.client.post("/projects/1", data={
+            "process-submitted": "true",
+            "action": "-1",
+            "process-selection": ["1"]
+            })
+
+        assert "You can&#39;t do that" in result.data
 
     @mock.patch("app.uploader.views.views.process_files", autospec=True)
     def test_project_show_bad_process(self, mock_process_files):
@@ -550,8 +633,8 @@ class AuthTests(unittest.TestCase):
             sess["user_id"] = self.user1.get_id()
             sess["_fresh"] = True
 
-        self.project = Project(name="Bars project", users=[self.user2])
-        self.project.save()
+        self.project = Project(name="Bars project")
+        self.user2.add_project(self.project, role=ProjectsUsers.ROLE_ADMIN)
 
         file_handle, file_path = tempfile.mkstemp()
         file_handle = os.fdopen(file_handle, "r+")

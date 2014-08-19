@@ -219,9 +219,24 @@ class ProjectsCLPD(CLPDView):
         project_objects = [Project.query.get(id) for id in selected_projects]
         if request.form["action"] == self.process_form.DELETE:
             for project in project_objects:
+                rel = ProjectsUsers.query.filter_by(user=current_user,
+                    project=project).one()
+
+                if rel.role < ProjectsUsers.ROLE_ADMIN:
+                    self.process_form.selection.errors.append("Not authorized"
+                        " to delete " + project.name)
+                    continue
+
                 self.delete_object(project, project.name)
+
         if request.form["action"] == self.process_form.PROCESS:
             for project in project_objects:
+                rel = ProjectsUsers.query.filter_by(user=current_user,
+                    project=project).one()
+                if rel.role < ProjectsUsers.ROLE_ADMIN:
+                    self.process_form.selection.errors.append("Not authorized"
+                        " to process " + project.name)
+                    continue
                 files = project.document_files
                 structure_file = project.structure_files[0]
                 process_files(project.path, structure_file.path, project)
@@ -252,13 +267,17 @@ class ProjectCLPD(CLPDView):
             exceptions.ProjectNotFoundException)
             # NOTE: handle access to nonexistent objects globally
 
+        if self.project not in current_user.projects:
+            return app.login_manager.unauthorized()
+
         self.template_kwargs["project"] = self.project
         self.template_kwargs["project_errors"] = self.project.get_errors()
         self.template_kwargs["project_warnings"] = self.project.get_warnings()
         self.template_kwargs["project_infos"] = self.project.get_infos()
 
-        if self.project not in current_user.projects:
-            return app.login_manager.unauthorized()
+        self.rel = ProjectsUsers.query.filter_by(user=current_user,
+            project=self.project).one()
+        self.template_kwargs["user_role"] = self.rel.role
 
     def set_choices(self, **kwargs):
         """The template needs the choices in the form of (id, filename).
@@ -280,6 +299,9 @@ class ProjectCLPD(CLPDView):
         the project directory and create a database record with its filename and
         path.
         """
+        if self.rel.role < ProjectsUsers.ROLE_ADMIN:
+            self.create_form.uploaded_file.errors.append("You can't do that.")
+            return
         uploaded_files = request.files.getlist("create-uploaded_file")
         for uploaded_file in uploaded_files:
             filename = secure_filename(uploaded_file.filename)
@@ -322,6 +344,9 @@ class ProjectCLPD(CLPDView):
         """If deleting, delete every database record and file. If processing,
         then send files to the processor.
         """
+        if self.rel.role < ProjectsUsers.ROLE_ADMIN:
+            self.process_form.selection.errors.append("You can't do that.")
+            return
         files = request.form.getlist("process-selection")
         structure_file_ids = request.form.getlist("process-structure_file")
 

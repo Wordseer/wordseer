@@ -17,6 +17,7 @@
 
 {% block creation_header %}Upload new document{% endblock %}
 {% block creation_form %}
+{% if user_role > 0 %}
 <form method="POST" enctype="multipart/form-data"
       class="form-inline clearfix" role="form">
     {{ create_form.hidden_tag() }}
@@ -31,6 +32,7 @@
 </form>
 <a href="{{ url_for("uploader.project_permissions", project_id=project.id) }}",
    class="btn btn-primary"><span class="glyphicon glyphicon-user"></span> Permissions</a>
+{% endif %}
 {% endblock %}
 
 {% block list_header %}Existing documents{% endblock %}
@@ -76,12 +78,14 @@
             {{ macros.show_logs(project_warnings, "alert alert-warning") }}
             {{ macros.show_logs(project_infos, "alert alert-info") }}
     <h3>Selected file actions:</h3>
-    {{ process_form.structure_button(class="btn btn-info",
-                icon="glyphicon-list", id='structure-button') }}
-    {{ process_form.process_button(class="btn btn-primary",
-                icon="glyphicon-tasks") }}
-    {{ process_form.delete_button(class="btn btn-danger",
-                icon="glyphicon-remove") }}
+    {% if user_role > 0 %}
+        {{ process_form.structure_button(class="btn btn-info",
+                    icon="glyphicon-list", id='structure-button') }}
+        {{ process_form.process_button(class="btn btn-primary",
+                    icon="glyphicon-tasks") }}
+        {{ process_form.delete_button(class="btn btn-danger",
+                    icon="glyphicon-remove") }}
+    {% endif %}
         </form>
     {% else %}
         <p>There are no files in this project.</p>
