@@ -42,14 +42,14 @@
                 <tr>
                     <td>{{ form.create_button(class="btn btn-primary") }}</td>
                     <td>{{ render_field(form.new_collaborator, label_class="sr-only") }}</td>
-                    <td>{{ form.permissions() }}</td>
+                    <td>{{ form.create_permissions() }}</td>
                 </tr>
             </tbody>
         </table>
         <p>Use the dropdown list to select a permission to apply to the checked
             users.</p>
         <div class="col-sm-4">
-            {{ form.permissions() }}
+            {{ form.update_permissions() }}
         </div>
         {{ form.update_button(class="btn btn-info",
                     icon="glyphicon-save") }}

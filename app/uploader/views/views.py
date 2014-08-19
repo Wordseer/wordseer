@@ -398,7 +398,7 @@ class ProjectPermissions(View):
                 ownership.delete()
 
         if request.form["action"] == self.form.UPDATE:
-            role = int(request.form["permissions-permissions"])
+            role = int(request.form["permissions-update_permissions"])
             for ownership in ownerships:
                 ownership.role = role
                 ownership.save(False)
@@ -406,7 +406,7 @@ class ProjectPermissions(View):
 
         if request.form["action"] == self.form.CREATE:
             email = request.form["permissions-new_collaborator"]
-            role = int(request.form["permissions-permissions"])
+            role = int(request.form["permissions-create_permissions"])
             user = User.query.filter(User.email == email).one()
             rel = user.add_project(project=self.project, role=role)
             self.form.selection.add_choice(rel.id, rel)

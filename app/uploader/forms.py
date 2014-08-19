@@ -181,7 +181,9 @@ class ProjectPermissionsForm(Form, HiddenSubmitted):
     new_collaborator = StringField("Add new user")
     possible_permissions = [(str(id), name) for id, name in
         ProjectsUsers.ROLE_DESCRIPTIONS.items()]
-    permissions = DropdownField("Permissions...", default="1",
+    create_permissions = DropdownField("Permissions", default="1",
+        choices=possible_permissions)
+    update_permissions = DropdownField("Permissions", default="1",
         choices=possible_permissions)
     create_button = ButtonField("Add collaborator", name="action", value=CREATE)
     update_button = ButtonField("Set permissions", name="action", value=UPDATE)
