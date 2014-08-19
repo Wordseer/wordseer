@@ -2,6 +2,7 @@
 """
 from app import db
 from base import Base
+from .log import Log
 
 class Project(db.Model, Base):
     """A WordSeer project for a collection of documents.
@@ -41,4 +42,22 @@ class Project(db.Model, Base):
             documents.extend(document_file.documents)
 
         return documents
+
+    def get_errors(self):
+        """Return all ``ErrorLogs`` attached to this project.
+        """
+        return Log.query.filter(Log.project == self).\
+            filter(Log.type == "error").all()
+
+    def get_warnings(self):
+        """Return all ``WarningLogs`` attached to this project.
+        """
+        return Log.query.filter(Log.project == self).\
+            filter(Log.type == "warning").all()
+
+    def get_infos(self):
+        """Return all ``InfoLogs`` attached to this project.
+        """
+        return Log.query.filter(Log.project == self).\
+            filter(Log.type == "info").all()
 

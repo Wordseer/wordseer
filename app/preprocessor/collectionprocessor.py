@@ -7,6 +7,7 @@ import logging
 import os
 
 from app import app
+from app.models import Project
 import database
 from . import logger
 from .documentparser import DocumentParser
@@ -14,16 +15,16 @@ from .sequenceprocessor import SequenceProcessor
 from . import structureextractor
 from .stringprocessor import StringProcessor
 from . import counter
-
 from app.models import Document, Base
 
 class CollectionProcessor(object):
     """Process a collection of files.
     """
     def __init__(self, project):
-        self.str_proc = StringProcessor(project)
-        self.pylogger = logging.getLogger(__name__)
         self.project = project
+        self.str_proc = StringProcessor(self.project)
+        self.pylogger = logging.getLogger(__name__)
+        self.project_logger = logger.ProjectLogger(self.pylogger, self.project)
 
     def process(self, collection_dir, docstruc_filename,
         filename_extension, start_from_scratch):
@@ -51,12 +52,11 @@ class CollectionProcessor(object):
 	    # Set up database if necessary
         if start_from_scratch is True:
             database.reset()
-
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
         if not "true" in logger.get(self.project,
                 "finished_recording_text_and_metadata"):
-            self.pylogger.info("Extracting document text and metadata")
+            self.project_logger.info("Extracting document text and metadata")
             self.extract_record_metadata(collection_dir,
                 docstruc_filename, filename_extension)
 
@@ -66,25 +66,19 @@ class CollectionProcessor(object):
                 app.config["PART_OF_SPEECH_TAGGING"])) and not
                 "true" in logger.get(self.project,
                     "finished_grammatical_processing").lower()):
-            self.pylogger.info("Parsing documents")
+            self.project_logger.info("Parsing documents")
             self.parse_documents()
-
-        # Calculate word-in-sentence counts and TF-IDFs
-        if not "true" in logger.get(self.project, "word_counts_done").lower():
-            self.pylogger.info("Calculating word counts")
-            # TODO: implement a method to do word counts for sentences
-            logger.log(self.project, "word_counts_done", "true", logger.REPLACE)
 
         # Calculate word TFIDFs
         if not "true" in logger.get(self.project, "tfidf_done").lower():
-            self.pylogger.info("Calculating TF IDF's")
+            self.project_logger.info("Calculating TF IDF's")
             # TODO: implement tfidf method in document
 
         # Calculate word-to-word-similarities
         if (app.config["WORD_TO_WORD_SIMILARITY"] and not
                 "true" in logger.get(self.project,
                     "word_similarity_calculations_done")):
-            self.pylogger.info("Calculating Lin Similarities")
+            self.project_logger.info("Calculating Lin Similarities")
             # TODO: implement similarities
 
     def extract_record_metadata(self, collection_dir, docstruc_filename,
@@ -135,14 +129,12 @@ class CollectionProcessor(object):
                     filename))
                 seconds_elapsed = (datetime.now() - start_time).total_seconds()
 
-                self.pylogger.info("Time to extract and record metadata: %ss",
-                    seconds_elapsed)
+                self.project_logger.info("Finished extracting and recording "
+                    "metadata for %s. Time: %ss (%s/%s).", filename,
+                    seconds_elapsed, str(num_files_done), str(len(contents)))
 
-                self.pylogger.info("%s/%s %s", str(num_files_done),
-                    str(len(contents)), filename)
                 logger.log(self.project, "text_and_metadata_recorded",
                     str(num_files_done), logger.UPDATE)
-
 
             num_files_done += 1
 
@@ -172,7 +164,7 @@ class CollectionProcessor(object):
 
         for document in documents:
             if document.id > latest_id:
-                self.pylogger.info("Parsing document %s/%s (#%s)",
+                self.project_logger.info("Parsing document %s/%s (#%s)",
                     str(documents_parsed + 1), str(len(documents)),
                     str(document.id))
 
@@ -180,7 +172,7 @@ class CollectionProcessor(object):
                 document_parser.parse_document(document)
                 seconds_elapsed = (datetime.now() - start_time).total_seconds()
 
-                self.pylogger.info("Time to parse document: %ss",
+                self.project_logger.info("Time to parse document: %ss",
                     str(seconds_elapsed))
                 logger.log(self.project, "finished_grammatical_processing",
                     "false", logger.REPLACE)
@@ -188,7 +180,7 @@ class CollectionProcessor(object):
                     str(document.id), logger.REPLACE)
 
             else:
-                self.pylogger.info("Skipping document %s/%s (#%s)",
+                self.project_logger.info("Skipping document %s/%s (#%s)",
                     str(documents_parsed + 1), str(len(documents)),
                     str(document.id))
 

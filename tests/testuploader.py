@@ -17,6 +17,7 @@ from app.models.documentfile import DocumentFile
 from app.models.flask_security import User
 from app.models.project import Project
 from app.models.structurefile import StructureFile
+from app.models.log import *
 import database
 
 class ViewsTests(unittest.TestCase):
@@ -393,7 +394,32 @@ class ViewsTests(unittest.TestCase):
         assert "/uploads/" + str(docid) in result.data
         assert "test-file.xml" in result.data
 
+    def test_logs(self):
+        """Test to make sure that logs are being displayed.
+        """
 
+        project1 = Project(name="foo", path="/test-path",
+            user=self.user)
+        project2 = Project(name="foob", path="/foobar",
+            user=self.user)
+
+        logs = [WarningLog(log_item="a", item_value="a", project=project1),
+            InfoLog(log_item="b", item_value="b", project=project1),
+            ErrorLog(log_item="c", item_value="c", project=project1)]
+
+        project1.document_files = [DocumentFile(path="foo")]
+        project2.document_files = [DocumentFile(path="foo")]
+        project1.save()
+        project2.save()
+
+        result = self.client.get("/projects/1")
+
+        assert "alert alert-warning" in result.data
+        assert "alert alert-info" in result.data
+        assert "alert alert-danger" in result.data
+        assert "<em>a</em>: a" in result.data
+        assert "<em>b</em>: b" in result.data
+        assert "<em>c</em>: c" in result.data
 
 class AuthTests(unittest.TestCase):
     """Make sure that users can only see the pages and such that they

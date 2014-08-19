@@ -9,10 +9,13 @@ expects a single Sentence object, and it will extract all Sequences from
 this sentence and record them in the database.
 """
 
+import logging
 from app import app
 from app.models.sequence import Sequence
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
+
+from .logger import ProjectLogger
 
 LEMMA = "lemma"
 WORD = "word"
@@ -23,12 +26,12 @@ class SequenceProcessor(object):
 
     def __init__(self, project):
         """Set up local variables for the SequenceProcessor.
-
-        :param boolean grammatical_info_exists: ??
         """
 
         self.project = project
         self.previously_indexed = []
+        self.logger = logging.getLogger(__name__)
+        self.project_logger = ProjectLogger(self.logger, project)
 
     def remove_stops(self, words):
         """Remove every sort of stop from the sentences.
@@ -88,8 +91,8 @@ class SequenceProcessor(object):
                             sequence = sequence_text
                         ).one()
                     except(MultipleResultsFound):
-                        self.logger.error("duplicate records found for: %s",
-                            str(key))
+                        self.project_logger.error("Duplicate records found "
+                            "for: %s", str(key))
                     except(NoResultFound):
                         sequence = Sequence(
                             sequence = sequence_text,
@@ -197,16 +200,6 @@ class SequenceProcessor(object):
                 "words": wordlist_nostops})
 
         return sequences
-
-    def finish(self):
-        """Have the reader_writer finish indexing the sequences. This method
-            simply calls finish_indexing_sequences() from the reader_writer
-            object.
-        """
-
-        #TODO: reader_writer
-        #self.reader_writer.finish_indexing_sequences()
-        pass
 
 def join_tws(words, delimiter, attr):
     """Join either the lemmas or text of words with the delimiter.

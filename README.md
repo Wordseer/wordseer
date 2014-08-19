@@ -13,16 +13,16 @@ There are two parts to this repository.
 [original implementation](https://bitbucket.org/silverasm/wordseer/overview)
 of wordseer into python from PHP.
 
-    This is located in `app/`. It is the server-side and web interface code for
-    the WordSeer application, written in Python using the Flask framework and
-    several web framework libraries.
+    This is located in `app/wordseer/`. It is the server-side and web interface
+    code for the WordSeer application, written in Python using the Flask
+    framework and several web framework libraries.
 
 
 2. An implementation of
 [wordseerbackend](https://bitbucket.org/silverasm/wordseerbackend/overview) in
 more maintainable python.
 
-    This is located in `app/pipeline/`. It is the pipeline or
+    This is located in `app/preprocessor/`. It is the pipeline or
     preprocessing code for uploaded data sets.
 
 ## Installation
@@ -32,10 +32,20 @@ more maintainable python.
 The following packages must be installed before performing any setup:
 
 - [Python 2.7](https://python.org/download)
-- [libxml2 2.6.21 or later](http://xmlsoft.org/downloads.html)
-- [libxslt 1.1.15 or later](http://xmlsoft.org/XSLT/downloads.html)
 - [Java 1.6 or later](https://www.java.com/en/download/manual.jsp)
-- If on linux or mac, [unzip](http://www.info-zip.org/UnZip.html)
+
+### Linux/OS X install
+
+Run `install.py` like so:
+
+    ./install.py -i
+
+This will launch the interactive installer which will guide you through the
+simple installation process.
+
+If you know what you want, run `install.py -h` to view known console flags.
+
+### Windows
 
 We also recommend installing the python dependencies (discussed below) in a
 [virtual environment](https://pypi.python.org/pypi/virtualenv).
@@ -43,16 +53,6 @@ We also recommend installing the python dependencies (discussed below) in a
     pip install virtualenv
     virtualenv venv
     source venv/bin/activate
-
-### Linux/OSX quick install
-
-1. Run `install.sh`:
-
-        ./install.sh
-
-    That's it.
-
-### Windows
 
 #### Installing the application
 1.  Run:
@@ -77,19 +77,6 @@ We also recommend installing the python dependencies (discussed below) in a
 
         git clone https://github.com/silverasm/stanford-corenlp-python.git
         cd stanford-corenlp-python
-
-    Create a file called `setup.py` in its root directory containing the
-    following:
-
-        from setuptools import setup, find_packages
-        setup(name='corenlp',
-            version='1.0',
-            packages=find_packages(),
-            package_data = {"": ["*.properties"],
-            "corenlp": ["*.properties"]},)
-
-    Then, from the root directory of `corenlp`, execute the following:
-
         python setup.py install
 
     This should install `corenlp` to your system.

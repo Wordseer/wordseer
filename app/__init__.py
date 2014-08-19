@@ -22,6 +22,18 @@ try:
 except KeyError:
     app.config.from_object(".".join(["config", DEFAULT_ENV]))
 
+
+try:
+    # Load the JSON preferences
+    preferences_path = os.path.join(app.config["ROOT"], "preferences.json")
+    with open(preferences_path) as preferences_file:
+        preferences = json.load(preferences_file)
+except (ValueError, IOError):
+    preferences = {"INSTALL_TYPE": "full"}
+
+for key, value in preferences.items():
+    app.config[key] = value
+
 """
 ===============
 Database Set Up

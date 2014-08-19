@@ -25,3 +25,4 @@ for file_name in files:
 
 
 cp_run(collection_dir, structure_file, extension, project)
+

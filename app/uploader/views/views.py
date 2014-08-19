@@ -9,6 +9,8 @@ import random
 import json
 from string import ascii_letters, digits
 from cStringIO import StringIO
+import logging
+
 from flask import config
 from flask import redirect, url_for
 from flask import render_template
@@ -34,8 +36,10 @@ from ...models import User
 from app import app
 from app import db
 from app.models import User
-from app.preprocessor.collectionprocessor import cp_run
 from app import csrf
+
+if app.config["INSTALL_TYPE"] == "full":
+    from app.preprocessor.collectionprocessor import cp_run
 
 def generate_form_token():
     """Sets a token to prevent double posts."""
@@ -249,6 +253,10 @@ class ProjectCLPD(CLPDView):
             # NOTE: handle access to nonexistent objects globally
 
         self.template_kwargs["project"] = self.project
+        self.template_kwargs["project_errors"] = self.project.get_errors()
+        self.template_kwargs["project_warnings"] = self.project.get_warnings()
+        self.template_kwargs["project_infos"] = self.project.get_infos()
+
         if self.project not in current_user.projects:
             return app.login_manager.unauthorized()
 
@@ -444,8 +452,12 @@ def process_files(collection_dir, structure_file, project):
     of files or bad things will happen - exactly one structure file, several
     document files.
     """
+    logger = logging.getLogger()
+    if app.config["INSTALL_TYPE"] == "partial":
+        logger.info("Not processing as per config.")
+        return
     args = (collection_dir, structure_file, app.config["DOCUMENT_EXTENSION"],
-        project)
+        project.id)
     preprocessing_process = threading.Thread(target=cp_run, args=args)
     preprocessing_process.start()
 
