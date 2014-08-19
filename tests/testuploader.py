@@ -521,6 +521,18 @@ class ProjectPermissionsTests(unittest.TestCase):
 
         assert "Can view</td>" not in result.data
 
+    def test_role_access(self):
+        """Make sure that regular users can't see permissions of a project
+        they have.
+        """
+
+        rel = self.user1.add_project(self.project1, ProjectsUsers.ROLE_USER)
+
+        result = self.client.get("/projects/2/permissions")
+
+        assert "Bars project" not in result.data
+
+
 class AuthTests(unittest.TestCase):
     """Make sure that users can only see the pages and such that they
     should be seeing.
