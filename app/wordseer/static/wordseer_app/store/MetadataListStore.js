@@ -9,7 +9,7 @@ Ext.define("WordSeer.store.MetadataListStore", {
 	proxy: {
 		type: 'ajax',
 		noCache: false,
-		url: ws_api_path + 'documents/get_properties/',
+		url: ws_api_path + 'projects/' + project_id + '/properties',
 		extraParams: {
 			instance: getInstance(),
 			user: getUsername(),

@@ -30,17 +30,15 @@ class SequencesView(MethodView):
                     "sequence": sequence.sequence,
                 })
 
-            print(results)
-
             return jsonify(results = results)
 
     def post(self):
         pass
 
-    def delete(self, property_id):
+    def delete(self, id):
         pass
 
-    def put(self, property_id):
+    def put(self, id):
         pass
         
 

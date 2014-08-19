@@ -5,7 +5,7 @@
 		type:'ajax',
 		noCache: false,
 		reader: 'json',
-		url: ws_api_path + 'documents/search-results/',
+		url: ws_api_path + 'projects/' + project_id + '/documents/',
 		extraParams: {
 			instance:getInstance(),
 	        user:getUsername(),

@@ -323,8 +323,8 @@ Ext.define('WordSeer.controller.SearchController', {
 					parameters.instance = getInstance();
 					// clear the previous query ID from the cache.
 					Ext.Ajax.request({
-						method: 'GET',
-						url: '../../src/php/caching/caching.php',
+						method: 'DELETE',
+						url: ws_api_path + 'query_caches/' + this.current_query_id,
 						timeout: 90000000,
 						params: {
 							user: getUsername(),
@@ -335,7 +335,7 @@ Ext.define('WordSeer.controller.SearchController', {
 					});
 					Ext.Ajax.request({
 						method: 'GET',
-						url: '../../src/php/caching/caching.php',
+						url: ws_api_path + 'query_caches/',
 						timeout: 90000000,
 						params: parameters,
 						disableCaching: false,

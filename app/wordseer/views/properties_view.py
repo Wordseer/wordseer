@@ -13,10 +13,9 @@ class PropertiesView(MethodView):
     def get(self, **kwargs):
 
         params = dict(kwargs, **request.args)
-        keys = params.keys()
 
-        if "sentence_id" in keys:
-            sentence = Sentence.query.get(kwargs["sentence_id"])
+        if "sentence_id" in kwargs.keys():
+            sentence = Sentence.query.get(params["sentence_id"])
 
             if not sentence:
                 # TODO: handle
@@ -24,7 +23,7 @@ class PropertiesView(MethodView):
 
             return jsonify(properties = dumps(sentence.properties))
 
-        elif "document_id" in keys:
+        elif "document_id" in kwargs.keys():
             document = Document.query.get(kwargs["document_id"])
 
             if not document:
@@ -33,7 +32,7 @@ class PropertiesView(MethodView):
 
             return jsonify(result = document.properties)
 
-        elif "project_id" in keys:
+        elif "project_id" in kwargs.keys():
             project = Project.query.get(kwargs["project_id"])
 
             if not project:
@@ -42,18 +41,23 @@ class PropertiesView(MethodView):
 
             properties = []
 
-            if params["unit"] == "document":
-                for document in project.get_documents():
-                    properties.extend(document.properties)
+            if "unit" in params.keys():
 
-            elif params["unit"] == "sentence":
-                sentences = []
+                if params["unit"] == "document":
+                    for document in project.get_documents():
+                        properties.extend(document.properties)
 
-                for document in project.get_documents():
-                    sentences.extend(document.all_sentences)
+                elif params["unit"] == "sentence":
+                    sentences = []
 
-                for sentence in sentences:
-                    properties.extend(sentence.properties)
+                    for document in project.get_documents():
+                        sentences.extend(document.all_sentences)
+
+                    for sentence in sentences:
+                        properties.extend(sentence.properties)
+
+            else:
+                properties = project.get_documents()[0].properties
 
             result = []
             for prop in properties:
@@ -66,16 +70,19 @@ class PropertiesView(MethodView):
 
             return jsonify(result = result)
 
-        if "property_id" in keys:
+        elif "property_id" in kwargs.keys():
             pass
+
+        else:
+            return
 
     def post(self):
         pass
 
-    def delete(self, property_id):
+    def delete(self, id):
         pass
 
-    def put(self, property_id):
+    def put(self, id):
         pass
         
 

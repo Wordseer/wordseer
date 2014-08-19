@@ -10,7 +10,7 @@ Ext.define("WordSeer.store.MetadataTreeStore", {
 	proxy: {
 		type: 'ajax',
 		noCache: false,
-		url: ws_api_path + 'grammaticalsearch/get_search_results/',
+		url: ws_api_path + 'projects/' + project_id + '/properties',
 		extraParams: {
 			instance: getInstance(),
 			user: getUsername(),

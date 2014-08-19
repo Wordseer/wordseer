@@ -32,16 +32,15 @@ class WordsView(MethodView):
                     "is_lemmatized": 1
                 })
 
-            print(results)
             return jsonify(results = results)
 
     def post(self):
         pass
 
-    def delete(self, property_id):
+    def delete(self, id):
         pass
 
-    def put(self, property_id):
+    def put(self, id):
         pass
         
 register_rest_view(

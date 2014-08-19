@@ -1,5 +1,5 @@
 from .base import Base
-from .cached_sentences import CachedSentences
+from .query_cache import QueryCache
 from .dependency import Dependency
 from .document import Document
 from .documentfile import DocumentFile
