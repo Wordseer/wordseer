@@ -46,23 +46,24 @@ Ext.define('WordSeer.controller.WindowingController', {
 				//TODO: add the move drag and drop behavior.
 				activate: this.layoutPanelActivated,
 				switchWidgets: this.switchWidgets,
+				initSearch: this.setLoadMask,
 			},
-			'widget': {
-				render: function(widget){
-					widget.ownerCt.setLoading(true);
-				},
-			},
+			// 'widget': {
+			// 	render: function(widget){
+			// 		widget.ownerCt.setLoading(true);
+			// 	},
+			// },
 			'databox': {
-				datachanged: this.clearLoading,
+				datachanged: this.clearLoadMask,
 			},
 			'word-tree': {
-				draw: this.clearLoading,
+				draw: this.clearLoadMask,
 			},
 			'word-frequencies': {
-				rendered: this.clearLoading,
+				rendered: this.clearLoadMask,
 			},
 			'document-viewer': {
-				draw: this.clearLoading,
+				draw: this.clearLoadMask,
 			},
 			'widgets-menu > button': {
 				click: this.launchWidgetFromWidgetsMenu
@@ -608,10 +609,17 @@ Ext.define('WordSeer.controller.WindowingController', {
 		}
 	},
 
-	clearLoading: function(component){
+	clearLoadMask: function(component){
 		var container = component.up('widget');
 		if (container){
 			container.ownerCt.setLoading(false);
+		}
+	},
+
+	setLoadMask: function(component){
+		var container = component.down('widget');
+		if (container){
+			container.ownerCt.setLoading(true);
 		}
 	},
 
