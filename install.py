@@ -124,6 +124,8 @@ def install_interactively():
         install_python_packages(REQUIREMENTS_MIN, False)
         set_install_type(PARTIAL_INSTALL_TYPE)
 
+    setup_database()
+
     sys.exit(0)
 
 def make_virtualenv(sudo_install=False):
