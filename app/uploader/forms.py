@@ -195,10 +195,25 @@ class ProjectPermissionsForm(Form, HiddenSubmitted):
         """
         action = form.create_button.data # All buttons have the same data
         if action == form.UPDATE or action == form.DELETE:
-            if field.data:
-                return True
-            else:
+            if not field.data:
                 raise ValidationError("You must make a selection")
+
+        if ((action == form.UPDATE and
+                form.update_permissions.data == str(ProjectsUsers.ROLE_USER))
+                or action == form.DELETE):
+            former_admins = []
+
+            for rel_id in field.data:
+                relationship = ProjectsUsers.query.get(rel_id)
+                if relationship.role == ProjectsUsers.ROLE_ADMIN:
+                    former_admins.append(relationship)
+
+            if former_admins:
+                project = former_admins[0].project
+                all_admins = ProjectsUsers.query.filter_by(project=project,
+                    role=ProjectsUsers.ROLE_ADMIN).all()
+                if all_admins == former_admins:
+                    raise ValidationError("At least one user must be an admin")
         return True
 
     def validate_new_collaborator(form, field):

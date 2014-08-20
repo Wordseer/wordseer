@@ -530,6 +530,7 @@ class ProjectPermissionsTests(unittest.TestCase):
         """Make sure users can only access their own permissions.
         """
         result = self.client.get("/projects/2/permissions")
+        assert result.status_code == 302
         assert "Permissions" not in result.data
         result = self.client.get("/projects/1/permissions")
         assert "Permissions" in result.data
@@ -544,6 +545,7 @@ class ProjectPermissionsTests(unittest.TestCase):
             "permissions-new_collaborator": "gjie"
             })
 
+        assert result.status_code == 200
         assert "No such user exists" in result.data
 
     def test_create_existing(self):
@@ -555,6 +557,7 @@ class ProjectPermissionsTests(unittest.TestCase):
             "permissions-new_collaborator": "foo@foo.com"
             })
 
+        assert result.status_code == 200
         assert "This user is already on this project" in result.data
 
     def test_create_proper(self):
@@ -567,6 +570,8 @@ class ProjectPermissionsTests(unittest.TestCase):
             "permissions-new_collaborator": "bar@bar.com",
             "permissions-create_permissions": "1"
             })
+
+        assert result.status_code == 200
         assert "bar@bar.com</label>" in result.data
 
     def test_delete_nonexistant(self):
@@ -577,6 +582,8 @@ class ProjectPermissionsTests(unittest.TestCase):
             "permissions-submitted": "true",
             "action": "-1",
             })
+
+        assert result.status_code == 200
         assert "must make a selection" in result.data
 
     def test_delete(self):
@@ -589,6 +596,7 @@ class ProjectPermissionsTests(unittest.TestCase):
             "permissions-selection": [str(rel.id)]
             })
 
+        assert result.status_code == 200
         assert "bar@bar.com" not in result.data
 
     def test_update(self):
@@ -599,9 +607,10 @@ class ProjectPermissionsTests(unittest.TestCase):
             "permissions-submitted": "true",
             "action": "0",
             "permissions-selection": [str(rel.id)],
-            "permissions-update_permission": ["1"]
+            "permissions-update_permissions": ["1"]
             })
 
+        assert result.status_code == 200
         assert "User</td>" not in result.data
 
     def test_role_access(self):
@@ -613,8 +622,38 @@ class ProjectPermissionsTests(unittest.TestCase):
 
         result = self.client.get("/projects/2/permissions")
 
+        assert result.status_code == 302
         assert "Bars project" not in result.data
 
+    def test_final_delete(self):
+        """Make sure that there is always at least one user with admin
+        privileges on a project.
+        """
+
+        result = self.client.post("/projects/1/permissions", data={
+            "permissions-submitted": "true",
+            "action": "-1",
+            "permissions-selection": ["1"]
+            })
+
+        assert result.status_code == 200
+        assert "At least one user" in result.data
+        assert "foo@foo.com</label>" in result.data
+
+    def test_final_update(self):
+        """Make sure that at least one user has admin privileges.
+        """
+
+        result = self.client.post("/projects/1/permissions", data={
+            "permissions-submitted": "true",
+            "action": "0",
+            "permissions-selection": ["1"],
+            "permissions-update_permissions": ["0"]
+            })
+
+        assert result.status_code == 200
+        assert "At least one user" in result.data
+        assert "User</td>" not in result.data
 
 class AuthTests(unittest.TestCase):
     """Make sure that users can only see the pages and such that they
