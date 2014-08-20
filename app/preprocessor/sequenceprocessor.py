@@ -201,16 +201,6 @@ class SequenceProcessor(object):
 
         return sequences
 
-    def finish(self):
-        """Have the reader_writer finish indexing the sequences. This method
-            simply calls finish_indexing_sequences() from the reader_writer
-            object.
-        """
-
-        #TODO: reader_writer
-        #self.reader_writer.finish_indexing_sequences()
-        pass
-
 def join_tws(words, delimiter, attr):
     """Join either the lemmas or text of words with the delimiter.
 

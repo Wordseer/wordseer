@@ -30,5 +30,5 @@ for file_name in files:
         project.document_files.append(document_file)
 
 
-cp_run(collection_dir, structure_file, extension, project)
+cp_run(collection_dir, structure_file, extension, project.id)
 
