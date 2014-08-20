@@ -565,7 +565,7 @@ class ProjectPermissionsTests(unittest.TestCase):
             "permissions-submitted": "true",
             "action": "1",
             "permissions-new_collaborator": "bar@bar.com",
-            "permissions-permissions": "1"
+            "permissions-create_permissions": "1"
             })
         assert "bar@bar.com</label>" in result.data
 
@@ -599,10 +599,10 @@ class ProjectPermissionsTests(unittest.TestCase):
             "permissions-submitted": "true",
             "action": "0",
             "permissions-selection": [str(rel.id)],
-            "permissions-permission": ["1"]
+            "permissions-update_permission": ["1"]
             })
 
-        assert "Can view</td>" not in result.data
+        assert "User</td>" not in result.data
 
     def test_role_access(self):
         """Make sure that regular users can't see permissions of a project
