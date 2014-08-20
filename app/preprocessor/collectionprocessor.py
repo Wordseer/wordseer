@@ -188,18 +188,19 @@ class CollectionProcessor(object):
 
         counter.count(self.project)
 
-def cp_run(collection_dir, structure_file, extension, project):
+def cp_run(collection_dir, structure_file, extension, project_id):
     """Run the collection processor.
 
     Arguments:
         collection_dir (str): Where to get files from.
         structure_file (str): The path to the structure file.
         extension (str): Extension of the document files.
-        project (Project): Which project to use for this processing.
+        project_id (int): Which project to use for this processing.
     """
     if extension[0] != ".":
         extension = "." + extension
 
+    project = Project.query.get(project_id)
     collection_processor = CollectionProcessor(project)
     collection_processor.process(collection_dir, structure_file, extension,
        False)
