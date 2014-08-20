@@ -29,16 +29,20 @@ Ext.define('WordSeer.controller.TagMenuController', {
             'tagmenu > wordseer-menuitem[action=sort]': {
                 click: this.sortSentences,
             },
+            'tagmenu > wordseer-menuitem[action=removesort]': {
+                click: this.removeSort,
+            },
             'tagmenu > wordseer-menuitem[action=search]': {
                 click: this.newSearch,
             },
-            'tagmenu > wordseer-menuitem[action=clearsort]': {
+            'tagmenu > wordseer-menuitem[action=resetsort]': {
                 click: this.clearSort,
             },
         });
     },
 
     showTagMenu: function(tag_el, view){
+        console.log(view.getStore().sorters);
         this.destroyMenu();
         $(tag_el).addClass("active");
         var formValues = {};
@@ -90,20 +94,96 @@ Ext.define('WordSeer.controller.TagMenuController', {
     },
 
     sortSentences: function(menuitem, e){
-        var menu = menuitem.up('tagmenu');
-        menu.view.getStore().sort(menu.key, menuitem.direction);
-        var sentencelist = $(menu.view.el.dom);
-        sentencelist.find('.metatag[metaname="' + menu.key +
-            '"]').addClass('sorting');
-        sentencelist.find('.sorting .key')
-            .append(' <span class="dir">[sort <i class="fa ' +
-                'fa-sort-amount-' + menuitem.direction.toLowerCase() +
-                '"></i> ]</span>');
+        var menu = menuitem.up('tagmenu'),
+            addnew = true,
+            sorters = menu.view.getStore().sorters
+            newsort = [],
+            sentencelist = $(menu.view.el.dom);
+        for (var i=0; i<sorters.items.length; i++){
+            // check for direction change and duplication, and prevent a new
+            // sorter from being added if either is found
+            var sorter = {
+                property: sorters.items[i].property,
+                direction: sorters.items[i].direction,
+            }
+            if (sorter.property == menu.key){
+                addnew = false;
+                sorter.direction = menuitem.direction;
+            }
+            if (sorter.property != 'id') {
+                newsort.push(sorter);
+            }
+        }
+        if (addnew) {
+            var newsorter = {
+                direction: menuitem.direction,
+                property: menu.key,
+            }
+            newsort.push(newsorter);
+        }
+
+        menu.view.getStore().sorters.clear();
+        menu.view.getStore().sort(newsort);
+        for (var i=0; i<newsort.length; i++){
+            var tag = sentencelist.find('.metatag[metaname="' +
+                newsort[i].property + '"]');
+            tag.each(function(){
+                $(this).addClass('sorting lev' + i)
+                    .insertBefore($(this).siblings('.metatag').get(i));
+                $(this).find('.key')
+                    .append(' <span class="dir">[sort <i class="fa ' +
+                    'fa-sort-amount-' + newsort[i].direction.toLowerCase() +
+                    '"></i> '+(i+1)+']</span>');
+            });
+        }
     },
 
     clearSort: function(menuitem, e){
         var menu = menuitem.up('tagmenu');
-        menu.view.getStore().sort('id');
+        menu.view.getStore().sorters.clear();
+        menu.view.getStore().sort("id");
+    },
+
+    removeSort: function(menuitem, e){
+        var menu = menuitem.up('tagmenu'),
+            sorters = menu.view.getStore().sorters
+            newsort = [],
+            sentencelist = $(menu.view.el.dom);
+        for (var i=0; i<sorters.items.length; i++){
+            // check for direction change and duplication, and prevent a new
+            // sorter from being added if either is found
+            var sorter = {
+                property: sorters.items[i].property,
+                direction: sorters.items[i].direction,
+            }
+            if (sorter.property != menu.key && sorter.property != 'id'){
+                newsort.push(sorter);
+            }
+        }
+
+        if (newsort.length == 0){
+            newsort.push(
+                {
+                    property: 'id',
+                    direction: 'ASC',
+                }
+            );
+        }
+
+        menu.view.getStore().sorters.clear();
+        menu.view.getStore().sort(newsort);
+        for (var i=0; i<newsort.length; i++){
+            var tag = sentencelist.find('.metatag[metaname="' +
+                newsort[i].property + '"]');
+            tag.each(function(){
+                $(this).addClass('sorting lev' + i)
+                    .insertBefore($(this).siblings('.metatag').get(i));
+                $(this).find('.key')
+                    .append(' <span class="dir">[sort <i class="fa ' +
+                    'fa-sort-amount-' + newsort[i].direction.toLowerCase() +
+                    '"></i> '+(i+1)+']</span>');
+            });
+        }
     },
 
     newSearch: function(menuitem, e) {

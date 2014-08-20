@@ -56,8 +56,13 @@ Ext.define('WordSeer.view.menu.TagMenu', {
             },
             {
                 xtype: 'wordseer-menuitem',
+                text: 'stop sorting by "' + me.key_display + '"',
+                action: 'removesort',
+            },
+            {
+                xtype: 'wordseer-menuitem',
                 text: 'reset to collection order',
-                action: 'clearsort',
+                action: 'resetsort',
             },
             {
                 xtype: 'wordseer-menuitem',
