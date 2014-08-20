@@ -529,7 +529,7 @@ def process_files(collection_dir, structure_file, project):
     of files or bad things will happen - exactly one structure file, several
     document files.
     """
-    project.status = Project.STATUS_PREPROCESSING
+    project.status = Project.STATUS_PROCESSING
     project.save()
     logger = logging.getLogger()
     if app.config["INSTALL_TYPE"] == "partial":
