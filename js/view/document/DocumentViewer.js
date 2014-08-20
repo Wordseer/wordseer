@@ -23,17 +23,18 @@ Ext.define('WordSeer.view.document.DocumentViewer', {
             word-id: The ID of the word
             sentnce-id: the id of the sentence in which the word appears
         The text of the HTML span is the word.
+
+        @event draw
+        Fired when the document is fully drawn.
         */
-        this.addEvents('wordclicked', 'search');
+        this.addEvents('wordclicked', 'search', 'draw');
         this.id = Ext.id();
         this.callParent(arguments);
     },
 
     draw:function(document_model_instance){
-        this.getEl().mask('loading');
         this.data = document_model_instance.raw;
         //this.contents = this.up('panel').getComponent('contents');
-        this.getEl().mask("Loading...")
         var t1 = new Date();
         this.drawDocument();
         var t2 = new Date();
@@ -42,7 +43,7 @@ Ext.define('WordSeer.view.document.DocumentViewer', {
         if (this.sentence_id) {
             this.scrollToSentence(this.sentence_id);
         }
-        this.getEl().unmask();
+        this.fireEvent('draw', this);
     },
 
     drawDocument:function(){
@@ -132,4 +133,3 @@ Ext.define('WordSeer.view.document.DocumentViewer', {
         container.scrollTo(sentence_element.parent());
     }
 })
-

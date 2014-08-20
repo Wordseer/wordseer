@@ -113,7 +113,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 	*/
 	requestWordFrequenciesData: function(formValues, word_frequencies_panel) {
 //		console.log("requested word frequencies data");
-		word_frequencies_panel.getEl().mask('loading');
 		var values = formValues.serialize();
 		Ext.Ajax.request({
 		    url:'../../src/php/word-frequencies/bar-charts.php',
@@ -131,19 +130,13 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		        var data  = Ext.decode(response.responseText)
 		        word_frequencies_panel.data = data;
 		        this.draw(data, word_frequencies_panel);
-            	if (word_frequencies_panel.getEl()){
-        	    	word_frequencies_panel.getEl().unmask();
-        	    }
+				word_frequencies_panel.fireEvent('rendered', word_frequencies_panel);
 		    },
 		    reset:function(response) {
-		    	if (word_frequencies_panel.getEl()){
-			    	word_frequencies_panel.getEl().unmask();
-			    }
+
 		    },
 		    failure: function(response) {
-		    	if (word_frequencies_panel.getEl()) {
-			    	word_frequencies_panel.getEl().unmask();
-		    	}
+
 		    	console.log("request to bar-charts failed.");
 		    }
 		})
@@ -1350,6 +1343,8 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 		panel.chart_divs = $(panel.getEl().dom).find('div.freq-chart');
 		this.renderAll(panel);
+		// tell the WindowingController that rendering is finished
+		panel.fireEvent('frequenciesrendered');
 	},
 
 	// Renders the specified chart or list.

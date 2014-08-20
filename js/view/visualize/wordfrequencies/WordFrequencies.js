@@ -90,8 +90,10 @@ Ext.define('WordSeer.view.visualize.wordfrequencies.WordFrequencies', {
 		@param {WordSeer.view.visualize.wordfrequencies.WordFrequencies} this view.
 		@param {Object} data An object containing one list of sentence records
 		for each search that was issued.
+
+		@event rendered Fired when the Controller is done drawing d3 content
 		*/
-		this.addEvents('search', 'change');
+		this.addEvents('search', 'change', 'rendered');
 		this.callParent(arguments);
 		this.down('checkbox[name=stacked]').setValue(true);
 		this.down('checkbox[name=labels]').setValue(true);

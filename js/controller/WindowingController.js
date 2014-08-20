@@ -47,6 +47,23 @@ Ext.define('WordSeer.controller.WindowingController', {
 				activate: this.layoutPanelActivated,
 				switchWidgets: this.switchWidgets,
 			},
+			'widget': {
+				render: function(widget){
+					widget.ownerCt.setLoading(true);
+				},
+			},
+			'databox': {
+				datachanged: this.clearLoading,
+			},
+			'word-tree': {
+				draw: this.clearLoading,
+			},
+			'word-frequencies': {
+				rendered: this.clearLoading,
+			},
+			'document-viewer': {
+				draw: this.clearLoading,
+			},
 			'widgets-menu > button': {
 				click: this.launchWidgetFromWidgetsMenu
 			},
@@ -90,7 +107,6 @@ Ext.define('WordSeer.controller.WindowingController', {
 		} else {
 			Ext.getCmp('windowing-viewport').down('layout').show();
 		}
-		$('.x-mask').remove();
 	},
 
 	/** Sets up the layouts that the application will use. By default, only
@@ -589,6 +605,13 @@ Ext.define('WordSeer.controller.WindowingController', {
 						panel_itemids[i]);
 				}
 			}
+		}
+	},
+
+	clearLoading: function(component){
+		var container = component.up('widget');
+		if (container){
+			container.ownerCt.setLoading(false);
 		}
 	},
 

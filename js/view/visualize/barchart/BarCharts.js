@@ -33,7 +33,6 @@
     },
     listeners:{
         search:function(formValues){
-            this.getEl().mask('loading');
             this.formValues = formValues;
             if(formValues.search.length > 0){
                 Ext.apply(this, formValues);
@@ -44,7 +43,6 @@
                     instance:getInstance(),
                 }, formValues.serialize());
                 Ext.apply(params, formValues.search[0]);
-                this.getEl().mask('loading');
                 this.data = Ext.Ajax.request({
                     url:'../../src/php/grammaticalsearch/get-search-results.php',
                     method:'GET',
@@ -88,7 +86,6 @@
         }
     },
     updateCharts:function(response){
-        this.getEl().unmask();
         this.data = Ext.decode(response.responseText)['statistics'];
         if(this.relation != 2){
             this.updateChart(this.govChart, this.data.gov.children, this.data.gov.childMax, 'gov');
