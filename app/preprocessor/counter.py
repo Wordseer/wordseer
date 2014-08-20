@@ -67,7 +67,7 @@ def count(project):
 
         if count % commit_interval == 0:
             db.session.commit()
-            logger.info('Counted %s dependencies.' % total_count)
+            logger.info('Counted %s dependencies.' % count)
             project_logger.info("Calculating count for dependency %s/%s", count,
                 len(dependencies_in_sentences))
 
