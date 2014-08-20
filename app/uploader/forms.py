@@ -8,6 +8,7 @@ from flask_wtf import Form
 from flask import redirect
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from sqlalchemy.orm.exc import NoResultFound
+from flask_security.core import current_user
 from wtforms.fields import StringField, HiddenField
 from wtforms.validators import Required, ValidationError
 
@@ -135,7 +136,8 @@ class ProjectCreateForm(Form, HiddenSubmitted):
     def validate_name(form, field):
         """Make sure there are no projects with this name existing.
         """
-        if Project.query.filter(Project.name == field.data).count() > 0:
+        user_project_names = [project.name for project in current_user.projects]
+        if field.data in user_project_names:
             raise ValidationError("A project with this name already exists")
 
 class ProjectProcessForm(ProcessForm):

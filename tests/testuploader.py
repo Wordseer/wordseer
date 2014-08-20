@@ -62,6 +62,19 @@ class ViewsTests(unittest.TestCase):
 
         assert "already exists" in result.data
 
+    def test_projects_duplicate_create(self):
+        """Test creating a project with the same name as another user's.
+        """
+        project = Project(name="test", users=[User()])
+        project.save()
+
+        result = self.client.post("/projects/", data={
+            "create-submitted": "true",
+            "create-name": "test"
+            })
+
+        assert "already exists" not in result.data
+
     def test_projects_empty_post(self):
         """Test POSTing without a project name to the projects view.
         """
