@@ -17,6 +17,7 @@
 
 {% block creation_header %}Upload new document{% endblock %}
 {% block creation_form %}
+{% if project.status == 0 %}
 <form method="POST" enctype="multipart/form-data"
       class="form-inline clearfix" role="form">
     {{ create_form.hidden_tag() }}
@@ -29,6 +30,7 @@
                 help=("Allowed extensions: " + allowed_extensions|join(", ") +
                     ".")) }}
 </form>
+{% endif %}
 {% endblock %}
 
 {% block list_header %}Existing documents{% endblock %}

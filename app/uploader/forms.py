@@ -12,7 +12,7 @@ from wtforms.validators import Required, ValidationError
 
 from app import app
 from .fields import ButtonField, MultiCheckboxField, MultiRadioField
-from ..models import Unit, Project, DocumentFile
+from ..models import Unit, Project, DocumentFile, StructureFile
 
 class HiddenSubmitted(object):
     """A mixin to provide a hidden field called "submitted" which has a default
@@ -114,6 +114,14 @@ class DocumentProcessForm(ProcessForm):
         if form.process_button.data == form.PROCESS:
             is_processable(docs=form.selection.data,
                 structure_files=form.structure_file.data)
+
+            project = StructureFile.query.get(form.structure_file.data[0]).\
+                project
+            if project.status == Project.STATUS_PREPROCESSING:
+                raise ValidationError("This project is already being "
+                    "preprocessed.")
+            elif project.status == Project.STATUS_DONE:
+                raise ValidationError("This project is already preprocessed.")
         else:
             if not form.selection.data and not form.structure_file.data:
                 raise ValidationError("You must select at least one file.")
@@ -147,6 +155,12 @@ class ProjectProcessForm(ProcessForm):
         if form.process_button.data == form.PROCESS:
             for project_id in form.selection.data:
                 project = Project.query.filter(Project.id == project_id).one()
+                if project.status == Project.STATUS_PREPROCESSING:
+                    raise ValidationError("Project " + project.name +
+                        " is already preprocessing.")
+                elif project.status == Project.STATUS_DONE:
+                    raise ValidationError("Project " + project.name +
+                        " is already preprocessed.")
                 is_processable(project=project)
         else:
             if not form.selection.data:
