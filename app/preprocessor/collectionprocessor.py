@@ -21,7 +21,7 @@ class CollectionProcessor(object):
     """Process a collection of files.
     """
     def __init__(self, project):
-        self.project = project
+        self.project = Project.query.get(project)
         self.str_proc = StringProcessor(self.project)
         self.pylogger = logging.getLogger(__name__)
         self.project_logger = logger.ProjectLogger(self.pylogger, self.project)
@@ -49,9 +49,13 @@ class CollectionProcessor(object):
 
         Base.commit_on_save = False
 
-	    # Set up database if necessary
+	# Set up database if necessary
         if start_from_scratch is True:
             database.reset()
+
+        self.project.status = Project.STATUS_PREPROCESSING
+        self.project.save()
+
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
         if not "true" in logger.get(self.project,
@@ -86,6 +90,10 @@ class CollectionProcessor(object):
                     "word_similarity_calculations_done")):
             self.project_logger.info("Calculating Lin Similarities")
             # TODO: implement similarities
+
+        self.project_logger.info("Finished preprocessing.")
+        self.project.status = Project.STATUS_DONE
+        self.project.save()
 
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):

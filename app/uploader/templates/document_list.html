@@ -70,17 +70,27 @@
             {{ macros.selection_table(process_form.selection, "document",
                 "table table-striped table-hover click-anywhere",
                 "File Name", "uploader.document_show", project_id=project.id) }}
-            {{ macros.show_logs(project_errors, "alert alert-danger") }}
-            {{ macros.show_logs(project_warnings, "alert alert-warning") }}
-            {{ macros.show_logs(project_infos, "alert alert-info") }}
-    <h3>Selected file actions:</h3>
-    {{ process_form.structure_button(class="btn btn-info",
-                icon="glyphicon-list", id='structure-button') }}
-    {{ process_form.process_button(class="btn btn-primary",
-                icon="glyphicon-tasks") }}
-    {{ process_form.delete_button(class="btn btn-danger",
-                icon="glyphicon-remove") }}
+            {% if project.status == 0 %}
+                <h3>Selected file actions:</h3>
+                {{ process_form.structure_button(class="btn btn-info",
+                            icon="glyphicon-list", id='structure-button') }}
+                {{ process_form.process_button(class="btn btn-primary",
+                            icon="glyphicon-tasks") }}
+                {{ process_form.delete_button(class="btn btn-danger",
+                            icon="glyphicon-remove") }}
+            {% endif %}
         </form>
+        {% if project.status == 1 %}
+            <p>Project is currently processing.</p>
+        {% elif project.status == 2 %}
+        <p><a class="btn btn-primary" rol="button"
+            href="{{url_for('wordseer.ext_app', project_id=project.id)}}"}>
+            Explore data
+        </a></p>
+        {% endif %}
+        {{ macros.show_logs(project_errors, "alert alert-danger") }}
+        {{ macros.show_logs(project_warnings, "alert alert-warning") }}
+        {{ macros.show_logs(project_infos, "alert alert-info") }}
     {% else %}
         <p>There are no files in this project.</p>
     {% endif %}
