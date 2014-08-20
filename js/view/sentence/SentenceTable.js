@@ -1,8 +1,8 @@
 /* Copyright 2012 Aditi Muralidharan. See the file "LICENSE" for the full license governing this code. */
 /** A list of sentences **/
-Ext.define('WordSeer.view.sentence.SentenceList',{
+Ext.define('WordSeer.view.sentence.SentenceTable',{
     extend:'WordSeer.view.export.ExportableTable',
-    alias:'widget.sentence-list',
+    alias:'widget.sentence-table',
     title:'Search Results',
     requires:[
         'WordSeer.store.SentenceSearchResultStore',

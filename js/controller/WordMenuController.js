@@ -30,7 +30,7 @@ Ext.define('WordSeer.controller.WordMenuController',{
 	init: function() {
 //		console.log('WordMenu controller initialized.');
 		this.control({
-			'document-viewer, sentence-list': {
+			'document-viewer, sentence-list, sentence-table': {
 				wordclicked: this.fromHTMLSpan
 			},
 			'word': {

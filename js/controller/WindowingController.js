@@ -50,7 +50,7 @@ Ext.define('WordSeer.controller.WindowingController', {
 			'widgets-menu > button': {
 				click: this.launchWidgetFromWidgetsMenu
 			},
-			'sentence-list, document-grid': {
+			'sentence-list, sentence-table, document-grid': {
 				select: this.showResultMenu,
 				deselect: this.destroyResultMenu
 			}
@@ -283,6 +283,8 @@ Ext.define('WordSeer.controller.WindowingController', {
 				var el = panel.getEl().down('option[value=word-frequencies-widget]');
 				if (el) el.set({disabled:'disabled'});
 				el = panel.getEl().down('option[value=sentence-list-widget]');
+				if (el) el.set({disabled:'disabled'});
+				el = panel.getEl().down('option[value=sentence-table-widget]');
 				if (el) el.set({disabled:'disabled'});
 			}
 			if (!has_grammatical_search || !has_search) {
@@ -522,10 +524,12 @@ Ext.define('WordSeer.controller.WindowingController', {
 			this.destroyResultMenu(view, record);
 			view.getEl().select('tr.hovered').removeCls('hovered');
 			var menu = Ext.create('WordSeer.view.menu.ResultListMenu', {
-				type: view.xtype == 'sentence-list'? 'sentence' : 'document',
-				sentenceId: view.xtype == 'sentence-list'? record.get('id'): false,
-				documentId: view.xtype == 'sentence-list'? record.get('document_id')
-				: record.get('id'),
+				type: view.xtype == 'sentence-list' || view.xtype == 'sentence-table'?
+				 	'sentence' : 'document',
+				sentenceId: view.xtype == 'sentence-list'|| view.xtype == 'sentence-table'?
+					record.get('id'): false,
+				documentId: view.xtype == 'sentence-list'|| view.xtype == 'sentence-table'?
+					record.get('document_id') : record.get('id'),
 			});
 			$(row_element).addClass('hovered');
 			menu.showBy(row_element, 'tl-bl?');

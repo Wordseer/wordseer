@@ -60,7 +60,7 @@
 			name = 'Grammatical Search Bar Charts';
 		} else if (xtype == 'column-vis-widget') {
 			name = 'Column Vis';
-		} else if (xtype == 'sentence-list-widget') {
+		} else if (xtype == 'sentence-list-widget' || xtype == 'sentence-table-widget' ) {
 			name = 'Search Results';
 		} else if (xtype == 'document-browser-widget') {
 			name = 'Documents';
