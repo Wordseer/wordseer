@@ -90,9 +90,9 @@
             Explore data
         </a></p>
         {% endif %}
-        {{ macros.show_logs(project_errors, "alert alert-danger") }}
-        {{ macros.show_logs(project_warnings, "alert alert-warning") }}
-        {{ macros.show_logs(project_infos, "alert alert-info") }}
+        {{ macros.show_logs(project_errors, "alert alert-danger", "Errors") }}
+        {{ macros.show_logs(project_warnings, "alert alert-warning", "Warnings") }}
+        {{ macros.show_logs(project_infos, "alert alert-info", "Info") }}
     {% else %}
         <p>There are no files in this project.</p>
     {% endif %}
