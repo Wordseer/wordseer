@@ -109,8 +109,22 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
     renderSentence: function(record, field, view){
         var sentence = record.get(field);
         var me = view;
-        var html = "<div class='sentence'>" + sentence.words + "</div>";
+        var html = "<div class='sentence'>" + sentence.words;
 
+        // add sentence set tags
+        var sentence_sets = record.get('sentence_set');
+        if (sentence_sets && sentence_sets.trim().length > 0) {
+            var sets = sentence_sets.trim().split(" ");
+            for (var j = 0; j < sets.length; j++) {
+                var id = parseInt(sets[j]);
+                html += WordSeer.model.SubsetModel
+                    .makeSubsetTag(id);
+            }
+        }
+
+        html += "</div>";
+
+        // add metadata pills
         for (var i = 0; i < me.all_fields.length; i++) {
             var metafield = me.all_fields[i];
             if (!me.base_field_names.contains(metafield.name)) {
@@ -129,41 +143,28 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
             }
         }
 
-
-        if (html && html.length > 0) {
-            var sentence_sets = record.get('sentence_set');
-            if (sentence_sets && sentence_sets.trim().length > 0) {
-                var sets = sentence_sets.trim().split(" ");
-                for (var j = 0; j < sets.length; j++) {
-                    var id = parseInt(sets[j]);
-                    html += WordSeer.model.SubsetModel
-                        .makeSubsetTag(id);
+        // make individual words clickable and highlight search terms
+        var i = 0;
+        html = html.replace(/class='word'/g,
+            function(match) {
+                cls = "word ";
+                if (sentence.gov_index.contains(i.toString())) {
+                    // cls += "gov-highlight ";
+                    cls += ' search-highlight';
                 }
-            }
-            var i = 0;
-            html = html.replace(/class='word'/g,
-                function(match) {
-                    cls = "word ";
-                    if (sentence.gov_index.contains(i.toString())) {
-                        // cls += "gov-highlight ";
-                        cls += ' search-highlight';
-                    }
-                    if (sentence.dep_index == i) {
-                        // cls += "dep-highlight ";
-                        cls += ' search-highlight';
-                    }
-                    i += 1;
-                    return (' onclick="Ext.getCmp(\'' +
-                        me.id +'\').fireEvent(\'wordclicked\', this, ' +
-                        'Ext.getCmp(\'' + me.id +'\'));"' +
-                   "container-id='" +me.id+"' class='" + cls + "'");
-                });
-                return {
-                    tag: 'td',
-                    html: html
-                };
-        } else {
-            return null;
-        }
+                if (sentence.dep_index == i) {
+                    // cls += "dep-highlight ";
+                    cls += ' search-highlight';
+                }
+                i += 1;
+                return (' onclick="Ext.getCmp(\'' +
+                    me.id +'\').fireEvent(\'wordclicked\', this, ' +
+                    'Ext.getCmp(\'' + me.id +'\'));"' +
+               "container-id='" +me.id+"' class='" + cls + "'");
+            });
+            return {
+                tag: 'td',
+                html: html
+            };
     },
 });
