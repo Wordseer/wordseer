@@ -1,8 +1,8 @@
 /* Copyright 2012 Aditi Muralidharan. See the file "LICENSE" for the full license governing this code. */
 /** A list of sentences **/
-Ext.define('WordSeer.view.sentence.SentenceList',{
+Ext.define('WordSeer.view.sentence.SentenceTable',{
     extend:'WordSeer.view.export.ExportableTable',
-    alias:'widget.sentence-list',
+    alias:'widget.sentence-table',
     title:'Search Results',
     requires:[
         'WordSeer.store.SentenceSearchResultStore',
@@ -68,22 +68,31 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
             sentence-id: the id of the sentence in which the word appears
         The text of the HTML span is the word.
         */
-        this.addEvents('search', 'wordclicked', 'tagclicked');
+        this.addEvents('search', 'wordclicked');
 
         this.columns = [
             {
+                headerTitle:'Sentence',
                 field:'sentence',
                 cls:'word-wrap',
-                flex:10,
+                flex:5,
                 renderer: this.renderSentence
             }
         ];
 
-        // store this data in instance for sentence renderer metadata
-        this.model = this.getStore().model;
-        this.base_field_names = this.model.getBaseFieldNames();
-        this.all_fields = this.model.getFields();
-
+        var model = this.getStore().model;
+        var base_field_names = model.getBaseFieldNames();
+        var all_fields = model.getFields();
+        for (var i = 0; i < all_fields.length; i++) {
+            var field = all_fields[i];
+            if (!base_field_names.contains(field.name)) {
+                this.columns.push({
+                    headerTitle: field.text.length > 0 ? field.text: field.name,
+                    field: field.name,
+                    flex: 1,
+                });
+            }
+        }
         this.callParent(arguments);
 
     },
@@ -108,63 +117,59 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
     */
     renderSentence: function(record, field, view){
         var sentence = record.get(field);
+        var html = sentence.words;
         var me = view;
-        var html = "<div class='sentence'>" + sentence.words;
-
-        // add sentence set tags
-        var sentence_sets = record.get('sentence_set');
-        if (sentence_sets && sentence_sets.trim().length > 0) {
-            var sets = sentence_sets.trim().split(" ");
-            for (var j = 0; j < sets.length; j++) {
-                var id = parseInt(sets[j]);
-                html += WordSeer.model.SubsetModel
-                    .makeSubsetTag(id);
-            }
-        }
-
-        html += "</div>";
-
-        // add metadata pills
-        for (var i = 0; i < me.all_fields.length; i++) {
-            var metafield = me.all_fields[i];
-            if (!me.base_field_names.contains(metafield.name)) {
-                var key = metafield.text;
-                if (key.trim() == '') { key = metafield.name; }
-                var value = record.get(metafield.name);
-                if (value) {
-                    html = html + "<div class='metatag'";
-                    var onclick = 'Ext.getCmp("' + me.id + '").fireEvent("tagclicked",'
-                        + 'this, Ext.getCmp("' + me.id + '"));';
-                    html = html + " onclick='" + onclick + "'";
-                    html = html + " metaname='" + metafield.name + "'";
-                    html = html + "><span class='key'>" + key +
-                        "</span><span class='value'>" + value + "</span></div>";
+        if (html && html.length > 0) {
+            var sentence_sets = record.get('sentence_set');
+            if (sentence_sets && sentence_sets.trim().length > 0) {
+                var sets = sentence_sets.trim().split(" ");
+                for (var j = 0; j < sets.length; j++) {
+                    var id = parseInt(sets[j]);
+                    html += WordSeer.model.SubsetModel
+                        .makeSubsetTag(id);
                 }
             }
+            var i = 0;
+            html = html.replace(/class='word'/g,
+                function(match) {
+                    cls = "word ";
+                    if (sentence.gov_index.contains(i.toString())) {
+                        // cls += "gov-highlight ";
+                        cls += ' search-highlight';
+                    }
+                    if (sentence.dep_index == i) {
+                        // cls += "dep-highlight ";
+                        cls += ' search-highlight';
+                    }
+                    i += 1;
+                    return (' onclick="Ext.getCmp(\'' +
+                        me.id +'\').fireEvent(\'wordclicked\', this, ' +
+                        'Ext.getCmp(\'' + me.id +'\'));"' +
+                   "container-id='" +me.id+"' class='" + cls + "'");
+                });
+                return {
+                    tag: 'td',
+                    html: html
+                };
+        } else {
+            return null;
         }
-
-        // make individual words clickable and highlight search terms
-        var i = 0;
-        html = html.replace(/class='word'/g,
-            function(match) {
-                cls = "word ";
-                if (sentence.gov_index.contains(i.toString())) {
-                    // cls += "gov-highlight ";
-                    cls += ' search-highlight';
-                }
-                if (sentence.dep_index == i) {
-                    // cls += "dep-highlight ";
-                    cls += ' search-highlight';
-                }
-                i += 1;
-                return (' onclick="Ext.getCmp(\'' +
-                    me.id +'\').fireEvent(\'wordclicked\', this, ' +
-                    'Ext.getCmp(\'' + me.id +'\'));"' +
-               "container-id='" +me.id+"' class='" + cls + "'");
-            });
-            return {
-                tag: 'td',
-                html: html
-            };
     },
+    // listeners: {
+    //     afterrender: function( eOpts ) {
+    //         view = this.getView();
+    //         view.tip = Ext.create('Ext.tip.ToolTip', {
+    //             target: view.el,
+    //             delegate: view.itemSelector,
+    //             trackMouse: true,
+    //             renderTo: Ext.getBody(),
+    //             listeners: {
+    //                 beforeshow: function updateTipBody(tip) {
+    //                     tip.update(
+    //                         "Double click to see this sentence in context.");
+    //                 }
+    //             }
+    //         });
+    //     }
+    // }
 });

@@ -99,7 +99,7 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
                     documentId: me.view.getStore().getById(sentence_id)
                         .get('document_id'),
                     type: 'sentence',
-                    seeInContext: (me.view.xtype === 'sentence-list')
+                    seeInContext: (me.view.xtype === 'sentence-list' || me.view.xtype === 'sentence-table')
                 },
             });
             menuItems.push({

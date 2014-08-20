@@ -9,10 +9,12 @@ Ext.define('WordSeer.controller.SentenceListController', {
 	views: [
 		'sentence.SentenceList',
 		'widget.SentenceListWidget',
+		'sentence.SentenceTable',
+		'widget.SentenceTableWidget',
 	],
 	init: function() {
 		this.control({
-			'sentence-list': {
+			'sentence-list, sentence-table': {
 				/** Makes the {@link WordSeer.view.sentence.SentenceList}'s
 				grid load with the passed-in form value parameters.
 

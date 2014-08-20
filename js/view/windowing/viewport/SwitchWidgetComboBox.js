@@ -34,13 +34,17 @@ Ext.define('WordSeer.view.windowing.viewport.SwitchWidgetComboBox', {
     			},
                 {
                     widget_xtype: 'sentence-list-widget',
-                    name: 'Sentences',
+                    name: 'Sentence List',
                 },
     			{
+					widget_xtype: 'sentence-table-widget',
+					name: 'Sentence Table',
+				},
+				{
     				widget_xtype: 'document-browser-widget',
-    				name: 'Documents',
+    				name: 'Document Table',
     			},
-                {
+				{
                     widget_xtype: 'document-viewer-widget',
                     name: 'Reader'
                 },
