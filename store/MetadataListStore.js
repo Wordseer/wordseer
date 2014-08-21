@@ -15,7 +15,10 @@ Ext.define("WordSeer.store.MetadataListStore", {
 			user: getUsername(),
 			onlyMetadata: "true",
 		},
-		reader: 'json',
+		reader: {
+          type: 'json',
+          root: 'results',
+      },
 	},
 	sorters: [{property:'count', direction: 'DESC'}],
 	constructor: function(config) {

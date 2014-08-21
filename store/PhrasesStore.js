@@ -13,7 +13,11 @@ Ext.define('WordSeer.store.PhrasesStore', {
 			instance: getInstance(),
 			length: 2,
 			has_function_words: 0
-		}
+		},
+		reader: {
+			type: 'json',
+			root: 'results',
+		},
 	},
 	filters: [{property:'lemmatized', value:0}]
 });

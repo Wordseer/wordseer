@@ -47,7 +47,8 @@ Ext.define('WordSeer.controller.SearchController', {
 			},
 			scope:this,
 			success:function(response){
-				var data = Ext.decode(response.responseText);
+				var resp = Ext.decode(response.responseText);
+				var data = resp.results;
 				var newFields = [
 					{name:'sentence', type: 'auto'},
 					{name: 'id', type:'int'},

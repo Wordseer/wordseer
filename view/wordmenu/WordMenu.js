@@ -268,7 +268,8 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
 
     addPhraseOptions: function(opts, success, response) {
         var itemId = 'phrases';
-        var phrases = Ext.decode(response.responseText);
+        var resp = Ext.decode(response.responseText);
+        var phrases = resp.results;
         menuItems = [];
         for (var i = 0; i < phrases.length; i++) {
             menuItems.push({

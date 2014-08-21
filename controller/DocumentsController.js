@@ -35,7 +35,8 @@ Ext.define('WordSeer.controller.DocumentsController', {
 			},
 			scope:this,
 			success:function(response){
-				var data = Ext.decode(response.responseText);
+				var resp = Ext.decode(response.responseText);
+				var data = resp.results;
 				var newFields = [
 					{name: 'has_text', type: 'boolean', default: false},
 					'units',
