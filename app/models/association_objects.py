@@ -119,3 +119,37 @@ class DependencyInSentence(db.Model, Base):
         backref=db.backref(
             "dependency_in_sentence", cascade="all, delete-orphan"))
 
+class ProjectsUsers(db.Model, Base):
+    """Associate Users with Projects.
+
+    Attributes:
+        user (User): The ``User`` in this relationship.
+        project (Project): The ``Project`` in this relationship.
+        role (int): The permissions of this ``User`` in this ``Project``.
+        ROLE_USER (int): The integer that represents a user role for
+            ``permissions``.
+        ROLE_ADMIN (int): Represents an admin role for ``permissions``.
+    """
+    ROLE_USER = 0
+    ROLE_ADMIN = 1
+
+    ROLE_DESCRIPTIONS = {
+        ROLE_USER: "User",
+        ROLE_ADMIN: "Admin"
+    }
+
+    def get_role_name(self):
+        """Return a human-readable role name.
+        """
+        return self.ROLE_DESCRIPTIONS[self.role]
+
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"))
+    project_id = db.Column(db.Integer(), db.ForeignKey("project.id"))
+    role = db.Column(db.Integer())
+
+    user = db.relationship("User", backref=db.backref("user_projects",
+        cascade="all, delete-orphan"))
+
+    project = db.relationship("Project", backref=db.backref("project_users",
+        cascade="all, delete-orphan"))
+

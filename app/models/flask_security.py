@@ -1,10 +1,13 @@
 """Models needed for flask-security.
 """
+from sqlalchemy.ext.associationproxy import association_proxy
+
 from flask.ext.security import RoleMixin
 from flask.ext.security import UserMixin
 
 from app import db
 from .base import Base
+from .association_objects import ProjectsUsers
 
 class Role(db.Model, Base, RoleMixin):
     """Represents a flask-security user role.
@@ -38,7 +41,28 @@ class User(db.Model, Base, UserMixin):
         backref=db.backref('users', lazy='dynamic'))
 
     sets = db.relationship("Set", backref="user")
-    projects = db.relationship("Project", backref="user")
+    #projects = db.relationship("ProjectsUsers", backref="user")
+    projects = association_proxy("user_projects", "project",
+            creator=lambda project: ProjectsUsers(project=project))
+
+    def add_project(self, project, role=ProjectsUsers.ROLE_USER, force=True):
+        """Add this user to ownership of a project.
+
+        Arguments:
+            project (Project): A ``Project`` to modify.
+            role (int): A role to set for this user in this project.
+
+        Returns:
+            ProjectsUsers: An assocation object linking this user and
+                ``project``.
+        """
+
+        association_object = ProjectsUsers(project=project, user=self,
+            role=role)
+
+        association_object.save(force)
+
+        return association_object
 
     def has_document_file(self, document_file):
         """Check if this user owns this `DocumentFile`.
