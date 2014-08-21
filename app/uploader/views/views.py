@@ -33,6 +33,7 @@ from ...models import Project
 from ...models import StructureFile
 from ...models import Unit
 from ...models import User
+from ...models import ProjectsUsers
 from app import app
 from app import db
 from app.models import User
@@ -203,9 +204,8 @@ class ProjectsCLPD(CLPDView):
         and a path. Their path is also created.
         """
         project = Project(
-            name=self.create_form.name.data,
-            user=current_user)
-        project.save()
+            name=self.create_form.name.data)
+        current_user.add_project(project, role=ProjectsUsers.ROLE_ADMIN)
         project.path = os.path.join(app.config["UPLOAD_DIR"], str(project.id))
         project.save()
         os.mkdir(project.path)
@@ -219,9 +219,24 @@ class ProjectsCLPD(CLPDView):
         project_objects = [Project.query.get(id) for id in selected_projects]
         if request.form["action"] == self.process_form.DELETE:
             for project in project_objects:
+                rel = ProjectsUsers.query.filter_by(user=current_user,
+                    project=project).one()
+
+                if rel.role < ProjectsUsers.ROLE_ADMIN:
+                    self.process_form.selection.errors.append("Not authorized"
+                        " to delete " + project.name)
+                    continue
+
                 self.delete_object(project, project.name)
+
         if request.form["action"] == self.process_form.PROCESS:
             for project in project_objects:
+                rel = ProjectsUsers.query.filter_by(user=current_user,
+                    project=project).one()
+                if rel.role < ProjectsUsers.ROLE_ADMIN:
+                    self.process_form.selection.errors.append("Not authorized"
+                        " to process " + project.name)
+                    continue
                 files = project.document_files
                 structure_file = project.structure_files[0]
                 process_files(project.path, structure_file.path, project)
@@ -252,13 +267,17 @@ class ProjectCLPD(CLPDView):
             exceptions.ProjectNotFoundException)
             # NOTE: handle access to nonexistent objects globally
 
+        if self.project not in current_user.projects:
+            return app.login_manager.unauthorized()
+
         self.template_kwargs["project"] = self.project
         self.template_kwargs["project_errors"] = self.project.get_errors()
         self.template_kwargs["project_warnings"] = self.project.get_warnings()
         self.template_kwargs["project_infos"] = self.project.get_infos()
 
-        if self.project not in current_user.projects:
-            return app.login_manager.unauthorized()
+        self.rel = ProjectsUsers.query.filter_by(user=current_user,
+            project=self.project).one()
+        self.template_kwargs["user_role"] = self.rel.role
 
     def set_choices(self, **kwargs):
         """The template needs the choices in the form of (id, filename).
@@ -280,6 +299,9 @@ class ProjectCLPD(CLPDView):
         the project directory and create a database record with its filename and
         path.
         """
+        if self.rel.role < ProjectsUsers.ROLE_ADMIN:
+            self.create_form.uploaded_file.errors.append("You can't do that.")
+            return
         uploaded_files = request.files.getlist("create-uploaded_file")
         for uploaded_file in uploaded_files:
             filename = secure_filename(uploaded_file.filename)
@@ -322,6 +344,9 @@ class ProjectCLPD(CLPDView):
         """If deleting, delete every database record and file. If processing,
         then send files to the processor.
         """
+        if self.rel.role < ProjectsUsers.ROLE_ADMIN:
+            self.process_form.selection.errors.append("You can't do that.")
+            return
         files = request.form.getlist("process-selection")
         structure_file_ids = request.form.getlist("process-structure_file")
 
@@ -354,14 +379,73 @@ class ProjectCLPD(CLPDView):
 uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>",
     view_func=ProjectCLPD.as_view("project_show"))
 
-# NOTE: It should not be necessary to include the project_id in the URL if this
-# just shows information about a document. The only reason it might need it is
-# if it's a page that shows information about the relationship between the
-# document and the project, which should probably be on a separate page anyway.
-@uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" +
-    app.config["DOCUMENT_ROUTE"] + '<int:document_file_id>')
+class ProjectPermissions(View):
+    """View and modify a project's permissions.
+    """
+    decorators = [login_required]
+    methods = ["GET", "POST"]
+    def __init__(self):
+        self.form = forms.ProjectPermissionsForm(prefix="permissions")
+
+    def handle_form(self):
+        """Handle the form actions.
+        """
+        selected_rels = request.form.getlist("permissions-selection")
+        ownerships = [ProjectsUsers.query.get(id) for id in selected_rels]
+        if request.form["action"] == self.form.DELETE:
+            for ownership in ownerships:
+                self.form.selection.delete_choice(ownership.id, ownership)
+                ownership.delete()
+
+        if request.form["action"] == self.form.UPDATE:
+            role = int(request.form["permissions-update_permissions"])
+            for ownership in ownerships:
+                ownership.role = role
+                ownership.save(False)
+            db.session.commit()
+
+        if request.form["action"] == self.form.CREATE:
+            email = request.form["permissions-new_collaborator"]
+            role = int(request.form["permissions-create_permissions"])
+            user = User.query.filter(User.email == email).one()
+            rel = user.add_project(project=self.project, role=role)
+            self.form.selection.add_choice(rel.id, rel)
+
+
+    def set_choices(self):
+        """Get the possible choices.
+        """
+        ownerships = ProjectsUsers.query.filter_by(project = self.project).all()
+
+        self.form.selection.choices = []
+        for ownership in ownerships:
+            self.form.selection.add_choice(ownership.id, ownership)
+
+    def dispatch_request(self, project_id):
+        """Render the template with the correct data.
+        """
+        self.project = Project.query.get(project_id)
+        if (not self.project or
+                self.project not in current_user.projects or
+                ProjectsUsers.query.filter_by(project = self.project).\
+                    filter_by(user = current_user).one().role is not
+                    ProjectsUsers.ROLE_ADMIN):
+            return app.login_manager.unauthorized()
+        self.set_choices()
+        if helpers.really_submitted(self.form):
+            self.handle_form()
+
+        return render_template("project_permissions.html",
+            project=self.project,
+            form=self.form)
+
+uploader.add_url_rule(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/permissions",
+    view_func=ProjectPermissions.as_view("project_permissions"))
+
+
+@uploader.route(app.config["DOCUMENT_ROUTE"] + '<int:document_file_id>')
 @login_required
-def document_show(project_id, document_file_id):
+def document_show(document_file_id):
     """The show action, which shows details for a particular DocumentFile.
 
     :param int document_file_id: The DocumentFile to retrieve details for.
@@ -383,16 +467,10 @@ def document_show(project_id, document_file_id):
     filename = os.path.split(document_file.path)[1]
     #TODO: move to objects
 
-    project = Project.query.join(User).filter(User.id == current_user.id).\
-        filter(DocumentFile.id == document_file_id).one()
-    # NOTE: do you mean projects? why do you only load one project when
-    # documents can be part of more than one project? This should likely
-    # just be document.projects
-
     return render_template("document_show.html",
         document_file=document_file,
-        project=project,
         filename=filename)
+
 @csrf.exempt
 @uploader.route(app.config["PROJECT_ROUTE"]+"<int:project_id>"+
     app.config["MAP_ROUTE"] + '<int:document_file_id>')
@@ -403,7 +481,6 @@ def document_map(project_id, document_file_id):
 
     :param int doc_id: The document to retrieve details for.
     """
-    print "DOC MAP"
     try:
         document = DocumentFile.query.get(document_file_id)
     except TypeError:

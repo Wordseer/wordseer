@@ -7,12 +7,14 @@ import os
 from flask_wtf import Form
 from flask import redirect
 from flask_wtf.file import FileAllowed, FileField, FileRequired
+from sqlalchemy.orm.exc import NoResultFound
+from flask_security.core import current_user
 from wtforms.fields import StringField, HiddenField
 from wtforms.validators import Required, ValidationError
 
 from app import app
-from .fields import ButtonField, MultiCheckboxField, MultiRadioField
-from ..models import Unit, Project, DocumentFile
+from .fields import ButtonField, MultiCheckboxField, MultiRadioField, DropdownField
+from ..models import Unit, Project, DocumentFile, ProjectsUsers, User
 
 class HiddenSubmitted(object):
     """A mixin to provide a hidden field called "submitted" which has a default
@@ -134,7 +136,8 @@ class ProjectCreateForm(Form, HiddenSubmitted):
     def validate_name(form, field):
         """Make sure there are no projects with this name existing.
         """
-        if Project.query.filter(Project.name == field.data).count() > 0:
+        user_project_names = [project.name for project in current_user.projects]
+        if field.data in user_project_names:
             raise ValidationError("A project with this name already exists")
 
 class ProjectProcessForm(ProcessForm):
@@ -165,4 +168,75 @@ class ConfirmDeleteForm(Form, HiddenSubmitted):
 
 class MapDocumentForm(Form, HiddenSubmitted):
     done = 0
+
+class ProjectPermissionsForm(Form, HiddenSubmitted):
+    """List and change project permissions.
+    """
+    UPDATE = "0"
+    DELETE = "-1"
+    CREATE = "1"
+
+    selection = MultiCheckboxField("Select",
+        coerce=int,
+        choices=[])
+
+    new_collaborator = StringField("Add new user")
+    possible_permissions = [(str(id), name) for id, name in
+        ProjectsUsers.ROLE_DESCRIPTIONS.items()]
+    create_permissions = DropdownField("Permissions", default="1",
+        choices=possible_permissions)
+    update_permissions = DropdownField("Permissions", default="1",
+        choices=possible_permissions)
+    create_button = ButtonField("Add collaborator", name="action", value=CREATE)
+    update_button = ButtonField("Set permissions", name="action", value=UPDATE)
+    delete_button = ButtonField("Delete", name="action", value=DELETE)
+
+    def validate_selection(form, field):
+        """Validate the selection. This only does anything if the UPDATE
+        or DELETE buttons have been pressed.
+        """
+        action = form.create_button.data # All buttons have the same data
+        if action == form.UPDATE or action == form.DELETE:
+            if not field.data:
+                raise ValidationError("You must make a selection")
+
+        if ((action == form.UPDATE and
+                form.update_permissions.data == str(ProjectsUsers.ROLE_USER))
+                or action == form.DELETE):
+            former_admins = []
+
+            for rel_id in field.data:
+                relationship = ProjectsUsers.query.get(rel_id)
+                if relationship.role == ProjectsUsers.ROLE_ADMIN:
+                    former_admins.append(relationship)
+
+            if former_admins:
+                project = former_admins[0].project
+                all_admins = ProjectsUsers.query.filter_by(project=project,
+                    role=ProjectsUsers.ROLE_ADMIN).all()
+                if all_admins == former_admins:
+                    raise ValidationError("At least one user must be an admin")
+        return True
+
+    def validate_new_collaborator(form, field):
+        """Validate the new_collaborator field. Only does anything if CREATE
+        button has been pressed.
+        """
+        action = form.create_button.data # All buttons have the same data
+        if action == form.CREATE:
+            users = User.query.all()
+            user_emails = [user.email for user in users]
+            existing_collaborators = [choice[1].user.id for choice in
+                form.selection.choices]
+
+            try:
+                new_user = User.query.filter_by(email = field.data).one()
+            except NoResultFound:
+                raise ValidationError("This user doesn't seem to be registered "
+                    "on this server.")
+
+            if new_user.id in existing_collaborators:
+                raise ValidationError("This user is already on this project.")
+
+        return True
 
