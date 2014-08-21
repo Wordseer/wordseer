@@ -48,3 +48,4 @@ def get_random_id_from(table, db, n=1):
         return ids[0]
     else:
         return tuple(ids)
+

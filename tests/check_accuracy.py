@@ -1,3 +1,8 @@
+"""Usage::
+
+    python check_accuracy.py mysql://<user>:<password>@<server>/<database> <path to sqlite db>
+"""
+
 from sqlalchemy import create_engine
 import sys
 import os
@@ -334,16 +339,14 @@ def get_matching_sentences(old_db, new_db, num_sentences):
 		"new": sentences_new
 	}
 
-# Main
-
 if __name__ == "__main__":
+    root = os.path.join(os.path.realpath(__file__))
 
-	root = os.path.join("home", "keien", "dev", "wordseer_flask")
+    # Read the args and connect to the databases
+    old_db = create_engine(sys.argv[1])
+    new_db = create_engine("sqlite:////" + os.path.join(sys.argv[2]))
 
-	# Read the args and connect to the databases
-	old_db = create_engine("mysql://keien@localhost/" + sys.argv[1])
-	new_db = create_engine("sqlite:////" + os.path.join(root, sys.argv[2]))
+    # check_documents(old_db, new_db)
+    accuracies = check_sentences(old_db, new_db, 100)
+    print(accuracies)
 
-	# check_documents(old_db, new_db)
-	accuracies = check_sentences(old_db, new_db, 100)
-	print(accuracies)
