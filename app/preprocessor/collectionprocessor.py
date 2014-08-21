@@ -199,6 +199,9 @@ class CollectionProcessor(object):
 def cp_run(collection_dir, structure_file, extension, project_id):
     """Run the collection processor.
 
+    This method will log any fatal preprocessor exceptions as an error in
+    the given project.
+
     Arguments:
         collection_dir (str): Where to get files from.
         structure_file (str): The path to the structure file.
@@ -210,6 +213,11 @@ def cp_run(collection_dir, structure_file, extension, project_id):
 
     project = Project.query.get(project_id)
     collection_processor = CollectionProcessor(project)
-    collection_processor.process(collection_dir, structure_file, extension,
-       False)
+    try:
+        collection_processor.process(collection_dir, structure_file, extension,
+           False)
+    except Exception as e:
+        project_logger = logger.ProjectLogger(logging.getLogger(__name__),
+            project)
+        project_logger.error("Fatal error: " + str(e))
 

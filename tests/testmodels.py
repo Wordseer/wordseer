@@ -23,6 +23,7 @@ from app.models import Log
 from app.models import InfoLog
 from app.models import ErrorLog
 from app.models import WarningLog
+from app.models import ProjectsUsers
 import database
 
 class TestWordModel(unittest.TestCase):
@@ -473,4 +474,32 @@ class TestProjectModel(unittest.TestCase):
         assert project.get_infos() == info_logs
         assert project.get_errors() == error_logs
         assert project.get_warnings() == warning_logs
+
+class TestUserModel(unittest.TestCase):
+    """Test the ``User`` model.
+    """
+
+    def setUp(self):
+        database.clean()
+
+    def test_add_project(self):
+        user = User()
+        project = Project()
+        user.save()
+        project.save()
+        assoc_object = user.add_project(project, ProjectsUsers.ROLE_ADMIN,
+            False)
+
+        assert assoc_object.user == user
+        assert assoc_object.project == project
+
+    def test_association_proxies(self):
+        user = User()
+        project = Project()
+
+        user.projects = [project]
+        project.users = [user]
+
+        user.save()
+        project.save()
 

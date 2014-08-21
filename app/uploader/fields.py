@@ -2,10 +2,10 @@
 Custom fields for this flask application.
 """
 
-from wtforms.fields import Field, SelectMultipleField
+from wtforms.fields import Field, SelectMultipleField, SelectField
 from wtforms.widgets import ListWidget, CheckboxInput, RadioInput
 
-from .widgets import ButtonWidget
+from .widgets import ButtonWidget, DropdownWidget
 
 class ButtonField(Field):
     """A field to conveniently use buttons in flask forms.
@@ -106,4 +106,7 @@ class MultiCheckboxField(SelectMultipleField):
         """
 
         self.choices.remove((choice_id, choice_data))
+
+class DropdownField(SelectField):
+    widget = DropdownWidget()
 

@@ -17,7 +17,7 @@
 
 {% block creation_header %}Upload new document{% endblock %}
 {% block creation_form %}
-{% if project.status == 0 %}
+{% if project.status == 0 and user_role > 0 %}
 <form method="POST" enctype="multipart/form-data"
       class="form-inline clearfix" role="form">
     {{ create_form.hidden_tag() }}
@@ -30,6 +30,10 @@
                 help=("Allowed extensions: " + allowed_extensions|join(", ") +
                     ".")) }}
 </form>
+{% endif %}
+{% if user_role > 0 %}
+<a href="{{ url_for("uploader.project_permissions", project_id=project.id) }}",
+   class="btn btn-primary"><span class="glyphicon glyphicon-user"></span> Permissions</a>
 {% endif %}
 {% endblock %}
 
@@ -72,7 +76,7 @@
             {{ macros.selection_table(process_form.selection, "document",
                 "table table-striped table-hover click-anywhere",
                 "File Name", "uploader.document_show", project_id=project.id) }}
-            {% if project.status == 0 %}
+            {% if user_role > 0 and project_status == 0%}
                 <h3>Selected file actions:</h3>
                 {{ process_form.structure_button(class="btn btn-info",
                             icon="glyphicon-list", id='structure-button') }}
@@ -85,10 +89,10 @@
         {% if project.status == 1 %}
             <p>Project is currently processing.</p>
         {% elif project.status == 2 %}
-        <p><a class="btn btn-primary" rol="button"
-            href="{{url_for('wordseer.ext_app', project_id=project.id)}}"}>
-            Explore data
-        </a></p>
+            <p><a class="btn btn-primary" rol="button"
+                href="{{url_for('wordseer.ext_app', project_id=project.id)}}"}>
+                Explore data
+            </a></p>
         {% endif %}
         {{ macros.show_logs(project_errors, "alert alert-danger", "Errors") }}
         {{ macros.show_logs(project_warnings, "alert alert-warning", "Warnings") }}

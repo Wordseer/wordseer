@@ -1,8 +1,11 @@
 """Models for projects.
 """
+from sqlalchemy.ext.associationproxy import association_proxy
+
 from app import db
 from base import Base
 from .log import Log
+from .association_objects import ProjectsUsers
 
 class Project(db.Model, Base):
     """A WordSeer project for a collection of documents.
@@ -26,7 +29,6 @@ class Project(db.Model, Base):
     # Attributes
     name = db.Column(db.String)
     path = db.Column(db.String)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     status = db.Column(db.Integer, default=STATUS_UNPROCESSED)
 
     # Active project indicator
@@ -45,6 +47,8 @@ class Project(db.Model, Base):
         backref="project", lazy="dynamic")
     dependency_in_sentence = db.relationship("DependencyInSentence",
         backref="project", lazy="dynamic")
+    users = association_proxy("project_users", "user",
+        creator=lambda user: ProjectsUsers(user=user))
 
     def get_documents(self):
         """A method to get all the ``Document``\s that are in this project.
