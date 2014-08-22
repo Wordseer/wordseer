@@ -16,10 +16,20 @@ class Project(db.Model, Base):
         user (User): The owner of this project.
         documents (list of Documents): ``Document``\s present in this project.
     """
+    STATUS_UNPROCESSED = 0
+    STATUS_PREPROCESSING = 1
+    STATUS_DONE = 2
+
+    STATUS_NAMES = {
+        STATUS_UNPROCESSED: "Not yet procesed.",
+        STATUS_PREPROCESSING: "Preprocessing.",
+        STATUS_DONE: "Preprocessed."
+    }
 
     # Attributes
     name = db.Column(db.String)
     path = db.Column(db.String)
+    status = db.Column(db.Integer, default=STATUS_UNPROCESSED)
 
     # Active project indicator
     active_project = None
