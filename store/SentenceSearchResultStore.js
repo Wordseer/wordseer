@@ -7,7 +7,7 @@ Ext.define('WordSeer.store.SentenceSearchResultStore', {
         type: 'ajax',
         noCache: false,
         timeout: 9000000,
-        url:'../../src/php/grammaticalsearch/get-search-results.php',
+        url: ws_api_path + 'grammaticalsearch/get_search_results/',
         extraParams: {
           instance: getInstance(),
           user: getUsername(),

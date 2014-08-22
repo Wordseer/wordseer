@@ -11,14 +11,17 @@ Ext.define('WordSeer.store.PhraseSetListStore', {
     model: 'WordSeer.model.PhraseSetModel',
     proxy: {
       type: 'ajax',
-      url:'../../src/php/subsets/crud.php',
+      url: ws_api_path + 'sets/',
       extraParams:{
          type:'listflat',
          collectiontype:'phrase',
          instance:getInstance(),
          user: getUsername(),
       },
-      reader: 'json',
+      reader: {
+          type: 'json',
+          root: 'results',
+      },
     },
     constructor: function() {
       this.callParent(arguments);

@@ -8,14 +8,17 @@ Ext.define('WordSeer.store.DocumentSetListStore', {
     storeId: 'DocumentSetListStore',
     proxy: {
       type: 'ajax',
-      url:'../../src/php/subsets/crud.php',
+      url: ws_api_path + 'sets/',
       extraParams:{
          type:'listflat',
          collectiontype:'document',
          instance:getInstance(),
          user: getUsername(),
       },
-      reader:'json',
+      reader: {
+          type: 'json',
+          root: 'results',
+      },
     },
     constructor: function(config) {
       this.callParent(arguments);

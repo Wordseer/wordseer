@@ -132,7 +132,7 @@ Ext.define('WordSeer.controller.MetadataController', {
     },
 
     /** Get and store the metadata corresponding to the user's search query
-    from `src/php/grammaticalsearch/get-search-results.php`.
+    from `projects/<id>/api/grammaticalsearch/search_results/`.
 
     @param {WordSeer.model.FormValues} formValues a formValues object
     representing a search query.

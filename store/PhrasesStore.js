@@ -8,12 +8,16 @@ Ext.define('WordSeer.store.PhrasesStore', {
 		type: 'ajax',
 		noCache: false,
 		timeout: 9000000,
-		url: '../../src/php/phrases/get-phrases.php',
+		url: ws_api_path + 'sequences/get_sequences/',
 		extraParams: {
 			instance: getInstance(),
 			length: 2,
 			has_function_words: 0
-		}
+		},
+		reader: {
+			type: 'json',
+			root: 'results',
+		},
 	},
 	filters: [{property:'lemmatized', value:0}]
 });

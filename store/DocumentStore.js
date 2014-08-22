@@ -4,12 +4,15 @@
 	proxy: {
 		type:'ajax',
 		noCache: false,
-		reader: 'json',
-		url: '../../src/php/document/get-document-search-results.php',
+		reader: {
+			type: 'json',
+			root: 'results',
+		},
+		url: ws_api_path + 'documents/search-results/',
 		extraParams: {
 			instance:getInstance(),
 	        user:getUsername(),
 	        include_text: false,
-	    }
+	    },
 	},
 })
