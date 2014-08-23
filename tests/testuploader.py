@@ -518,6 +518,76 @@ class ViewsTests(unittest.TestCase):
         assert "<em>b</em>: b" in result.data
         assert "<em>c</em>: c" in result.data
 
+    def test_process_processed_files(self):
+        """Make sure that a project that's being processed or already
+        processed can't be processed again.
+        """
+
+        project1 = Project(name="foo", path="/test-path",
+            status=Project.STATUS_PREPROCESSING)
+        rel = self.user.add_project(project1, role=ProjectsUsers.ROLE_ADMIN)
+        document_file = DocumentFile(path="foo/foo.xml")
+        structure_file = StructureFile(path="foo/foo.json")
+        project1.document_files = [document_file]
+        project1.structure_files = [structure_file]
+        project1.save()
+
+        data = {
+            "process-submitted": "true",
+            "action": "0",
+            "process-selection": [str(document_file.id)],
+            "process-structure_file": [str(structure_file.id)]
+            }
+
+        result = self.client.post("/projects/1", data=data)
+
+        assert "Upload" not in result.data
+        assert "Process" not in result.data
+        assert "This project is already" in result.data
+
+        project1.status = Project.STATUS_DONE
+        project1.save()
+
+        result = self.client.post("/projects/1", data=data)
+
+        assert "This project is already" in result.data
+        assert "Upload" not in result.data
+        assert "Process" not in result.data
+
+    def test_projects_process_processed(self):
+        """Test processing a processed project.
+        """
+        project = Project(name="test", status=Project.STATUS_PREPROCESSING)
+        rel = self.user.add_project(project, role=ProjectsUsers.ROLE_ADMIN)
+
+        project.save()
+
+        document_file1 = DocumentFile(projects=[project],
+            path="/test-path/1.xml")
+        document_file2 = DocumentFile(projects=[project],
+            path="/test-path/2.json")
+        document_file1.save()
+        document_file2.save()
+
+        result = self.client.post("/projects/", data={
+            "process-submitted": "true",
+            "action": "0",
+            "process-selection": ["1"]
+            })
+
+        assert "is already preprocessing" in result.data
+
+        project.status = Project.STATUS_DONE
+        project.save()
+
+        result = self.client.post("/projects/", data={
+            "process-submitted": "true",
+            "action": "0",
+            "process-selection": ["1"]
+            })
+
+        assert "is already preprocessed" in result.data
+
 class ProjectPermissionsTests(unittest.TestCase):
     """Tests for the ProjectPermissions view.
     """
