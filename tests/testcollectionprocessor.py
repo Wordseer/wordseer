@@ -136,7 +136,7 @@ class TestCollectionProcessor(unittest.TestCase):
         mock_logger.log.assert_has_calls(logger_calls)
 
         # Make sure the counter has been called
-        mock_counter.count.assert_called_once_with(colproc.project)
+        mock_counter.count_all.assert_called_once_with(colproc.project)
 
 class TestCollectionProcessorProcess(unittest.TestCase):
     """Tests specifically for CollectionProcessor.process().

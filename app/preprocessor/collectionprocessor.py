@@ -194,7 +194,7 @@ class CollectionProcessor(object):
 
             documents_parsed += 1
 
-        counter.count(self.project)
+        counter.count_all(self.project)
 
 def cp_run(collection_dir, structure_file, extension, project_id):
     """Run the collection processor.

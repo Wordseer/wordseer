@@ -67,7 +67,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         # project argument assigned active_project if not present
         if project == None: project = Project.active_project
 
-        return WordCount.find_or_create(
+        return WordCount.find_or_initialize(
             word_id = self.id,
             project_id = project.id,
         )

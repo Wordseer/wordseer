@@ -59,7 +59,7 @@ class Sequence(db.Model, Base):
         # project argument assigned active_project if not present
         if project == None: project = Project.active_project
 
-        return SequenceCount.find_or_create(
+        return SequenceCount.find_or_initialize(
             sequence_id = self.id,
             project_id = project.id,
         )
@@ -77,8 +77,9 @@ class Sequence(db.Model, Base):
             project = project
         )
         word_in_sequence.save(force=force)
-        
+
         return word_in_sequence
 
     def __repr__(self):
         return "<Sequence {0}>".format(self.sequence)
+
