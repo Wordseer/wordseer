@@ -66,8 +66,9 @@ def count_dependencies(project, commit_interval):
             COUNT(DISTINCT document_id) AS document_count,
             COUNT(DISTINCT sentence_id) AS sentence_count
         FROM dependency_in_sentence
+        WHERE project_id = %s
         GROUP BY dependency_id
-    """).fetchall()
+    """ % project.id).fetchall()
 
     project_logger.info("Calculating counts for dependencies")
 
@@ -102,14 +103,15 @@ def count_sequences(project, commit_interval):
     count = 0
     logger = logging.getLogger(__name__)
     project_logger = ProjectLogger(logger, project)
-
+    #pdb.set_trace()
     sequences_in_sentences = db.session.execute("""
         SELECT sequence_id,
             COUNT(DISTINCT document_id) AS document_count,
             COUNT(DISTINCT sentence_id) AS sentence_count
         FROM sequence_in_sentence
+        WHERE project_id = %s
         GROUP BY sequence_id
-    """).fetchall()
+    """ % project.id).fetchall()
 
     project_logger.info("Calculating counts for sequences")
 
@@ -150,8 +152,9 @@ def count_words(project, commit_interval):
         SELECT word_id,
             COUNT(DISTINCT sentence_id) AS sentence_count
         FROM word_in_sentence
+        WHERE project_id = %s
         GROUP BY word_id
-    """).fetchall()
+    """ % project.id).fetchall()
 
     for row in words_in_sentences:
         count += 1
