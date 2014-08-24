@@ -62,10 +62,9 @@ class Dependency(db.Model, Base):
         # project argument assigned active_project if not present
         if project == None: project = Project.active_project
 
-        return DependencyCount.find_or_initialize(
-            dependency_id = self.id,
-            project_id = project.id,
-        )
+        return DependencyCount.fast_find_or_initialize(
+            "dependency_id = %s and project_id = %s" % (self.id, project.id),
+            dependency_id = self.id, project_id = project.id)
 
     def __repr__(self):
         """Representation string for the dependency
