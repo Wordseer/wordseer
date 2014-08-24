@@ -48,7 +48,7 @@ class SequenceInSentence(db.Model, Base):
     sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
     position = db.Column(db.Integer)
 
     project = db.relationship("Project")
