@@ -14,7 +14,7 @@ class Count(db.Model, Base):
     type = db.Column(db.String(64))
     sentence_count = db.Column(db.Integer, index=True, default=0)
     document_count = db.Column(db.Integer, index=True, default=0)
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
 
     # Relationship
 
@@ -50,12 +50,29 @@ class SequenceCount(Count):
     id = db.Column(db.Integer, db.ForeignKey("count.id"), primary_key=True)
 
     # Belongs to a sequence
-    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
+    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"), index=True)
     sequence = db.relationship("Sequence")
 
     __mapper_args__ = {
         "polymorphic_identity": "sequence_count",
     }
+
+    @classmethod
+    def fast_find_or_initialize(cls, query, **kwargs):
+        """Use a query to see if a row exists.
+        """
+        tablename = cls.__tablename__
+        query_base = ("FROM count JOIN %s ON count.id = sequence_count.id "
+            "WHERE %s LIMIT 1") % (tablename, query)
+        #query = "SELECT * %s LIMIT 1" % query_base
+        query = "SELECT EXISTS (SELECT 1 %s)" % query_base
+        match = db.session.execute(query).fetchone()
+        if match == (1,):
+            return db.session.execute("SELECT * %s" % query_base).fetchone()
+        else:
+            new_record = cls(**kwargs)
+            new_record.save(force=False)
+            return new_record
 
 class DependencyCount(Count):
     """Model to store counts for dependencies.
@@ -71,3 +88,4 @@ class DependencyCount(Count):
     __mapper_args__ = {
         "polymorphic_identity": "dependency_count",
     }
+
