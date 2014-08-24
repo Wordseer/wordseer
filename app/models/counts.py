@@ -68,7 +68,8 @@ class SequenceCount(Count):
         query = "SELECT EXISTS (SELECT 1 %s)" % query_base
         match = db.session.execute(query).fetchone()
         if match == (1,):
-            return db.session.execute("SELECT * %s" % query_base).fetchone()
+            return db.session.execute(("SELECT document_count, "
+                " sentence_count %s") % query_base).fetchone()
         else:
             new_record = cls(**kwargs)
             new_record.save(force=False)
