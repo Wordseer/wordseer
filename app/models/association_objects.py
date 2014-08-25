@@ -17,7 +17,7 @@ class WordInSentence(db.Model, Base):
         surface (str): The ``Word`` with exact capitalization.
     """
 
-    word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
+    word_id = db.Column(db.Integer, db.ForeignKey("word.id"), index=True)
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
     position = db.Column(db.Integer)

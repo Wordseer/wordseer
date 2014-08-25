@@ -11,6 +11,7 @@ class Count(db.Model, Base):
 
     # Attributes
 
+    id = db.Column(db.Integer, primary_key=True, index=True)
     type = db.Column(db.String(64))
     sentence_count = db.Column(db.Integer, index=True, default=0)
     document_count = db.Column(db.Integer, index=True, default=0)
@@ -32,10 +33,11 @@ class WordCount(Count):
     """
 
     # We need to redefine ID here for polymorphic inheritance
-    id = db.Column(db.Integer, db.ForeignKey("count.id"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("count.id"), primary_key=True,
+        index=True)
 
     # Belongs to a word
-    word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
+    word_id = db.Column(db.Integer, db.ForeignKey("word.id"), index=True)
     word = db.relationship("Word")
 
     __mapper_args__ = {

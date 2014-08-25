@@ -36,6 +36,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
 
     # Attributes
 
+    id = db.Column(db.Integer, primary_key=True, index=True)
     word = db.Column(db.String, index=True)
     lemma = db.Column(db.String, index=True)
     part_of_speech = db.Column(db.String, index=True)
