@@ -50,7 +50,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         """
         return self.get_sentences()
 
-    def get_sentences(self, project=None)
+    def get_sentences(self, project=None):
         if not project:
             project = Project.active_project
 
