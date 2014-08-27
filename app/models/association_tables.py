@@ -31,3 +31,8 @@ roles_users = db.Table('roles_users',
         db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 )
 
+bigrams_in_sentences = db.Table("bigrams_in_sentences",
+        db.Column("bigram_offset_id", db.Integer, db.ForeignKey("bigram_offset.id")),
+        db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id"))
+)
+

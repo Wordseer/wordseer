@@ -143,3 +143,13 @@ class ProjectsUsers(db.Model, Base):
     project = db.relationship("Project", backref=db.backref("project_users",
         cascade="all, delete-orphan"))
 
+class BigramOffset(db.Model, Base):
+    """This represents a bigram with a certain offset.
+    """
+
+    offset = db.Column(db.Integer())
+    frequency = db.Column(db.Integer())
+    bigram_id = db.Column(db.Integer, db.ForeignKey("bigram.id"))
+    sentences = db.relationship("Sentence", secondary="bigrams_in_sentences",
+        backref="bigrams")
+
