@@ -16,6 +16,7 @@ from .structurefile import StructureFile
 from .unit import Unit
 from .word import Word
 from .counts import *
+from .bigram import Bigram
 
 from .association_objects import *
 from .association_tables import *
