@@ -36,6 +36,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
 
     # Attributes
 
+    id = db.Column(db.Integer, primary_key=True, index=True)
     word = db.Column(db.String, index=True)
     lemma = db.Column(db.String, index=True)
     part_of_speech = db.Column(db.String, index=True)
@@ -77,10 +78,9 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         # project argument assigned active_project if not present
         if project == None: project = Project.active_project
 
-        return WordCount.find_or_initialize(
-            word_id = self.id,
-            project_id = project.id,
-        )
+        return WordCount.fast_find_or_initialize(
+            "word_id = %s and project_id = %s" % (self.id, project.id),
+            word_id = self.id, project_id = project.id)
 
     def __repr__(self):
         """Representation string for words, showing the word.

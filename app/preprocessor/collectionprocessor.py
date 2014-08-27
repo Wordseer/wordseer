@@ -73,22 +73,6 @@ class CollectionProcessor(object):
             self.project_logger.info("Parsing documents")
             self.parse_documents()
 
-        # Calculate word TFIDFs
-        if not "true" in logger.get(self.project, "tfidf_done").lower():
-            self.project_logger.info("Calculating TF IDF's")
-            # TODO: implement tfidf method in document
-
-        # Calculate word-to-word-similarities
-        if (app.config["WORD_TO_WORD_SIMILARITY"] and not
-                "true" in logger.get(self.project,
-                    "word_similarity_calculations_done")):
-            self.project_logger.info("Calculating Lin Similarities")
-            # TODO: implement similarities
-
-        self.project_logger.info("Finished preprocessing.")
-        self.project.status = Project.STATUS_DONE
-        self.project.save()
-
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):
         """Extract metadata from each file in collection_dir, and populate the

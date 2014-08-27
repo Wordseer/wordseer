@@ -57,12 +57,12 @@ class Sequence(db.Model, Base):
     def get_counts(self, project=None):
 
         # project argument assigned active_project if not present
-        if project == None: project = Project.active_project
+        if project == None:
+            project = Project.active_project
 
-        return SequenceCount.find_or_initialize(
-            sequence_id = self.id,
-            project_id = project.id,
-        )
+        return SequenceCount.fast_find_or_initialize(
+            "sequence_id = %s and project_id = %s" % (self.id, project.id),
+            sequence_id = self.id, project_id = project.id)
 
     def add_word(self, word, project=None, force=True):
         """Add a word to this sequence within the scope of the project
