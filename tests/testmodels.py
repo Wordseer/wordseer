@@ -4,6 +4,7 @@ import unittest
 import copy
 
 from app import db
+from app.models import Bigram
 from app.models import Dependency
 from app.models import Document
 from app.models import DocumentFile
@@ -502,4 +503,61 @@ class TestUserModel(unittest.TestCase):
 
         user.save()
         project.save()
+
+class TestBigramModels(unittest.TestCase):
+    """Test the Bigram models.
+    """
+    def test_bigram(self):
+        """Test creating a bigram.
+        """
+        word1 = Word(word="foo")
+        word2 = Word(word="bar")
+        bigram = Bigram(word1, word2)
+
+        bigram.save()
+
+        assert bigram.word == word1
+        assert bigram.secondary_word == word2
+        assert len(bigram.offsets) == 10
+
+    def test_bigram_offset(self):
+        """Test the BigramOffset model.
+        """
+        word1 = Word(word="foo")
+        word2 = Word(word="bar")
+        bigram = Bigram(word1, word2)
+        sentence = Sentence()
+        bigram.offsets[0].sentences = [sentence]
+        bigram.save()
+
+        assert bigram.offsets[0].offset == -5
+
+    def test_get_offset(self):
+        """Test the get_offset method.
+        """
+        word1 = Word(word="foo")
+        word2 = Word(word="bar")
+        bigram = Bigram(word1, word2)
+        bigram.save()
+
+        for i in range(-5, 0) + range(1, 6):
+            offset = bigram.get_offset(i)
+            assert offset.offset == i
+
+    def test_add_instance(self):
+        """Test the add_instance method.
+        """
+
+        word1 = Word(word="foo")
+        word2 = Word(word="bar")
+        bigram = Bigram(word1, word2)
+        bigram.save()
+        sentence = Sentence(text="foo")
+        sentence.save()
+
+        offset = bigram.add_instance(-3, sentence)
+
+        assert offset.sentences == [sentence]
+        assert offset.offset == -3
+        assert sentence.bigrams == [offset]
 
