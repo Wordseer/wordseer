@@ -30,8 +30,10 @@ class Bigram:
     def __init__(self, w, wi):
         self.w = w
         self.wi = wi
+        # Each value reflects the frequency of a word at that offset
         self.p = [0] * 10
         self.freq = 0.0
+        # Each set reflects an offset
         self.sent_ids = [set() for i in range(10)]
 
     # Sort instances of Bigram by wi
