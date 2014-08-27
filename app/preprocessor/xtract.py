@@ -97,7 +97,7 @@ class Bigram:
 
 # Class to keep track of Bigrams that survived Stage 1
 class S1Bigram:
-    def __init__(self, w, wi, strength, spread, distances, sent_ids):
+    def __init__(self wi, strength, spread, distances, sent_ids):
         self.w = w
         self.wi = wi
         self.strength = strength
@@ -109,7 +109,8 @@ class S1Bigram:
         ret = self.w + " " + self.wi + " " + str(self.distances) + " " + str(self.sent_ids)
         return ret
 
-# Class to keep track of many bigrams
+# Class to keep track of many bigrams, this allows us to perform counts
+# over several sentences
 class BigramCollection:
     WILDCARD_CHAR = "*"
 
@@ -121,6 +122,7 @@ class BigramCollection:
         return len(self.bigrams)
 
     def splitSentenceToLemmas(self, sentence):
+        # We don't need this, sentences already have lemmas by now
         global word_to_lemma_dic
 
         lemmas = []
@@ -147,35 +149,25 @@ class BigramCollection:
         c.close()
 
         # List of lemmas in the sentence
-        lemmas = [w["lemma"].lower() for w in tokens]
+        lemmas = [token["lemma"].lower() for token in tokens]
         # lemmas = self.splitSentenceToLemmas(sentence["sentence"])
 
         # Find where query is located
-        if query in word_to_lemma_dic:
-            wLemmas = [word_to_lemma_dic[query]]
-        else:
-            wLemmas = [query]
-
-        wIndex = -1
-        for li, l in enumerate(lemmas):
-            for wl in wLemmas:
-                if l == wl:
-                    wIndex = li
-                    break
-            if wIndex != -1:
-                break
+        query_lemma = word_to_lemma_dic.get(query, query)
+        query_index = lemmas.index(query_lemma)
 
         # Take +/- 5 bigrams
-        startIndex = max(wIndex - 5, 0)
-        endIndex = min(wIndex + 5, len(lemmas) - 1)
-        for i in range(startIndex, endIndex + 1):
+        startIndex = max(query_index - 5, 0)
+        endIndex = min(query_index + 5, len(lemmas))
+
+        for i in range(startIndex, endIndex):
             if lemmas[i] != query and lemmas[i] not in wordseer.util.punctuation:
                 if not self.containsBigram(lemmas[i]):
                     self.bigrams[lemmas[i]] = Bigram(query, lemmas[i])
 
                 # Update total count and specific bigram's count
                 self.wfreq += 1
-                self.bigrams[lemmas[i]].addInstance(i - wIndex, sent_id)
+                self.bigrams[lemmas[i]].addInstance(i - query_index, sent_id)
 
     def getFbar(self):
         return self.wfreq / len(self.bigrams)
@@ -262,13 +254,13 @@ def calculateTopPhrases(query):
     # FIXME: Only taking the first word for now
     query = query.split()[0].lower()
 
-    # Get the sentences that match the query, matching all word forms
+    # Get the sentences that contain the query lemma, matching all word forms
     foundSentences = wordseer.search.getMatchingSentencesByLemma(query)
     savedSentences = [x for x in foundSentences]
 
     # print "<p>At getMatchingSentencesByLemma: <b>%.3f seconds</b></p>" % (time.time() - start_time)
 
-    # Add ALL sentences
+    # Add ALL sentences xyzf
     bigrams = BigramCollection()
     for sentence in savedSentences:
         bigrams.addSentence(query, sentence)

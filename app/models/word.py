@@ -47,9 +47,14 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         """Retrieves sentences that contain this word within the scope of the
         current active project.
         """
+        return self.get_sentences()
+
+    def get_sentences(self, project=None)
+        if not project:
+            project = Project.active_project
 
         return Sentence.query.join(WordInSentence).join(Word).\
-            filter(WordInSentence.project==Project.active_project).\
+            filter(WordInSentence.project==project).\
             filter(WordInSentence.word==self).all()
 
     @property
@@ -57,9 +62,14 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         """Retrieves sequences that contain this word within the scope of the
         current active project.
         """
+        return self.get_sequences()
+
+    def get_sequences(self, project=None):
+        if not project:
+            project = Project.active_project
 
         return Sequence.query.join(WordInSequence).join(Word).\
-            filter(WordInSequence.project==Project.active_project).\
+            filter(WordInSequence.project==project).\
             filter(WordInSequence.word==self).all()
 
     def get_counts(self, project=None):
@@ -77,3 +87,4 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         """
 
         return "<Word: " + str(self.word) + ">"
+
