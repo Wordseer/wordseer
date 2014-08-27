@@ -67,3 +67,42 @@ class Bigram(db.Model, Base):
 
         return bigram_offset
 
+    def __repr__(self):
+        """Return a string representation of this bigram.
+        """
+        return "<Bigram | primary: %s | secondary: %s >" % (self.word,
+            self.secondary_word)
+
+    def get_strength(self, f_bar, sigma):
+        #TODO: what is this?
+        return (self.frequency - f_bar) / sigma
+
+    def get_spread(self):
+        #TODO: what is this?
+        u = 0.0
+        for offset in self.offsets:
+            ps = offset.frequency - (self.frequency / 10)
+            u += (ps * ps)
+        return u / 10
+
+    def get_distances(self, k1=1):
+        """TODO: what?
+
+        Arguments:
+            k1 (int): Threshhold above which distances are interesting.
+
+        Returns:
+            list of ints: A list of relative positions to w in the range (-5, 5)
+            excluding 0.
+        """
+
+        min_peak = (self.freq / 10) + (k1 * math.sqrt(self.get_spread()))
+
+        distances = []
+
+        for offset in offsets:
+            if offset.frequency > min_peak:
+                distances.append(offset.offset)
+
+        return distances
+
