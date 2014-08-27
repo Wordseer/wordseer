@@ -15,7 +15,7 @@ class Bigram(db.Model, Base):
 
     word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
     secondary_word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
-    frequency = db.Column(db.Integer)
+    frequency = db.Column(db.Integer, default=0)
 
     word = db.relationship("Word", foreign_keys=word_id)
     secondary_word = db.relationship("Word", foreign_keys=secondary_word_id)
@@ -62,8 +62,9 @@ class Bigram(db.Model, Base):
             BigramOffset: The modified BigramOffset object.
         """
         bigram_offset = self.get_offset(offset)
-        bigram_offset.sentences.append(sentence)
-        bigram_offset.save(force)
+        bigram_offset.add_sentence(sentence, force)
+
+        self.frequency += 1
 
         return bigram_offset
 

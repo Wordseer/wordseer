@@ -560,4 +560,6 @@ class TestBigramModels(unittest.TestCase):
         assert offset.sentences == [sentence]
         assert offset.offset == -3
         assert sentence.bigrams == [offset]
+        assert bigram.frequency == 1
+        assert offset.frequency == 1
 

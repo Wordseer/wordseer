@@ -147,9 +147,22 @@ class BigramOffset(db.Model, Base):
     """This represents a bigram with a certain offset.
     """
 
-    offset = db.Column(db.Integer())
-    frequency = db.Column(db.Integer())
+    offset = db.Column(db.Integer(), nullable=False)
+    frequency = db.Column(db.Integer(), default=0)
     bigram_id = db.Column(db.Integer, db.ForeignKey("bigram.id"))
     sentences = db.relationship("Sentence", secondary="bigrams_in_sentences",
         backref="bigrams")
+
+    def add_sentence(self, sentence, force=True):
+        """Add a sentence to the ``sentences`` attribute and update frequency
+        accordingly.
+
+        Arguments:
+            sentence (Sentence): A Sentence to add to this BigramOffset.
+            force (bool): If ``True``, save and commit to the database.
+        """
+        self.sentences.append(sentence)
+        self.frequency += 1
+
+        self.save(force)
 
