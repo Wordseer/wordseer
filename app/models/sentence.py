@@ -40,6 +40,7 @@ class Sentence(db.Model, Base):
 
     unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
     document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
+    bigram_id = db.Column(db.Integer, db.ForeignKey("bigram_offset.id"))
     text = db.Column(db.Text, index=True)
 
     # Relationships
