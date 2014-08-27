@@ -64,11 +64,15 @@ class Project(db.Model, Base):
 
         return documents
 
-    def get_words(self):
-        """Get all the ``Word``\s in this project.
+    def get_sentences(self):
+        """Get all ``Sentence``\s present in this project.
         """
+        sentences = []
 
-        pass
+        for document in self.get_documents():
+            sentences.extend(document.all_sentences)
+
+        return sentences
 
     def frequent_sequences(self, position, length, limit, lemmatized = False):
         """Return the most frequently occurring sequences with the given
