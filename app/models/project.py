@@ -64,6 +64,12 @@ class Project(db.Model, Base):
 
         return documents
 
+    def get_words(self):
+        """Get all the ``Word``\s in this project.
+        """
+
+        pass
+
     def frequent_sequences(self, position, length, limit, lemmatized = False):
         """Return the most frequently occurring sequences with the given
         parameters.

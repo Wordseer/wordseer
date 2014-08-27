@@ -12,6 +12,7 @@ this sentence and record them in the database.
 import logging
 from app import app
 from app.models.sequence import Sequence
+from app.models.word import Word
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 
@@ -29,23 +30,8 @@ class SequenceProcessor(object):
         """
 
         self.project = project
-        self.previously_indexed = []
         self.logger = logging.getLogger(__name__)
         self.project_logger = ProjectLogger(self.logger, project)
-
-    def remove_stops(self, words):
-        """Remove every sort of stop from the sentences.
-
-        :param list words: A list of TaggedWord objects.
-        :return list: The list without stops.
-        """
-
-        without_stops = []
-        for word in words:
-            if word.word.lower() not in app.config["STOPWORDS"]:
-                without_stops.append(word)
-
-        return without_stops
 
     def process(self, sentence, sequence_dict=None):
         """Iterate and record every four word long sequence. The method records
@@ -56,62 +42,10 @@ class SequenceProcessor(object):
         :return list: A list of Sequence objects, representing the results
             of processing. These sequences are also sent to the ReaderWriter.
         """
+        bigrams = {}
+        for word in Word.query:
 
-        sequences = [] # a list of Sequences
-        for i in range(0, len(sentence.words)):
-            # Iterate through every word
-            self.previously_indexed = []
-            for j in range(i+1, len(sentence.words) + 1):
-                # Check every word after the one at i
-                if j - i < 5:
-                    # If this word is less than five words away from i,
-                    # create a new Sequence (four or fewer words)
-                    sequences.extend(self.get_sequence(sentence, i, j))
 
-        # Write the sequences to the database using duplication check
-
-        if isinstance(sequence_dict, dict):
-
-            for sequence in sequences:
-                sequence_text = sequence["sequence"]
-                lemmatized = sequence["is_lemmatized"]
-                has_function_words = sequence["has_function_words"]
-                all_function_words = sequence["all_function_words"]
-                length = len(sequence["words"])
-                position = sequence["start_position"]
-
-                key = sequence_text
-
-                if key in sequence_dict.keys():
-                    sequence = sequence_dict[key]
-                else:
-
-                    try:
-                        sequence = Sequence.query.filter_by(
-                            sequence = sequence_text
-                        ).one()
-                    except(MultipleResultsFound):
-                        self.project_logger.error("Duplicate records found "
-                            "for: %s", str(key))
-                    except(NoResultFound):
-                        sequence = Sequence(
-                            sequence = sequence_text,
-                            lemmatized = lemmatized,
-                            has_function_words = has_function_words,
-                            all_function_words = all_function_words,
-                            length = length
-                        )
-
-                    sequence_dict[key] = sequence
-
-                sentence.add_sequence(
-                    sequence = sequence,
-                    position = position,
-                    project = self.project,
-                    force = False
-                )
-
-        return sequences
 
     def get_sequence(self, sentence, i, j):
         """Handle the main processing part in the process() loop.
@@ -220,4 +154,17 @@ def join_tws(words, delimiter, attr):
             result.extend([word.word, delimiter])
 
     return "".join(result[:-1])
+
+class BigramCollection(object):
+    WILDCARD_CHAR = "*"
+
+    def __init__(self):
+        self.bigrams = {}
+        self.wfreq = 0.0
+
+    def __len__(self):
+        return len(self.bigrams)
+
+    def add_sentence(self, query, sentence):
+        lemmas = sentence.lemmas
 
