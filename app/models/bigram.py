@@ -20,7 +20,8 @@ class Bigram(db.Model, Base):
     word = db.relationship("Word", foreign_keys=word_id)
     secondary_word = db.relationship("Word", foreign_keys=secondary_word_id)
 
-    offsets = db.relationship("BigramOffset", backref="bigram")
+    offsets = db.relationship("BigramOffset", backref="bigram",
+        order_by="BigramOffset.offset")
 
     def __init__(self, word, secondary_word):
         """Instantiate a bigram.
@@ -29,6 +30,7 @@ class Bigram(db.Model, Base):
             word (Word): The primary word
             secondary_word (Word): The secondary word
         """
+        self.frequency = 0
         self.word = word
         self.secondary_word = secondary_word
         self.offsets = [BigramOffset(offset=i, bigram=self)
@@ -49,6 +51,7 @@ class Bigram(db.Model, Base):
         elif offset > 0:
             return self.offsets[offset + 4]
         else:
+            pdb.set_trace()
             raise ValueError("Offset cannot be 0")
 
     def add_instance(self, offset, sentence, force=True):
@@ -75,26 +78,53 @@ class Bigram(db.Model, Base):
             self.secondary_word)
 
     def get_strength(self, f_bar, sigma):
-        #TODO: what is this?
+        """Get the strength of this word pair.
+
+        Strength is defined the frequency of this pair minus the average
+        average frequency of the primary word in this pair (f-bar) divided by
+        the standard deviation around f-bar.
+
+        Arguments:
+            f_bar (float): Average frequency of ``self.word``
+            sigma (float): Standard deviation of ``f_bar``.
+
+        Returns:
+            float: The strength of this word pair, also known as ki,
+        """
         return (self.frequency - f_bar) / sigma
 
     def get_spread(self):
-        #TODO: what is this?
-        u = 0.0
-        for offset in self.offsets:
-            ps = offset.frequency - (self.frequency / 10)
-            u += (ps * ps)
-        return u / 10
+        """This method returns the shape of the histogram showing the frequency
+        of ``secondary_word`` versus ``offset``.
 
-    def get_distances(self, k1=1):
-        """TODO: what?
+        If the value (known as ui) returned by this function is small, then
+        the histogram will tend to be flat and ``secondary_word`` has an equal
+        chance of appearing with any offset relative to ``word``. If it is
+        large, then the histogram will tend to have peaks at certain offsets.
+
+        The formula is the average variance of all offsets.
+
+        Returns:
+            float: ui, a value described above.
+        """
+        ui = 0.0
+
+        for offset in self.offsets:
+            difference = offset.frequency - (self.frequency / 10)
+            ui += (difference * difference)
+
+        return ui / 10
+
+    def get_interesting_offsets(self, k1=1):
+        """Return offsets that are interesting to look at. If a certain
+        offset is unusually favored, it will be returned by this method.
 
         Arguments:
             k1 (int): Threshhold above which distances are interesting.
 
         Returns:
-            list of ints: A list of relative positions to w in the range (-5, 5)
-            excluding 0.
+            list of BigramOffsets: A list of BigramOffsets representing
+            interesting offsets.
         """
 
         min_peak = (self.freq / 10) + (k1 * math.sqrt(self.get_spread()))
@@ -103,7 +133,7 @@ class Bigram(db.Model, Base):
 
         for offset in offsets:
             if offset.frequency > min_peak:
-                distances.append(offset.offset)
+                distances.append(offset)
 
         return distances
 
