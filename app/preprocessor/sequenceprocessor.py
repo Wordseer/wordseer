@@ -1,12 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-This module handles breaking down text into Sequence objects, which are
-collections of at most four words.
-
-The SequenceProcessor requires a database reader/writer to be initialized.
-The most interesting method to the user is the process() method. This method
-expects a single Sentence object, and it will extract all Sequences from
-this sentence and record them in the database.
+"""Handle creation of sequences from sentences.
 """
 
 import logging
@@ -15,18 +7,25 @@ from app.models.sequence import Sequence
 from app.models.word import Word
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
+from app.models.bigram import Bigram
 
 from .logger import ProjectLogger
 
-LEMMA = "lemma"
-WORD = "word"
-
 class SequenceProcessor(object):
-    """Process given input into Sequences.
+    """Process given input into sequences, stored as bigrams.
     """
 
     def __init__(self, project):
         """Set up local variables for the SequenceProcessor.
+
+        Bigrams are stored in a dictionary that is structured like so::
+
+            {
+                "primary_lemma": {
+                    "secondary_lemma": bigram,
+                    "secondary_lemma": bigram2,
+                },
+            }
         """
 
         self.project = project
@@ -34,7 +33,7 @@ class SequenceProcessor(object):
         self.project_logger = ProjectLogger(self.logger, project)
         self.bigrams = {}
 
-    def process(self, sentence, sequence_dict=None):
+    def process(self):
         """Iterate and record every bigram present.
 
         This function uses the xtract algorithm. In short, every lemma is a
@@ -44,15 +43,11 @@ class SequenceProcessor(object):
         This method iterates over every sentence in the project and then
         iterates over every word in every sentence; each word and its sentence
         is passed on to ``get_bigrams``.
-
-        :param Sentence sentence: The sentence to process,
-        :return list: A list of Sequence objects, representing the results
-            of processing. These sequences are also sent to the ReaderWriter.
         """
         sentences = self.project.get_sentences()
         for sentence in sentences:
             for index, word in enumerate(sentence.words):
-                get_bigrams(sentence, word, index)
+                self.get_bigrams(sentence, word, index)
 
     def get_bigrams(self, sentence, word, index):
         """Handle the main bigram processing.
@@ -72,129 +67,19 @@ class SequenceProcessor(object):
         start_index = max(index - 5, 0)
         end_index = min(index + 6, len(sentence.words))
 
+        if not word.lemma in self.bigrams:
+            self.bigrams[word.lemma] = {}
+
         for i in range(start_index, end_index):
-            lemma = sentence.words[i].lemma
-            if lemma in self.bigrams:
-                self.bigrams[lemma] = Bigram(word, lemma)
+            if i - index == 0:
+                # We don't want a bigram with two of the same words
+                continue
+            secondary_word = sentence.words[i]
+            secondary_lemma = secondary_word.lemma
+            if secondary_lemma not in self.bigrams[word.lemma]:
+                self.bigrams[word.lemma][secondary_lemma] = Bigram(word,
+                    secondary_word)
 
-    def get_sequence(self, sentence, i, j):
-        """Handle the main processing part in the process() loop.
-
-        :param Sentence sentence: A sentence object to create sequences from.
-        :param int i: The index to start the sequence from, inclusive.
-        :param int j: The index to stop the sequence from, exclusive.
-        :return list: A list of dicts representing sequences.
-        """
-
-        sequences = []
-
-        wordlist = sentence.words[i:j] # all the words
-        lemmatized_phrase = join_tws(wordlist, " ", "lemma") # only lemmas
-        surface_phrase = join_tws(wordlist, " ", "word") # only words
-
-        if surface_phrase in self.previously_indexed:
-            #If we've already seen this sentence, don't bother
-            return sequences
-
-        wordlist_nostops = self.remove_stops(wordlist)
-        lemmatized_phrase_nostops = join_tws(wordlist_nostops, " ", LEMMA)
-        surface_phrase_nostops = join_tws(wordlist_nostops, " ", WORD)
-
-        # TOOO: Aditi says it's possible to remove these checks, should
-        # see if that's doable after the unit test is written
-        has_stops = len(wordlist_nostops) < len(wordlist)
-        lemmatized_has_stops = (len(lemmatized_phrase_nostops) <
-            len(lemmatized_phrase))
-        all_stop_words = len(wordlist_nostops) == 0
-        lemmatized_all_stop_words = len(lemmatized_phrase_nostops) == 0
-
-        # Definitely make a Sequence of the surface_phrase
-        sequences.append({"start_position": i,
-            "sentence_id": sentence.id,
-            "document_id": sentence.document_id,
-            "sequence": surface_phrase,
-            "is_lemmatized": False,
-            "has_function_words": has_stops,
-            "all_function_words": all_stop_words,
-            "words": wordlist})
-        self.previously_indexed.append(surface_phrase)
-
-        # If it's not just stops, has stops, and the first word isn't a stop,
-        # and it hasn't been indexed, then make a Sequence from the nostop SP
-        if (has_stops and not # Should have stops to avoid duplicate
-            all_stop_words and
-            wordlist_nostops[0] == wordlist[0] and not
-            surface_phrase_nostops in self.previously_indexed):
-            sequences.append({"start_position": i,
-                "sentence_id": sentence.id,
-                "document_id": sentence.document_id,
-                "sequence": surface_phrase_nostops,
-                "is_lemmatized": False,
-                "has_function_words": False,
-                "all_function_words": False,
-                "words": wordlist_nostops})
-            self.previously_indexed.append(surface_phrase_nostops)
-
-        # Definitely make a Sequence of the lemmatized_phrase
-        sequences.append({"start_position": i,
-            "sentence_id": sentence.id,
-            "document_id": sentence.document_id,
-            "sequence": lemmatized_phrase,
-            "is_lemmatized": True,
-            "has_function_words": lemmatized_has_stops,
-            "all_function_words": lemmatized_all_stop_words,
-            "words": wordlist})
-        self.previously_indexed.append(lemmatized_phrase)
-
-        # Maybe make a sequence of the lemmatized_phrase_nostop
-        if (lemmatized_has_stops and not
-            lemmatized_all_stop_words and
-            wordlist_nostops[0] == wordlist[0] and not
-            lemmatized_phrase_nostops in self.previously_indexed):
-            # We don't add this to previously_indexed
-            #print "Lemmatized nostop"
-            #print lemmatized_phrase_nostops
-            sequences.append({"start_position": i,
-                "sentence_id": sentence.id,
-                "document_id": sentence.document_id,
-                "sequence": lemmatized_phrase_nostops,
-                "is_lemmatized": True,
-                "has_function_words": False,
-                "all_function_words": False,
-                "words": wordlist_nostops})
-
-        return sequences
-
-def join_tws(words, delimiter, attr):
-    """Join either the lemmas or text of words with the delimiter.
-
-    :param list words: A list of TaggedWord objects.
-    :param str delimiter: A delimiter to put between the words/lemmas.
-    :param str attr: Either sequenceprocessor.LEMMA to combine lemmas or
-        sequenceprocessor.WORD to combine words.
-    :return str: The combined sentence.
-    """
-
-    result = []
-
-    for word in words:
-        if attr == LEMMA:
-            result.extend([word.lemma, delimiter])
-        elif attr == WORD:
-            result.extend([word.word, delimiter])
-
-    return "".join(result[:-1])
-
-class BigramCollection(object):
-    WILDCARD_CHAR = "*"
-
-    def __init__(self):
-        self.bigrams = {}
-        self.wfreq = 0.0
-
-    def __len__(self):
-        return len(self.bigrams)
-
-    def add_sentence(self, query, sentence):
-        lemmas = sentence.lemmas
+            self.bigrams[word.lemma][secondary_lemma].add_instance(i - index,
+                sentence, False)
 
