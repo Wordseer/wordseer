@@ -23,10 +23,9 @@ class DocumentParserTests(unittest.TestCase):
         self.project.save()
 
         self.mock_str_proc = MagicMock()
-        with patch("app.preprocessor.documentparser.SequenceProcessor"):
-            self.docparser = documentparser.DocumentParser(
-                self.mock_str_proc,
-                self.project)
+        self.docparser = documentparser.DocumentParser(
+            self.mock_str_proc,
+            self.project)
 
     @patch("app.preprocessor.documentparser.db", autospec=True)
     def test_parse_document(self, mock_db, mock_logger):
