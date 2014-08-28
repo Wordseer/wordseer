@@ -153,6 +153,10 @@ class BigramOffset(db.Model, Base):
     sentences = db.relationship("Sentence", secondary="bigrams_in_sentences",
         backref="bigrams")
 
+    def __init__(self, **kwargs):
+        self.frequency = 0
+        super(BigramOffset, self).__init__(**kwargs)
+
     def add_sentence(self, sentence, force=True):
         """Add a sentence to the ``sentences`` attribute and update frequency
         accordingly.
@@ -161,6 +165,7 @@ class BigramOffset(db.Model, Base):
             sentence (Sentence): A Sentence to add to this BigramOffset.
             force (bool): If ``True``, save and commit to the database.
         """
+        #pdb.set_trace()
         self.sentences.append(sentence)
         self.frequency += 1
 
