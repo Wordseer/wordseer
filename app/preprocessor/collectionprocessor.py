@@ -25,6 +25,7 @@ class CollectionProcessor(object):
         self.str_proc = StringProcessor(self.project)
         self.pylogger = logging.getLogger(__name__)
         self.project_logger = logger.ProjectLogger(self.pylogger, self.project)
+        self.sequence_processor = SequenceProcessor(self.project)
 
     def process(self, collection_dir, docstruc_filename,
         filename_extension, start_from_scratch):
@@ -72,6 +73,15 @@ class CollectionProcessor(object):
                     "finished_grammatical_processing").lower()):
             self.project_logger.info("Parsing documents")
             self.parse_documents()
+
+        # Process the sequences
+        if (app.config["GRAMMATICAL_PROCESSING"] and not
+                "true" in logger.get(self.project,
+                    "finished_sequence_processing").lower()):
+            self.project_logger.info("Processing sequences")
+            self.sequence_processor.process()
+            logger.log(self.project, "finished_sequence_processing", "true",
+                logger.REPLACE)
 
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):

@@ -6,7 +6,6 @@ from datetime import datetime
 import logging
 
 from . import logger
-from .sequenceprocessor import SequenceProcessor
 from app import db
 
 LATEST_SENT_ID = "latest_parsed_sentence_id"
@@ -18,7 +17,6 @@ class DocumentParser(object):
     def __init__(self, parser, project):
         self.logger = logging.getLogger(__name__)
         self.parser = parser
-        self.sequence_processor = SequenceProcessor(project)
         self.project = project
         self.project_logger = logger.ProjectLogger(self.logger, self.project)
 
@@ -31,8 +29,6 @@ class DocumentParser(object):
 
         :param Document document: The document to parse and record.
         """
-        #pdb.set_trace()
-
         start_time = datetime.now()
         count = 0
         products = []
@@ -53,8 +49,6 @@ class DocumentParser(object):
             if sentence.id > current_max:
                 parsed = self.parser.parse(sentence, relationships,
                     dependencies)
-                self.sequence_processor.process(sentence, sequences)
-                # products.append(parsed)
                 count += 1
                 current_max = sentence.id
 
