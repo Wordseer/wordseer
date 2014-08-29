@@ -18,9 +18,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     Words are the most basic building blocks of everything.
 
     Attributes:
-        word (str): The word.
         lemma (str): The word's lemma.
-        part_of_speech (str): The part of speech of the word.
         sentences (list of Sentences): The ``Sentences`` that this ``Word`` is
             in. This relationship is described by ``WordInSentence``.
         sequences (list of Sequences): The ``Sequences`` that this ``Word`` is
@@ -37,9 +35,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     # Attributes
 
     id = db.Column(db.Integer, primary_key=True, index=True)
-    word = db.Column(db.String, index=True)
     lemma = db.Column(db.String, index=True)
-    part_of_speech = db.Column(db.String, index=True)
 
     # Scoped Pseudo-relationships
 
@@ -86,5 +82,5 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         """Representation string for words, showing the word.
         """
 
-        return "<Word: " + str(self.word) + ">"
+        return "<Word: " + str(self.lemma) + ">"
 
