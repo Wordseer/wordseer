@@ -512,7 +512,8 @@ class TestBigramModels(unittest.TestCase):
         """
         word1 = Word(word="foo")
         word2 = Word(word="bar")
-        bigram = Bigram(word1, word2)
+        project = Project()
+        bigram = Bigram(word1, word2, project)
 
         bigram.save()
 
@@ -525,19 +526,22 @@ class TestBigramModels(unittest.TestCase):
         """
         word1 = Word(word="foo")
         word2 = Word(word="bar")
-        bigram = Bigram(word1, word2)
+        project = Project()
+        bigram = Bigram(word1, word2, project)
         sentence = Sentence()
         bigram.offsets[0].sentences = [sentence]
         bigram.save()
 
         assert bigram.offsets[0].offset == -5
+        assert bigram.offsets[0].project_id == project.id
 
     def test_get_offset(self):
         """Test the get_offset method.
         """
         word1 = Word(word="foo")
         word2 = Word(word="bar")
-        bigram = Bigram(word1, word2)
+        project = Project()
+        bigram = Bigram(word1, word2, project)
         bigram.save()
 
         for i in range(-5, 0) + range(1, 6):
@@ -550,7 +554,9 @@ class TestBigramModels(unittest.TestCase):
 
         word1 = Word(word="foo")
         word2 = Word(word="bar")
-        bigram = Bigram(word1, word2)
+        project = Project()
+        project.save()
+        bigram = Bigram(word1, word2, project)
         bigram.save()
         sentence = Sentence(text="foo")
         sentence.save()
