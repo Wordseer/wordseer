@@ -3,6 +3,7 @@
 
 import logging
 from app import app
+from app import db
 from app.models.sequence import Sequence
 from app.models.word import Word
 from sqlalchemy.orm.exc import NoResultFound
@@ -10,6 +11,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound
 from app.models.bigram import Bigram
 
 from .logger import ProjectLogger
+import pdb
 
 class SequenceProcessor(object):
     """Process given input into sequences, stored as bigrams.
@@ -31,7 +33,7 @@ class SequenceProcessor(object):
         self.project = project
         self.logger = logging.getLogger(__name__)
         self.project_logger = ProjectLogger(self.logger, project)
-        self.bigrams = {}
+        #self.bigrams = {}
 
     def process(self):
         """Iterate and record every bigram present.
@@ -45,9 +47,18 @@ class SequenceProcessor(object):
         is passed on to ``get_bigrams``.
         """
         sentences = self.project.get_sentences()
+        count = 0
+        total = len(sentences)
         for sentence in sentences:
             for index, word in enumerate(sentence.words):
                 self.get_bigrams(sentence, word, index)
+            count += 1
+            if count % 5 == 0:
+                self.project_logger.info("Processing bigrams from sentence %s/%s",
+                    count, total)
+                db.session.commit()
+        db.session.commit()
+
 
     def get_bigrams(self, sentence, word, index):
         """Handle the main bigram processing.
@@ -66,20 +77,23 @@ class SequenceProcessor(object):
         """
         start_index = max(index - 5, 0)
         end_index = min(index + 6, len(sentence.words))
-
-        if not word.lemma in self.bigrams:
-            self.bigrams[word.lemma] = {}
+        main_lemma = word.lemma.lower()
 
         for i in range(start_index, end_index):
             if i - index == 0:
                 # We don't want a bigram with two of the same words
                 continue
-            secondary_word = sentence.words[i]
-            secondary_lemma = secondary_word.lemma
-            if secondary_lemma not in self.bigrams[word.lemma]:
-                self.bigrams[word.lemma][secondary_lemma] = Bigram(word,
-                    secondary_word)
 
-            self.bigrams[word.lemma][secondary_lemma].add_instance(i - index,
-                sentence, False)
+            secondary_word = sentence.words[i]
+            secondary_lemma = secondary_word.lemma.lower()
+            try:
+                bigram = Bigram.query.filter(Bigram.word == word).\
+                    filter(Bigram.secondary_word == secondary_word).one()
+            except NoResultFound:
+                bigram = Bigram(word, secondary_word, self.project)
+            except MultipleResultsFound:
+                pdb.set_trace()
+
+            bigram.add_instance(i - index, sentence, False)
+            bigram.flush()
 
