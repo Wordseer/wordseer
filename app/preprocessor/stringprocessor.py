@@ -13,6 +13,7 @@ from app import db
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 from .logger import ProjectLogger
+import pdb
 
 class StringProcessor(object):
     """Tokenize or parse a string.
@@ -110,20 +111,17 @@ class StringProcessor(object):
 
                         relationships[key] = relationship
 
+                    #TODO: make this a try except
                     # Read the data for the governor, and find the
                     # corresponding word
-                    governor = Word.query.filter_by(
-                        word = governor,
-                        lemma = governor_lemma,
-                        part_of_speech = governor_pos
-                    ).first()
+                    governor = Word.query.\
+                        filter_by(lemma=governor_lemma.lower()).\
+                        first()
 
                     # Same as above for the dependent in the relationship
-                    dependent = Word.query.filter_by(
-                        word = dependent,
-                        lemma = dependent_lemma,
-                        part_of_speech = dependent_pos
-                    ).first()
+                    dependent = Word.query.\
+                        filter_by(lemma=dependent_lemma.lower()).\
+                        first()
 
                     try:
                         governor.id
@@ -141,7 +139,6 @@ class StringProcessor(object):
                     if key in dependencies.keys():
                         dependency = dependencies[key]
                     else:
-
                         try:
                             dependency = Dependency.query.filter_by(
                                 grammatical_relationship = relationship,
@@ -151,7 +148,7 @@ class StringProcessor(object):
                         except(MultipleResultsFound):
                             self.logg_error(("duplicate records found for: %s",
                                 str(key)))
-                        except(NoResultFound):
+                            except(NoResultFound):
                             dependency = Dependency(
                                 grammatical_relationship = relationship,
                                 governor = governor,
@@ -339,11 +336,9 @@ def tokenize_from_raw(parsed_text, txt, project):
         position = 0
 
         for word_data in sentence_data["words"]:
-            word = word_data[0]
+            surface_word = word_data[0]
             part_of_speech = word_data[1]["PartOfSpeech"]
-            lemma = word_data[1]["Lemma"]
-
-            key = (word, part_of_speech, lemma)
+            lemma = word_data[1]["Lemma"].lower()
 
             space_before = " "
 
@@ -353,34 +348,22 @@ def tokenize_from_raw(parsed_text, txt, project):
             except IndexError:
                 pass
 
-            if key in words.keys():
-                word = words[key]
-
-            else:
-                try:
-                    word = Word.query.filter_by(
-                        word = word,
-                        lemma = lemma,
-                        part_of_speech = part_of_speech
-                    ).one()
-                except(MultipleResultsFound):
-                    project_logger.warning("Duplicate records found for: %s",
-                        str(key))
-                except(NoResultFound):
-                    word = Word(
-                        word = word,
-                        lemma = lemma,
-                        part_of_speech = part_of_speech
-                    )
-                    # print("New word " + str(word))
-
-                words[key] = word
+            #TODO: project specific
+            try:
+                word = Word.query.filter_by(lemma=lemma).one()
+            except MultipleResultsFound:
+                pdb.set_trace()
+                project_logger.warning("Duplicate records found for: %s, "
+                    "this should never happen.", str(lemma))
+            except NoResultFound:
+                word = Word(lemma=lemma)
 
             sentence.add_word(
                 word = word,
+                surface = surface_word,
                 position = position,
-                space_before = space_before, # word["space_before"],
-                part_of_speech = word.part_of_speech,
+                space_before = space_before,
+                part_of_speech = part_of_speech,
                 project = project,
                 force=False
             )
