@@ -265,65 +265,8 @@ def get_word_ids_from_sequence_set(sequence_set_id):
 
     for sequence in sequences:
         for word in sequence.words:
-            if lemmatize:
-                ids.extend(get_lemma_variant_ids(word.word))
-            else:
-                ids.append(word.id)
+            ids.append(word.id)
     return list(set(ids))
-
-# TODO: move to Word instance method (word.lemma_variant_ids)
-def get_lemma_variant_ids(surface_word):
-    """Get ``Word`` IDs for all words that have the same lemma as this one.
-
-    That is, get the list of all lemmas whose surface word is ``surface_word``
-    and then return the IDs of all ``Word``\s that have those lemmas.
-
-    Arguments:
-        surface_word (str): The surface word to query.
-
-    Returns:
-        list: A list of IDs from ``Word`` objects with the same lemma as
-        the given word.
-    """
-    surface_word = surface_word.strip()
-    lemmas = db.session.query(Word).\
-        filter(Word.word == surface_word).\
-        all()
-
-    lemma_list = [word.lemma for word in lemmas]
-
-    words = db.session.query(Word.id).\
-        filter(Word.lemma.in_(lemma_list)).\
-        all()
-
-    return [word.id for word in words]
-
-#TODO: merge with above?
-# TODO: move to Word instance method (word.lemma_variants)
-def get_lemma_variants(surface_word):
-    """Get the ``word`` attributes of ``Word``\s that all have the same lemma
-    as the given word.
-
-    Arguments:
-        surface_word (str): The surface word to query.
-
-    Returns:
-        list: A list of ``word`` attributes from ``Word`` objects with the same
-        lemma as the given word.
-    """
-
-    lemmas = db.session.query(Word).\
-        filter(Word.word == surface_word).\
-        all()
-
-    lemma_list = [word.lemma for word in lemmas]
-
-    words = db.session.query(Word).\
-        distinct().\
-        filter(Word.lemma.in_(lemma_list)).\
-        all()
-
-    return [word.word for word in words]
 
 #TODO: need clarification
 def make_query_string(gov, govtype, dep, deptype, relation, collection,
@@ -369,8 +312,9 @@ def parse_phrase_strings(phrase_strings):
     for phrase_string in phrase_strings:
 
         # Split on underscore to remove the unnecessary components, then
-        # restore any actual underscores in the phrase 
+        # restore any actual underscores in the phrase
         text = "_".join(phrase_string.split("_")[2:])
         sequence_texts.append(text)
 
     return sequence_texts
+
