@@ -145,10 +145,10 @@ class StringProcessor(object):
                                 governor = governor,
                                 dependent = dependent
                             ).one()
-                        except(MultipleResultsFound):
+                        except MultipleResultsFound:
                             self.logg_error(("duplicate records found for: %s",
                                 str(key)))
-                            except(NoResultFound):
+                        except NoResultFound:
                             dependency = Dependency(
                                 grammatical_relationship = relationship,
                                 governor = governor,
@@ -348,15 +348,20 @@ def tokenize_from_raw(parsed_text, txt, project):
             except IndexError:
                 pass
 
+            if lemma in words:
+                word = words[lemma]
+
             #TODO: project specific
-            try:
-                word = Word.query.filter_by(lemma=lemma).one()
-            except MultipleResultsFound:
-                pdb.set_trace()
-                project_logger.warning("Duplicate records found for: %s, "
-                    "this should never happen.", str(lemma))
-            except NoResultFound:
-                word = Word(lemma=lemma)
+            else:
+                try:
+                    word = Word.query.filter_by(lemma=lemma).one()
+                except MultipleResultsFound:
+                    pdb.set_trace()
+                    project_logger.warning("Duplicate records found for: %s, "
+                        "this should never happen.", str(lemma))
+                except NoResultFound:
+                    word = Word(lemma=lemma)
+                words[lemma] = word
 
             sentence.add_word(
                 word = word,
