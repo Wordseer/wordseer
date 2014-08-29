@@ -37,7 +37,7 @@ class TestWordModel(unittest.TestCase):
         Project.active_project = Project()
 
     def test_model_word(self):
-        """Test to make sure that the atttributes of the Word model can be
+        """Test to make sure that the attributes of the Word model can be
         properly set.
         """
 
@@ -47,11 +47,11 @@ class TestWordModel(unittest.TestCase):
         word_1 = Word()
         word_2 = Word()
 
-        word_1.word = string_1
-        word_2.word = string_2
+        word_1.lemma = string_1
+        word_2.lemma = string_2
 
-        assert word_1.word == string_1
-        assert word_2.word == string_2
+        assert word_1.lemma == string_1
+        assert word_2.lemma == string_2
 
 class TestSentenceModel(unittest.TestCase):
     """Tests for the ``Sentence`` model.
@@ -71,8 +71,8 @@ class TestSentenceModel(unittest.TestCase):
 
         assert sentence.text == text
 
-        word_1 = Word(word="hello")
-        word_2 = Word(word="world")
+        word_1 = Word(lemma="hello")
+        word_2 = Word(lemma="world")
 
         sentence.words.append(word_1)
         sentence.words.append(word_2)
@@ -104,7 +104,7 @@ class TestSentenceModel(unittest.TestCase):
         """
 
         sentence = Sentence(text="foo")
-        word = Word(word="foo")
+        word = Word(lemma="foo")
         project = Project()
 
         project.save()
@@ -126,7 +126,7 @@ class TestSentenceModel(unittest.TestCase):
         """
 
         sentence = Sentence(text="foo")
-        word = Word(word="foo")
+        word = Word(lemma="foo")
         dependency = Dependency(governor=word)
         project = Project()
 
@@ -220,7 +220,7 @@ class TestUnitModels(unittest.TestCase):
         assert unit.number == number
 
         sentence = Sentence()
-        sentence.words = [Word(word="hello"), Word(word="world")]
+        sentence.words = [Word(lemma="hello"), Word(lemma="world")]
         prop = Property(name="title", value="Hello World")
 
         unit.sentences.append(sentence)
@@ -510,8 +510,8 @@ class TestBigramModels(unittest.TestCase):
     def test_bigram(self):
         """Test creating a bigram.
         """
-        word1 = Word(word="foo")
-        word2 = Word(word="bar")
+        word1 = Word(lemma="foo")
+        word2 = Word(lemma="bar")
         project = Project()
         bigram = Bigram(word1, word2, project)
 
@@ -524,8 +524,8 @@ class TestBigramModels(unittest.TestCase):
     def test_bigram_offset(self):
         """Test the BigramOffset model.
         """
-        word1 = Word(word="foo")
-        word2 = Word(word="bar")
+        word1 = Word(lemma="foo")
+        word2 = Word(lemma="bar")
         project = Project()
         bigram = Bigram(word1, word2, project)
         sentence = Sentence()
@@ -538,8 +538,8 @@ class TestBigramModels(unittest.TestCase):
     def test_get_offset(self):
         """Test the get_offset method.
         """
-        word1 = Word(word="foo")
-        word2 = Word(word="bar")
+        word1 = Word(lemma="foo")
+        word2 = Word(lemma="bar")
         project = Project()
         bigram = Bigram(word1, word2, project)
         bigram.save()
@@ -552,8 +552,8 @@ class TestBigramModels(unittest.TestCase):
         """Test the add_instance method.
         """
 
-        word1 = Word(word="foo")
-        word2 = Word(word="bar")
+        word1 = Word(lemma="foo")
+        word2 = Word(lemma="bar")
         project = Project()
         project.save()
         bigram = Bigram(word1, word2, project)

@@ -19,10 +19,10 @@ class TestUtils(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         database.clean()
-        cls.word1 = Word(word="foo", lemma="bar")
-        cls.word2 = Word(word="foo", lemma="baz")
-        cls.word3 = Word(word="bar", lemma="bar")
-        cls.word4 = Word(word="baz", lemma="qux")
+        cls.word1 = Word(lemma="bar")
+        cls.word2 = Word(lemma="baz")
+        cls.word3 = Word(lemma="bar")
+        cls.word4 = Word(lemma="qux")
 
         sequence1 = Sequence(words=[cls.word1, cls.word2])
         sequence2 = Sequence(words=[cls.word4])
@@ -75,24 +75,6 @@ class TestUtils(unittest.TestCase):
 
         assert expected == helpers.remove_spaces_around_punctuation(sentence)
 
-    def test_get_lemma_variant_ids(self):
-        """Test get_lemma_variant_ids().
-        """
-
-        variant_ids = helpers.get_lemma_variant_ids("foo")
-
-        assert sorted(variant_ids) == sorted([self.word1.id, self.word2.id,
-            self.word3.id])
-
-    def test_get_lemma_variants(self):
-        """Test get_lemma_variants()
-        """
-
-        variants = helpers.get_lemma_variants("foo")
-
-        assert sorted(variants) == sorted([self.word1.word, self.word2.word,
-            self.word3.word])
-
     @mock.patch("app.wordseer.helpers.request", autospec=True)
     def test_get_word_ids_from_sequence_set(self, mock_request):
         """Test the get_word_ids_from_sequence_set method with
@@ -108,7 +90,7 @@ class TestUtils(unittest.TestCase):
         assert sorted(word_ids) == sorted([self.word1.id, self.word2.id,
             self.word4.id])
 
-
+    @unittest.skip("Do we even need this?")
     @mock.patch("app.wordseer.helpers.request", autospec=True)
     def test_lemmatize_get_word_ids_from_sequence_set(self, mock_request):
         """Test the get_word_ids_from_sequence_set method with
