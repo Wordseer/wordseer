@@ -5,6 +5,7 @@ sequences.
 from app import db
 from .base import Base
 from .association_objects import BigramOffset
+from .project import Project
 
 class Bigram(db.Model, Base):
     """A bigram consists of two words, one primary word and one secondary word.
@@ -23,18 +24,21 @@ class Bigram(db.Model, Base):
     offsets = db.relationship("BigramOffset", backref="bigram",
         order_by="BigramOffset.offset")
 
-    def __init__(self, word, secondary_word):
+    def __init__(self, word, secondary_word, project=None):
         """Instantiate a bigram.
 
         Arguments:
             word (Word): The primary word
             secondary_word (Word): The secondary word
         """
+        if not project:
+            project = Project.active_project
+
         self.frequency = 0
         self.word = word
         self.secondary_word = secondary_word
-        self.offsets = [BigramOffset(offset=i, bigram=self)
-            for i in range(-5, 0) + range(1, 6)]
+        self.offsets = [BigramOffset(offset=i, bigram=self,
+            project_id=project.id) for i in range(-5, 0) + range(1, 6)]
 
     def get_offset(self, offset):
         """Get the BigramOffset object that corresponds to a given offset
@@ -64,6 +68,7 @@ class Bigram(db.Model, Base):
         Returns:
             BigramOffset: The modified BigramOffset object.
         """
+
         bigram_offset = self.get_offset(offset)
         bigram_offset.add_sentence(sentence, force)
 
