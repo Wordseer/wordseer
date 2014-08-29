@@ -11,6 +11,7 @@ from app.models.word import Word
 from app.models.sentence import Sentence
 from app.preprocessor.sequenceprocessor import SequenceProcessor
 import database
+import pdb
 
 class SequenceProcessorTests(unittest.TestCase):
     """Tests for SequenceProcessor.
@@ -20,10 +21,61 @@ class SequenceProcessorTests(unittest.TestCase):
         """
         database.clean()
         self.project = mock.create_autospec(Project)
-        self.seq_proc = SequenceProcessor(self.project)
+        self.sequence_processor = SequenceProcessor(self.project)
 
         self.words = [Word(lemma="first", word="first"),
             Word(lemma="second", word="second"),
             Word(lemma="third", word="third")]
         self.string = "first second third"
+
+    def test_process(self):
+        """Test the process method.
+        """
+        self.sequence_processor.get_bigrams = mock.create_autospec(self.sequence_processor.get_bigrams)
+        mock_sentences = []
+        get_bigrams_calls = []
+        for i in range(0, 10):
+            mock_sentence = mock.create_autospec(Sentence, words=[])
+            for j in range(0, 4):
+                mock_word = mock.create_autospec(Word)
+                mock_sentence.words.append(mock_word)
+                get_bigrams_calls.append(mock.call(mock_sentence, mock_word, j))
+
+            mock_sentences.append(mock_sentence)
+
+        self.project.get_sentences.return_value = mock_sentences
+
+        self.sequence_processor.process()
+
+        self.sequence_processor.get_bigrams.assert_has_calls(get_bigrams_calls)
+
+    @mock.patch("app.preprocessor.sequenceprocessor.Bigram", autospec=True)
+    def test_get_bigrams(self, mock_bigram):
+        """Test the get_bigrams method.
+        """
+        sentence = Sentence(words=[
+            Word(lemma="The"),
+            Word(lemma="quick"),
+            Word(lemma="brown"),
+            Word(lemma="the"),
+            Word(lemma="fox"), # Query word
+            Word(lemma="jumped"),
+            Word(lemma="over"),
+            Word(lemma="the"),
+            Word(lemma="lazy"),
+            Word(lemma="dog")])
+
+        self.sequence_processor.get_bigrams(sentence, sentence.words[4], 4)
+        bigrams = {
+            "fox": {"the": mock_bigram.return_value,
+                "quick": mock_bigram.return_value,
+                "brown": mock_bigram.return_value,
+                "jumped": mock_bigram.return_value,
+                "over": mock_bigram.return_value,
+                "lazy": mock_bigram.return_value,
+                "dog": mock_bigram.return_value}
+            }
+
+        assert self.sequence_processor.bigrams == bigrams
+        pdb.set_trace()
 
