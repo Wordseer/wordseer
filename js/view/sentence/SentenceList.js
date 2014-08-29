@@ -1,7 +1,7 @@
 /* Copyright 2012 Aditi Muralidharan. See the file "LICENSE" for the full license governing this code. */
 /** A list of sentences **/
 Ext.define('WordSeer.view.sentence.SentenceList',{
-    extend:'WordSeer.view.export.ExportableTable',
+    extend:'WordSeer.view.table.Table',
     alias:'widget.sentence-list',
     title:'Search Results',
     requires:[
@@ -17,7 +17,7 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
             option: {
                 tag: 'span',
                 cls: 'button disabled',
-                html: 'Add to group',
+                html: 'Add selected to Set',
                 action: 'add',
             },
             listeners: [
@@ -32,7 +32,7 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
         {
             option: {
                 tag: 'span',
-                html: 'Remove from group',
+                html: 'Remove selected from Set',
                 cls: 'button disabled',
                 action: 'remove',
             },
