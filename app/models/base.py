@@ -44,6 +44,12 @@ class Base(object):
         if Base.commit_on_save or force:
             db.session.commit()
 
+    def flush(self):
+        """Flush this model to the database.
+        """
+        db.session.add(self)
+        db.session.flush()
+
     def delete(self):
         """Deletes this model instance and commits.
         """
