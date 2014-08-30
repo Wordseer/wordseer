@@ -111,33 +111,55 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 				button: button_el,
 				floatParent: panel,
 				itemId: 'frequent-words-overlay',
-				width: 1200,
-				height: 420,
+				width: 400,
+				height: 550,
+				layout: 'accordion',
 				items: [
-					{
-						xtype: 'frequent-words',
-						flex:1,
-						pos: 'N',
-						store: panel.getLayoutPanelModel().NStore
-					},
-					{
-						xtype: 'frequent-words',
-						flex:1,
-						pos: 'V',
-						store: panel.getLayoutPanelModel().VStore
-					},
-					{
-						xtype: 'frequent-words',
-						flex:1,
-						pos: 'J',
-						store: panel.getLayoutPanelModel().JStore
-					},
-					{
-						xtype: 'phraseslist',
-						flex:1,
-						store: panel.getLayoutPanelModel().getPhrasesStore(),
-					}
-				]
+					Ext.create("Ext.panel.Panel", {
+						title: 'Nouns',
+						items: [
+							{
+								xtype: 'frequent-words',
+								flex:1,
+								pos: 'N',
+								store: panel.getLayoutPanelModel().NStore
+							}
+						]
+					}),
+					Ext.create("Ext.panel.Panel", {
+						title: 'Verbs',
+						items: [
+							{
+								xtype: 'frequent-words',
+								flex:1,
+								pos: 'V',
+								store: panel.getLayoutPanelModel().VStore
+							},
+						]
+					}),
+					Ext.create("Ext.panel.Panel", {
+						title: 'Adjectives',
+						items: [
+							{
+								xtype: 'frequent-words',
+								flex:1,
+								pos: 'J',
+								store: panel.getLayoutPanelModel().JStore
+							},
+						]
+					}),
+					Ext.create("Ext.panel.Panel", {
+						title: 'Phrases',
+						items: [
+							{
+								xtype: 'phraseslist',
+								flex:1,
+								store:
+									panel.getLayoutPanelModel().getPhrasesStore(),
+							}
+						]
+					}),
+				],
 			});
 			overlay.showBy(button_el);
 			panel.add(overlay);
