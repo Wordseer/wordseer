@@ -584,6 +584,10 @@ div.overlay {
 		top: $space_2;
 		left: $space_2;
 	}
+
+    div.x-accordion-layout-ct {
+        margin-top: 22px;
+    }
 }
 
 /*******************************************************************************
@@ -604,9 +608,10 @@ Derived Components: FrequentWordsList
 }
 
 div.frequent-words-list {
-	@include data-table(300px, 270, $databox-options-height);
+	@include data-table(350, 380, $databox-options-height);
 	float: left;
 	padding: 10px;
+    font-family: "Open Sans", sans-serif;
 }
 
 td.frequent-word-word {
@@ -619,6 +624,10 @@ td.frequent-word-word {
 td.frequent-word-count {
 	min-width: 60px;
 	padding-right: $space_2;
+    svg.lollipop {
+        width: 125px;
+        height: 17px;
+    }
 }
 
 th.frequent-word-word {

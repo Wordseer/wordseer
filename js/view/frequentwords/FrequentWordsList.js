@@ -4,7 +4,7 @@ appear in sentences matching the main search. This view gets displayed in the
 {@link WordSeer.view.widget.Widget} along with the list of frequent phrases.
 */
 Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
-	extend: 'WordSeer.view.export.ExportableTable',
+	extend: 'WordSeer.view.table.Table',
 	alias: 'widget.frequent-words',
 	requires: [
 		'WordSeer.store.FrequentWordsStore'
@@ -28,11 +28,11 @@ Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
 		*/
 		orderedByDiffProp: true
 	},
-	width: 290,
 	selectable: false,
+	width: "100%",
 	options: [
 		{
-			label: 'Group by stem',
+			label: 'Group by stem?',
 			option: {
 				tag: 'span',
 				cls: 'checkbox checked',
@@ -44,19 +44,6 @@ Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
 				}
 			]
 		},
-		{
-			label: 'Distinctive first',
-			option: {
-				tag: 'span',
-				cls: 'checkbox checked',
-				action: 'order-by-score',
-			},
-			listeners: [
-				{
-					event: 'click',
-				}
-			]
-		}
 	],
 	columns: [
 		{
@@ -97,23 +84,25 @@ Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
 		},
 		{
 			field: 'score_sentences',
-			hidden: true,
 			headerCls: 'frequent-word-count',
-			headerTitle: 'Mutual Information',
+			headerTitle: 'Distinctiveness',
 			renderer: function(record, field) {
 				var count = record.get(field);
-				return {tag: 'td', cls:'frequent-word-count', html:count};
-			}
+				var svg = '<svg class="lollipop" data-score="'+ (1 - 1 / count)
+					+'"></svg>';
+				return {tag: 'td', cls:'frequent-word-count distinct', html:svg};
+			},
+			sortDirection: "DESC"
 		}
 	],
-	title: 'Frequent Words',
+	// title: 'Frequent Words',
 	constructor: function(cfg) {
 		if (cfg.pos == 'N') {
-			cfg.title = 'Nouns';
+			// cfg.title = 'Nouns';
 		} else if (cfg.pos == 'V') {
-			cfg.title = 'Verbs';
+			// cfg.title = 'Verbs';
 		} else if (cfg.pos == 'J') {
-			cfg.title = 'Adjectives';
+			// cfg.title = 'Adjectives';
 		}
 		this.callParent(arguments);
 		this.autoEl.cls += ' frequent-words-list';

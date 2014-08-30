@@ -29,8 +29,12 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						this.applySorter(view);
 					}
 
-				}
+				},
 			},
+			'frequent-words': {
+				datachanged: this.lollipop,
+				afterrender: this.lollipop,
+			}
 		});
 	},
 
@@ -111,8 +115,8 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 				button: button_el,
 				floatParent: panel,
 				itemId: 'frequent-words-overlay',
-				width: 400,
-				height: 550,
+				width: 420,
+				height: 600,
 				layout: 'accordion',
 				items: [
 					Ext.create("Ext.panel.Panel", {
@@ -120,7 +124,6 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						items: [
 							{
 								xtype: 'frequent-words',
-								flex:1,
 								pos: 'N',
 								store: panel.getLayoutPanelModel().NStore
 							}
@@ -131,7 +134,6 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						items: [
 							{
 								xtype: 'frequent-words',
-								flex:1,
 								pos: 'V',
 								store: panel.getLayoutPanelModel().VStore
 							},
@@ -142,7 +144,6 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						items: [
 							{
 								xtype: 'frequent-words',
-								flex:1,
 								pos: 'J',
 								store: panel.getLayoutPanelModel().JStore
 							},
@@ -153,7 +154,6 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						items: [
 							{
 								xtype: 'phraseslist',
-								flex:1,
 								store:
 									panel.getLayoutPanelModel().getPhrasesStore(),
 							}
@@ -164,5 +164,33 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 			overlay.showBy(button_el);
 			panel.add(overlay);
 		}
+	},
+
+	lollipop: function(component){
+		var svg = d3.select(component.el.dom)
+			.selectAll('.distinct .lollipop')
+			.datum(function(){ return this.dataset; });
+
+		console.log(svg);
+		var r = 5;
+		var scale = d3.scale.linear()
+			.domain([0,1])
+			.range([r, 125-r]);
+
+		svg.append('circle')
+			.attr('cx', function(d){
+				return scale(d.score);
+			})
+			.attr('cy', 8)
+			.attr('r', r);
+
+		svg.append('line')
+			.attr('x1', scale(0))
+			.attr('x2', function(d){ return scale(d.score); })
+			.attr('y1', 8)
+			.attr('y2', 8)
+			.attr('stroke', '#000')
+			.attr('stroke-width', 1);
+
 	}
 });

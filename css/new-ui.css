@@ -680,28 +680,33 @@ div.overlay span.overlay-title {
   top: 7.68px;
   left: 7.68px;
 }
+/* line 588, new-ui.scss */
+div.overlay div.x-accordion-layout-ct {
+  margin-top: 22px;
+}
 
 /*******************************************************************************
 Derived Components: FrequentWordsList
 *******************************************************************************/
-/* line 606, new-ui.scss */
+/* line 610, new-ui.scss */
 div.frequent-words-list {
   float: left;
   padding: 10px;
+  font-family: "Open Sans", sans-serif;
 }
-/* line 594, new-ui.scss */
+/* line 598, new-ui.scss */
 div.frequent-words-list table.table tbody {
   overflow: auto;
   display: block;
-  height: 300px;
-  width: 270;
+  height: 350;
+  width: 380;
 }
-/* line 600, new-ui.scss */
+/* line 604, new-ui.scss */
 div.frequent-words-list table.table thead > tr {
   display: block;
 }
 
-/* line 612, new-ui.scss */
+/* line 617, new-ui.scss */
 td.frequent-word-word {
   min-width: 120px;
   max-width: 120px;
@@ -710,18 +715,23 @@ td.frequent-word-word {
   color: #64839f;
 }
 
-/* line 619, new-ui.scss */
+/* line 624, new-ui.scss */
 td.frequent-word-count {
   min-width: 60px;
   padding-right: 7.68px;
 }
+/* line 627, new-ui.scss */
+td.frequent-word-count svg.lollipop {
+  width: 125px;
+  height: 17px;
+}
 
-/* line 624, new-ui.scss */
+/* line 633, new-ui.scss */
 th.frequent-word-word {
   min-width: 120px;
 }
 
-/* line 627, new-ui.scss */
+/* line 636, new-ui.scss */
 th.frequent-word-count {
   min-width: 60px;
   padding-right: 7.68px;
@@ -731,14 +741,14 @@ th.frequent-word-count {
 /*******************************************************************************
 Derived Components: RelatedWordsList
 *******************************************************************************/
-/* line 594, new-ui.scss */
+/* line 598, new-ui.scss */
 div.related-words-list table.table tbody {
   overflow: auto;
   display: block;
   height: 300px;
   width: 220px;
 }
-/* line 600, new-ui.scss */
+/* line 604, new-ui.scss */
 div.related-words-list table.table thead > tr {
   display: block;
 }
@@ -746,52 +756,52 @@ div.related-words-list table.table thead > tr {
 /*******************************************************************************
 Derived Components: Treepanel
 *******************************************************************************/
-/* line 647, new-ui.scss */
+/* line 656, new-ui.scss */
 tr[level='1'] td.content:nth-of-type(1) {
   padding-left: 7.68px;
 }
 
-/* line 647, new-ui.scss */
+/* line 656, new-ui.scss */
 tr[level='2'] td.content:nth-of-type(1) {
   padding-left: 15.36px;
 }
 
-/* line 647, new-ui.scss */
+/* line 656, new-ui.scss */
 tr[level='3'] td.content:nth-of-type(1) {
   padding-left: 23.04px;
 }
 
-/* line 647, new-ui.scss */
+/* line 656, new-ui.scss */
 tr[level='4'] td.content:nth-of-type(1) {
   padding-left: 30.72px;
 }
 
-/* line 647, new-ui.scss */
+/* line 656, new-ui.scss */
 tr[level='5'] td.content:nth-of-type(1) {
   padding-left: 38.4px;
 }
 
-/* line 647, new-ui.scss */
+/* line 656, new-ui.scss */
 tr[level='6'] td.content:nth-of-type(1) {
   padding-left: 46.08px;
 }
 
-/* line 647, new-ui.scss */
+/* line 656, new-ui.scss */
 tr[level='7'] td.content:nth-of-type(1) {
   padding-left: 53.76px;
 }
 
-/* line 647, new-ui.scss */
+/* line 656, new-ui.scss */
 tr[level='8'] td.content:nth-of-type(1) {
   padding-left: 61.44px;
 }
 
-/* line 647, new-ui.scss */
+/* line 656, new-ui.scss */
 tr[level='9'] td.content:nth-of-type(1) {
   padding-left: 69.12px;
 }
 
-/* line 647, new-ui.scss */
+/* line 656, new-ui.scss */
 tr[level='10'] td.content:nth-of-type(1) {
   padding-left: 76.8px;
 }
@@ -799,14 +809,14 @@ tr[level='10'] td.content:nth-of-type(1) {
 /*******************************************************************************
 Derived Components: Set List
 *******************************************************************************/
-/* line 594, new-ui.scss */
+/* line 598, new-ui.scss */
 div.sets-list table.table tbody {
   overflow: auto;
   display: block;
   height: 150px;
   width: 400px;
 }
-/* line 600, new-ui.scss */
+/* line 604, new-ui.scss */
 div.sets-list table.table thead > tr {
   display: block;
 }
@@ -814,30 +824,30 @@ div.sets-list table.table thead > tr {
 /*******************************************************************************
 Base Components: MultiTable
 *******************************************************************************/
-/* line 665, new-ui.scss */
+/* line 674, new-ui.scss */
 ul.multitable {
   margin: 0px;
   padding: 0px;
 }
-/* line 669, new-ui.scss */
+/* line 678, new-ui.scss */
 ul.multitable li {
   list-style-type: none;
 }
-/* line 671, new-ui.scss */
+/* line 680, new-ui.scss */
 ul.multitable li.collapsed ul {
   display: none;
 }
-/* line 674, new-ui.scss */
+/* line 683, new-ui.scss */
 ul.multitable li.expanded ul {
   display: visible;
 }
-/* line 678, new-ui.scss */
+/* line 687, new-ui.scss */
 ul.multitable ul {
   padding-left: 0px;
   max-height: 200px;
   overflow: auto;
 }
-/* line 683, new-ui.scss */
+/* line 692, new-ui.scss */
 ul.multitable li.multitable-header {
   border-bottom: 1px solid #eeeeee;
   cursor: pointer;
@@ -846,17 +856,17 @@ ul.multitable li.multitable-header {
   font-weight: bold;
   font-size: 9px;
 }
-/* line 686, new-ui.scss */
+/* line 695, new-ui.scss */
 ul.multitable span.multitable-row {
   display: block;
 }
-/* line 689, new-ui.scss */
+/* line 698, new-ui.scss */
 ul.multitable span.multitable-cell {
   display: inline-block;
   padding-left: 4.8px;
   padding-right: 4.8px;
 }
-/* line 694, new-ui.scss */
+/* line 703, new-ui.scss */
 ul.multitable li.multitable-level-2 {
   cursor: default;
   padding-top: 4.8px;
@@ -878,24 +888,24 @@ ul.multitable li.multitable-level-2:hover {
 /*******************************************************************************
 Derived Components: Metadata multitable
 *******************************************************************************/
-/* line 720, new-ui.scss */
+/* line 729, new-ui.scss */
 li span.metadata-count {
   max-width: 60px;
   min-width: 60px;
 }
 
-/* line 724, new-ui.scss */
+/* line 733, new-ui.scss */
 li span.metadata-value {
   max-width: 120px;
   min-width: 120px;
 }
-/* line 727, new-ui.scss */
+/* line 736, new-ui.scss */
 li span.metadata-value.multitable-cell, li span.metadata-value.multitable-header-cell {
   color: #64839f;
   font-weight: bold;
 }
 
-/* line 732, new-ui.scss */
+/* line 741, new-ui.scss */
 li span.multitable-level-1 {
   font-weight: bold;
   color: #64839f;
@@ -904,11 +914,11 @@ li span.multitable-level-1 {
   margin-bottom: 12.288px;
   text-transform: capitalize;
 }
-/* line 711, new-ui.scss */
+/* line 720, new-ui.scss */
 li span.multitable-level-1 span.action-button-toggle-expand, li span.multitable-level-1 span.action-button-toggle-contract {
   top: 8px;
 }
-/* line 714, new-ui.scss */
+/* line 723, new-ui.scss */
 li span.multitable-level-1 span.metadata-category {
   padding-left: 4.8px;
   padding-right: 4.8px;
@@ -917,7 +927,7 @@ li span.multitable-level-1 span.metadata-category {
 /*******************************************************************************
 Base Components: Landing Page
 *******************************************************************************/
-/* line 743, new-ui.scss */
+/* line 752, new-ui.scss */
 div.landing-page {
   overflow: scroll;
   background-color: #64839f;
@@ -925,7 +935,7 @@ div.landing-page {
   margin: 4.8px;
   padding: 3px;
 }
-/* line 749, new-ui.scss */
+/* line 758, new-ui.scss */
 div.landing-page div.landingpage-render-target {
   position: absolute;
   top: 109px;
@@ -933,7 +943,7 @@ div.landing-page div.landingpage-render-target {
   right: 3px;
   bottom: 4.8px;
 }
-/* line 756, new-ui.scss */
+/* line 765, new-ui.scss */
 div.landing-page div.main-header {
   height: 109px;
   width: 100%;
@@ -942,7 +952,7 @@ div.landing-page div.main-header {
   color: white;
   font-size: 40;
 }
-/* line 763, new-ui.scss */
+/* line 772, new-ui.scss */
 div.landing-page div.main-header h1 {
   margin: 0px;
 }
@@ -950,7 +960,7 @@ div.landing-page div.main-header h1 {
 /*******************************************************************************
 Base Components: Menu
 *******************************************************************************/
-/* line 774, new-ui.scss */
+/* line 783, new-ui.scss */
 .menu, .autosuggest-menu {
   padding: 1px;
   border: 2px solid #f7d04a;
@@ -958,7 +968,7 @@ Base Components: Menu
 }
 
 /* creates the larger triangle */
-/* line 781, new-ui.scss */
+/* line 790, new-ui.scss */
 .menu:before, .autosuggest-menu:before {
   top: 10px;
   /* controls vertical position */
@@ -970,7 +980,7 @@ Base Components: Menu
 }
 
 /* creates the smaller  triangle */
-/* line 790, new-ui.scss */
+/* line 799, new-ui.scss */
 .menu:after, .autosuggest-menu:after {
   top: 16px;
   /* value = (:before top) + (:before border-top) - (:after border-top) */
@@ -981,13 +991,13 @@ Base Components: Menu
   border-color: transparent #fff;
 }
 
-/* line 798, new-ui.scss */
+/* line 807, new-ui.scss */
 .menuitem, .autosuggest-menuitem {
   cursor: pointer;
   display: block;
   padding: 7.68px;
 }
-/* line 801, new-ui.scss */
+/* line 810, new-ui.scss */
 .menuitem.hovered, .hovered.autosuggest-menuitem {
   background: #f7d04a;
 }
@@ -995,7 +1005,7 @@ Base Components: Menu
 /*******************************************************************************
 Derived Components: AutoSuggest Menu
 *******************************************************************************/
-/* line 811, new-ui.scss */
+/* line 820, new-ui.scss */
 .autosuggest-menu {
   border: 0px;
   -webkit-box-shadow: 10px, 0px, 5px;
@@ -1006,14 +1016,14 @@ Derived Components: AutoSuggest Menu
 /*******************************************************************************
 Base Components: Overviews
 *******************************************************************************/
-/* line 825, new-ui.scss */
+/* line 834, new-ui.scss */
 div.overview {
   position: static;
   margin: 4.8px;
   padding: 3px;
   margin-right: 50px;
 }
-/* line 830, new-ui.scss */
+/* line 839, new-ui.scss */
 div.overview div.overview-render-target {
   position: absolute;
   top: 100px;
@@ -1021,7 +1031,7 @@ div.overview div.overview-render-target {
   right: 3px;
   bottom: 4.8px;
 }
-/* line 837, new-ui.scss */
+/* line 846, new-ui.scss */
 div.overview div.overview-header {
   height: 109px;
   width: 100%;
@@ -1030,7 +1040,7 @@ div.overview div.overview-header {
   font-weight: 700;
   color: white;
 }
-/* line 845, new-ui.scss */
+/* line 854, new-ui.scss */
 div.overview div.range-facet {
   position: static !important;
   background-color: transparent;
@@ -1041,23 +1051,23 @@ div.overview div.range-facet div.databox-header {
   color: white;
   background-color: transparent;
 }
-/* line 847, new-ui.scss */
+/* line 856, new-ui.scss */
 div.overview div.range-facet .axis text {
   fill: #eeeeee;
 }
-/* line 850, new-ui.scss */
+/* line 859, new-ui.scss */
 div.overview div.range-facet .axis line, div.overview div.range-facet .axis path {
   stroke: #eeeeee;
 }
-/* line 853, new-ui.scss */
+/* line 862, new-ui.scss */
 div.overview div.range-facet .brush rect.extent {
   fill: #000000;
 }
-/* line 856, new-ui.scss */
+/* line 865, new-ui.scss */
 div.overview div.range-facet .background.bar {
   stroke: #eeeeee;
 }
-/* line 859, new-ui.scss */
+/* line 868, new-ui.scss */
 div.overview div.range-facet .title span {
   color: #eeeeee;
 }
@@ -1065,20 +1075,20 @@ div.overview div.range-facet .title span {
 /*******************************************************************************
 Derived Components: Range Facets
 *******************************************************************************/
-/* line 868, new-ui.scss */
+/* line 877, new-ui.scss */
 div.range-facet {
   height: 100px;
 }
-/* line 871, new-ui.scss */
+/* line 880, new-ui.scss */
 div.range-facet.x-box-item {
   position: static !important;
 }
-/* line 874, new-ui.scss */
+/* line 883, new-ui.scss */
 div.range-facet div.chart.collapsed {
   display: none;
 }
 
-/* line 881, new-ui.scss */
+/* line 890, new-ui.scss */
 div.rangefacets div.range-facet div.databox-header {
   font-weight: bold;
   color: #64839f;
@@ -1087,11 +1097,11 @@ div.rangefacets div.range-facet div.databox-header {
   margin-bottom: 12.288px;
   text-transform: capitalize;
 }
-/* line 711, new-ui.scss */
+/* line 720, new-ui.scss */
 div.rangefacets div.range-facet div.databox-header span.action-button-toggle-expand, div.rangefacets div.range-facet div.databox-header span.action-button-toggle-contract {
   top: 8px;
 }
-/* line 714, new-ui.scss */
+/* line 723, new-ui.scss */
 div.rangefacets div.range-facet div.databox-header span.metadata-category {
   padding-left: 4.8px;
   padding-right: 4.8px;
@@ -1100,7 +1110,7 @@ div.rangefacets div.range-facet div.databox-header span.metadata-category {
 /*******************************************************************************
 Base Components: Sentence List Widget
 *******************************************************************************/
-/* line 890, new-ui.scss */
+/* line 899, new-ui.scss */
 div.sentence {
   font-family: "Bitter";
   line-height: 1.5;
@@ -1108,7 +1118,7 @@ div.sentence {
   margin-bottom: 6px;
 }
 
-/* line 897, new-ui.scss */
+/* line 906, new-ui.scss */
 div.metatag {
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
   float: left;
@@ -1117,49 +1127,49 @@ div.metatag {
   border: 1px solid #808080;
   cursor: pointer;
 }
-/* line 904, new-ui.scss */
+/* line 913, new-ui.scss */
 div.metatag span {
   display: table-cell;
   padding: 2px 6px;
   color: #808080;
 }
-/* line 908, new-ui.scss */
+/* line 917, new-ui.scss */
 div.metatag span.key {
   font-weight: 700;
   text-transform: uppercase;
   font-size: 11px;
   border-right: 1px solid #808080;
 }
-/* line 914, new-ui.scss */
+/* line 923, new-ui.scss */
 div.metatag span.value {
   font-size: 12px;
   font-weight: 400;
 }
-/* line 918, new-ui.scss */
+/* line 927, new-ui.scss */
 div.metatag span.dir {
   display: inline;
 }
-/* line 922, new-ui.scss */
+/* line 931, new-ui.scss */
 div.metatag:last-child {
   margin-bottom: 36px;
 }
-/* line 925, new-ui.scss */
+/* line 934, new-ui.scss */
 div.metatag.active {
   background-color: #f7d04a;
 }
-/* line 928, new-ui.scss */
+/* line 937, new-ui.scss */
 div.metatag.sorting {
   background-color: #fff2fe;
 }
-/* line 930, new-ui.scss */
+/* line 939, new-ui.scss */
 div.metatag.sorting.lev0 {
   background-color: #ffd8fc;
 }
-/* line 933, new-ui.scss */
+/* line 942, new-ui.scss */
 div.metatag.sorting.lev1 {
   background-color: #ffe7fd;
 }
-/* line 936, new-ui.scss */
+/* line 945, new-ui.scss */
 div.metatag.sorting.lev2 {
   background-color: #fff2fe;
 }
