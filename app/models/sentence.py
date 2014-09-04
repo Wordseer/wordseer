@@ -6,9 +6,8 @@ from app import db
 from .base import Base
 from .project import Project
 from .association_objects import DependencyInSentence
-from .association_objects import SequenceInSentence
 from .association_objects import WordInSentence
-from .counts import WordCount, DependencyCount, SequenceCount
+from .counts import WordCount, DependencyCount
 
 class Sentence(db.Model, Base):
     """A model representing a sentence.

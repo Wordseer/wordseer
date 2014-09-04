@@ -6,9 +6,9 @@ reset()
 
 
 p=Project(name="test")
-w=Word(word="foo")
-w2=Word(word="bar")
-w3=Word(word="mar")
+w=Word(lemma="foo")
+w2=Word(lemma="bar")
+w3=Word(lemma="mar")
 s=Sentence(text="foo bar")
 
 Project.active_project = p
@@ -94,3 +94,4 @@ print(se.sentences)
 Project.active_project = p
 
 print(se.sentences)
+

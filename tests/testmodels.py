@@ -13,8 +13,6 @@ from app.models import Property
 from app.models import Project
 from app.models import Sentence
 from app.models import Set
-from app.models import Sequence
-from app.models import SequenceSet
 from app.models import SentenceSet
 from app.models import StructureFile
 from app.models import Unit
@@ -90,15 +88,6 @@ class TestSentenceModel(unittest.TestCase):
         db.session.add_all([dependency1, dependency2])
         db.session.commit()
 
-        #Test with Sequences
-        sequence1 = Sequence()
-        sequence2 = Sequence()
-
-        sentence.sequences = [sequence1, sequence2]
-
-        db.session.add_all([sequence1, sequence2])
-        db.session.commit()
-
     def test_add_word(self):
         """Test the ``add_word()`` method of ``Sentence``.
         """
@@ -144,25 +133,6 @@ class TestSentenceModel(unittest.TestCase):
         assert rel.dependent_index == 2
         assert rel.project == project
 
-    def test_add_sequence(self):
-        """Test the ``add_sequence()`` method of ``Sentence``.
-        """
-
-        sentence = Sentence(text="foo")
-        sequence = Sequence(lemmatized=False)
-        project = Project()
-
-        project.save()
-        sentence.save()
-        sequence.save()
-
-        rel = sentence.add_sequence(sequence, position=1, project=project)
-
-        assert rel.sequence == sequence
-        assert rel.sentence == sentence
-        assert rel.position == 1
-        assert rel.project == project
-
 class TestDependencyModel(unittest.TestCase):
     """Tests for the ``Depenedency`` model.
     """
@@ -177,23 +147,6 @@ class TestDependencyModel(unittest.TestCase):
 
         dependency = Dependency()
         dependency.save()
-
-        db.session.commit()
-
-class TestSequenceModel(unittest.TestCase):
-    """Tests for the ``Sequence`` model.
-    """
-    def setUp(self):
-        """Clean the current database.
-        """
-        database.clean()
-
-    def test_model_sequence(self):
-        """Test to make sure that Sequence is working properly.
-        """
-
-        sequence = Sequence()
-        sequence.save()
 
         db.session.commit()
 
@@ -315,12 +268,10 @@ class TestSetsModels(unittest.TestCase):
         database.clean()
 
         cls.set = Set()
-        cls.sequenceset = SequenceSet()
         cls.sentenceset = SentenceSet()
         cls.documentset = DocumentSet()
 
-        db.session.add_all([cls.set, cls.sequenceset, cls.sentenceset,
-            cls.documentset])
+        db.session.add_all([cls.set, cls.sentenceset, cls.documentset])
         db.session.commit()
 
     def test_set(self):
@@ -336,18 +287,8 @@ class TestSetsModels(unittest.TestCase):
         assert set2.parent == self.set
         assert self.set.children == [set2]
 
-        assert len(sets) == 4
+        assert len(sets) == 3
         assert self.set in sets
-
-    def test_sequenceset(self):
-        """Test the ``SequenceSet`` model.
-        """
-
-        sets = db.session.query(SequenceSet).all()
-
-        assert len(sets) == 1
-        assert self.sequenceset in sets
-        assert sets[0].get_items() == []
 
     def test_sentenceset(self):
         """Test the ``SentenceSet`` model.

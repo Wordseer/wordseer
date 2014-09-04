@@ -10,7 +10,6 @@ from .project import Project
 from .property import Property
 from .property_metadata import PropertyMetadata
 from .sentence import Sentence
-from .sequence import Sequence
 from .sets import *
 from .structurefile import StructureFile
 from .unit import Unit

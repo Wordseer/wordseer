@@ -37,8 +37,6 @@ class Document(Unit, NonPrimaryKeyEquivalenceMixin):
     parent = None
 
     # Relationships
-    sequence_in_sentence = db.relationship("SequenceInSentence",
-        backref="document", lazy="dynamic")
     dependency_in_sentence = db.relationship("DependencyInSentence",
         backref="document", lazy="dynamic")
 

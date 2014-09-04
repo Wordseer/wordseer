@@ -77,8 +77,8 @@ class TokenizeSentenceTests(CommonTests, unittest.TestCase):
         """Make sure space_before has been properly done
         """
         for s in range(0, len(self.result)):
-            for w in range(0, len(self.result[s].words_sentence)):
-                space = self.result[s].words_sentence[w].space_before
+            for w in range(0, len(self.result[s].sentence_words)):
+                space = self.result[s].sentence_words[w].space_before
 
                 try:
                     actual_char = self.example[int(self.raw["sentences"][s]\

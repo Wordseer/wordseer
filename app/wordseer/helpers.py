@@ -5,8 +5,6 @@ import pdb
 
 from flask import request
 
-from ..models.association_tables import sequences_in_sequencesets
-from ..models.sequence import Sequence
 from ..models.word import Word
 from app import app
 from app import db

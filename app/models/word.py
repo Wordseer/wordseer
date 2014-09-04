@@ -6,9 +6,7 @@ from app import db
 from .base import Base
 from .project import Project
 from .sentence import Sentence
-from .sequence import Sequence
 from .association_objects import WordInSentence
-from .association_objects import WordInSequence
 from .counts import WordCount
 from .mixins import NonPrimaryKeyEquivalenceMixin
 

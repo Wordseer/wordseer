@@ -14,10 +14,10 @@ documents_in_documentsets = db.Table("documents_in_documentsets",
     db.Column("documentset_id", db.Integer, db.ForeignKey("document_set.id"))
 )
 
-sequences_in_sequencesets = db.Table("sequences_in_sequencesets",
+bigrams_in_bigramsets = db.Table("bigrams_in_bigramsets",
     db.metadata,
-    db.Column("sequence_id", db.Integer, db.ForeignKey("sequence.id")),
-    db.Column("sequenceset_id", db.Integer, db.ForeignKey("sequence_set.id")),
+    db.Column("bigram_id", db.Integer, db.ForeignKey("bigram.id")),
+    db.Column("bigram_set_id", db.Integer, db.ForeignKey("bigram_set.id")),
 )
 
 document_files_in_projects = db.Table("document_files_in_projects",

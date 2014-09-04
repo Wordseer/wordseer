@@ -9,10 +9,11 @@ import mock
 
 from app import app
 from app import db
-from app.models import Sequence, Word, SequenceSet
+from app.models import Word
 from app.wordseer import helpers
 import database
 
+@unittest.skip("Needs reworking based on how the views are written.")
 class TestUtils(unittest.TestCase):
     """Test the helpers module.
     """
@@ -24,14 +25,7 @@ class TestUtils(unittest.TestCase):
         cls.word3 = Word(lemma="bar")
         cls.word4 = Word(lemma="qux")
 
-        sequence1 = Sequence(words=[cls.word1, cls.word2])
-        sequence2 = Sequence(words=[cls.word4])
-        sequence3 = Sequence(words=[cls.word3])
-        cls.sequenceset1 = SequenceSet(sequences=[sequence1, sequence2])
-        cls.sequenceset2 = SequenceSet(sequences=[sequence3])
-
-        db.session.add_all([sequence1, sequence2, sequence3, cls.sequenceset1,
-            cls.sequenceset2, cls.word1, cls.word2, cls.word3, cls.word4])
+        db.session.add_all([cls.word1, cls.word2, cls.word3, cls.word4])
         db.session.commit()
 
     def test_table_exists(self):

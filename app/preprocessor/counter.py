@@ -6,7 +6,7 @@ import logging
 
 from app import db
 from .logger import ProjectLogger
-from app.models import Document, Dependency Word
+from app.models import Document, Dependency, Word
 
 def count_all(project, commit_interval=500):
     """Run counts for documents, dependencies, and words.

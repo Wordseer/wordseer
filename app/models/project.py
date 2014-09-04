@@ -41,10 +41,6 @@ class Project(db.Model, Base):
     logs = db.relationship("Log", backref="project")
     word_in_sentence = db.relationship("WordInSentence",
         backref="project", lazy="dynamic")
-    sequence_in_sentence = db.relationship("SequenceInSentence",
-        backref="project", lazy="dynamic")
-    word_in_sequence = db.relationship("WordInSequence",
-        backref="project", lazy="dynamic")
     dependency_in_sentence = db.relationship("DependencyInSentence",
         backref="project", lazy="dynamic")
     users = association_proxy("project_users", "user",

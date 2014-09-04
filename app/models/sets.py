@@ -8,13 +8,13 @@ class Set(db.Model, Base):
     """This is the basic ``Set`` class.
 
     ``Set``\s contain other objects; by default, there are ``DocumentSet``\s,
-    ``SentenceSet``\s, and ``SequenceSet``\s, containing ``Document``\s,
-    ``Sentence``\s, and ``Sequence``\s respectively.
+    ``SentenceSet``\s, and ``BigramSet``\s, containing ``Document``\s,
+    ``Sentence``\s, and ``Bigram``\s respectively.
 
     A ``Set`` model has an association with a ``User`` and has some properties
     like a name and a creation date.
 
-    The more specialized type of ``Set``\s (like ``SequenceSet``\s, etc) inherit
+    The more specialized type of ``Set``\s (like ``BigramSet``\s, etc) inherit
     from this class.
 
     Attributes:
@@ -50,32 +50,32 @@ class Set(db.Model, Base):
 
         raise NotImplementedError()
 
-class SequenceSet(Set):
-    """A ``Set`` that can have a list of ``Sequences`` in it.
+class BigramSet(Set):
+    """A ``Set`` that can have a list of ``Bigrams`` in it.
 
-    The ``type`` attribute a ``SequenceSet`` is set to ``sequenceset``.
+    The ``type`` attribute a ``BigramSet`` is set to ``bigramset``.
 
     Attributes:
-        sequences (list): A list of ``Sequence``s in this ``SequenceSet``.
+        bigrams (list): A list of ``Bigram``\s in this ``BigramSet``.
     """
 
     id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
-    sequences = db.relationship("Sequence",
-        secondary="sequences_in_sequencesets",
+    bigrams = db.relationship("Bigram",
+        secondary="bigrams_in_bigramsets",
         backref="sets")
 
     __mapper_args__ = {
-        "polymorphic_identity": "sequenceset",
+        "polymorphic_identity": "bigramset",
     }
 
     def get_items(self):
-        """Return the ``Sequence``\s associated with this ``SequenceSet``.
+        """Return the ``Bigram``\s associated with this ``BigramSet``.
 
         Returns:
-            list of Sequences
+            list of Bigrams
         """
 
-        return self.sequences
+        return self.bigrams
 
 class SentenceSet(Set):
     """A ``Set`` that can have a list of ``Sentences`` in it.

@@ -25,8 +25,6 @@ class TestSetViews(unittest.TestCase):
         db.session.add(self.user)
 
         self.set1 = models.sets.SentenceSet(name="test1", user=self.user)
-        self.set2 = models.sets.SequenceSet(name="test2", parent=self.set1,
-            user=self.user)
         self.set3 = models.sets.SentenceSet(name="test3", parent=self.set1,
             user=self.user)
         self.set4 = models.sets.SentenceSet(name="test4", parent=self.set1,
@@ -34,7 +32,7 @@ class TestSetViews(unittest.TestCase):
         self.set5 = models.sets.DocumentSet(name="test5", user=self.user)
 
 
-        db.session.add_all([self.set1, self.set2, self.set3, self.set4,
+        db.session.add_all([self.set1, self.set3, self.set4,
             self.set5])
 
         db.session.commit()
