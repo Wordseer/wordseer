@@ -45,7 +45,7 @@ class Sentence(db.Model, Base):
 
     # Relationships
 
-    words = association_proxy("word_in_sentence", "word",
+    words = association_proxy("words_sentence", "word",
         creator=lambda word: WordInSentence(word=word))
 
     sequences = association_proxy("sequence_in_sentence", "sequence",

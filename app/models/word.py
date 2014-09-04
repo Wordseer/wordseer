@@ -37,23 +37,11 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     id = db.Column(db.Integer, primary_key=True, index=True)
     lemma = db.Column(db.String, index=True)
 
-    # Scoped Pseudo-relationships
 
-    @property
-    def sentences(self):
-        """Retrieves sentences that contain this word within the scope of the
-        current active project.
-        """
-        return self.get_sentences()
+    sentences = association_proxy("word_sentences", "sentence",
+        creator=lambda word: WordInSentence(sentence=sentence))
 
-    def get_sentences(self, project=None):
-        if not project:
-            project = Project.active_project
-
-        return Sentence.query.join(WordInSentence).join(Word).\
-            filter(WordInSentence.project==project).\
-            filter(WordInSentence.word==self).all()
-
+    #Pseudo-relationships
     @property
     def sequences(self):
         """Retrieves sequences that contain this word within the scope of the
@@ -65,7 +53,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         if not project:
             project = Project.active_project
 
-        return Sequence.query.join(WordInSequence).join(Word).\
+        return Sequence.query.join(WordInSequence).\
             filter(WordInSequence.project==project).\
             filter(WordInSequence.word==self).all()
 

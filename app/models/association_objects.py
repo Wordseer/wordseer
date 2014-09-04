@@ -27,11 +27,11 @@ class WordInSentence(db.Model, Base):
 
     sentence = db.relationship("Sentence",
         backref=db.backref(
-            "word_in_sentence", cascade="all, delete-orphan"))
+            "words_sentence", cascade="all, delete-orphan"))
 
     word = db.relationship("Word",
         backref=db.backref(
-            "word_in_sentence", cascade="all, delete-orphan"))
+            "word_sentences", cascade="all, delete-orphan"))
 
 class SequenceInSentence(db.Model, Base):
     """Association object for sequences in sentences.
