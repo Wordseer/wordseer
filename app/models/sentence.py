@@ -22,8 +22,6 @@ class Sentence(db.Model, Base):
         document (Document): the ``Document`` (top-level unit) to which this
             sentence belongs to.
         text (str): The raw text of the sentence.
-        sequences (list of Sequences): ``Sequence``\s present in this sentence.
-            This relationship is described with ``SequenceInSentence``.
         dependencies (list of Dependencies): ``Dependency``\s present in this
             sentence. This relationship is described with
             ``DependencyInSentence``.
@@ -33,7 +31,7 @@ class Sentence(db.Model, Base):
 
     Relationships:
         belongs to: unit, document
-        has many: words, sequences, dependencies
+        has many: words, dependencies
     """
 
     # Attributes
@@ -45,13 +43,10 @@ class Sentence(db.Model, Base):
 
     # Relationships
 
-    words = association_proxy("words_sentence", "word",
+    words = association_proxy("sentence_words", "word",
         creator=lambda word: WordInSentence(word=word))
 
-    sequences = association_proxy("sequence_in_sentence", "sequence",
-        creator=lambda sequence: SequenceInSentence(sequence=sequence))
-
-    dependencies = association_proxy("dependency_in_sentence", "dependency",
+    dependencies = association_proxy("sentence_dependencies", "dependency",
         creator=lambda dependency: DependencyInSentence(dependency=dependency))
 
     document = db.relationship("Document", foreign_keys=[document_id],
@@ -138,35 +133,4 @@ class Sentence(db.Model, Base):
         dependency_in_sentence.save(force=force)
 
         return dependency_in_sentence
-
-    def add_sequence(self, sequence, position=None, project=None, force=True):
-        """Add a ``Sequence`` to the ``Sentence`` by explicitly creating the
-        association object.
-
-        Arguments:
-            sequence (Sequence): The ``Sequence`` to associate with this
-                ``Sentence``.
-
-        Keyword Arguments:
-            position (int): The position (0-indexed) of this ``Sequence`` in
-                this ``Sentence``. Default is ``None``.
-
-        Returns:
-            SequenceInSentence: The association object that associates this
-            ``Sentence`` and ``sequence``.
-        """
-        # project argument assigned active_project if not present
-        if project == None: project = Project.active_project
-
-        sequence_in_sentence = SequenceInSentence(
-            sequence=sequence,
-            sentence=self,
-            project=project,
-            document=self.document,
-            position=position
-        )
-
-        sequence_in_sentence.save(force=force)
-
-        return sequence_in_sentence
 

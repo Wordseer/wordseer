@@ -19,6 +19,7 @@ class WordInSentence(db.Model, Base):
 
     word_id = db.Column(db.Integer, db.ForeignKey("word.id"), index=True)
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
+
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
     position = db.Column(db.Integer)
     space_before = db.Column(db.String)
@@ -27,55 +28,11 @@ class WordInSentence(db.Model, Base):
 
     sentence = db.relationship("Sentence",
         backref=db.backref(
-            "words_sentence", cascade="all, delete-orphan"))
+            "sentence_words", cascade="all, delete-orphan"))
 
     word = db.relationship("Word",
         backref=db.backref(
             "word_sentences", cascade="all, delete-orphan"))
-
-class SequenceInSentence(db.Model, Base):
-    """Association object for sequences in sentences.
-
-    Attributes:
-        sequence (Sequence): The ``Sequence`` in this relationship.
-        sentence (Sentence): The ``Sentence`` in this relationship.
-        position (int): The starting index (0-indexed) of ``sequence`` in
-            ``sentence``.
-    """
-
-    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
-    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
-    document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
-    position = db.Column(db.Integer)
-
-    sequence = db.relationship("Sequence",
-        backref=db.backref(
-            "sequence_in_sentence", cascade="all, delete-orphan"))
-
-    sentence = db.relationship("Sentence",
-        backref=db.backref(
-            "sequence_in_sentence", cascade="all, delete-orphan"))
-
-class WordInSequence(db.Model, Base):
-    """Association object for words in sequences.
-
-    Attributes:
-        word (Word): The ``Word`` in this relationship.
-        sequence (Sequence): The ``Sequence`` in this relationship.
-    """
-
-    word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
-    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
-
-    word = db.relationship("Word",
-        backref=db.backref(
-            "word_in_sequence", cascade="all, delete-orphan"))
-
-    sequence = db.relationship("Sequence",
-        backref=db.backref(
-            "word_in_sequence", cascade="all, delete-orphan"))
 
 class DependencyInSentence(db.Model, Base):
     """Association object for dependencies in sentences.
@@ -103,11 +60,11 @@ class DependencyInSentence(db.Model, Base):
 
     dependency = db.relationship("Dependency",
         backref=db.backref(
-            "dependency_in_sentence", cascade="all, delete-orphan"))
+            "dependency_sentences", cascade="all, delete-orphan"))
 
     sentence = db.relationship("Sentence",
         backref=db.backref(
-            "dependency_in_sentence", cascade="all, delete-orphan"))
+            "sentence_dependencies", cascade="all, delete-orphan"))
 
 class ProjectsUsers(db.Model, Base):
     """Associate Users with Projects.

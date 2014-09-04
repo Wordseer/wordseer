@@ -39,23 +39,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     sentences = association_proxy("word_sentences", "sentence",
-        creator=lambda word: WordInSentence(sentence=sentence))
-
-    #Pseudo-relationships
-    @property
-    def sequences(self):
-        """Retrieves sequences that contain this word within the scope of the
-        current active project.
-        """
-        return self.get_sequences()
-
-    def get_sequences(self, project=None):
-        if not project:
-            project = Project.active_project
-
-        return Sequence.query.join(WordInSequence).\
-            filter(WordInSequence.project==project).\
-            filter(WordInSequence.word==self).all()
+        creator=lambda sentence: WordInSentence(sentence=sentence))
 
     def get_counts(self, project=None):
 

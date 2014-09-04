@@ -4,7 +4,6 @@
 import logging
 from app import app
 from app import db
-from app.models.sequence import Sequence
 from app.models.word import Word
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
@@ -33,7 +32,7 @@ class SequenceProcessor(object):
         self.project = project
         self.logger = logging.getLogger(__name__)
         self.project_logger = ProjectLogger(self.logger, project)
-        #self.bigrams = {}
+        self.bigrams = {}
 
     def process(self):
         """Iterate and record every bigram present.
@@ -53,10 +52,11 @@ class SequenceProcessor(object):
             for index, word in enumerate(sentence.words):
                 self.get_bigrams(sentence, word, index)
             count += 1
-            if count % 5 == 0:
+            if count % 10 == 0:
                 self.project_logger.info("Processing bigrams from sentence %s/%s",
                     count, total)
                 db.session.commit()
+                self.bigrams = {}
         db.session.commit()
 
 
@@ -77,7 +77,10 @@ class SequenceProcessor(object):
         """
         start_index = max(index - 5, 0)
         end_index = min(index + 6, len(sentence.words))
-        main_lemma = word.lemma.lower()
+        main_lemma = word.lemma
+
+        if not main_lemma in self.bigrams:
+            self.bigrams[main_lemma] = {}
 
         for i in range(start_index, end_index):
             if i - index == 0:
@@ -85,14 +88,20 @@ class SequenceProcessor(object):
                 continue
 
             secondary_word = sentence.words[i]
-            secondary_lemma = secondary_word.lemma.lower()
+            secondary_lemma = secondary_word.lemma
+
             try:
-                bigram = Bigram.query.filter(Bigram.word == word).\
-                    filter(Bigram.secondary_word == secondary_word).one()
-            except NoResultFound:
-                bigram = Bigram(word, secondary_word, self.project)
-            except MultipleResultsFound:
-                pdb.set_trace()
+                bigram = self.bigrams[main_lemma][secondary_lemma]
+            except KeyError:
+                try:
+                    bigram = Bigram.query.filter(Bigram.word == word).\
+                        filter(Bigram.secondary_word == secondary_word).one()
+                except NoResultFound:
+                    bigram = Bigram(word, secondary_word, self.project)
+                except MultipleResultsFound:
+                    pdb.set_trace()
+
+                self.bigrams[main_lemma][secondary_lemma] = bigram
 
             bigram.add_instance(i - index, sentence, False)
             bigram.flush()
