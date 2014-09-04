@@ -40,22 +40,10 @@ class Dependency(db.Model, Base):
 
     grammatical_relationship = db.relationship(
         "GrammaticalRelationship", backref="dependency")
-
     governor = db.relationship("Word", foreign_keys=[governor_id])
-
     dependent = db.relationship("Word", foreign_keys=[dependent_id])
-
-    # Scoped Pseudo-relationships
-
-    @property
-    def sentences(self):
-        """Retrieves all sentences that contain this dependency, within
-        the scope of the current active project.
-        """
-
-        return Sentence.query.join(DependencyInSentence).join(Dependency).\
-            filter(DependencyInSentence.project==Project.active_project).\
-            filter(DependencyInSentence.dependency==self).all()
+    sentences = association_proxy("dependency_sentences", "sentence",
+        creator=lambda dependency: DependencyInSentence(dependency=dependency))
 
     def get_counts(self, project=None):
 
