@@ -22,6 +22,7 @@ class GrammaticalRelationship(db.Model, Base):
     # Attributes
 
     name = db.Column(db.String, index=True)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     def __repr__(self):
         """Return a string representation of this ``GrammaticalRelationship``.

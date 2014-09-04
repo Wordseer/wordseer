@@ -36,7 +36,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
 
     id = db.Column(db.Integer, primary_key=True, index=True)
     lemma = db.Column(db.String, index=True)
-
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     sentences = association_proxy("word_sentences", "sentence",
         creator=lambda word: WordInSentence(sentence=sentence))

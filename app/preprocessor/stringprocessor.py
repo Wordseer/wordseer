@@ -100,14 +100,16 @@ class StringProcessor(object):
 
                         try:
                             relationship = GrammaticalRelationship.query.\
-                                filter_by(name = grammatical_relationship).\
+                                filter_by(name=grammatical_relationship).\
+                                filter_by(project_id=self.project.id).\
                                 one()
                         except(MultipleResultsFound):
                             project_logger.error("duplicate records found "
                                 "for: %s", str(key))
                         except(NoResultFound):
                             relationship = GrammaticalRelationship(
-                                name = grammatical_relationship)
+                                name=grammatical_relationship,
+                                project_id=self.project.id)
 
                         relationships[key] = relationship
 
@@ -116,11 +118,13 @@ class StringProcessor(object):
                     # corresponding word
                     governor = Word.query.\
                         filter_by(lemma=governor_lemma.lower()).\
+                        filter_by(project_id=self.project.id).\
                         first()
 
                     # Same as above for the dependent in the relationship
                     dependent = Word.query.\
                         filter_by(lemma=dependent_lemma.lower()).\
+                        filter_by(project_id=self.project.id).\
                         first()
 
                     try:
@@ -130,8 +134,7 @@ class StringProcessor(object):
                         project_logger.error("Governor or dependent not "
                             "found; giving up on parse. This likely indicates"
                             " an error in the preprocessing; rerunning the "
-                            "preprocessor is recommended.")
-                        project_logger.info(sentence)
+                            "preprocessor is recommended: %s", sentence.text)
                         return sentence
 
                     key = (relationship.name, governor.id, dependent.id)
@@ -354,13 +357,14 @@ def tokenize_from_raw(parsed_text, txt, project):
             #TODO: project specific
             else:
                 try:
-                    word = Word.query.filter_by(lemma=lemma).one()
+                    word = Word.query.filter_by(lemma=lemma,
+                        project_id=project.id).one()
                 except MultipleResultsFound:
                     pdb.set_trace()
                     project_logger.warning("Duplicate records found for: %s, "
                         "this should never happen.", str(lemma))
                 except NoResultFound:
-                    word = Word(lemma=lemma)
+                    word = Word(lemma=lemma, project_id=project.id)
                 words[lemma] = word
 
             sentence.add_word(
