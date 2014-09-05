@@ -510,3 +510,19 @@ class TestBigramModels(unittest.TestCase):
         assert bigram.frequency == 1
         assert offset.frequency == 1
 
+    def test_get_fbar(self):
+        """Test the get_fbar method.
+        """
+        word1 = Word(lemma="foo")
+        word2 = Word(lemma="bar")
+        project = Project()
+        bigram = Bigram(word1, word2, project)
+
+        bigram.offsets[0].sentences = [Sentence()]
+        bigram.offsets[1].sentences = [Sentence()]
+        bigram.offsets[2].sentences = [Sentence(), Sentence()]
+
+        bigram.frequency = 4
+
+        assert bigram.get_fbar() == 4/3.0
+

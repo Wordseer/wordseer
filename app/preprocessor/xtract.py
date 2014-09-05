@@ -172,6 +172,10 @@ class BigramCollection:
                 self.bigrams[lemmas[i]].addInstance(i - query_index, sent_id)
 
     def getFbar(self):
+        # Total number ocurrences of bigrams that have this word as the primary
+        # word
+        # Divided by the number of different bigrams with this word as the
+        # primary word
         return self.wfreq / len(self.bigrams)
 
     def getSigma(self):
@@ -262,7 +266,7 @@ def calculateTopPhrases(query):
 
     # print "<p>At getMatchingSentencesByLemma: <b>%.3f seconds</b></p>" % (time.time() - start_time)
 
-    # Add ALL sentences xyzf
+    # Add ALL sentences
     bigrams = BigramCollection()
     for sentence in savedSentences:
         bigrams.addSentence(query, sentence)
@@ -274,7 +278,7 @@ def calculateTopPhrases(query):
 
     # print "<p>Finished Stage 1: <b>%.3f seconds</b></p>" % (time.time() - start_time)
 
-    # Proceed toward Stage 2
+    # Proceed toward Stage 2 ----
     for tempBG in postStage1:
         for d in tempBG.distances:
             offset = d
@@ -284,6 +288,10 @@ def calculateTopPhrases(query):
                 offset += 4
 
             s2bigrams = BigramCollection()
+            # For every sentence in the sentences that contain the query lemma
+            # If that sentence is in this offset
+
+            # For every sentence in this offset
             for stage2sent in [s for s in savedSentences if s["id"] in tempBG.sent_ids[offset]]:
                 s2bigrams.addSentence(query, stage2sent)
 
