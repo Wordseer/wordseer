@@ -1,7 +1,8 @@
 """Bigrams are collections of two words. They are how WordSeer handles
 sequences.
 """
-
+import math
+import pdb
 from app import db
 from .base import Base
 from .association_objects import BigramOffset
@@ -17,6 +18,10 @@ class Bigram(db.Model, Base):
     word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
     secondary_word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
     frequency = db.Column(db.Integer, default=0)
+    stage = db.Column(db.Integer, default=0)
+    strength = db.Column(db.Float)
+    spread = db.Column(db.Integer)
+    interesting = db.Column(db.Boolean, default=False)
 
     word = db.relationship("Word", foreign_keys=word_id)
     secondary_word = db.relationship("Word", foreign_keys=secondary_word_id)
@@ -55,7 +60,6 @@ class Bigram(db.Model, Base):
         elif offset > 0:
             return self.offsets[offset + 4]
         else:
-            pdb.set_trace()
             raise ValueError("Offset cannot be 0")
 
     def add_instance(self, offset, sentence, force=True):
@@ -68,6 +72,7 @@ class Bigram(db.Model, Base):
         Returns:
             BigramOffset: The modified BigramOffset object.
         """
+        #TODO: should run differently if this is a stage 1 bigram
 
         bigram_offset = self.get_offset(offset)
         bigram_offset.add_sentence(sentence, force)
@@ -82,21 +87,20 @@ class Bigram(db.Model, Base):
         return "<Bigram | primary: %s | secondary: %s >" % (self.word,
             self.secondary_word)
 
-    def get_strength(self, f_bar, sigma):
+    def get_strength(self):
         """Get the strength of this word pair.
 
         Strength is defined the frequency of this pair minus the average
         average frequency of the primary word in this pair (f-bar) divided by
         the standard deviation around f-bar.
 
-        Arguments:
-            f_bar (float): Average frequency of ``self.word``
-            sigma (float): Standard deviation of ``f_bar``.
-
         Returns:
             float: The strength of this word pair, also known as ki,
         """
-        return (self.frequency - f_bar) / sigma
+        try:
+            return (self.frequency - self.get_fbar()) / self.get_sigma()
+        except ZeroDivisionError:
+            return 0.0
 
     def get_spread(self):
         """This method returns the shape of the histogram showing the frequency
@@ -132,13 +136,74 @@ class Bigram(db.Model, Base):
             interesting offsets.
         """
 
-        min_peak = (self.freq / 10) + (k1 * math.sqrt(self.get_spread()))
+        min_peak = (self.frequency / 10) + (k1 * math.sqrt(self.get_spread()))
 
         distances = []
 
-        for offset in offsets:
+        for offset in self.offsets:
             if offset.frequency > min_peak:
+                offset.interesting = True
                 distances.append(offset)
 
         return distances
+
+    def get_number_of_offsets(self):
+        """Return the number of unique offsets that this bigram has.
+
+        Returns:
+            int: between 1 and 10, inclusive.
+        """
+        num_offsets = 0
+        for offset in self.offsets:
+            if len(offset.sentences) > 0:
+                num_offsets += 1
+
+    def get_fbar(self):
+        """Get the average frequency of this bigram.
+
+        Defined as the number of ocurrences of this bigram divided by
+        the number of bigrams with the same primary word.
+
+        Returns:
+            float
+        """
+        # Works
+        bigrams = self.query.filter(Bigram.word == self.word).all()
+        total_ocurrences = 0.0
+
+        for bigram in bigrams:
+            total_ocurrences += bigram.frequency
+
+        total_bigrams = len(bigrams)
+        return total_ocurrences / total_bigrams
+
+    def get_sigma(self):
+        """Get the standard deviation around f-bar, that is, the standard
+        deviation of bigram frequencies.
+
+        Returns:
+            float
+        """
+        # Works
+        fbar = self.get_fbar()
+        bigrams = self.query.filter(Bigram.word == self.word).all()
+
+        squared_diffs = 0.0
+        #pdb.set_trace()
+        for bigram in bigrams:
+            x = bigram.frequency - fbar
+            squared_diffs += (x * x)
+
+        return math.sqrt(squared_diffs / len(bigrams))
+
+    def pass_stage_one(self):
+        self.strength = self.get_strength()
+        self.spread = self.get_spread()
+        offsets = self.get_interesting_offsets()
+        self.stage = 1
+        if offsets:
+            self.frequency = 0
+            self.interesting = True
+        for offset in offsets:
+            self.frequency += offset.frequency
 
