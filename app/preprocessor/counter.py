@@ -6,7 +6,8 @@ import logging
 
 from app import db
 from .logger import ProjectLogger
-from app.models import Document, Dependency, Word
+from app.models import Document, Dependency, Word, Bigram
+import pdb
 
 def count_all(project, commit_interval=500):
     """Run counts for documents, dependencies, and words.
@@ -18,6 +19,7 @@ def count_all(project, commit_interval=500):
     count_documents(project, commit_interval)
     count_dependencies(project, commit_interval)
     count_words(project, commit_interval)
+    count_bigrams(project, commit_interval)
 
 def count_documents(project, commit_interval):
     """Calculate counts for documents.
@@ -128,4 +130,63 @@ def count_words(project, commit_interval):
     db.session.commit()
     project_logger.info('Counted %s words.',
         len(words_in_sentences))
+
+def count_bigrams(project, commit_interval):
+    """Run statistic analysis on bigrams.
+
+    Arguments:
+        project (Project): The ``Project`` to run counts for.
+        commit_interval (int): This method will commit the counts every this
+            many times.
+    """
+    k0 = 1 # Strength threshhold
+    k1 = 1 # Distance threshhold
+    u0 = 10 # Spread thresshold
+    T = .5 # Probability threshhold
+
+    bigrams = Bigram.query.join(Word, Word.id==Bigram.word_id).\
+        filter(Word.project_id == project.id).all()
+    s1_bigrams = []
+    s2_bigrams = []
+    ngrams = []
+
+    for bigram in bigrams:
+        if bigram.get_strength() >= k0 and bigram.get_spread >= u0:
+            # Promote these somehow
+            bigram.pass_stage_one()
+            s1_bigrams.append(bigram)
+
+    db.session.commit()
+
+    for bigram in s1_bigrams:
+        ngram = []
+        for i in range(-5, 6):
+            try:
+                offset = bigram.get_offset(i)
+            except ValueError:
+                offset = 0
+
+            if offset == 0:
+                ngram.append(bigram.word)
+
+            elif float(offset.frequency / bigram.frequency) > T:
+                ngram.append(bigram.secondary_word)
+
+            else:
+                ngram.append("*")
+
+        start_i = -1
+        end_i = len(ngram)
+        for i, x in enumerate(ngram):
+            if x != "*":
+                start_i = i
+                break
+        for i in range(len(ngram) - 1, -1, -1):
+            if ngram[i] != "*":
+                end_i = i
+                break
+
+        ngrams.append(ngram[start_i:end_i + 1])
+
+    pdb.set_trace()
 
