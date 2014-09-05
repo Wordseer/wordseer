@@ -110,6 +110,7 @@ class BigramOffset(db.Model, Base):
     sentences = db.relationship("Sentence", secondary="bigrams_in_sentences",
         backref="bigrams")
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    interesting = db.Column(db.Boolean)
 
     def __init__(self, **kwargs):
         self.frequency = 0
