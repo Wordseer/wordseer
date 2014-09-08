@@ -83,6 +83,9 @@ class CollectionProcessor(object):
             logger.log(self.project, "finished_sequence_processing", "true",
                 logger.REPLACE)
 
+
+        counter.count_all(self.project)
+
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):
         """Extract metadata from each file in collection_dir, and populate the
@@ -188,7 +191,6 @@ class CollectionProcessor(object):
 
             documents_parsed += 1
 
-        counter.count_all(self.project)
 
 def cp_run(collection_dir, structure_file, extension, project_id):
     """Run the collection processor.
@@ -207,11 +209,14 @@ def cp_run(collection_dir, structure_file, extension, project_id):
 
     project = Project.query.get(project_id)
     collection_processor = CollectionProcessor(project)
-    try:
-        collection_processor.process(collection_dir, structure_file, extension,
-           False)
-    except Exception as e:
-        project_logger = logger.ProjectLogger(logging.getLogger(__name__),
-            project)
-        project_logger.error("Fatal error: " + str(e))
+    #try:
+    #    collection_processor.process(collection_dir, structure_file, extension,
+    #       False)
+    #except Exception as e:
+    #    project_logger = logger.ProjectLogger(logging.getLogger(__name__),
+    #        project)
+    #    project_logger.error("Fatal error: " + str(e))
+
+    collection_processor.process(collection_dir, structure_file, extension,
+       False)
 
