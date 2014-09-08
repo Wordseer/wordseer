@@ -3,10 +3,12 @@ models.
 """
 
 import logging
+from datetime import datetime
 
+from app import app
 from app import db
 from .logger import ProjectLogger
-from app.models import Document, Dependency, Word, Bigram
+from app.models import Document, Dependency, Word, Bigram, WordInSentence, Ngram
 import pdb
 
 def count_all(project, commit_interval=500):
@@ -69,7 +71,6 @@ def count_dependencies(project, commit_interval):
         WHERE project_id = %s
         GROUP BY dependency_id
     """ % project.id).fetchall()
-
     project_logger.info("Calculating counts for dependencies")
 
     for row in dependencies_in_sentences:
@@ -143,50 +144,142 @@ def count_bigrams(project, commit_interval):
     k1 = 1 # Distance threshhold
     u0 = 10 # Spread thresshold
     T = .5 # Probability threshhold
+    count = 0
+    logger = logging.getLogger(__name__)
+    project_logger = ProjectLogger(logger, project)
 
     bigrams = Bigram.query.join(Word, Word.id==Bigram.word_id).\
         filter(Word.project_id == project.id).all()
     s1_bigrams = []
     s2_bigrams = []
     ngrams = []
+    phrase_index = {}
+    interesting_offsets = 0
 
+    project_logger.info("Getting stage 1 bigrams")
     for bigram in bigrams:
+        count += 1
         if bigram.get_strength() >= k0 and bigram.get_spread >= u0:
             # Promote these somehow
-            bigram.pass_stage_one()
+            offsets = bigram.pass_stage_one()
+            interesting_offsets += offsets
             s1_bigrams.append(bigram)
+        if count % commit_interval == 0:
+            project_logger.info("Calculating count for bigram %s/%s", count,
+                len(bigrams))
+            db.session.commit()
 
     db.session.commit()
+    project_logger.info("Got %s bigrams", count)
+    project_logger.info("Counting %s ngrams with %s interesting offsets",
+        len(s1_bigrams), interesting_offsets)
+    count = 0
+    t0 = datetime.now()
 
     for bigram in s1_bigrams:
-        ngram = []
-        for i in range(-5, 6):
-            try:
-                offset = bigram.get_offset(i)
-            except ValueError:
-                offset = 0
+        for bigram_offset in bigram.offsets:
+            if bigram_offset.interesting:
+                sentences = bigram_offset.sentences
+                s22_bigrams = get_stage22_bigrams(sentences, bigram.word,
+                    project)
+                ngram = get_ngram(s22_bigrams, T)
+                has_stops = has_stop_words(ngram)
+                phrase = " ".join([word.lemma for word in ngram])
+                if not all_stop_words(ngram):
+                    if not phrase in phrase_index:
+                        phrase_index[phrase] = Ngram(text=phrase,
+                            has_stop_words=has_stops,
+                            words=ngram)
+                    phrase_index[phrase].count += len(bigram_offset.sentences)
+        now = datetime.now()
+        diff = (now - t0).total_seconds()
+        project_logger.info("%s seconds to process bigram %s/%s", diff,
+            count, len(s1_bigrams))
+        t0 = now
 
-            if offset == 0:
-                ngram.append(bigram.word)
+        count += 1
+        if count % commit_interval == 0:
+            project_logger.info("Getting ngrams from bigram %s/%s", count,
+                len(s1_bigrams))
+            db.session.commit()
 
-            elif float(offset.frequency / bigram.frequency) > T:
-                ngram.append(bigram.secondary_word)
+    db.session.commit()
+    project_logger.info("Got %s ngrams", count)
+
+def all_stop_words(words):
+    text = [word.lemma for word in words]
+    return all(word in app.config["STOPWORDS"] for word in text)
+
+
+def has_stop_words(words):
+    text = [word.lemma for word in words]
+    return any(word in app.config["STOPWORDS"] for word in text)
+
+def get_ngram(bigrams, T):
+    wildcard = Word(lemma="WILDCARD")
+    ngram = []
+    frequencies = [0] * 10
+    for bigram in bigrams:
+        for i in range(0, 10):
+            frequencies[i] += bigram.offsets[i].frequency
+
+    #FIXME: misses last position
+    for i in range(0, 10):
+        word_to_add = wildcard
+
+        if i == 5:
+            ngram.append(bigram.word)
+            continue
+
+        for bigram in bigrams:
+            if frequencies[i] > 0 and float(bigram.offsets[i].frequency) / frequencies[i] > T:
+                word_to_add = bigram.secondary_word
+
+        ngram.append(word_to_add)
+
+    start_i = -1
+    end_i = len(ngram)
+
+    for i, x in enumerate(ngram):
+        if x != wildcard:
+            start_i = i
+            break
+    for i in range(len(ngram) - 1, -1, -1):
+        if ngram[i] != wildcard:
+            end_i = i
+            break
+
+    return ngram[start_i:end_i + 1]
+
+def get_stage22_bigrams(sentences, word, project):
+    """Execute stage 2.2 of xtract.
+    """
+    bigrams = {}
+
+    for sentence in sentences:
+       rel = WordInSentence.query.filter_by(sentence=sentence,
+            word=word).first()
+
+       start_index = max(rel.position - 5, 0)
+       end_index = min(rel.position + 6, sentence.length)
+
+       for i in range(start_index, end_index):
+            if i - rel.position == 0:
+                continue
+            offset_rel = WordInSentence.query.filter_by(sentence=sentence,
+                position=i).one()
+
+            key = (word, offset_rel.word)
+
+            if key in bigrams:
+                bigram = bigrams[key]
 
             else:
-                ngram.append("*")
+                bigram = Bigram(word, offset_rel.word, project)
+                bigram.stage = 22
+                bigrams[key] = bigram
 
-        start_i = -1
-        end_i = len(ngram)
-        for i, x in enumerate(ngram):
-            if x != "*":
-                start_i = i
-                break
-        for i in range(len(ngram) - 1, -1, -1):
-            if ngram[i] != "*":
-                end_i = i
-                break
+            bigram.add_instance(i - rel.position, sentence, False)
 
-        ngrams.append(ngram[start_i:end_i + 1])
-
-    pdb.set_trace()
+    return [bigram for key, bigram in bigrams.items()]
 
