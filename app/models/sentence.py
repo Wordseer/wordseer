@@ -39,6 +39,7 @@ class Sentence(db.Model, Base):
     document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
     bigram_id = db.Column(db.Integer, db.ForeignKey("bigram_offset.id"))
     text = db.Column(db.Text, index=True)
+    length = db.Column(db.Integer)
 
     # Relationships
 

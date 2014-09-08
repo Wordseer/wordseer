@@ -206,4 +206,5 @@ class Bigram(db.Model, Base):
             self.interesting = True
         for offset in offsets:
             self.frequency += offset.frequency
+        return len(offsets)
 
