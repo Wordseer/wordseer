@@ -49,10 +49,10 @@ class SequenceProcessor(object):
         count = 0
         total = len(sentences)
         for sentence in sentences:
-            for index, word in enumerate(sentence.words):
-                self.get_bigrams(sentence, word, index)
+            for index, rel in enumerate(sentence.sentence_words):
+                self.get_bigrams(sentence, rel.word, index)
             count += 1
-            if count % 10 == 0:
+            if count % 25 == 0:
                 self.project_logger.info("Processing bigrams from sentence %s/%s",
                     count, total)
                 db.session.commit()
