@@ -335,7 +335,8 @@ def tokenize_from_raw(parsed_text, txt, project):
     sentence_count = len(parsed_text["sentences"])
 
     for sentence_data in parsed_text["sentences"]:
-        sentence = Sentence(text = sentence_data["text"])
+        sentence = Sentence(text=sentence_data["text"],
+            length=len(sentence_data["words"]))
         position = 0
 
         for word_data in sentence_data["words"]:
