@@ -36,3 +36,8 @@ bigrams_in_sentences = db.Table("bigrams_in_sentences",
         db.Column("sentence_id", db.Integer, db.ForeignKey("sentence.id"))
 )
 
+words_in_ngrams = db.Table("words_in_ngrams",
+    db.Column("ngram_id", db.Integer, db.ForeignKey("ngram.id")),
+    db.Column("word_id", db.Integer, db.ForeignKey("word.id"))
+)
+
