@@ -59,11 +59,9 @@ class SequenceProcessor(object):
                 db.session.commit()
                 self.bigrams = {}
 
-        for bigram in Bigram.query.all():
-            bigram.save_stats()
+        self.project_logger.info("Processed %s bigrams.", count)
 
         db.session.commit()
-
 
     def get_bigrams(self, sentence, word, index):
         """Handle the main bigram processing.
