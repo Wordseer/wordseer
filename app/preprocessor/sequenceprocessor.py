@@ -50,7 +50,8 @@ class SequenceProcessor(object):
         total = len(sentences)
         for sentence in sentences:
             for index, rel in enumerate(sentence.sentence_words):
-                self.get_bigrams(sentence, rel.word, index)
+                if len(rel.word.sentences) > 3:
+                    self.get_bigrams(sentence, rel.word, index)
             count += 1
             if count % 25 == 0:
                 self.project_logger.info("Processing bigrams from sentence %s/%s",

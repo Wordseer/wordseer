@@ -162,6 +162,7 @@ def count_bigrams(project, commit_interval):
         if bigram.get_strength() >= k0 and bigram.get_spread >= u0:
             # Promote these somehow
             offsets = bigram.pass_stage_one()
+            bigram.save(False)
             interesting_offsets += offsets
             s1_bigrams.append(bigram)
         if count % commit_interval == 0:
@@ -185,12 +186,15 @@ def count_bigrams(project, commit_interval):
                 ngram = get_ngram(s22_bigrams, T)
                 has_stops = has_stop_words(ngram)
                 phrase = " ".join([word.lemma for word in ngram])
+
                 if not all_stop_words(ngram):
                     if not phrase in phrase_index:
                         phrase_index[phrase] = Ngram(text=phrase,
                             has_stop_words=has_stops,
                             words=ngram)
                     phrase_index[phrase].count += len(bigram_offset.sentences)
+                    phrase_index[phrase].save(False)
+
         now = datetime.now()
         diff = (now - t0).total_seconds()
         project_logger.info("%s seconds to process bigram %s/%s", diff,
@@ -207,15 +211,44 @@ def count_bigrams(project, commit_interval):
     project_logger.info("Got %s ngrams", count)
 
 def all_stop_words(words):
-    text = [word.lemma for word in words]
+    """Determine if a list of words contains stop words.
+
+    For this purpose, the wildcard word does not count as a word. That is, if
+    a list contains only stop words and wild cards, this method will return
+    ``True``.
+
+    Arguments:
+        words (list of Words): A list of Word objects to check for stopwords.
+    """
+    wildcard = Word(lemma="WILDCARD")
+    text = [word.lemma for word in words if word != wildcard]
     return all(word in app.config["STOPWORDS"] for word in text)
 
 
 def has_stop_words(words):
+    """Determine if there are stop words present in the given list.
+
+    Arguments:
+        words (list of Words): A list of Word objects to check for stopwords.
+    """
     text = [word.lemma for word in words]
     return any(word in app.config["STOPWORDS"] for word in text)
 
 def get_ngram(bigrams, T):
+    """Given a list of bigrams and a probability threshhold, extract the
+    ngram.
+
+    The given bigrams should all have the same primary word; this function
+    is designed to take in bigrams from get_stage22_bigrams.
+
+    Arguments:
+        bigrams (list of Bigrams): A list of bigrams to process.
+        T (float): The probability threshhold to add something to the ngram
+            at a given position.
+
+    Returns:
+        list of Words: The resulting ngram.
+    """
     wildcard = Word(lemma="WILDCARD")
     ngram = []
     frequencies = [0] * 10
@@ -223,16 +256,20 @@ def get_ngram(bigrams, T):
         for i in range(0, 10):
             frequencies[i] += bigram.offsets[i].frequency
 
-    #FIXME: misses last position
-    for i in range(0, 10):
+    for o in range(-5, 6):
         word_to_add = wildcard
 
-        if i == 5:
+        if o == 5:
             ngram.append(bigram.word)
             continue
 
         for bigram in bigrams:
-            if frequencies[i] > 0 and float(bigram.offsets[i].frequency) / frequencies[i] > T:
+            if o < 0:
+                i = o + 5
+            else:
+                i = o + 4
+            if (frequencies[i] > 0 and
+                    float(bigram.offsets[i].frequency) / frequencies[i] > T):
                 word_to_add = bigram.secondary_word
 
         ngram.append(word_to_add)
@@ -244,6 +281,7 @@ def get_ngram(bigrams, T):
         if x != wildcard:
             start_i = i
             break
+
     for i in range(len(ngram) - 1, -1, -1):
         if ngram[i] != wildcard:
             end_i = i
@@ -253,6 +291,14 @@ def get_ngram(bigrams, T):
 
 def get_stage22_bigrams(sentences, word, project):
     """Execute stage 2.2 of xtract.
+
+    Arguments:
+        sentences (list of Sentences): Sentences to run statistics on.
+        word (Word): The primary word in all the bigrams.
+        project (Project): The project the Word and Sentence are a part of.
+
+    Returns:
+        list of Bigrams: Bigrams that pass stage 2.2 of Xtract.
     """
     bigrams = {}
 
