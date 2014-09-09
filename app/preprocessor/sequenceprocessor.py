@@ -58,6 +58,10 @@ class SequenceProcessor(object):
                     count, total)
                 db.session.commit()
                 self.bigrams = {}
+
+        for bigram in Bigram.query.all():
+            bigram.save_stats()
+
         db.session.commit()
 
 

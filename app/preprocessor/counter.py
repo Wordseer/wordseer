@@ -159,7 +159,7 @@ def count_bigrams(project, commit_interval):
     project_logger.info("Getting stage 1 bigrams")
     for bigram in bigrams:
         count += 1
-        if bigram.get_strength() >= k0 and bigram.get_spread >= u0:
+        if bigram.strength >= k0 and bigram.spread >= u0:
             # Promote these somehow
             offsets = bigram.pass_stage_one()
             bigram.save(False)

@@ -102,6 +102,12 @@ class Bigram(db.Model, Base):
         except ZeroDivisionError:
             return 0.0
 
+    def save_stats(self):
+        """Save the bigram's strength.
+        """
+        self.strength = self.get_strength()
+        self.spread = self.get_spread()
+
     def get_spread(self):
         """This method returns the shape of the histogram showing the frequency
         of ``secondary_word`` versus ``offset``.
@@ -197,8 +203,8 @@ class Bigram(db.Model, Base):
         return math.sqrt(squared_diffs / len(bigrams))
 
     def pass_stage_one(self):
-        self.strength = self.get_strength()
-        self.spread = self.get_spread()
+        #self.strength = self.get_strength()
+        #self.spread = self.get_spread()
         offsets = self.get_interesting_offsets()
         self.stage = 1
         if offsets:
