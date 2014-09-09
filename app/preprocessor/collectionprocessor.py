@@ -74,17 +74,19 @@ class CollectionProcessor(object):
             self.project_logger.info("Parsing documents")
             self.parse_documents()
 
-        # Process the sequences
+        # Process the bigrams
         if (app.config["GRAMMATICAL_PROCESSING"] and not
                 "true" in logger.get(self.project,
-                    "finished_sequence_processing").lower()):
-            self.project_logger.info("Processing sequences")
+                    "finished_bigram_processing").lower()):
+            self.project_logger.info("Processing bigrams")
             self.sequence_processor.process()
-            logger.log(self.project, "finished_sequence_processing", "true",
+            logger.log(self.project, "finished_bigram_processing", "true",
                 logger.REPLACE)
 
-
-        counter.count_all(self.project)
+        # Do the counts
+        if not "true" in logger.get(self.project, "finished_counts").lower():
+            self.project_logger.info("Performing counts")
+            counter.count_all(self.project)
 
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):
