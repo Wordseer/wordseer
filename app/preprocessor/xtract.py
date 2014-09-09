@@ -203,7 +203,7 @@ class BigramCollection:
     def getStageTwoBigrams(self, T):
         freqs = [0] * 10
         ngram = []
-
+        # For every bigram that has the same primary word
         for key, bigram in self.bigrams.iteritems():
             for i in range(0, 10):
                 if i < 5:
@@ -279,8 +279,8 @@ def calculateTopPhrases(query):
     # print "<p>Finished Stage 1: <b>%.3f seconds</b></p>" % (time.time() - start_time)
 
     # Proceed toward Stage 2 ----
-    for tempBG in postStage1:
-        for d in tempBG.distances:
+    for tempBG in postStage1: # For every S1 Bigram
+        for d in tempBG.distances: # For every interesting distance
             offset = d
             if d < 0:
                 offset += 5
