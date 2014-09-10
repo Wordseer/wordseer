@@ -283,8 +283,8 @@ def split_sentences(text):
                 if all([len(subsentence.split(" ")) <= max_length
                     for subsentence in subsentences]):
 
-                    project_logger.info("Splitting sentence around %s to fit "
-                        "length limit.", character)
+                    project_logger.warning("Splitting sentence around %s to "
+                        "fit length limit.", character)
                     break
 
                 # Otherwise, reset subsentences and try again
