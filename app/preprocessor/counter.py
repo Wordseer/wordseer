@@ -9,7 +9,6 @@ from app import app
 from app import db
 from .logger import ProjectLogger
 from app.models import Document, Dependency, Word, Bigram, WordInSentence, Ngram
-import pdb
 
 def count_all(project, commit_interval=500):
     """Run counts for documents, dependencies, and words.
@@ -196,13 +195,13 @@ def count_bigrams(project, commit_interval):
                     phrase_index[phrase].count += len(bigram_offset.sentences)
                     phrase_index[phrase].save(False)
 
+        count += 1
         now = datetime.now()
         diff = (now - t0).total_seconds()
         project_logger.info("%s seconds to process bigram %s/%s", diff,
             count, len(s1_bigrams))
         t0 = now
 
-        count += 1
         if count % commit_interval == 0:
             project_logger.info("Getting ngrams from bigram %s/%s", count,
                 len(s1_bigrams))
@@ -258,9 +257,10 @@ def get_ngram(bigrams, T):
             frequencies[i] += bigram.offsets[i].frequency
 
     for o in range(-5, 6):
+        # o is an offset, i is an index
         word_to_add = wildcard
 
-        if o == 5:
+        if o == 0:
             ngram.append(bigram.word)
             continue
 
