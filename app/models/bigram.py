@@ -22,6 +22,7 @@ class Bigram(db.Model, Base):
     strength = db.Column(db.Float)
     spread = db.Column(db.Integer)
     interesting = db.Column(db.Boolean, default=False)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     word = db.relationship("Word", foreign_keys=word_id)
     secondary_word = db.relationship("Word", foreign_keys=secondary_word_id)
@@ -42,6 +43,7 @@ class Bigram(db.Model, Base):
         self.frequency = 0
         self.word = word
         self.secondary_word = secondary_word
+        self.project_id = project.id
         self.offsets = [BigramOffset(offset=i, bigram=self,
             project_id=project.id) for i in range(-5, 0) + range(1, 6)]
 
@@ -72,8 +74,6 @@ class Bigram(db.Model, Base):
         Returns:
             BigramOffset: The modified BigramOffset object.
         """
-        #TODO: should run differently if this is a stage 1 bigram
-
         bigram_offset = self.get_offset(offset)
         bigram_offset.add_sentence(sentence, force)
 
@@ -125,7 +125,7 @@ class Bigram(db.Model, Base):
         ui = 0.0
 
         for offset in self.offsets:
-            difference = offset.frequency - (self.frequency / 10)
+            difference = offset.frequency - (float(self.frequency) / 10)
             ui += (difference * difference)
 
         return ui / 10
@@ -142,7 +142,8 @@ class Bigram(db.Model, Base):
             interesting offsets.
         """
 
-        min_peak = (self.frequency / 10) + (k1 * math.sqrt(self.get_spread()))
+        min_peak = ((float(self.frequency) / 10) +
+            (k1 * math.sqrt(self.get_spread())))
 
         distances = []
 
@@ -174,14 +175,21 @@ class Bigram(db.Model, Base):
             float
         """
         # Works
-        bigrams = self.query.filter(Bigram.word == self.word).all()
-        total_ocurrences = 0.0
+        frequencies = db.session.query(Bigram.frequency).\
+            filter(Bigram.word == self.word).\
+            filter(Bigram.project_id == self.project_id).all()
+        #bigrams = self.query.filter(Bigram.word == self.word).all()
+        total_ocurrences = 0
 
-        for bigram in bigrams:
-            total_ocurrences += bigram.frequency
+        #for bigram in bigrams:
+        #    total_ocurrences += bigram.frequency
 
-        total_bigrams = len(bigrams)
-        return total_ocurrences / total_bigrams
+        #total_bigrams = len(bigrams)
+        for frequency in frequencies:
+            total_ocurrences += frequency[0]
+        total_bigrams = len(frequencies)
+
+        return total_ocurrences / float(total_bigrams)
 
     def get_sigma(self):
         """Get the standard deviation around f-bar, that is, the standard
@@ -192,7 +200,8 @@ class Bigram(db.Model, Base):
         """
         # Works
         fbar = self.get_fbar()
-        bigrams = self.query.filter(Bigram.word == self.word).all()
+        bigrams = self.query.filter(Bigram.word == self.word).\
+            filter(Bigram.project_id == self.project_id).all()
 
         squared_diffs = 0.0
         #pdb.set_trace()
