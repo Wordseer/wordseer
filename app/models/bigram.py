@@ -178,13 +178,8 @@ class Bigram(db.Model, Base):
         frequencies = db.session.query(Bigram.frequency).\
             filter(Bigram.word == self.word).\
             filter(Bigram.project_id == self.project_id).all()
-        #bigrams = self.query.filter(Bigram.word == self.word).all()
         total_ocurrences = 0
 
-        #for bigram in bigrams:
-        #    total_ocurrences += bigram.frequency
-
-        #total_bigrams = len(bigrams)
         for frequency in frequencies:
             total_ocurrences += frequency[0]
         total_bigrams = len(frequencies)
@@ -204,7 +199,6 @@ class Bigram(db.Model, Base):
             filter(Bigram.project_id == self.project_id).all()
 
         squared_diffs = 0.0
-        #pdb.set_trace()
         for bigram in bigrams:
             x = bigram.frequency - fbar
             squared_diffs += (x * x)
@@ -212,8 +206,6 @@ class Bigram(db.Model, Base):
         return math.sqrt(squared_diffs / len(bigrams))
 
     def pass_stage_one(self):
-        #self.strength = self.get_strength()
-        #self.spread = self.get_spread()
         offsets = self.get_interesting_offsets()
         self.stage = 1
         if offsets:
