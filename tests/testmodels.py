@@ -51,6 +51,24 @@ class TestWordModel(unittest.TestCase):
         assert word_1.lemma == string_1
         assert word_2.lemma == string_2
 
+    def test_equivalence(self):
+        """Test to make sure equivalence works.
+        """
+        sentence = Sentence()
+        word1 = Word(lemma="FOO")
+        word2 = Word(lemma="FOO")
+        word3 = Word(lemma="BAR")
+
+        word1.sentences = [sentence]
+        word1.save()
+        word2.save()
+        word3.save()
+
+        assert word1 == word2
+        assert not (word1 != word2)
+        assert word2 != word3
+        assert not (word2 == word3)
+
 class TestSentenceModel(unittest.TestCase):
     """Tests for the ``Sentence`` model.
     """
@@ -517,12 +535,16 @@ class TestBigramModels(unittest.TestCase):
         word2 = Word(lemma="bar")
         project = Project()
         bigram = Bigram(word1, word2, project)
+        bigram1 = Bigram(word1, Word(), project)
 
         bigram.offsets[0].sentences = [Sentence()]
         bigram.offsets[1].sentences = [Sentence()]
         bigram.offsets[2].sentences = [Sentence(), Sentence()]
 
         bigram.frequency = 4
+        bigram1.frequency = 2
+        bigram.save()
+        bigram1.save()
 
-        assert bigram.get_fbar() == 4/3.0
+        assert bigram.get_fbar() == 3.0
 

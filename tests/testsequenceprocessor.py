@@ -28,19 +28,26 @@ class SequenceProcessorTests(unittest.TestCase):
     def test_process(self):
         """Test the process method.
         """
-        self.sequence_processor.get_bigrams = mock.create_autospec(self.sequence_processor.get_bigrams)
+        self.sequence_processor.get_bigrams = mock.MagicMock()
         mock_sentences = []
         get_bigrams_calls = []
+        sentence1 = Sentence()
+        sentence2 = Sentence()
+        sentence3 = Sentence()
         for i in range(0, 10):
-            mock_sentence = mock.create_autospec(Sentence, words=[])
+            mock_sentence = Sentence()
             for j in range(0, 4):
-                mock_word = mock.create_autospec(Word)
+                mock_word = Word()
                 mock_sentence.words.append(mock_word)
+                mock_word.sentences.extend([sentence1, sentence2, sentence3])
                 get_bigrams_calls.append(mock.call(mock_sentence, mock_word, j))
+
 
             mock_sentences.append(mock_sentence)
 
         self.project.get_sentences.return_value = mock_sentences
+
+        pdb.set_trace()
 
         self.sequence_processor.process()
 
