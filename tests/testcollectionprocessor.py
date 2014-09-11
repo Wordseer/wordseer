@@ -135,9 +135,6 @@ class TestCollectionProcessor(unittest.TestCase):
                 "latest_parsed_document_id", str(i), mock_logger.REPLACE))
         mock_logger.log.assert_has_calls(logger_calls)
 
-        # Make sure the counter has been called
-        mock_counter.count_all.assert_called_once_with(colproc.project)
-
 class TestCollectionProcessorProcess(unittest.TestCase):
     """Tests specifically for CollectionProcessor.process().
     """
@@ -154,10 +151,8 @@ class TestCollectionProcessorProcess(unittest.TestCase):
         # for calling process()
         self.log_dict = {"finished_recording_text_and_metadata": "true",
             "finished_grammatical_processing": "true",
-            "finished_sequence_processing": "true",
-            "word_counts_done": "true",
-            "tfidf_done": "true",
-            "word_similarity_calculations_done": "true"
+            "finished_bigram_processing": "true",
+            "finished_counts": "true",
         }
 
         self.args = ["", "", "", False]

@@ -18,11 +18,12 @@ from app.preprocessor import counter
 class CounterTests(unittest.TestCase):
     """Test the counting functions.
     """
+    @mock.patch.object(counter, "count_bigrams", autospec=True)
     @mock.patch.object(counter, "count_documents", autospec=True)
     @mock.patch.object(counter, "count_dependencies", autospec=True)
     @mock.patch.object(counter, "count_words", autospec=True)
     def test_count_all(self, mock_count_words, mock_count_dependencies,
-            mock_count_documents):
+            mock_count_documents, mock_count_bigrams):
         """Test the count_all function.
         """
         mock_project = mock.create_autospec(Project)
@@ -33,6 +34,7 @@ class CounterTests(unittest.TestCase):
         mock_count_words.assert_called_once_with(mock_project, interval)
         mock_count_dependencies.assert_called_once_with(mock_project, interval)
         mock_count_documents.assert_called_once_with(mock_project, interval)
+        mock_count_bigrams.assert_called_once_with(mock_project, interval)
 
     @mock.patch("app.preprocessor.counter.ProjectLogger", autospec=True)
     @mock.patch("app.preprocessor.counter.db", autospec=True)

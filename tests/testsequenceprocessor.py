@@ -12,7 +12,6 @@ from app.models.bigram import Bigram
 from app.models.sentence import Sentence
 from app.preprocessor.sequenceprocessor import SequenceProcessor
 import database
-import pdb
 
 class SequenceProcessorTests(unittest.TestCase):
     """Tests for SequenceProcessor.
@@ -46,8 +45,6 @@ class SequenceProcessorTests(unittest.TestCase):
             mock_sentences.append(mock_sentence)
 
         self.project.get_sentences.return_value = mock_sentences
-
-        pdb.set_trace()
 
         self.sequence_processor.process()
 
