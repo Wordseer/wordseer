@@ -42,6 +42,9 @@ class Sequence(db.Model, Base):
     words = association_proxy("word_in_sequence", "word",
         creator=lambda word: WordInSequence(word=word))
 
+    # Indices
+    __table_args__ = (db.Index("ix_sequence_length_lemmatized", "length", "lemmatized"),)
+
     # Scoped Pseudo-relationships
 
     @property
