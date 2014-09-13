@@ -90,7 +90,7 @@ Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
 				var count = record.get(field);
 				var svg = '<svg class="lollipop" data-score="'+ (1 - 1 / count)
 					+'"></svg>';
-				return {tag: 'td', cls:'frequent-word-count distinct', html:svg};
+				return {tag: 'td', cls:'frequent-word-count distinct', html:count};
 			},
 			sortDirection: "DESC"
 		}
