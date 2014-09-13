@@ -137,11 +137,16 @@ def make_virtualenv(sudo_install=False):
     """
     print "Setting up virtualenv."
     venv_name = "venv"
-    packages = subprocess.check_output(["pip2.7", "freeze"])
+    packages = subprocess.check_output("pip2.7 freeze", shell=True)
     if not "virtualenv" in packages:
         if sudo_install:
+            system = sys.platform
             print "Installing virtualenv."
-            subprocess.call(["sudo", "pip2.7", "install", "virtualenv"])
+            if "win" in system:
+                subprocess.call("pip2.7 install virtualenv", shell=True)
+            else:
+                #subprocess.call(["sudo", "pip2.7", "install", "virtualenv"])
+                subprocess.call("sudo pip2.7 install virtualenv", shell=True)
         else:
             print "Virtualenv not found, not installing."
             return
@@ -160,14 +165,38 @@ def install_python_packages(reqs=REQUIREMENTS_FULL, full=True):
         reqs (str): The requirements file to install from.
         full (boolean): ``True`` if a full installation, ``False`` otherwise.
     """
-    print "Installing python dependencies from " + reqs
-    system = subprocess.check_output(["uname", "-a"])
+    system = sys.platform
+    import platform
+    if "win" in system:
+        print "checking windows prerequisites"
+        arch, os = platform.architecture()
+        print arch, os
+        if '32' in arch:
+            if not check_module_exists("pywin"):
+                print "installing pywin32 (32bit)"
+                subprocess.call("easy_install-2.7 bin\\win32\\pywin32-219.win32-py2.7.exe", shell=True)
+            if not check_module_exists("lxml"):
+                print "installing lxml (32bit)"
+                subprocess.call("easy_install-2.7 bin\\win32\\lxml-3.3.6.win32-py2.7.exe", shell=True)
 
-    subprocess.call(["pip2.7 install -r " + reqs],
+        elif '64' in arch:
+            if not check_module_exists("pywin"):
+                print "installing pywin32 (64bit)"
+                subprocess.call("easy_install-2.7 bin\\win64\\pywin32-219.win-amd64-py2.7.exe", shell=True)
+            if not check_module_exists("lxml"):
+                print "installing lxml (64bit)"
+                subprocess.call("easy_install-2.7 bin\\win64\\lxml-3.3.6.win-amd64-py2.7.exe", shell=True)
+
+    print "Installing python dependencies from " + reqs
+#    system = subprocess.check_output(["uname", "-a"])
+    
+    
+    
+    subprocess.call("pip2.7 install -r " + reqs,
         shell=True)
 
     if full:
-        subprocess.call(["python -m nltk.downloader punkt"], shell=True)
+        subprocess.call("python -m nltk.downloader punkt", shell=True)
 
 def setup_stanford_corenlp(force=False):
     """Download and move Stanford CoreNLP to the expected place.
@@ -206,7 +235,8 @@ def setup_database():
     """Set up the database.
     """
     print "Setting up database..."
-    subprocess.call(["python2.7 database.py reset"], shell=True)
+    #TODO: Should we always call python2.7?
+    subprocess.call("python database.py reset", shell=True)
 
 def pip_is_installed():
     """Check if the correct version of pip is installed.
@@ -313,6 +343,15 @@ def main():
         set_install_type(PARTIAL_INSTALL_TYPE)
 
     setup_database()
+
+def check_module_exists(module):
+    packages = subprocess.check_output("pip2.7 freeze", shell=True)
+    if not module in packages:
+        print "%s does not exist" % module
+        return False
+    else:
+        print "%s does exists" %module
+        return True
 
 if __name__ == "__main__":
     main()

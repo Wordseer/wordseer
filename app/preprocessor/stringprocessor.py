@@ -14,6 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 from .logger import ProjectLogger
 
+
 class StringProcessor(object):
     """Tokenize or parse a string.
     """
