@@ -14,6 +14,9 @@
          instance:getInstance(),
          user: getUsername(),
       },
-      reader:  'json',
+      reader: {
+          type: 'json',
+          root: 'results',
+      },
     },
 })

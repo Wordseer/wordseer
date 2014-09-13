@@ -18,7 +18,10 @@ Ext.define('WordSeer.store.PhraseSetListStore', {
          instance:getInstance(),
          user: getUsername(),
       },
-      reader: 'json',
+      reader: {
+          type: 'json',
+          root: 'results',
+      },
     },
     constructor: function() {
       this.callParent(arguments);

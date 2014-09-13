@@ -15,7 +15,10 @@ Ext.define('WordSeer.store.DocumentSetListStore', {
          instance:getInstance(),
          user: getUsername(),
       },
-      reader:'json',
+      reader: {
+          type: 'json',
+          root: 'results',
+      },
     },
     constructor: function(config) {
       this.callParent(arguments);

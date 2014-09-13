@@ -14,6 +14,10 @@ Ext.define('WordSeer.store.PhrasesAutoSuggestStore', {
 		extraParams: {
 			instance: getInstance(),
 			user: getUsername(),
-		}
+		},
+		reader: {
+			type: 'json',
+			root: 'results',
+		},
 	}
 });

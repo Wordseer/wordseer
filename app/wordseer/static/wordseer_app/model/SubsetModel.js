@@ -26,7 +26,10 @@ Ext.define('WordSeer.model.SubsetModel', {
             type: 'read',
             user: getUsername(),
         },
-        reader:'json',
+        reader: {
+            type: 'json',
+            root: 'results',
+        },
     },
     fields: [
         {name:'text', type:'string'},
