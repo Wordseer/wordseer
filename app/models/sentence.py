@@ -67,7 +67,7 @@ class Sentence(db.Model, Base):
         return "<Sentence: " + str(self.text) + ">"
 
     def add_word(self, word, position=None, space_before="",
-        part_of_speech="", project=None, force=True):
+        part_of_speech="", surface=None, project=None, force=True):
         """Add a word to the sentence by explicitly creating the association
         object.
 
@@ -91,6 +91,7 @@ class Sentence(db.Model, Base):
 
         word_in_sentence = WordInSentence(
             word=word,
+            surface=surface,
             project=project,
             sentence=self,
             position=position,

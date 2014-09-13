@@ -31,16 +31,14 @@ class CommonTests(object):
             for w in range(0, len(self.result[s].words)):
                 word = self.result[s].words[w]
                 raw_word = self.raw["sentences"][s]["words"][w]
-                assert word.word == raw_word[0]
-                assert word.lemma == raw_word[1]["Lemma"]
-                assert word.part_of_speech == raw_word[1]["PartOfSpeech"]
+                assert word.lemma == raw_word[1]["Lemma"].lower()
 
     def test_tags(self):
         """Test to make sure the words are accurately tagged.
         """
         # Make sure the words are tagged.
         for sentence in self.result:
-            for word in sentence.words:
+            for word in sentence.word_in_sentence:
                 self.failIf(word.part_of_speech == "")
 
 class TokenizeParagraphTests(CommonTests, unittest.TestCase):
@@ -63,7 +61,7 @@ class TokenizeParagraphTests(CommonTests, unittest.TestCase):
         # Todo: Check without hardcoding the ends?
         for sent in self.result:
             self.failUnless(isinstance(sent, Sentence))
-            self.failUnless(sent.words[-2].word in ["word", "death",
+            self.failUnless(sent.words[-2].lemma in ["word", "death",
                 "candle"])
 
 class TokenizeSentenceTests(CommonTests, unittest.TestCase):
