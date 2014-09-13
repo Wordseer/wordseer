@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 """Installtion script for WordSeer.
 """
+import platform
 import argparse
 import shutil
 import os
@@ -10,7 +11,6 @@ import urllib2
 import zipfile
 import gzip
 import glob
-import pdb
 import json
 # Config
 # Location of CoreNLP
@@ -68,10 +68,27 @@ def install_prerequisites(sudo):
     Arguments:
         sudo (boolean): If ``True``, use sudo.
     """
-    #TODO: this is unix-specific
     system = sys.platform
+    if "win32" in system:
+        print "checking windows prerequisites"
+        arch, os = platform.architecture()
+        print arch, os
+        if '32' in arch:
+            if not check_package_exists("pywin"):
+                print "installing pywin32 (32bit)"
+                subprocess.call("easy_install-2.7 bin\\win32\\pywin32-219.win32-py2.7.exe", shell=True)
+            if not check_package_exists("lxml"):
+                print "installing lxml (32bit)"
+                subprocess.call("easy_install-2.7 bin\\win32\\lxml-3.3.6.win32-py2.7.exe", shell=True)
 
-    if "linux" in system and sudo:
+        elif '64' in arch:
+            if not check_package_exists("pywin"):
+                print "installing pywin32 (64bit)"
+                subprocess.call("easy_install-2.7 bin\\win64\\pywin32-219.win-amd64-py2.7.exe", shell=True)
+            if not check_package_exists("lxml"):
+                print "installing lxml (64bit)"
+                subprocess.call("easy_install-2.7 bin\\win64\\lxml-3.3.6.win-amd64-py2.7.exe", shell=True)
+    elif "linux" in system and sudo:
         print "Attempting to install prerequisites for linux."
         uname = subprocess.call(["uname -a"], shell=True)
         if "ARCH" in system:
@@ -83,8 +100,8 @@ def install_prerequisites(sudo):
                 shell=True)
 
     elif "darwin" in system:
-        print "Mac detected. Compiling requirements for lxml."
-        subprocess.call(["STATIC_DEPS=true pip2.7 install lxml"], shell=True)
+        print "Mac detected. Installing lxml from binary."
+        subprocess.call(["easy_install bin/macosx/lxml-3.4.0-py2.7-macosx-10.9-intel.egg"], shell=True)
 
     else:
         print "Not installing prerequisites."
@@ -137,21 +154,27 @@ def make_virtualenv(sudo_install=False):
     """
     print "Setting up virtualenv."
     venv_name = "venv"
-    packages = subprocess.check_output("pip2.7 freeze", shell=True)
-    if not "virtualenv" in packages:
+    if not check_package_exists("virtualenv"):
         if sudo_install:
             system = sys.platform
             print "Installing virtualenv."
             if "win" in system:
                 subprocess.call("pip2.7 install virtualenv", shell=True)
             else:
-                #subprocess.call(["sudo", "pip2.7", "install", "virtualenv"])
                 subprocess.call("sudo pip2.7 install virtualenv", shell=True)
         else:
             print "Virtualenv not found, not installing."
             return
     else:
         print "Virtualenv already installed."
+        try:
+            subprocess.call(["virtualenv"])
+        except OSError:
+            #TODO: this is not multiplatform
+            pip_output = subprocess.check_output("pip install virtualenv", shell=True)
+            path = pip_output.split("\n")[0].split()[-1]
+            os.environ["PATH"] += ":" + os.path.join(path, "../../../bin")
+    
     subprocess.call(["virtualenv", "--python=python2.7", venv_name])
     venv_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
     #TODO: this is unix-specific
@@ -165,32 +188,8 @@ def install_python_packages(reqs=REQUIREMENTS_FULL, full=True):
         reqs (str): The requirements file to install from.
         full (boolean): ``True`` if a full installation, ``False`` otherwise.
     """
-    system = sys.platform
-    import platform
-    if "win" in system:
-        print "checking windows prerequisites"
-        arch, os = platform.architecture()
-        print arch, os
-        if '32' in arch:
-            if not check_module_exists("pywin"):
-                print "installing pywin32 (32bit)"
-                subprocess.call("easy_install-2.7 bin\\win32\\pywin32-219.win32-py2.7.exe", shell=True)
-            if not check_module_exists("lxml"):
-                print "installing lxml (32bit)"
-                subprocess.call("easy_install-2.7 bin\\win32\\lxml-3.3.6.win32-py2.7.exe", shell=True)
-
-        elif '64' in arch:
-            if not check_module_exists("pywin"):
-                print "installing pywin32 (64bit)"
-                subprocess.call("easy_install-2.7 bin\\win64\\pywin32-219.win-amd64-py2.7.exe", shell=True)
-            if not check_module_exists("lxml"):
-                print "installing lxml (64bit)"
-                subprocess.call("easy_install-2.7 bin\\win64\\lxml-3.3.6.win-amd64-py2.7.exe", shell=True)
 
     print "Installing python dependencies from " + reqs
-#    system = subprocess.check_output(["uname", "-a"])
-    
-    
     
     subprocess.call("pip2.7 install -r " + reqs,
         shell=True)
@@ -344,13 +343,13 @@ def main():
 
     setup_database()
 
-def check_module_exists(module):
+def check_package_exists(package):
     packages = subprocess.check_output("pip2.7 freeze", shell=True)
-    if not module in packages:
-        print "%s does not exist" % module
+    if not package in packages:
+        print "%s does not exist" % package
         return False
     else:
-        print "%s does exists" %module
+        print "%s does exists" % package
         return True
 
 if __name__ == "__main__":
