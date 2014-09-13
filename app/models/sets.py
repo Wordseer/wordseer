@@ -34,8 +34,10 @@ class Set(db.Model, Base):
     creation_date = db.Column(db.Date)
     type = db.Column(db.String)
     parent_id = db.Column(db.Integer, db.ForeignKey("set.id"))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
 
     # Relationships
+    project = db.relationship("Project")
     children = db.relationship("Set", backref=db.backref("parent",
         remote_side=[id]))
 
