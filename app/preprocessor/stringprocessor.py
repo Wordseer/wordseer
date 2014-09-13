@@ -99,7 +99,8 @@ class StringProcessor(object):
 
                         try:
                             relationship = GrammaticalRelationship.query.\
-                                filter_by(name = grammatical_relationship).\
+                                filter_by(name=grammatical_relationship,
+                                project=self.project).\
                                 one()
                         except(MultipleResultsFound):
                             project_logger.error("duplicate records found "

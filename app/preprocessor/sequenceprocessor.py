@@ -87,9 +87,9 @@ class SequenceProcessor(object):
                 else:
 
                     try:
-                        sequence = Sequence.query.filter_by(
-                            sequence = sequence_text
-                        ).one()
+                        sequence = Sequence.query.\
+                            filter_by(sequence = sequence_text,
+                            project=self.project).one()
                     except(MultipleResultsFound):
                         self.project_logger.error("Duplicate records found "
                             "for: %s", str(key))
@@ -99,7 +99,8 @@ class SequenceProcessor(object):
                             lemmatized = lemmatized,
                             has_function_words = has_function_words,
                             all_function_words = all_function_words,
-                            length = length
+                            length = length,
+                            project=self.project
                         )
 
                     sequence_dict[key] = sequence
