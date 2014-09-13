@@ -47,8 +47,9 @@
 <script charset="utf-8">
     // pass some variables from flask to JS
     var ws_static_path = "{{ url_for('.static', filename='wordseer_app') }}";
+    var ws_project_path = "/projects/";
     var project_id = {{ project_id }};
-    var ws_api_path = "/";
+    var ws_api_path = "";
 </script>
 <script type='text/javascript' src='{{ url_for('wordseer.static',
     filename='wordseer_app/util.js')}}'></script>
