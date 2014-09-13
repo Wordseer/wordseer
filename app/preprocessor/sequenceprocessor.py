@@ -100,7 +100,7 @@ class SequenceProcessor(object):
                             has_function_words = has_function_words,
                             all_function_words = all_function_words,
                             length = length,
-                            project=self.project
+                            project=self.project,
                             words = words
                         )
                         sequence.save(False)
