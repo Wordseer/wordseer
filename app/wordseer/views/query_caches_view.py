@@ -33,11 +33,12 @@ class QueryCachesView(MethodView):
 
     def put(self, id):
         pass
-        
+
 
 register_rest_view(
     QueryCachesView,
     wordseer,
     'query_caches_view',
     'query_cache',
+    parents=["project"]
 )
