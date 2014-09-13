@@ -1,0 +1,15 @@
+<article>
+<year>2008</year>
+<title>Talc: using desktop graffiti to fight software vulnerability</title>
+<author>Sankarpandian, Kandha</author>
+<author>Little, Travis</author>
+<author>Edwards, W. Keith</author>
+<keyword>graffiti</keyword>
+<keyword>home users</keyword>
+<keyword>internet security</keyword>
+<keyword>patch management</keyword>
+<keyword>security framework</keyword>
+<keyword>software vulnerabilities</keyword>
+<keyword>usable security</keyword>
+<abstract>With the proliferation of computer security threats on the Internet, especially threats such as worms that automatically exploit software flaws, it is becoming more and more important that home users keep their computers secure from known software vulnerabilities. Unfortunately, keeping software up-to-date is notoriously difficult for home users. This paper introduces TALC, a system to encourage and help home users patch vulnerable software. TALC increases home users' awareness of software vulnerabilities and their motivation to patch their software; it does so by detecting unpatched software and then drawing graffiti on their computer's background wallpaper image to denote potential vulnerabilities. Users can "clean up" the graffiti by applying necessary patches, which TALC makes possible by assisting in the software patching process</abstract>
+<article>

@@ -1,0 +1,14 @@
+<article>
+<year>2003</year>
+<title>GAZE-2: conveying eye contact in group video conferencing using eye-controlled camera direction</title>
+<author>Vertegaal, Roel</author>
+<author>Weevers, Ivo</author>
+<author>Sohn, Changuk</author>
+<author>Cheung, Chris</author>
+<keyword>attentive user interfaces</keyword>
+<keyword>eye contact</keyword>
+<keyword>eye tracking</keyword>
+<keyword>gaze</keyword>
+<keyword>multiparty video conferencing</keyword>
+<abstract>GAZE-2 is a novel group video conferencing system that uses eye-controlled camera direction to ensure parallax-free transmission of eye contact. To convey eye contact, GAZE-2 employs a video tunnel that allows placement of cameras behind participant images on the screen. To avoid parallax, GAZE-2 automatically directs the cameras in this video tunnel using an eye tracker, selecting a single camera closest to where the user is looking for broadcast. Images of users are displayed in a virtual meeting room, and rotated towards the participant each user looks at. This way, eye contact can be conveyed to any number of users with only a single video stream per user. We empirically evaluated whether eye contact perception is affected by automated camera direction, which causes angular shifts in the transmitted images. Findings suggest camera shifts do not affect eye contact perception, and are not considered highly distractive.</abstract>
+<article>

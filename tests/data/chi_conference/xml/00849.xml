@@ -1,0 +1,14 @@
+<article>
+<year>2011</year>
+<title>SandCanvas: a multi-touch art medium inspired by sand animation</title>
+<author>Kazi, Rubaiat Habib</author>
+<author>Chua, Kien Chuan</author>
+<author>Zhao, Shengdong</author>
+<author>Davis, Richard</author>
+<author>Low, Kok-Lim</author>
+<keyword>creativity</keyword>
+<keyword>multi-touch art</keyword>
+<keyword>sand animation</keyword>
+<keyword>table-top computing</keyword>
+<abstract>Sand animation is a performance art technique in which an artist tells stories by creating animated images with sand. Inspired by this medium, we have developed a new multi-touch digital artistic medium named SandCanvas</i> that simplifies the creation of sand animations. SandCanvas</i> also goes beyond traditional sand animation with tools for mixing sand animation with video and replicating recorded free-form hand gestures. In this paper, we analyze common sand animation hand gestures, present SandCanvas</i>'s intuitive UI, and describe implementation challenges we encountered. We also present an evaluation with professional and novice artists that shows the importance and unique affordances of this new medium.</abstract>
+<article>

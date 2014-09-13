@@ -1,0 +1,12 @@
+<article>
+<year>2006</year>
+<title>Using hybrid networks for the analysis of online software development communities</title>
+<author>Medynskiy, Yevgeniy "Eugene"</author>
+<author>Ducheneaut, Nicolas</author>
+<author>Farahat, Ayman</author>
+<keyword>natural language processing</keyword>
+<keyword>online communities</keyword>
+<keyword>social networks</keyword>
+<keyword>visualization</keyword>
+<abstract>Social network-based systems usually suffer from two major limitations: they tend to rely on a single data source (e.g. email traffic), and the form of network patterns is often privileged over their content. To go beyond these limitations we describe a system we developed to visualize and navigate hybrid networks constructed from multiple data sources - with a direct link between formal representations and the raw content. We illustrate the benefits of our approach by analyzing patterns of collaboration in a large Open Source project, using hybrid networks to uncover important roles that would otherwise have been missed.</abstract>
+<article>
