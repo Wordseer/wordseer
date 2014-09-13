@@ -108,7 +108,8 @@ class StringProcessor(object):
                                 "for: %s", str(key))
                         except(NoResultFound):
                             relationship = GrammaticalRelationship(
-                                name = grammatical_relationship)
+                                name = grammatical_relationship,
+                                project=self.project)
 
                         relationships[key] = relationship
 
