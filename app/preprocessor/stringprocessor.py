@@ -100,14 +100,16 @@ class StringProcessor(object):
                         try:
                             #FIXME: project specific
                             relationship = GrammaticalRelationship.query.\
-                                filter_by(name = grammatical_relationship).\
+                                filter_by(name=grammatical_relationship,
+                                project=self.project).\
                                 one()
                         except(MultipleResultsFound):
                             project_logger.error("duplicate records found "
                                 "for: %s", str(key))
                         except(NoResultFound):
                             relationship = GrammaticalRelationship(
-                                name = grammatical_relationship)
+                                name = grammatical_relationship,
+                                project=self.project)
 
                         relationships[key] = relationship
 
