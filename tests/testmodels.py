@@ -70,8 +70,8 @@ class TestSentenceModel(unittest.TestCase):
 
         assert sentence.text == text
 
-        word_1 = Word(word="hello")
-        word_2 = Word(word="world")
+        word_1 = Word(lemma="hello")
+        word_2 = Word(lemma="world")
 
         sentence.words.append(word_1)
         sentence.words.append(word_2)
@@ -103,7 +103,7 @@ class TestSentenceModel(unittest.TestCase):
         """
 
         sentence = Sentence(text="foo")
-        word = Word(word="foo")
+        word = Word(lemma="foo")
         project = Project()
 
         project.save()
@@ -125,7 +125,7 @@ class TestSentenceModel(unittest.TestCase):
         """
 
         sentence = Sentence(text="foo")
-        word = Word(word="foo")
+        word = Word(lemma="foo")
         dependency = Dependency(governor=word)
         project = Project()
 
@@ -219,7 +219,7 @@ class TestUnitModels(unittest.TestCase):
         assert unit.number == number
 
         sentence = Sentence()
-        sentence.words = [Word(word="hello"), Word(word="world")]
+        sentence.words = [Word(lemma="hello"), Word(lemma="world")]
         prop = Property(name="title", value="Hello World")
 
         unit.sentences.append(sentence)
