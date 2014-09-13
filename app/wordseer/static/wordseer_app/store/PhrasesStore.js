@@ -8,7 +8,7 @@ Ext.define('WordSeer.store.PhrasesStore', {
 		type: 'ajax',
 		noCache: false,
 		timeout: 9000000,
-		url: ws_api_path + 'projects/' + project_id + '/sequences',
+		url: ws_api_path + ws_project_path + project_id + '/sequences',
 		reader: {
 			type: 'json',
 			root: 'results'
@@ -17,7 +17,7 @@ Ext.define('WordSeer.store.PhrasesStore', {
 			instance: getInstance(),
 			length: 2,
 			has_function_words: 0
-		}
+		},
 	},
 	filters: [{property:'lemmatized', value:0}]
 });

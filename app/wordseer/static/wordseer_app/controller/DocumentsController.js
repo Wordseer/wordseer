@@ -26,7 +26,7 @@ Ext.define('WordSeer.controller.DocumentsController', {
 	init: function() {
 //		console.log('Document controller initialized');
 		Ext.Ajax.request({
-			url: ws_api_path + 'projects/' + project_id + '/properties',
+			url: ws_project_path + project_id + '/properties/',
 			method:'GET',
 			disableCaching: false,
 			params:{
@@ -35,7 +35,8 @@ Ext.define('WordSeer.controller.DocumentsController', {
 			},
 			scope:this,
 			success:function(response){
-				var data = Ext.decode(response.responseText);
+				var resp = Ext.decode(response.responseText);
+				var data = resp.results;
 				var newFields = [
 					{name: 'has_text', type: 'boolean', default: false},
 					'units',

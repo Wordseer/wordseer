@@ -10,15 +10,14 @@ Ext.define("WordSeer.store.MetadataTreeStore", {
 	proxy: {
 		type: 'ajax',
 		noCache: false,
-		url: ws_api_path + 'projects/' + project_id + '/properties',
+		url: ws_project_path + project_id + '/meta_properties',
 		extraParams: {
-			instance: getInstance(),
 			user: getUsername(),
 			onlyMetadata: true,
 		},
 		reader: {
 			type:'json',
-			root: 'children',
+			root: 'results',
 		},
 	},
 	sorters: [{property:'text', direction:'ASC'}],

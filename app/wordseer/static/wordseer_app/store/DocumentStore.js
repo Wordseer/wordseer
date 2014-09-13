@@ -4,12 +4,15 @@
 	proxy: {
 		type:'ajax',
 		noCache: false,
-		reader: 'json',
-		url: ws_api_path + 'projects/' + project_id + '/documents/',
+		url: ws_api_path + ws_project_path + project_id + '/documents/',
+		reader: {
+			type: 'json',
+			root: 'results',
+		},
 		extraParams: {
 			instance:getInstance(),
 	        user:getUsername(),
 	        include_text: false,
-	    }
+	    },
 	},
 })
