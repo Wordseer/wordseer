@@ -54,7 +54,7 @@ class Project(db.Model, Base):
 
         return documents
 
-    def frequent_sequences(self, position, length, limit, lemmatized = False):
+    def frequent_sequences(self, length, limit, lemmatized = False):
         """Return the most frequently occurring sequences with the given
         parameters.
 
@@ -78,7 +78,7 @@ class Project(db.Model, Base):
                 INNER JOIN sequence_count
                 ON sequence.id = sequence_count.sequence_id
                 INNER JOIN count ON sequence_count.id = count.id
-            WHERE sequence_in_sentence.position = {position} AND
+            WHERE
                 sequence.length = {length} AND
                 sequence.lemmatized = {lemmatized} AND
                 count.project_id = {project_id}
@@ -86,14 +86,13 @@ class Project(db.Model, Base):
             ORDER BY count.sentence_count DESC
             LIMIT {limit}
         """.format(
-            position = position,
             length = length,
             lemmatized = int(lemmatized),
             project_id = self.id,
             limit = limit
         )).fetchall()
 
-    def frequent_words(self, part_of_speech, position, limit):
+    def frequent_words(self, part_of_speech, limit):
         """Return the most frequently occurring words with the given parameters.
 
         This query is similar to the one above; see above for explanation.
@@ -110,14 +109,13 @@ class Project(db.Model, Base):
                 INNER JOIN word_count
                 ON word.id = word_count.word_id
                 INNER JOIN count ON word_count.id = count.id
-            WHERE word_in_sentence.position = {position} AND
+            WHERE
                 word.part_of_speech LIKE '{part_of_speech}%' AND
                 count.project_id = {project_id}
             GROUP BY word.id
             ORDER BY count.sentence_count DESC
             LIMIT {limit}
         """.format(
-            position = position,
             part_of_speech = part_of_speech,
             project_id = self.id,
             limit = limit
@@ -140,4 +138,3 @@ class Project(db.Model, Base):
         """
         return Log.query.filter(Log.project == self).\
             filter(Log.type == "info").all()
-

@@ -13,7 +13,7 @@ class WordsView(MethodView):
     def get(self, **kwargs):
         params = dict(kwargs, **request.args)
         keys = params.keys()
-        
+
         if "project_id" in keys:
 
             project = Project.query.get(params["project_id"])
@@ -21,7 +21,7 @@ class WordsView(MethodView):
             position = params["start"][0]
             limit = params["limit"][0]
 
-            words = project.frequent_words(part_of_speech, position, limit)
+            words = project.frequent_words(part_of_speech, limit)
 
             results = []
 
@@ -42,7 +42,7 @@ class WordsView(MethodView):
 
     def put(self, id):
         pass
-        
+
 register_rest_view(
     WordsView,
     wordseer,

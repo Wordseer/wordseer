@@ -14,7 +14,7 @@ class SequencesView(MethodView):
         params = dict(kwargs, **request.args)
         keys = params.keys()
 
-        if "project_id" in keys: 
+        if "project_id" in keys:
             project = Project.query.get(params["project_id"])
             position = int(params["start"][0])
             length = int(params["length"][0])
@@ -22,7 +22,7 @@ class SequencesView(MethodView):
 
             results = []
 
-            sequences = project.frequent_sequences(position, length, limit)
+            sequences = project.frequent_sequences(length, limit)
 
             for sequence in sequences:
                 results.append({
@@ -40,7 +40,7 @@ class SequencesView(MethodView):
 
     def put(self, id):
         pass
-        
+
 
 register_rest_view(
     SequencesView,
