@@ -42,6 +42,9 @@ class Sequence(db.Model, Base):
     words = association_proxy("word_in_sequence", "word",
         creator=lambda word: WordInSequence(word=word))
 
+    # Indices
+    __table_args__ = (db.Index("ix_sequence_length_lemmatized", "length", "lemmatized"),)
+
     # Scoped Pseudo-relationships
 
     @property
@@ -57,12 +60,12 @@ class Sequence(db.Model, Base):
     def get_counts(self, project=None):
 
         # project argument assigned active_project if not present
-        if project == None: project = Project.active_project
+        if project == None:
+            project = Project.active_project
 
-        return SequenceCount.find_or_create(
-            sequence_id = self.id,
-            project_id = project.id,
-        )
+        return SequenceCount.fast_find_or_initialize(
+            "sequence_id = %s and project_id = %s" % (self.id, project.id),
+            sequence_id = self.id, project_id = project.id)
 
     def add_word(self, word, project=None, force=True):
         """Add a word to this sequence within the scope of the project
@@ -77,8 +80,9 @@ class Sequence(db.Model, Base):
             project = project
         )
         word_in_sequence.save(force=force)
-        
+
         return word_in_sequence
 
     def __repr__(self):
         return "<Sequence {0}>".format(self.sequence)
+

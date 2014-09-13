@@ -49,9 +49,13 @@ class CollectionProcessor(object):
 
         Base.commit_on_save = False
 
-	    # Set up database if necessary
+	# Set up database if necessary
         if start_from_scratch is True:
             database.reset()
+
+        self.project.status = Project.STATUS_PREPROCESSING
+        self.project.save()
+
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
         if not "true" in logger.get(self.project,
@@ -68,18 +72,6 @@ class CollectionProcessor(object):
                     "finished_grammatical_processing").lower()):
             self.project_logger.info("Parsing documents")
             self.parse_documents()
-
-        # Calculate word TFIDFs
-        if not "true" in logger.get(self.project, "tfidf_done").lower():
-            self.project_logger.info("Calculating TF IDF's")
-            # TODO: implement tfidf method in document
-
-        # Calculate word-to-word-similarities
-        if (app.config["WORD_TO_WORD_SIMILARITY"] and not
-                "true" in logger.get(self.project,
-                    "word_similarity_calculations_done")):
-            self.project_logger.info("Calculating Lin Similarities")
-            # TODO: implement similarities
 
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):
@@ -186,7 +178,7 @@ class CollectionProcessor(object):
 
             documents_parsed += 1
 
-        counter.count(self.project)
+        counter.count_all(self.project)
 
 def cp_run(collection_dir, structure_file, extension, project_id):
     """Run the collection processor.

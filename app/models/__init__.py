@@ -15,6 +15,7 @@ from .sets import *
 from .structurefile import StructureFile
 from .unit import Unit
 from .word import Word
+from .counts import *
 
 from .association_objects import *
 from .association_tables import *

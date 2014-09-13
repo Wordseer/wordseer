@@ -17,12 +17,12 @@ class WordInSentence(db.Model, Base):
         surface (str): The ``Word`` with exact capitalization.
     """
 
-    word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
+    word_id = db.Column(db.Integer, db.ForeignKey("word.id"), index=True)
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
-    position = db.Column(db.Integer)
+    position = db.Column(db.Integer, index=True)
     space_before = db.Column(db.String)
-    part_of_speech = db.Column(db.String)
+    part_of_speech = db.Column(db.String, index=True)
     surface = db.Column(db.String)
 
     sentence = db.relationship("Sentence",
@@ -43,11 +43,11 @@ class SequenceInSentence(db.Model, Base):
             ``sentence``.
     """
 
-    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
+    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"), index=True)
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
-    position = db.Column(db.Integer)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
+    position = db.Column(db.Integer, index=True)
 
     sequence = db.relationship("Sequence",
         backref=db.backref(
