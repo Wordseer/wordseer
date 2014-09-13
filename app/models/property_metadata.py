@@ -13,8 +13,7 @@ class PropertyMetadata(db.Model, Base):
 
     Attributes:
         type (str): The type of these ``Property``\s (string, int, date, etc.)
-        filterable (boolean): If True, then this ``Property`` object should be
-            filterable in the wordseer interface.
+        is_category (boolean): no idea
         display_name (str): The name of the property that this object is
             describing; this is the same as the ``name`` of the
             ``Property`` object described.
@@ -27,4 +26,3 @@ class PropertyMetadata(db.Model, Base):
     is_category = db.Column(db.Boolean)
     display_name = db.Column(db.String)
     display = db.Column(db.Boolean)
-

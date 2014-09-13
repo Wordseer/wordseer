@@ -54,21 +54,28 @@ class PropertiesView(MethodView):
                         sentences.extend(document.all_sentences)
 
                     for sentence in sentences:
-                        properties.extend(sentence.properties)
-
+                            properties.extend(sentence.properties)
             else:
                 properties = project.get_documents()[0].properties
 
             result = []
+
             for prop in properties:
+                dt = prop.data_type
+                if dt == None:
+                    dt = "string"
+
                 result.append({
+                    "count": 0,
+                    "document_count": 0,
+                    "leaf": True,
                     "propertyName": prop.name,
-                    "nameToDisplay":  prop.name,
-                    "valueIsDisplayed": prop.value,
-                    "type": prop.data_type
+                    "text": prop.value,
+                    "value": prop.value,
                 })
 
-            return jsonify(result = result)
+            return jsonify(results = result)
+
 
         elif "property_id" in kwargs.keys():
             pass
@@ -84,12 +91,65 @@ class PropertiesView(MethodView):
 
     def put(self, id):
         pass
-        
+
+class PropertiesMetaView(MethodView):
+
+    def get(self, **kwargs):
+
+        params = dict(kwargs, **request.args)
+
+        if "project_id" in kwargs.keys():
+            project = Project.query.get(kwargs["project_id"])
+
+            if not project:
+                # TODO: real error response
+                print("Project not found")
+
+            # TODO: this sucks but PropertyMetadata is not being populated by
+            # the preprocessor so this is the only alternative
+            property_meta = { i.name: i.data_type for i in Property.query.all() }
+
+            result = []
+
+            for prop in property_meta.keys():
+                ctype = property_meta[prop]
+                if ctype == None:
+                    ctype = "string"
+                result.append({
+                    "propertyName": prop,
+                    "text":  prop,
+                    "type": ctype
+                })
+
+            return jsonify(results = result)
+
+        elif "property_id" in kwargs.keys():
+            pass
+
+        else:
+            return
+
+    def post(self):
+        pass
+
+    def delete(self, id):
+        pass
+
+    def put(self, id):
+        pass
 
 register_rest_view(
     PropertiesView,
     wordseer,
     'properties_view',
     'property',
+    parents=["project", "document", "sentence"],
+)
+
+register_rest_view(
+    PropertiesMetaView,
+    wordseer,
+    'properties_meta_view',
+    'meta_property',
     parents=["project", "document", "sentence"],
 )
