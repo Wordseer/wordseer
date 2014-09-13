@@ -11,7 +11,7 @@ Ext.define('WordSeer.store.PhraseSetListStore', {
     model: 'WordSeer.model.PhraseSetModel',
     proxy: {
       type: 'ajax',
-      url: ws_api_path + 'sets/',
+      url: ws_project_path + project_id +  '/sets/',
       extraParams:{
          type:'listflat',
          collectiontype:'phrase',

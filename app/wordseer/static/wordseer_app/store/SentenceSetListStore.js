@@ -7,7 +7,7 @@
     storeId: 'SentenceSetListStore',
     proxy: {
       type: 'ajax',
-      url: ws_api_path + 'sets/',
+      url: ws_project_path + project_id +  '/sets/',
       extraParams:{
          type:'listflat',
          collectiontype:'sentence',
