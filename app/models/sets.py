@@ -3,6 +3,7 @@
 
 from app import db
 from .base import Base
+from .project import Project
 
 class Set(db.Model, Base):
     """This is the basic ``Set`` class.
@@ -130,4 +131,3 @@ class DocumentSet(Set):
         """
 
         return self.documents
-

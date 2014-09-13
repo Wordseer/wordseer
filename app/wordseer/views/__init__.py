@@ -6,4 +6,5 @@ __all__ = [
     "documents_view",
     "query_caches_view",
     "sentences_view",
+    "sets",
 ]
