@@ -1,85 +1,104 @@
 {
-	structureName:"document",
-	xpaths:["article"],
-	titleXpaths:["./title/text()"],
-	units:[
-		{
-			belongsTo: "document",
-			structureName: "sentence",
-			xpaths: ['./abstract/text()']
-		}
-	],
-	metadata:[
-		{
-			belongsTo:"document",
-			propertyName:"Author",
-			xpaths:["./author/text()"],
-			valueIsDisplayed:true,
-			nameIsDisplayed:true,
-			type:"string",
-			displayName:"Author",
-			isCategory: true,
-		},
-		{
-			belongsTo:"document",
-			propertyName:"Title",
-			xpaths:["./title/text()"],
-			valueIsDisplayed:true,
-			nameIsDisplayed:true,
-			type:"string",
-			displayName:"Title",
-			isCategory: true,
-		},
-		{
-			belongsTo:"document",
-			propertyName:"Year",
-			xpaths:["./year/text()"],
-			valueIsDisplayed:true,
-			nameIsDisplayed:true,
-			type:"date_%Y",
-			displayName:"Year",
-			isCategory: true,
-		},
-		{
-			belongsTo:"document",
-			propertyName:"Keyword",
-			xpaths:["./keyword/text()"],
-			valueIsDisplayed:true,
-			nameIsDisplayed:true,
-			type:"string",
-			displayName:"Keyword",
-			isCategory: true,
-		},
-		{
-			belongsTo:"document",
-			propertyName:"GeneralTerm",
-			xpaths:["./general_term/text()"],
-			valueIsDisplayed:true,
-			nameIsDisplayed:true,
-			type:"string",
-			displayName:"GeneralTerm",
-			isCategory: true,
-		},
-		{
-			belongsTo:"document",
-			propertyName:"Category",
-			xpaths:["./category/text()"],
-			valueIsDisplayed:true,
-			nameIsDisplayed:true,
-			type:"string",
-			displayName:"Category",
-			isCategory: true,
-		},
-		{
-			belongsTo:"document",
-			propertyName:"Conference",
-			xpaths:["./conference/text()"],
-			valueIsDisplayed:true,
-			nameIsDisplayed:true,
-			type:"string",
-			displayName:"Conference",
-			isCategory: true,
-		}
-
-	]
+    "structureName": "document",
+    "xpaths": [
+        "article"
+    ],
+    "titleXpaths": [
+        "./title/text()"
+    ],
+    "units": [
+        {
+            "belongsTo": "document",
+            "structureName": "sentence",
+            "xpaths": [
+                "./abstract/text()"
+            ]
+        }
+    ],
+    "metadata": [
+        {
+            "belongsTo": "document",
+            "propertyName": "Author",
+            "xpaths": [
+                "./author/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "string",
+            "displayName": "Author",
+            "isCategory": true
+        },
+        {
+            "belongsTo": "document",
+            "propertyName": "Title",
+            "xpaths": [
+                "./title/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "string",
+            "displayName": "Title",
+            "isCategory": true
+        },
+        {
+            "belongsTo": "document",
+            "propertyName": "Year",
+            "xpaths": [
+                "./year/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "date_%Y",
+            "displayName": "Year",
+            "isCategory": true
+        },
+        {
+            "belongsTo": "document",
+            "propertyName": "Keyword",
+            "xpaths": [
+                "./keyword/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "string",
+            "displayName": "Keyword",
+            "isCategory": true
+        },
+        {
+            "belongsTo": "document",
+            "propertyName": "GeneralTerm",
+            "xpaths": [
+                "./general_term/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "string",
+            "displayName": "GeneralTerm",
+            "isCategory": true
+        },
+        {
+            "belongsTo": "document",
+            "propertyName": "Category",
+            "xpaths": [
+                "./category/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "string",
+            "displayName": "Category",
+            "isCategory": true
+        },
+        {
+            "belongsTo": "document",
+            "propertyName": "Conference",
+            "xpaths": [
+                "./conference/text()"
+            ],
+            "valueIsDisplayed": true,
+            "nameIsDisplayed": true,
+            "type": "string",
+            "displayName": "Conference",
+            "isCategory": true
+        }
+    ]
 }
