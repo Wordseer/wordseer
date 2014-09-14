@@ -1,3 +1,6 @@
+.select {
+    width: 50px;
+}
 .emph {
     font-size: 1.5em;
 }
@@ -22,11 +25,13 @@
 table {
     width: 100%;
 }
-td {
+
+table.buttons td {
     width: 100%;
 }
+
 td.fitted, th.fitted {
-    width: 1%;
+    width: 1% !important;
     white-space: nowrap;
 }
 

@@ -116,6 +116,58 @@ non-functional. #}
     {% endfor %}
 {%- endmacro %}
 
+{% macro selection_table(choices, type, table_class, heading, link_dest) %}
+    {# Print a list of documents or projects, with the ability to select
+    and links to the page of each element.
+
+    This is a two-column table, with the first column being checkboxes and
+    headed by a link to select every checkbox.
+
+    Args:
+        choices: The list of choices, as from a MultiCheckboxField.
+        type: Either "document" or "project", which changes how the link is
+            created.
+        table_class: The class to use for the table.
+        heading: The heading for the second column.
+        link_dest: The first argument to pass to url_for.
+    #}
+
+    <table class="{{ table_class }}">
+        <thead>
+            <tr>
+                <th class="select">
+                    Select (<a href="#" class="check-all">All</a>)
+                </th>
+                <th>
+                    {{ heading }}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for choice in choices %}
+                <tr class="{%if 'document' in type and '.json' in choice.label.text%}json-entry{% else %}xml-entry{%endif %}" >
+                    <td>
+                        {{ choice }}
+                    </td>
+                    <td>
+                        <label for="{{ choice.id }}">
+                            {% if "project" in type %}
+                                <a href="{{ url_for(link_dest,
+                                    project_id=choice.data, **kwargs) }}">
+                            {% elif "document" in type %}
+                                <a href="{{ url_for(link_dest,
+                                    document_file_id=choice.data, **kwargs) }}">
+                            {% endif %}
+                                {{ choice.label.text }}
+                            </a>
+                        </label>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
 {% macro show_logs(logs, div_class) %}
     {# Print a list of errors. #}
     {% if logs %}
