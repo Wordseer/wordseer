@@ -132,40 +132,6 @@ non-functional. #}
         link_dest: The first argument to pass to url_for.
     #}
 
-    <table class="{{ table_class }}">
-        <thead>
-            <tr>
-                <th class="select">
-                    Select (<a href="#" class="check-all">All</a>)
-                </th>
-                <th>
-                    {{ heading }}
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for choice in choices %}
-                <tr class="{%if 'document' in type and '.json' in choice.label.text%}json-entry{% else %}xml-entry{%endif %}" >
-                    <td>
-                        {{ choice }}
-                    </td>
-                    <td>
-                        <label for="{{ choice.id }}">
-                            {% if "project" in type %}
-                                <a href="{{ url_for(link_dest,
-                                    project_id=choice.data, **kwargs) }}">
-                            {% elif "document" in type %}
-                                <a href="{{ url_for(link_dest,
-                                    document_file_id=choice.data, **kwargs) }}">
-                            {% endif %}
-                                {{ choice.label.text }}
-                            </a>
-                        </label>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 {% endmacro %}
 
 {% macro show_logs(logs, div_class) %}

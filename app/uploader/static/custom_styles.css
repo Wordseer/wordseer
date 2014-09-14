@@ -1,7 +1,6 @@
-.select {
-    width: 50px;
+.emph {
+    font-size: 1.5em;
 }
-
 .btn-file {
     position: relative;
     overflow: hidden;
@@ -20,6 +19,17 @@
     cursor: inherit;
     display: block;
 }
+table {
+    width: 100%;
+}
+td {
+    width: 100%;
+}
+td.fitted, th.fitted {
+    width: 1%;
+    white-space: nowrap;
+}
+
 input[readonly] {
     background-color: white !important;
     cursor: text !important;
