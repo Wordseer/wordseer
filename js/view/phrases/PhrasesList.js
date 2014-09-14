@@ -8,11 +8,9 @@ Ext.define('WordSeer.view.phrases.PhrasesList', {
 	requires: [
 		'WordSeer.store.PhrasesStore',
 	],
-	title: 'Phrases',
 	has_function_words: false,
 	length: 2,
-	width: 300,
-	height: 250,
+	width: "100%",
 	options: [
 		{
 
@@ -36,19 +34,6 @@ Ext.define('WordSeer.view.phrases.PhrasesList', {
 				]
 			},
 			listeners: [{event: 'change'}],
-		},
-		{
-			label: 'Distinctive first',
-			option: {
-				tag: 'span',
-				cls: 'checkbox checked',
-				action: 'order-by-diffprop',
-			},
-			listeners: [
-				{
-					event: 'click',
-				}
-			]
 		}
 	],
 	columns: [
@@ -87,6 +72,18 @@ Ext.define('WordSeer.view.phrases.PhrasesList', {
 					html: record.get(field)+''
 				};
 			}
+		},
+		{
+			field: 'diffprop_sentences',
+			headerCls: 'frequent-word-count',
+			headerTitle: 'Distinctiveness',
+			renderer: function(record, field) {
+				var count = record.get(field);
+				var svg = '<svg class="lollipop" data-score="'+ count
+					+'"></svg>';
+				return {tag: 'td', cls:'frequent-word-count distinct', html:svg};
+			},
+			sortDirection: "DESC"
 		}
 	],
 	initComponent: function() {

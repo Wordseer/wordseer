@@ -646,7 +646,7 @@ Derived Components: FrequentWordsList
 }
 
 div.frequent-words-list {
-	@include data-table(350, 380, $databox-options-height);
+	@include data-table(350, 360, $databox-options-height);
 	float: left;
     font-family: "Open Sans", sans-serif;
 }

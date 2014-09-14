@@ -171,6 +171,7 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 			.selectAll('.distinct .lollipop')
 			.datum(function(){ return this.dataset; });
 
+		// console.log(svg[0]);
 		var maxscore = d3.max(svg.data(), function(d){
 			return +d.score;
 		});
@@ -189,11 +190,13 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 
 		svg.append('line')
 			.attr('x1', scale(0))
-			.attr('x2', function(d){ return scale(d.score); })
+			.attr('x2', function(d){
+				// console.log("append line");
+				return scale(d.score); })
 			.attr('y1', 8)
 			.attr('y2', 8)
-			.attr('stroke', '#000')
+			// .attr('stroke', '#000')
 			.attr('stroke-width', 1);
-
+		// debugger;
 	}
 });

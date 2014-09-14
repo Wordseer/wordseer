@@ -723,7 +723,7 @@ div.frequent-words-list table.table tbody {
   overflow: auto;
   display: block;
   height: 350;
-  width: 380;
+  width: 360;
 }
 /* line 642, new-ui.scss */
 div.frequent-words-list table.table thead > tr {
