@@ -115,9 +115,11 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 				button: button_el,
 				floatParent: panel,
 				itemId: 'frequent-words-overlay',
+				title: "Frequent Words",
 				width: 380,
 				height: 560,
 				layout: 'accordion',
+				draggable: true,
 				items: [
 					Ext.create("Ext.panel.Panel", {
 						title: 'Nouns',

@@ -583,7 +583,7 @@ div.overlay {
 		text-transform: uppercase;
 		position: absolute;
 		top: $space_2;
-		left: $space_2;
+		left: $space_2 + $nav-button-size;
 	}
 
     div.x-accordion-layout-ct {
