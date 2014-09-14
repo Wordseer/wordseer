@@ -111,13 +111,12 @@ class TestSentenceModel(unittest.TestCase):
         word.save()
 
         rel = sentence.add_word(word, position=4, space_before=" ",
-            part_of_speech="ADF", project=project)
+            project=project)
 
         assert rel.word == word
         assert rel.sentence == sentence
         assert rel.position == 4
         assert rel.space_before == " "
-        assert rel.part_of_speech == "ADF"
         assert rel.project == project
 
     def test_add_dependency(self):

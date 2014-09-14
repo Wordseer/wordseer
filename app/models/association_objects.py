@@ -13,7 +13,6 @@ class WordInSentence(db.Model, Base):
         sentence (Sentence): The ``Sentence`` in this relationship.
         position (int): The position of ``word`` in ``sentence``.
         space_before (str): The space before ``word`` (if any).
-        part_of_speech (str): The part of speech of ``word``.
         surface (str): The ``Word`` with exact capitalization.
     """
 
@@ -22,7 +21,6 @@ class WordInSentence(db.Model, Base):
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
     position = db.Column(db.Integer, index=True)
     space_before = db.Column(db.String)
-    part_of_speech = db.Column(db.String, index=True)
     surface = db.Column(db.String)
 
     sentence = db.relationship("Sentence",

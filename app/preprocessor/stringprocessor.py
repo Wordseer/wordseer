@@ -114,11 +114,15 @@ class StringProcessor(object):
 
                     # Read the data for the governor, and find the
                     # corresponding word
-                    governor = Word.query.filter_by(lemma = governor_lemma).\
+                    governor = Word.query.filter_by(lemma=governor_lemma,
+                            surface=governor.lower(),
+                            part_of_speech=governor_pos).\
                         first()
 
                     # Same as above for the dependent in the relationship
-                    dependent = Word.query.filter_by(lemma = dependent_lemma).\
+                    dependent = Word.query.filter_by(lemma = dependent_lemma,
+                            surface=dependent.lower(),
+                            part_of_speech=dependent_pos).\
                         first()
 
                     try:
@@ -346,26 +350,30 @@ def tokenize_from_raw(parsed_text, txt, project):
             except IndexError:
                 pass
 
-            if lemma in words:
-                word = words[lemma]
+            key = (surface.lower(), part_of_speech, lemma)
+
+            if key in words:
+                word = words[key]
 
             else:
                 try:
-                    word = Word.query.filter_by(lemma=lemma).one()
+                    word = Word.query.filter_by(lemma=lemma,
+                        surface=surface.lower(),
+                        part_of_speech=part_of_speech).one()
                 except(MultipleResultsFound):
                     project_logger.warning("Duplicate records found for: %s",
                         str(key))
                 except(NoResultFound):
-                    word = Word(lemma=lemma)
-                    # print("New word " + str(word))
+                    word = Word(lemma=lemma,
+                        surface=surface.lower(),
+                        part_of_speech=part_of_speech)
 
-                words[lemma] = word
+                words[key] = word
 
             sentence.add_word(
                 word = word,
                 position = position,
-                space_before = space_before, # word["space_before"],
-                part_of_speech = part_of_speech,
+                space_before = space_before,
                 surface=surface,
                 project = project,
                 force=False

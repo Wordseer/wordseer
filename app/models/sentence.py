@@ -67,7 +67,7 @@ class Sentence(db.Model, Base):
         return "<Sentence: " + str(self.text) + ">"
 
     def add_word(self, word, position=None, space_before="",
-        part_of_speech="", surface=None, project=None, force=True):
+        surface=None, project=None, force=True):
         """Add a word to the sentence by explicitly creating the association
         object.
 
@@ -78,7 +78,6 @@ class Sentence(db.Model, Base):
             position (int): The position (0-indexed) of ``word`` in this
                 ``Sentence``.
             space_before (str): The space before ``word``, if any.
-            part_of_speech (str): The part of speech of ``word``.
             project (Project): The ``Project`` that scopes this relationship
 
         Returns:
@@ -96,7 +95,6 @@ class Sentence(db.Model, Base):
             sentence=self,
             position=position,
             space_before=space_before,
-            part_of_speech=part_of_speech,
         )
 
         word_in_sentence.save(force=force)

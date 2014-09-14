@@ -36,6 +36,8 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
 
     id = db.Column(db.Integer, primary_key=True, index=True)
     lemma = db.Column(db.String, index=True)
+    surface = db.Column(db.String)
+    part_of_speech = db.Column(db.String)
 
     # Scoped Pseudo-relationships
 
