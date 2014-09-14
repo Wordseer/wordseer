@@ -255,8 +255,8 @@ class TestDocumentViews(unittest.TestCase):
         self.document1.properties.append(self.prop2)
 
         # create words, sentences, units and associate with document
-        self.word1 = models.word.Word(word="hello")
-        self.word2 = models.word.Word(word="world")
+        self.word1 = models.word.Word(lemma="hello")
+        self.word2 = models.word.Word(lemma="world")
         self.sent1 = models.sentence.Sentence()
         self.sent1.words.append(self.word1)
         self.sent1.words.append(self.word2)

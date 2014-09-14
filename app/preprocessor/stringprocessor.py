@@ -98,7 +98,6 @@ class StringProcessor(object):
                     else:
 
                         try:
-                            #FIXME: project specific
                             relationship = GrammaticalRelationship.query.\
                                 filter_by(name=grammatical_relationship,
                                 project=self.project).\
