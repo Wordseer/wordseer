@@ -1,0 +1,15 @@
+<article>
+<year>2010</year>
+<title>The life and times of files and information: a study of desktop provenance</title>
+<author>Jensen, Carlos</author>
+<author>Lonsdale, Heather</author>
+<author>Wynn, Eleanor</author>
+<author>Cao, Jill</author>
+<author>Slater, Michael</author>
+<author>Dietterich, Thomas G.</author>
+<keyword>desktop search</keyword>
+<keyword>documents</keyword>
+<keyword>file organization</keyword>
+<keyword>provenance</keyword>
+<abstract>In the field of Human-Computer Interaction, provenance refers to the history and genealogy of a document or file. Provenance helps us to understand the evolution and relationships of files; how and when different versions of a document were created, or how different documents in a collection build on each other through copy-paste events. Though methods for tracking provenance and the subsequent use of this meta-data have been proposed and developed into tools, there have been no studies documenting the types and frequency of provenance events in typical computer use. This is knowledge essential for the design of efficient query methods and information displays. We conducted a longitudinal study of knowledge workers at Intel Corporation tracking provenance events in their computer use. We also interviewed knowledge workers to determine the effectiveness of provenance cues for document recall. Our data shows that provenance relationships are common, and provenance cues aid recall.</abstract>
+<article>

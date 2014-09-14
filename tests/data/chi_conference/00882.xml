@@ -1,0 +1,15 @@
+<article>
+<year>2011</year>
+<title>FingerGlass: efficient multiscale interaction on multitouch screens</title>
+<author>K\"{a}ser, Dominik P.</author>
+<author>Agrawala, Maneesh</author>
+<author>Pauly, Mark</author>
+<keyword>bimanual</keyword>
+<keyword>fat finger problem</keyword>
+<keyword>multiscale interaction</keyword>
+<keyword>navigation</keyword>
+<keyword>object translation</keyword>
+<keyword>precise selection</keyword>
+<keyword>touch screens</keyword>
+<abstract>Many tasks in graphical user interfaces require users to interact with elements at various levels of precision. We present FingerGlass, a bimanual technique designed to improve the precision of graphical tasks on multitouch screens. It enables users to quickly navigate to different locations and across multiple scales of a scene using a single hand. The other hand can simultaneously interact with objects in the scene. Unlike traditional pan-zoom interfaces, FingerGlass retains contextual information during the interaction. We evaluated our technique in the context of precise object selection and translation and found that FingerGlass significantly outperforms three state-of-the-art baseline techniques in both objective and subjective measurements: users acquired and translated targets more than 50\% faster than with the second-best technique in our experiment.</abstract>
+<article>

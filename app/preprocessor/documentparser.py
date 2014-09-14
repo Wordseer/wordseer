@@ -63,8 +63,6 @@ class DocumentParser(object):
                     self.project_logger.info("Average parse speed after %s "
                         "sentences: %s seconds per sentence", str(count),
                         str(average_time / count))
-
-                    # products = []
                     relationships = dict()
                     dependencies = dict()
                     sequences = dict()

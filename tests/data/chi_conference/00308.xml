@@ -1,0 +1,15 @@
+<article>
+<year>2010</year>
+<title>Dynamic query interface for spatial proximity query with degree-of-interest varied by distance to query point</title>
+<author>Cho, Myoungsu</author>
+<author>Kim, Bohyoung</author>
+<author>Jeong, Dong Kyun</author>
+<author>Shin, Yeong-Gil</author>
+<author>Seo, Jinwook</author>
+<keyword>degree-of-interest</keyword>
+<keyword>dynamic query interface</keyword>
+<keyword>spatial proximity query</keyword>
+<keyword>tab interface</keyword>
+<keyword>visual information seeking</keyword>
+<abstract>In this paper we present an interactive query interface called "TrapezoidBox" to support spatial proximity queries where users' degree of interest varies depending upon the degree of separation from the point of interest. Spatial proximity queries are commonly built in information seeking tasks especially on online maps. If not impossible, it is hard to formulate spatial proximity queries using existing dynamic query widgets such as range sliders. TrapezoidBox allows users to easily build spatial proximity queries by interactively adjusting a trapezoidal function. Our controlled user study results show that TrapezoidBox has several advantages over a baseline interface with range sliders.</abstract>
+<article>

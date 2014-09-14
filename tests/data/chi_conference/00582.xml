@@ -1,0 +1,14 @@
+<article>
+<year>2006</year>
+<title>Effects of display position and control space orientation on user preference and performance</title>
+<author>Wigdor, Daniel</author>
+<author>Shen, Chia</author>
+<author>Forlines, Clifton</author>
+<author>Balakrishnan, Ravin</author>
+<keyword>display position</keyword>
+<keyword>input control space orientation</keyword>
+<keyword>input-output mappings</keyword>
+<keyword>performance</keyword>
+<keyword>spatial transformation</keyword>
+<abstract>In many environments, it is often the case that input is made to displays that are positioned non-traditionally relative to one or more users. This typically requires users to perform interaction tasks under transformed input-display spatial mappings, and the literature is unclear as to how such transformations affect performance. We present two experiments that explore the impact of display space position and input control space orientation on user's subjective preference and objective performance in a docking task. Our results provide guidelines as to optimal display placement and control orientation in collaborative computing environments with one or more shared displays.</abstract>
+<article>

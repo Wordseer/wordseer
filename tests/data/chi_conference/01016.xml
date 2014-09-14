@@ -1,0 +1,14 @@
+<article>
+<year>2011</year>
+<title>Interaction with magic lenses: real-world validation of a Fitts' Law model</title>
+<author>Rohs, Michael</author>
+<author>Oulasvirta, Antti</author>
+<author>Suomalainen, Tiia</author>
+<keyword>Fitt's Law</keyword>
+<keyword>augmented reality</keyword>
+<keyword>field experiment</keyword>
+<keyword>human-performance modeling</keyword>
+<keyword>magic lens pointing</keyword>
+<keyword>target acquisition</keyword>
+<abstract>Rohs and Oulasvirta (2008) proposed a two-component Fitts' law model for target acquisition with magic lenses in mobile augmented reality (AR) with 1) a physical pointing phase, in which the target can be directly observed on the background surface, and 2) a virtual pointing phase, in which the target can only be observed through the device display. The model provides a good fit (R<sup>2</sup>=0.88) with laboratory data, but it is not known if it generalizes to real-world AR tasks. In the present outdoor study, subjects (N=12) did building-selection tasks in an urban area. The differences in task characteristics to the laboratory study are drastic: targets are three-dimensional and they vary in shape, size, z-distance, and visual context. Nevertheless, the model yielded an R<sup>2</sup> of 0.80, and when using effective target width an R<sup>2</sup> of 0.88 was achieved.</abstract>
+<article>

@@ -1,0 +1,11 @@
+<article>
+<year>2006</year>
+<title>Searching in audio: the utility of transcripts, dichotic presentation, and time-compression</title>
+<author>Ranjan, Abhishek</author>
+<author>Balakrishnan, Ravin</author>
+<author>Chignell, Mark</author>
+<keyword>audio time-compression</keyword>
+<keyword>dichotic listening</keyword>
+<keyword>transcripts</keyword>
+<abstract>Searching audio data can potentially be facilitated by the use of automatic speech recognition (ASR) technology to generate text transcripts which can then be easily queried. However, since current ASR technology cannot reliably generate 100\% accurate transcripts, additional techniques for fluid browsing and searching of the audio itself are required. We explore the impact of transcripts of various qualities, dichotic presentation, and time-compression on an audio search task. Results show that dichotic presentation and reasonably accurate transcripts can assist in the search process, but suggest that time-compression and low accuracy transcripts should be used carefully.</abstract>
+<article>

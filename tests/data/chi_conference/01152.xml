@@ -1,0 +1,16 @@
+<article>
+<year>2002</year>
+<title>Separating the swarm: categorization methods for user sessions on the web</title>
+<author>Heer, Jeffrey</author>
+<author>Chi, Ed H.</author>
+<keyword>World Wide Web</keyword>
+<keyword>classification</keyword>
+<keyword>clustering</keyword>
+<keyword>data mining</keyword>
+<keyword>user categorization</keyword>
+<keyword>user patterns</keyword>
+<keyword>user profile</keyword>
+<keyword>user study</keyword>
+<keyword>web mining</keyword>
+<abstract>Understanding user behaviors on Web sites enables site owners to make sites more usable, ultimately helping users to achieve their goals more quickly. Accordingly, researchers have devised methods for categorizing user sessions in hopes of revealing user interests. These techniques build user profiles by combining users' navigation paths with other data features, such as page viewing time, hyperlink structure, and page content. Previously, we have presented complex techniques of combining many of these data features to cluster user profiles. In this paper, we introduce a user study and a systematic evaluation of these different data features and their associated weighting schemes. We present the results of our study, including accuracy measures for a number of clustering approaches, and offer recommendations for Web analysts. While further investigation over more sites is needed to definitively settle on a robust scheme, we have characterized this analytic space</abstract>
+<article>

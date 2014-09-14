@@ -1,0 +1,14 @@
+<article>
+<year>2002</year>
+<title>Specifying preferences based on user history</title>
+<author>Terveen, Loren</author>
+<author>McMackin, Jessica</author>
+<author>Amento, Brian</author>
+<author>Hill, Will</author>
+<keyword>collaborative filtering</keyword>
+<keyword>history</keyword>
+<keyword>mobile devices</keyword>
+<keyword>reuse</keyword>
+<keyword>visualization</keyword>
+<abstract>Many applications require users to specify preferences. We support users in this task by letting them define preferences relative to their personal history or that of other users. We implement this idea using a graphical technique called control shadows, which we have implemented on both a desktop computer and on a cell phone with a small, grayscale display. An empirical study compared user performance on the graphical interface and a text table interface with identical functionality. On the desktop, users completed their tasks more quickly and effectively and strongly preferred the graphical interface. On the cell phone, there was no significant difference between the graphical and table interfaces. Finally, personal history proved useful in specifying preferences, but history of other users was not helpful</abstract>
+<article>

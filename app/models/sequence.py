@@ -36,9 +36,11 @@ class Sequence(db.Model, Base):
     has_function_words = db.Column(db.Boolean, index=True)
     all_function_words = db.Column(db.Boolean, index=True)
     length = db.Column(db.Integer, index=True)
-
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
+    
     # Relationships
 
+    project = db.relationship("Project")
     words = association_proxy("word_in_sequence", "word",
         creator=lambda word: WordInSequence(word=word))
 
