@@ -28,6 +28,7 @@ CORENLP_LOCAL_NAME = "stanford-corenlp"
 PREFERENCES_PATH = "./preferences.json"
 FULL_INSTALL_TYPE = "full"
 PARTIAL_INSTALL_TYPE = "partial"
+VENV_DIR = sys.prefix
 
 CORENLP_LOCAL_PATH = os.path.join(CORENLP_LOCAL_DIR, CORENLP_LOCAL_NAME)
 CORENLP_ZIP_DIRECTORY = os.path.splitext(os.path.basename(CORENLP))[0]
@@ -142,7 +143,7 @@ def install_interactively():
         set_install_type(PARTIAL_INSTALL_TYPE)
 
     setup_database()
-
+    write_startup_scripts()
     sys.exit(0)
 
 def make_virtualenv(sudo_install=False):
@@ -158,8 +159,8 @@ def make_virtualenv(sudo_install=False):
         if sudo_install:
             system = sys.platform
             print "Installing virtualenv."
-            if "win" in system:
-                subprocess.call("pip2.7 install virtualenv", shell=True)
+            if "win32" in system:
+                subprocess.call("pip install virtualenv", shell=True)
             else:
                 subprocess.call("sudo pip2.7 install virtualenv", shell=True)
         else:
@@ -168,18 +169,36 @@ def make_virtualenv(sudo_install=False):
     else:
         print "Virtualenv already installed."
         try:
-            subprocess.call(["virtualenv"])
+            subprocess.call("virtualenv", shell=True)
         except OSError:
             #TODO: this is not multiplatform
             pip_output = subprocess.check_output("pip install virtualenv", shell=True)
             path = pip_output.split("\n")[0].split()[-1]
             os.environ["PATH"] += ":" + os.path.join(path, "../../../bin")
-    
-    subprocess.call(["virtualenv", "--python=python2.7", venv_name])
-    venv_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
+    #Initiate VENV
+    subprocess_output =  subprocess.call("virtualenv --python=python2.7 " + venv_name, shell=True)
+    if subprocess_output != '0':    
+        subprocess_output =  subprocess.call("virtualenv " + venv_name, shell=True)
+    #CLEAR VENV
+    subprocess_output =  subprocess.call("virtualenv --python=python2.7 --clear " + venv_name, shell=True)
+    if subprocess_output != '0':    
+        subprocess_output =  subprocess.call("virtualenv --clear " + venv_name, shell=True)    
+    #VENV_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
+    global VENV_DIR
+    VENV_DIR= os.path.join(os.path.dirname(os.path.realpath(__file__)), venv_name)
+    print VENV_DIR
     #TODO: this is unix-specific
-    os.environ["PATH"] = (os.path.join(ROOT_DIRECTORY, venv_name, "bin") + ":" +
-        os.environ["PATH"])
+    add_to_path(os.path.join(VENV_DIR, "bin"))
+    add_to_path(os.path.join(VENV_DIR, "Scripts"))
+    
+    #clone python.exe to venv root (required by winpexpect)
+    if "win32" in sys.platform:
+        #clone_command = 'copy '+os.path.join(venv_dir,venv_name,'Scripts', 'python.exe ') + os.path.join(venv_dir, venv_name,'.')
+        #print clone_command
+        shutil.copyfile(os.path.join(VENV_DIR,'Scripts', 'python.exe '), os.path.join(VENV_DIR, 'python.exe '))
+        #subprocess.call(clone_command)
+        
+
 
 def install_python_packages(reqs=REQUIREMENTS_FULL, full=True):
     """Install the required python modules.
@@ -245,8 +264,13 @@ def pip_is_installed():
             version, ``True`` otherwise.
     """
     try:
-        pip_version = subprocess.check_output(["pip2.7", "-V"])
+        pip_version = subprocess.check_output("pip -V", shell=True)
+        print pip_version
     except OSError:
+        print OSError
+        return False
+    except subprocess.CalledProcessError:
+        print subprocess.CalledProcessError
         return False
 
     return True
@@ -273,8 +297,10 @@ def install_pip(sudo):
     """
     pip_name = "get-pip.py"
     #TODO: windows-specific
-    possible_paths = [os.path.join(sys.prefix + "/bin"),
-        "/usr/local/bin"]
+    
+    possible_paths = [os.path.join(sys.prefix, 'bin'),
+        "/usr/local/bin",
+        os.path.join(sys.prefix, 'Scripts')]
 
     # Stop if it's installed
     if pip_is_installed():
@@ -282,10 +308,11 @@ def install_pip(sudo):
         return
 
     # If it's not installed, see if we can install it
-    if sudo:
+    if sudo and not 'win32' in sys.platform:
         print "Attempting to install pip."
         download_file(PIP, pip_name)
         subprocess.call("sudo python2.7 get-pip.py", shell=True)
+    
     else:
         print "Pip not installed or not accessible, not set to install."
 
@@ -293,16 +320,36 @@ def install_pip(sudo):
     if not pip_is_installed():
         print "Pip not in PATH, attempting to find."
         for possible_path in possible_paths:
-            if "pip" in os.listdir(possible_path):
-                print "Found pip in " + possible_path + ", adding to PATH."
-                os.environ["PATH"] = possible_path + ":" + os.environ["PATH"]
-
+            try:
+                print "Looking for pip in %s" % possible_path
+                if "pip" in os.listdir(possible_path) or 'pip.exe' in os.listdir(possible_path):
+                    print "Found pip in " + possible_path + ", adding to PATH."
+                    add_to_path(possible_path)
+            except OSError:
+                # print OSError
+                continue
     if pip_is_installed():
         print "Pip installed successfully."
     else:
         print "Pip install failed. Quitting."
         sys.exit(1)
-
+def add_to_path(new_path):
+    path_sep = ':'
+    if 'win32' in sys.platform:
+        path_sep = ';'
+    os.environ["PATH"] = new_path + path_sep + os.environ["PATH"]
+def write_startup_scripts():
+    print "tyring to write startup"
+    if "win32" in sys.platform:
+        print "Writing startup file"
+        f = open('start_windows.bat', 'w')
+        print VENV_DIR, sys.prefix
+        if VENV_DIR!= sys.prefix:
+            python_path = os.path.join(VENV_DIR,"Scripts","python.exe")
+        else:
+            python_path = os.path.join(VENV_DIR, "python.exe")
+        f.write(python_path+' wordseer.py\n')
+        f.close()
 def main():
     """Perform the installation process.
     """
@@ -340,11 +387,15 @@ def main():
     else:
         install_python_packages(REQUIREMENTS_MIN, False)
         set_install_type(PARTIAL_INSTALL_TYPE)
-
+    
+    
     setup_database()
+    write_startup_scripts()
+    
 
 def check_package_exists(package):
     packages = subprocess.check_output("pip2.7 freeze", shell=True)
+    print packages
     if not package in packages:
         print "%s does not exist" % package
         return False
