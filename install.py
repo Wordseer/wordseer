@@ -101,7 +101,7 @@ def install_prerequisites(sudo):
 
     elif "darwin" in system:
         print "Mac detected. Installing lxml from binary."
-        subprocess.call(["easy_install bin/macosx/lxml-3.4.0-py2.7-macosx-10.9-intel.egg"], shell=True)
+        subprocess.call(["easy_install bin/macosx/lxml-3.3.6-py2.7-macosx-10.9-intel.egg"], shell=True)
 
     else:
         print "Not installing prerequisites."
