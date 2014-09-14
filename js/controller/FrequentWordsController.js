@@ -115,8 +115,8 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 				button: button_el,
 				floatParent: panel,
 				itemId: 'frequent-words-overlay',
-				width: 420,
-				height: 600,
+				width: 380,
+				height: 560,
 				layout: 'accordion',
 				items: [
 					Ext.create("Ext.panel.Panel", {
@@ -171,11 +171,14 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 			.selectAll('.distinct .lollipop')
 			.datum(function(){ return this.dataset; });
 
-		console.log(svg);
-		var r = 5;
+		var maxscore = d3.max(svg.data(), function(d){
+			return +d.score;
+		});
+
+		var r = 4;
 		var scale = d3.scale.linear()
-			.domain([0,1])
-			.range([r, 125-r]);
+			.domain([0, maxscore])
+			.range([r, 100-r]);
 
 		svg.append('circle')
 			.attr('cx', function(d){

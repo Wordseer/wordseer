@@ -88,9 +88,9 @@ Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
 			headerTitle: 'Distinctiveness',
 			renderer: function(record, field) {
 				var count = record.get(field);
-				var svg = '<svg class="lollipop" data-score="'+ (1 - 1 / count)
+				var svg = '<svg class="lollipop" data-score="'+ count
 					+'"></svg>';
-				return {tag: 'td', cls:'frequent-word-count distinct', html:count};
+				return {tag: 'td', cls:'frequent-word-count distinct', html:svg};
 			},
 			sortDirection: "DESC"
 		}

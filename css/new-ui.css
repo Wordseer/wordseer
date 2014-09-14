@@ -7,13 +7,13 @@ Colors
 /*******************************************************************************
 Fonts
 *******************************************************************************/
-/* line 58, new-ui.scss */
+/* line 59, new-ui.scss */
 body {
   font-family: Helvetica, Arial, sans-serif !important;
   font-size: 10px;
 }
 
-/* line 62, new-ui.scss */
+/* line 63, new-ui.scss */
 .background {
   background-color: #526b84;
 }
@@ -21,18 +21,18 @@ body {
 /*******************************************************************************
 Buttons
 *******************************************************************************/
-/* line 75, new-ui.scss */
+/* line 76, new-ui.scss */
 .button, .action-button-see-more, .action-button-save, .action-button-save-picture, .action-button-toggle-expand, .action-button-toggle-contract, span.nav-button-move, span.nav-button-save, span.nav-button-close, span.nav-button-back, span.nav-button-forward, span.nav-button-pinned, span.switch-button {
   width: 21px;
   height: 21px;
   display: inline-block;
 }
-/* line 79, new-ui.scss */
+/* line 80, new-ui.scss */
 .button:hover, .action-button-see-more:hover, .action-button-save:hover, .action-button-save-picture:hover, .action-button-toggle-expand:hover, .action-button-toggle-contract:hover, span.nav-button-move:hover, span.nav-button-save:hover, span.nav-button-close:hover, span.nav-button-back:hover, span.nav-button-forward:hover, span.nav-button-pinned:hover, span.switch-button:hover {
   cursor: pointer;
 }
 
-/* line 85, new-ui.scss */
+/* line 86, new-ui.scss */
 .action-button-see-more {
   position: relative;
   top: 5px;
@@ -40,12 +40,12 @@ Buttons
   background-image: url("icons/action-button-see-more.png");
   background-repeat: no-repeat;
 }
-/* line 94, new-ui.scss */
+/* line 95, new-ui.scss */
 .action-button-see-more:hover {
   cursor: pointer;
 }
 
-/* line 85, new-ui.scss */
+/* line 86, new-ui.scss */
 .action-button-save {
   position: relative;
   top: 5px;
@@ -53,12 +53,12 @@ Buttons
   background-image: url("icons/action-button-save.png");
   background-repeat: no-repeat;
 }
-/* line 94, new-ui.scss */
+/* line 95, new-ui.scss */
 .action-button-save:hover {
   cursor: pointer;
 }
 
-/* line 85, new-ui.scss */
+/* line 86, new-ui.scss */
 .action-button-save-picture {
   position: relative;
   top: 5px;
@@ -66,12 +66,12 @@ Buttons
   background-image: url("icons/action-button-save-picture.png");
   background-repeat: no-repeat;
 }
-/* line 94, new-ui.scss */
+/* line 95, new-ui.scss */
 .action-button-save-picture:hover {
   cursor: pointer;
 }
 
-/* line 85, new-ui.scss */
+/* line 86, new-ui.scss */
 .action-button-toggle-expand {
   position: relative;
   top: 5px;
@@ -79,12 +79,12 @@ Buttons
   background-image: url("icons/action-button-toggle-expand.png");
   background-repeat: no-repeat;
 }
-/* line 94, new-ui.scss */
+/* line 95, new-ui.scss */
 .action-button-toggle-expand:hover {
   cursor: pointer;
 }
 
-/* line 85, new-ui.scss */
+/* line 86, new-ui.scss */
 .action-button-toggle-contract {
   position: relative;
   top: 5px;
@@ -92,7 +92,7 @@ Buttons
   background-image: url("icons/action-button-toggle-contract.png");
   background-repeat: no-repeat;
 }
-/* line 94, new-ui.scss */
+/* line 95, new-ui.scss */
 .action-button-toggle-contract:hover {
   cursor: pointer;
 }
@@ -100,7 +100,7 @@ Buttons
 /*******************************************************************************
 Base components: Data Box
 *******************************************************************************/
-/* line 110, new-ui.scss */
+/* line 111, new-ui.scss */
 div.databox, ul.multitable, div.range-facet {
   padding: 0;
   background-color: white;
@@ -108,7 +108,7 @@ div.databox, ul.multitable, div.range-facet {
   margin-bottom: 7.68px;
 }
 
-/* line 117, new-ui.scss */
+/* line 118, new-ui.scss */
 div.databox-header {
   display: block;
   width: 100%;
@@ -117,7 +117,7 @@ div.databox-header {
   z-index: 1000;
 }
 
-/* line 125, new-ui.scss */
+/* line 126, new-ui.scss */
 h2.databox-header {
   display: inline-block;
   font-family: "Bitter", serif;
@@ -134,44 +134,44 @@ h2.databox-header {
 /*******************************************************************************
 Base components: Options Data Box
 *******************************************************************************/
-/* line 147, new-ui.scss */
+/* line 148, new-ui.scss */
 div.databox-options {
   display: block;
   top: 32px;
   font-size: 10px;
 }
-/* line 150, new-ui.scss */
+/* line 151, new-ui.scss */
 div.databox-options span.databox-option {
   margin-right: 7.68px;
 }
-/* line 152, new-ui.scss */
+/* line 153, new-ui.scss */
 div.databox-options span.databox-option span.databox-option-label {
   margin-right: 4.8px;
 }
-/* line 155, new-ui.scss */
+/* line 156, new-ui.scss */
 div.databox-options span.databox-option span.button, div.databox-options span.databox-option span.action-button-see-more, div.databox-options span.databox-option span.action-button-save, div.databox-options span.databox-option span.action-button-save-picture, div.databox-options span.databox-option span.action-button-toggle-expand, div.databox-options span.databox-option span.action-button-toggle-contract, div.databox-options span.databox-option span.nav-button-move, div.databox-options span.databox-option span.nav-button-save, div.databox-options span.databox-option span.nav-button-close, div.databox-options span.databox-option span.nav-button-back, div.databox-options span.databox-option span.nav-button-forward, div.databox-options span.databox-option span.nav-button-pinned, div.databox-options span.databox-option span.switch-button {
   padding: 4.8px;
   cursor: pointer;
   width: auto;
 }
-/* line 159, new-ui.scss */
+/* line 160, new-ui.scss */
 div.databox-options span.databox-option span.button:hover, div.databox-options span.databox-option span.action-button-see-more:hover, div.databox-options span.databox-option span.action-button-save:hover, div.databox-options span.databox-option span.action-button-save-picture:hover, div.databox-options span.databox-option span.action-button-toggle-expand:hover, div.databox-options span.databox-option span.action-button-toggle-contract:hover, div.databox-options span.databox-option span.nav-button-move:hover, div.databox-options span.databox-option span.nav-button-save:hover, div.databox-options span.databox-option span.nav-button-close:hover, div.databox-options span.databox-option span.nav-button-back:hover, div.databox-options span.databox-option span.nav-button-forward:hover, div.databox-options span.databox-option span.nav-button-pinned:hover, div.databox-options span.databox-option span.switch-button:hover {
   text-decoration: underline;
 }
-/* line 163, new-ui.scss */
+/* line 164, new-ui.scss */
 div.databox-options span.databox-option span.disabled {
   color: #eeeeee;
 }
-/* line 165, new-ui.scss */
+/* line 166, new-ui.scss */
 div.databox-options span.databox-option span.disabled:hover {
   text-decoration: none;
 }
-/* line 170, new-ui.scss */
+/* line 171, new-ui.scss */
 div.databox-options div.databox-body {
   top: 55px;
 }
 
-/* line 175, new-ui.scss */
+/* line 176, new-ui.scss */
 span.checkbox {
   display: inline-block;
   height: 16px;
@@ -180,7 +180,7 @@ span.checkbox {
   top: 3px;
   background-image: url("icons/checkbox.png");
 }
-/* line 182, new-ui.scss */
+/* line 183, new-ui.scss */
 span.checkbox.checked {
   background-image: url("icons/checkbox-checked.png");
 }
@@ -194,26 +194,26 @@ Things with selectable rows: Tables, multitables.
 /*****************
 Tag List
 *******************/
-/* line 231, new-ui.scss */
+/* line 232, new-ui.scss */
 div.overview div.tag-list {
   position: static !important;
   background-color: transparent;
   display: block;
 }
-/* line 225, new-ui.scss */
+/* line 226, new-ui.scss */
 div.overview div.tag-list div.databox-header {
   color: white;
   background-color: transparent;
 }
 
-/* line 236, new-ui.scss */
+/* line 237, new-ui.scss */
 ul.tag-list-body {
   width: 100%;
   list-style-type: none;
   padding-left: 3px;
 }
 
-/* line 244, new-ui.scss */
+/* line 245, new-ui.scss */
 li.tag-list {
   display: inline-block;
   margin: 3px;
@@ -227,12 +227,12 @@ li.tag-list {
   border-radius: 4.8px;
   cursor: pointer;
 }
-/* line 252, new-ui.scss */
+/* line 253, new-ui.scss */
 li.tag-list:hover {
   background-color: #f7d04a;
 }
 
-/* line 257, new-ui.scss */
+/* line 258, new-ui.scss */
 span.tag-list-number {
   padding-left: 3px;
 }
@@ -240,17 +240,17 @@ span.tag-list-number {
 /*****************
 Table
 *******************/
-/* line 268, new-ui.scss */
+/* line 269, new-ui.scss */
 table.table {
   border-collapse: collapse;
   width: 100%;
 }
-/* line 271, new-ui.scss */
+/* line 272, new-ui.scss */
 table.table thead {
   text-align: left;
   font-weight: bold;
 }
-/* line 278, new-ui.scss */
+/* line 279, new-ui.scss */
 table.table thead tr th {
   padding-left: 4.8px;
   padding-right: 4.8px;
@@ -261,49 +261,49 @@ table.table thead tr th {
   font-weight: bold;
   font-size: 9px;
 }
-/* line 285, new-ui.scss */
+/* line 286, new-ui.scss */
 table.table tbody {
   font-size: 12px;
   overflow: scroll;
 }
-/* line 289, new-ui.scss */
+/* line 290, new-ui.scss */
 table.table tbody tr:nth-child(1) td {
   padding-top: 4.8px;
 }
-/* line 293, new-ui.scss */
+/* line 294, new-ui.scss */
 table.table tbody tr {
   cursor: default;
 }
-/* line 198, new-ui.scss */
+/* line 199, new-ui.scss */
 table.table tbody tr.selected {
   background-color: #f7d04a;
 }
-/* line 201, new-ui.scss */
+/* line 202, new-ui.scss */
 table.table tbody tr.selected:hover {
   background-color: #f7d04a;
 }
-/* line 204, new-ui.scss */
+/* line 205, new-ui.scss */
 table.table tbody tr:hover {
   background-color: #eeeeee;
 }
-/* line 295, new-ui.scss */
+/* line 296, new-ui.scss */
 table.table tbody tr.hovered {
   background-color: #eeeeee;
   color: black;
 }
-/* line 299, new-ui.scss */
+/* line 300, new-ui.scss */
 table.table tbody tr td {
   padding-left: 4.8px;
   cursor: default;
   max-width: 350px;
   overflow: auto;
 }
-/* line 302, new-ui.scss */
+/* line 303, new-ui.scss */
 tr.selected table.table tbody tr td {
   color: black;
 }
 
-/* line 314, new-ui.scss */
+/* line 315, new-ui.scss */
 span.table-header-sorter {
   display: inline-block;
   width: 16px;
@@ -312,12 +312,12 @@ span.table-header-sorter {
   top: 7.68px;
   margin-left: 7.68px;
 }
-/* line 322, new-ui.scss */
+/* line 323, new-ui.scss */
 span.table-header-sorter.ascending {
   background-image: url("icons/ascending.png");
   background-repeat: no-repeat;
 }
-/* line 322, new-ui.scss */
+/* line 323, new-ui.scss */
 span.table-header-sorter.descending {
   background-image: url("icons/descending.png");
   background-repeat: no-repeat;
@@ -326,12 +326,12 @@ span.table-header-sorter.descending {
 /*
 For jquery.resizableColumns.js
 */
-/* line 334, new-ui.scss */
+/* line 335, new-ui.scss */
 .rc-handle-container {
   position: relative;
 }
 
-/* line 338, new-ui.scss */
+/* line 339, new-ui.scss */
 .rc-handle {
   position: absolute;
   width: 7px;
@@ -339,16 +339,16 @@ For jquery.resizableColumns.js
   margin-left: -3px;
   z-index: 2;
 }
-/* line 344, new-ui.scss */
+/* line 345, new-ui.scss */
 .rc-handle:hover {
   border-left: 1px dotted #1d3040;
 }
 
-/* line 349, new-ui.scss */
+/* line 350, new-ui.scss */
 table.rc-table-resizing {
   cursor: ew-resize;
 }
-/* line 352, new-ui.scss */
+/* line 353, new-ui.scss */
 table.rc-table-resizing thead, table.rc-table-resizing thead > th, table.rc-table-resizing thead > th > a {
   cursor: ew-resize;
 }
@@ -356,13 +356,13 @@ table.rc-table-resizing thead, table.rc-table-resizing thead > th, table.rc-tabl
 /*******************************************************************************
 Base components: Layout panel
 *******************************************************************************/
-/* line 379, new-ui.scss */
+/* line 380, new-ui.scss */
 div.panel {
   position: absolute;
   margin: 4.8px;
   padding: 3px;
 }
-/* line 383, new-ui.scss */
+/* line 384, new-ui.scss */
 div.panel div.panel-render-target {
   position: absolute;
   top: 126.576px;
@@ -372,22 +372,22 @@ div.panel div.panel-render-target {
   padding: 3px;
   background-color: white;
 }
-/* line 390, new-ui.scss */
+/* line 391, new-ui.scss */
 div.panel div.panel-render-target div.inner {
   max-height: 100%;
   max-width: 100%;
 }
-/* line 396, new-ui.scss */
+/* line 397, new-ui.scss */
 div.panel.active {
   background-color: #f7d04a;
 }
 
-/* line 401, new-ui.scss */
+/* line 402, new-ui.scss */
 div.panelheader {
   height: 51px;
   width: 100%;
 }
-/* line 404, new-ui.scss */
+/* line 405, new-ui.scss */
 div.panelheader span.panel-header-menubutton {
   -webkit-border-radius: 4.8px;
   -moz-border-radius: 4.8px;
@@ -408,23 +408,23 @@ div.panelheader span.panel-header-menubutton {
   background-color: #1d3040;
   color: white;
 }
-/* line 421, new-ui.scss */
+/* line 422, new-ui.scss */
 div.panelheader span.panel-header-menubutton.open {
   background-color: white;
   color: black;
 }
-/* line 425, new-ui.scss */
+/* line 426, new-ui.scss */
 div.panelheader span.panel-header-menubutton:hover {
   background-color: white;
   color: #1d3040;
   cursor: pointer;
 }
-/* line 431, new-ui.scss */
+/* line 432, new-ui.scss */
 div.panelheader select.panel-header-widget-select {
   margin: 9.77136px;
   height: 31.45728px;
 }
-/* line 436, new-ui.scss */
+/* line 437, new-ui.scss */
 div.panelheader div.panel-header-navcontrols {
   float: right;
   clear: right;
@@ -440,7 +440,7 @@ div.panelheader div.panel-header-navcontrols {
   border-top-right-radius: 4.8px;
 }
 
-/* line 447, new-ui.scss */
+/* line 448, new-ui.scss */
 div.breadcrumbs {
   height: 75.576px;
   width: 100%;
@@ -449,7 +449,7 @@ div.breadcrumbs {
   padding-left: 4.8px;
   padding-top: 4.8px;
 }
-/* line 454, new-ui.scss */
+/* line 455, new-ui.scss */
 div.breadcrumbs span.breadcrumb {
   float: left;
   min-height: 66.576px;
@@ -465,20 +465,20 @@ div.breadcrumbs span.breadcrumb {
   min-width: 100px;
   margin-right: 7.68px;
 }
-/* line 464, new-ui.scss */
+/* line 465, new-ui.scss */
 div.breadcrumbs span.breadcrumb span.breadcrumb-contents {
   display: inline-block;
   width: 80%;
   padding-right: 7.68px;
 }
-/* line 468, new-ui.scss */
+/* line 469, new-ui.scss */
 div.breadcrumbs span.breadcrumb span.breadcrumb-contents span.relation, div.breadcrumbs span.breadcrumb span.breadcrumb-contents span.property {
   font-weight: normal;
   width: 100%;
   display: block;
   font-size: 10px;
 }
-/* line 475, new-ui.scss */
+/* line 476, new-ui.scss */
 div.breadcrumbs span.breadcrumb span.breadcrumb-controls {
   float: right;
   clear: right;
@@ -487,7 +487,7 @@ div.breadcrumbs span.breadcrumb span.breadcrumb-controls {
   z-index: 100;
 }
 
-/* line 486, new-ui.scss */
+/* line 487, new-ui.scss */
 span.breadcrumb-close {
   float: right;
   clear: right;
@@ -499,7 +499,7 @@ span.breadcrumb-close {
   background-repeat: no-repeat;
 }
 
-/* line 486, new-ui.scss */
+/* line 487, new-ui.scss */
 span.breadcrumb-toggle-on {
   float: right;
   clear: right;
@@ -511,7 +511,7 @@ span.breadcrumb-toggle-on {
   background-repeat: no-repeat;
 }
 
-/* line 486, new-ui.scss */
+/* line 487, new-ui.scss */
 span.breadcrumb-toggle-off {
   float: right;
   clear: right;
@@ -523,91 +523,91 @@ span.breadcrumb-toggle-off {
   background-repeat: no-repeat;
 }
 
-/* line 501, new-ui.scss */
+/* line 502, new-ui.scss */
 span.nav-button-move {
   float: right;
   margin: 3px;
   background-image: url("icons/nav-button-move.png");
   background-repeat: no-repeat;
 }
-/* line 509, new-ui.scss */
+/* line 510, new-ui.scss */
 span.nav-button-move[enabled=false], span.nav-button-move.disabled {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
   opacity: 0.2;
   cursor: default;
 }
 
-/* line 501, new-ui.scss */
+/* line 502, new-ui.scss */
 span.nav-button-save {
   float: right;
   margin: 3px;
   background-image: url("icons/nav-button-save.png");
   background-repeat: no-repeat;
 }
-/* line 509, new-ui.scss */
+/* line 510, new-ui.scss */
 span.nav-button-save[enabled=false], span.nav-button-save.disabled {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
   opacity: 0.2;
   cursor: default;
 }
 
-/* line 501, new-ui.scss */
+/* line 502, new-ui.scss */
 span.nav-button-close {
   float: right;
   margin: 3px;
   background-image: url("icons/nav-button-close.png");
   background-repeat: no-repeat;
 }
-/* line 509, new-ui.scss */
+/* line 510, new-ui.scss */
 span.nav-button-close[enabled=false], span.nav-button-close.disabled {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
   opacity: 0.2;
   cursor: default;
 }
 
-/* line 501, new-ui.scss */
+/* line 502, new-ui.scss */
 span.nav-button-back {
   float: right;
   margin: 3px;
   background-image: url("icons/nav-button-back.png");
   background-repeat: no-repeat;
 }
-/* line 509, new-ui.scss */
+/* line 510, new-ui.scss */
 span.nav-button-back[enabled=false], span.nav-button-back.disabled {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
   opacity: 0.2;
   cursor: default;
 }
 
-/* line 501, new-ui.scss */
+/* line 502, new-ui.scss */
 span.nav-button-forward {
   float: right;
   margin: 3px;
   background-image: url("icons/nav-button-forward.png");
   background-repeat: no-repeat;
 }
-/* line 509, new-ui.scss */
+/* line 510, new-ui.scss */
 span.nav-button-forward[enabled=false], span.nav-button-forward.disabled {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
   opacity: 0.2;
   cursor: default;
 }
 
-/* line 501, new-ui.scss */
+/* line 502, new-ui.scss */
 span.nav-button-pinned {
   float: right;
   margin: 3px;
   background-image: url("icons/nav-button-pinned.png");
   background-repeat: no-repeat;
 }
-/* line 509, new-ui.scss */
+/* line 510, new-ui.scss */
 span.nav-button-pinned[enabled=false], span.nav-button-pinned.disabled {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
   opacity: 0.2;
   cursor: default;
 }
 
-/* line 523, new-ui.scss */
+/* line 524, new-ui.scss */
 span.switch-button {
   width: 10.8px;
   height: 10.8px;
@@ -617,33 +617,33 @@ span.switch-button {
   background-image: url("icons/switch-button.png");
   background-repeat: no-repeat;
 }
-/* line 534, new-ui.scss */
+/* line 535, new-ui.scss */
 span.switch-button:hover {
   background-image: url("icons/switch-button-hover.png");
   background-repeat: no-repeat;
 }
-/* line 540, new-ui.scss */
+/* line 541, new-ui.scss */
 span.switch-button.invisible {
   display: none;
 }
 
-/* line 545, new-ui.scss */
+/* line 546, new-ui.scss */
 span.word:hover {
   cursor: pointer;
   text-decoration: underline;
 }
 
-/* line 549, new-ui.scss */
+/* line 550, new-ui.scss */
 span.menu-word {
   background-color: #f7d04a;
 }
 
-/* line 552, new-ui.scss */
+/* line 553, new-ui.scss */
 span.word.search {
   background-color: #fffaa5;
 }
 
-/* line 555, new-ui.scss */
+/* line 556, new-ui.scss */
 span.word.match {
   background-color: #FFDAB9;
 }
@@ -651,26 +651,26 @@ span.word.match {
 /*******************************************************************************
 Base Components: Overlay
 *******************************************************************************/
-/* line 563, new-ui.scss */
+/* line 564, new-ui.scss */
 div.overlay {
   padding: 7.68px;
   position: absolute;
   width: 400px;
   background-color: white;
 }
-/* line 568, new-ui.scss */
+/* line 569, new-ui.scss */
 div.overlay div.overlay-render-target {
   width: 100%;
   height: 100%;
 }
-/* line 572, new-ui.scss */
+/* line 573, new-ui.scss */
 div.overlay span.nav-button-pinned, div.overlay span.nav-button-close {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 10000;
 }
-/* line 578, new-ui.scss */
+/* line 579, new-ui.scss */
 div.overlay span.overlay-title {
   font-family: "Bitter";
   font-weight: 300;
@@ -680,33 +680,57 @@ div.overlay span.overlay-title {
   top: 7.68px;
   left: 7.68px;
 }
-/* line 588, new-ui.scss */
+/* line 589, new-ui.scss */
 div.overlay div.x-accordion-layout-ct {
   margin-top: 22px;
+}
+/* line 592, new-ui.scss */
+div.overlay div.x-accordion-layout-ct .x-accordion-item .x-accordion-hd {
+  height: 24px;
+  background-color: #f7d04a;
+  border: none;
+  transition: background-color 0.2s;
+}
+/* line 599, new-ui.scss */
+div.overlay div.x-accordion-layout-ct .x-accordion-item .x-accordion-hd .x-tool {
+  display: none;
+}
+/* line 608, new-ui.scss */
+div.overlay div.x-accordion-layout-ct .x-accordion-item .x-accordion-hd .x-tool img {
+  display: none;
+}
+/* line 613, new-ui.scss */
+div.overlay div.x-accordion-layout-ct .x-accordion-item .x-accordion-hd .x-panel-header-text-container {
+  font-family: "Bitter", serif;
+  font-size: 14px;
+  font-weight: bold;
+}
+/* line 620, new-ui.scss */
+div.overlay div.x-accordion-layout-ct .x-accordion-item.x-collapsed .x-accordion-hd {
+  background-color: #eeeeee;
 }
 
 /*******************************************************************************
 Derived Components: FrequentWordsList
 *******************************************************************************/
-/* line 610, new-ui.scss */
+/* line 648, new-ui.scss */
 div.frequent-words-list {
   float: left;
-  padding: 10px;
   font-family: "Open Sans", sans-serif;
 }
-/* line 598, new-ui.scss */
+/* line 636, new-ui.scss */
 div.frequent-words-list table.table tbody {
   overflow: auto;
   display: block;
   height: 350;
   width: 380;
 }
-/* line 604, new-ui.scss */
+/* line 642, new-ui.scss */
 div.frequent-words-list table.table thead > tr {
   display: block;
 }
 
-/* line 617, new-ui.scss */
+/* line 654, new-ui.scss */
 td.frequent-word-word {
   min-width: 120px;
   max-width: 120px;
@@ -715,23 +739,31 @@ td.frequent-word-word {
   color: #64839f;
 }
 
-/* line 624, new-ui.scss */
+/* line 661, new-ui.scss */
 td.frequent-word-count {
   min-width: 60px;
   padding-right: 7.68px;
 }
-/* line 627, new-ui.scss */
+/* line 664, new-ui.scss */
 td.frequent-word-count svg.lollipop {
-  width: 125px;
+  width: 100px;
   height: 17px;
 }
+/* line 667, new-ui.scss */
+td.frequent-word-count svg.lollipop line {
+  stroke: #ababab;
+}
+/* line 670, new-ui.scss */
+td.frequent-word-count svg.lollipop circle {
+  fill: #ababab;
+}
 
-/* line 633, new-ui.scss */
+/* line 676, new-ui.scss */
 th.frequent-word-word {
   min-width: 120px;
 }
 
-/* line 636, new-ui.scss */
+/* line 679, new-ui.scss */
 th.frequent-word-count {
   min-width: 60px;
   padding-right: 7.68px;
@@ -741,14 +773,14 @@ th.frequent-word-count {
 /*******************************************************************************
 Derived Components: RelatedWordsList
 *******************************************************************************/
-/* line 598, new-ui.scss */
+/* line 636, new-ui.scss */
 div.related-words-list table.table tbody {
   overflow: auto;
   display: block;
   height: 300px;
   width: 220px;
 }
-/* line 604, new-ui.scss */
+/* line 642, new-ui.scss */
 div.related-words-list table.table thead > tr {
   display: block;
 }
@@ -756,52 +788,52 @@ div.related-words-list table.table thead > tr {
 /*******************************************************************************
 Derived Components: Treepanel
 *******************************************************************************/
-/* line 656, new-ui.scss */
+/* line 699, new-ui.scss */
 tr[level='1'] td.content:nth-of-type(1) {
   padding-left: 7.68px;
 }
 
-/* line 656, new-ui.scss */
+/* line 699, new-ui.scss */
 tr[level='2'] td.content:nth-of-type(1) {
   padding-left: 15.36px;
 }
 
-/* line 656, new-ui.scss */
+/* line 699, new-ui.scss */
 tr[level='3'] td.content:nth-of-type(1) {
   padding-left: 23.04px;
 }
 
-/* line 656, new-ui.scss */
+/* line 699, new-ui.scss */
 tr[level='4'] td.content:nth-of-type(1) {
   padding-left: 30.72px;
 }
 
-/* line 656, new-ui.scss */
+/* line 699, new-ui.scss */
 tr[level='5'] td.content:nth-of-type(1) {
   padding-left: 38.4px;
 }
 
-/* line 656, new-ui.scss */
+/* line 699, new-ui.scss */
 tr[level='6'] td.content:nth-of-type(1) {
   padding-left: 46.08px;
 }
 
-/* line 656, new-ui.scss */
+/* line 699, new-ui.scss */
 tr[level='7'] td.content:nth-of-type(1) {
   padding-left: 53.76px;
 }
 
-/* line 656, new-ui.scss */
+/* line 699, new-ui.scss */
 tr[level='8'] td.content:nth-of-type(1) {
   padding-left: 61.44px;
 }
 
-/* line 656, new-ui.scss */
+/* line 699, new-ui.scss */
 tr[level='9'] td.content:nth-of-type(1) {
   padding-left: 69.12px;
 }
 
-/* line 656, new-ui.scss */
+/* line 699, new-ui.scss */
 tr[level='10'] td.content:nth-of-type(1) {
   padding-left: 76.8px;
 }
@@ -809,14 +841,14 @@ tr[level='10'] td.content:nth-of-type(1) {
 /*******************************************************************************
 Derived Components: Set List
 *******************************************************************************/
-/* line 598, new-ui.scss */
+/* line 636, new-ui.scss */
 div.sets-list table.table tbody {
   overflow: auto;
   display: block;
   height: 150px;
   width: 400px;
 }
-/* line 604, new-ui.scss */
+/* line 642, new-ui.scss */
 div.sets-list table.table thead > tr {
   display: block;
 }
@@ -824,30 +856,30 @@ div.sets-list table.table thead > tr {
 /*******************************************************************************
 Base Components: MultiTable
 *******************************************************************************/
-/* line 674, new-ui.scss */
+/* line 717, new-ui.scss */
 ul.multitable {
   margin: 0px;
   padding: 0px;
 }
-/* line 678, new-ui.scss */
+/* line 721, new-ui.scss */
 ul.multitable li {
   list-style-type: none;
 }
-/* line 680, new-ui.scss */
+/* line 723, new-ui.scss */
 ul.multitable li.collapsed ul {
   display: none;
 }
-/* line 683, new-ui.scss */
+/* line 726, new-ui.scss */
 ul.multitable li.expanded ul {
   display: visible;
 }
-/* line 687, new-ui.scss */
+/* line 730, new-ui.scss */
 ul.multitable ul {
   padding-left: 0px;
   max-height: 200px;
   overflow: auto;
 }
-/* line 692, new-ui.scss */
+/* line 735, new-ui.scss */
 ul.multitable li.multitable-header {
   border-bottom: 1px solid #eeeeee;
   cursor: pointer;
@@ -856,31 +888,31 @@ ul.multitable li.multitable-header {
   font-weight: bold;
   font-size: 9px;
 }
-/* line 695, new-ui.scss */
+/* line 738, new-ui.scss */
 ul.multitable span.multitable-row {
   display: block;
 }
-/* line 698, new-ui.scss */
+/* line 741, new-ui.scss */
 ul.multitable span.multitable-cell {
   display: inline-block;
   padding-left: 4.8px;
   padding-right: 4.8px;
 }
-/* line 703, new-ui.scss */
+/* line 746, new-ui.scss */
 ul.multitable li.multitable-level-2 {
   cursor: default;
   padding-top: 4.8px;
   padding-bottom: 4.8px;
 }
-/* line 198, new-ui.scss */
+/* line 199, new-ui.scss */
 ul.multitable li.multitable-level-2.selected {
   background-color: #f7d04a;
 }
-/* line 201, new-ui.scss */
+/* line 202, new-ui.scss */
 ul.multitable li.multitable-level-2.selected:hover {
   background-color: #f7d04a;
 }
-/* line 204, new-ui.scss */
+/* line 205, new-ui.scss */
 ul.multitable li.multitable-level-2:hover {
   background-color: #eeeeee;
 }
@@ -888,24 +920,24 @@ ul.multitable li.multitable-level-2:hover {
 /*******************************************************************************
 Derived Components: Metadata multitable
 *******************************************************************************/
-/* line 729, new-ui.scss */
+/* line 772, new-ui.scss */
 li span.metadata-count {
   max-width: 60px;
   min-width: 60px;
 }
 
-/* line 733, new-ui.scss */
+/* line 776, new-ui.scss */
 li span.metadata-value {
   max-width: 120px;
   min-width: 120px;
 }
-/* line 736, new-ui.scss */
+/* line 779, new-ui.scss */
 li span.metadata-value.multitable-cell, li span.metadata-value.multitable-header-cell {
   color: #64839f;
   font-weight: bold;
 }
 
-/* line 741, new-ui.scss */
+/* line 784, new-ui.scss */
 li span.multitable-level-1 {
   font-weight: bold;
   color: #64839f;
@@ -914,11 +946,11 @@ li span.multitable-level-1 {
   margin-bottom: 12.288px;
   text-transform: capitalize;
 }
-/* line 720, new-ui.scss */
+/* line 763, new-ui.scss */
 li span.multitable-level-1 span.action-button-toggle-expand, li span.multitable-level-1 span.action-button-toggle-contract {
   top: 8px;
 }
-/* line 723, new-ui.scss */
+/* line 766, new-ui.scss */
 li span.multitable-level-1 span.metadata-category {
   padding-left: 4.8px;
   padding-right: 4.8px;
@@ -927,7 +959,7 @@ li span.multitable-level-1 span.metadata-category {
 /*******************************************************************************
 Base Components: Landing Page
 *******************************************************************************/
-/* line 752, new-ui.scss */
+/* line 795, new-ui.scss */
 div.landing-page {
   overflow: scroll;
   background-color: #64839f;
@@ -935,7 +967,7 @@ div.landing-page {
   margin: 4.8px;
   padding: 3px;
 }
-/* line 758, new-ui.scss */
+/* line 801, new-ui.scss */
 div.landing-page div.landingpage-render-target {
   position: absolute;
   top: 109px;
@@ -943,7 +975,7 @@ div.landing-page div.landingpage-render-target {
   right: 3px;
   bottom: 4.8px;
 }
-/* line 765, new-ui.scss */
+/* line 808, new-ui.scss */
 div.landing-page div.main-header {
   height: 109px;
   width: 100%;
@@ -952,7 +984,7 @@ div.landing-page div.main-header {
   color: white;
   font-size: 40;
 }
-/* line 772, new-ui.scss */
+/* line 815, new-ui.scss */
 div.landing-page div.main-header h1 {
   margin: 0px;
 }
@@ -960,7 +992,7 @@ div.landing-page div.main-header h1 {
 /*******************************************************************************
 Base Components: Menu
 *******************************************************************************/
-/* line 783, new-ui.scss */
+/* line 826, new-ui.scss */
 .menu, .autosuggest-menu {
   padding: 1px;
   border: 2px solid #f7d04a;
@@ -968,7 +1000,7 @@ Base Components: Menu
 }
 
 /* creates the larger triangle */
-/* line 790, new-ui.scss */
+/* line 833, new-ui.scss */
 .menu:before, .autosuggest-menu:before {
   top: 10px;
   /* controls vertical position */
@@ -980,7 +1012,7 @@ Base Components: Menu
 }
 
 /* creates the smaller  triangle */
-/* line 799, new-ui.scss */
+/* line 842, new-ui.scss */
 .menu:after, .autosuggest-menu:after {
   top: 16px;
   /* value = (:before top) + (:before border-top) - (:after border-top) */
@@ -991,13 +1023,13 @@ Base Components: Menu
   border-color: transparent #fff;
 }
 
-/* line 807, new-ui.scss */
+/* line 850, new-ui.scss */
 .menuitem, .autosuggest-menuitem {
   cursor: pointer;
   display: block;
   padding: 7.68px;
 }
-/* line 810, new-ui.scss */
+/* line 853, new-ui.scss */
 .menuitem.hovered, .hovered.autosuggest-menuitem {
   background: #f7d04a;
 }
@@ -1005,7 +1037,7 @@ Base Components: Menu
 /*******************************************************************************
 Derived Components: AutoSuggest Menu
 *******************************************************************************/
-/* line 820, new-ui.scss */
+/* line 863, new-ui.scss */
 .autosuggest-menu {
   border: 0px;
   -webkit-box-shadow: 10px, 0px, 5px;
@@ -1016,14 +1048,14 @@ Derived Components: AutoSuggest Menu
 /*******************************************************************************
 Base Components: Overviews
 *******************************************************************************/
-/* line 834, new-ui.scss */
+/* line 877, new-ui.scss */
 div.overview {
   position: static;
   margin: 4.8px;
   padding: 3px;
   margin-right: 50px;
 }
-/* line 839, new-ui.scss */
+/* line 882, new-ui.scss */
 div.overview div.overview-render-target {
   position: absolute;
   top: 100px;
@@ -1031,7 +1063,7 @@ div.overview div.overview-render-target {
   right: 3px;
   bottom: 4.8px;
 }
-/* line 846, new-ui.scss */
+/* line 889, new-ui.scss */
 div.overview div.overview-header {
   height: 109px;
   width: 100%;
@@ -1040,34 +1072,34 @@ div.overview div.overview-header {
   font-weight: 700;
   color: white;
 }
-/* line 854, new-ui.scss */
+/* line 897, new-ui.scss */
 div.overview div.range-facet {
   position: static !important;
   background-color: transparent;
   display: block;
 }
-/* line 225, new-ui.scss */
+/* line 226, new-ui.scss */
 div.overview div.range-facet div.databox-header {
   color: white;
   background-color: transparent;
 }
-/* line 856, new-ui.scss */
+/* line 899, new-ui.scss */
 div.overview div.range-facet .axis text {
   fill: #eeeeee;
 }
-/* line 859, new-ui.scss */
+/* line 902, new-ui.scss */
 div.overview div.range-facet .axis line, div.overview div.range-facet .axis path {
   stroke: #eeeeee;
 }
-/* line 862, new-ui.scss */
+/* line 905, new-ui.scss */
 div.overview div.range-facet .brush rect.extent {
   fill: #000000;
 }
-/* line 865, new-ui.scss */
+/* line 908, new-ui.scss */
 div.overview div.range-facet .background.bar {
   stroke: #eeeeee;
 }
-/* line 868, new-ui.scss */
+/* line 911, new-ui.scss */
 div.overview div.range-facet .title span {
   color: #eeeeee;
 }
@@ -1075,20 +1107,20 @@ div.overview div.range-facet .title span {
 /*******************************************************************************
 Derived Components: Range Facets
 *******************************************************************************/
-/* line 877, new-ui.scss */
+/* line 920, new-ui.scss */
 div.range-facet {
   height: 100px;
 }
-/* line 880, new-ui.scss */
+/* line 923, new-ui.scss */
 div.range-facet.x-box-item {
   position: static !important;
 }
-/* line 883, new-ui.scss */
+/* line 926, new-ui.scss */
 div.range-facet div.chart.collapsed {
   display: none;
 }
 
-/* line 890, new-ui.scss */
+/* line 933, new-ui.scss */
 div.rangefacets div.range-facet div.databox-header {
   font-weight: bold;
   color: #64839f;
@@ -1097,11 +1129,11 @@ div.rangefacets div.range-facet div.databox-header {
   margin-bottom: 12.288px;
   text-transform: capitalize;
 }
-/* line 720, new-ui.scss */
+/* line 763, new-ui.scss */
 div.rangefacets div.range-facet div.databox-header span.action-button-toggle-expand, div.rangefacets div.range-facet div.databox-header span.action-button-toggle-contract {
   top: 8px;
 }
-/* line 723, new-ui.scss */
+/* line 766, new-ui.scss */
 div.rangefacets div.range-facet div.databox-header span.metadata-category {
   padding-left: 4.8px;
   padding-right: 4.8px;
@@ -1110,7 +1142,7 @@ div.rangefacets div.range-facet div.databox-header span.metadata-category {
 /*******************************************************************************
 Base Components: Sentence List Widget
 *******************************************************************************/
-/* line 899, new-ui.scss */
+/* line 942, new-ui.scss */
 div.sentence {
   font-family: "Bitter";
   line-height: 1.5;
@@ -1118,7 +1150,7 @@ div.sentence {
   margin-bottom: 6px;
 }
 
-/* line 906, new-ui.scss */
+/* line 949, new-ui.scss */
 div.metatag {
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
   float: left;
@@ -1127,49 +1159,49 @@ div.metatag {
   border: 1px solid #808080;
   cursor: pointer;
 }
-/* line 913, new-ui.scss */
+/* line 956, new-ui.scss */
 div.metatag span {
   display: table-cell;
   padding: 2px 6px;
   color: #808080;
 }
-/* line 917, new-ui.scss */
+/* line 960, new-ui.scss */
 div.metatag span.key {
   font-weight: 700;
   text-transform: uppercase;
   font-size: 11px;
   border-right: 1px solid #808080;
 }
-/* line 923, new-ui.scss */
+/* line 966, new-ui.scss */
 div.metatag span.value {
   font-size: 12px;
   font-weight: 400;
 }
-/* line 927, new-ui.scss */
+/* line 970, new-ui.scss */
 div.metatag span.dir {
   display: inline;
 }
-/* line 931, new-ui.scss */
+/* line 974, new-ui.scss */
 div.metatag:last-child {
   margin-bottom: 36px;
 }
-/* line 934, new-ui.scss */
+/* line 977, new-ui.scss */
 div.metatag.active {
   background-color: #f7d04a;
 }
-/* line 937, new-ui.scss */
+/* line 980, new-ui.scss */
 div.metatag.sorting {
   background-color: #fff2fe;
 }
-/* line 939, new-ui.scss */
+/* line 982, new-ui.scss */
 div.metatag.sorting.lev0 {
   background-color: #ffd8fc;
 }
-/* line 942, new-ui.scss */
+/* line 985, new-ui.scss */
 div.metatag.sorting.lev1 {
   background-color: #ffe7fd;
 }
-/* line 945, new-ui.scss */
+/* line 988, new-ui.scss */
 div.metatag.sorting.lev2 {
   background-color: #fff2fe;
 }

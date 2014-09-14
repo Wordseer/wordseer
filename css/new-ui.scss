@@ -44,6 +44,7 @@ $darkblue: #1D3040;
 $background-blue: #526b84;
 $background-lightblue: #64839f;
 $pink: #ffd8fc;
+$darkgray: #ababab;
 
 /*******************************************************************************
 Fonts
@@ -587,6 +588,43 @@ div.overlay {
 
     div.x-accordion-layout-ct {
         margin-top: 22px;
+        .x-accordion-item {
+            .x-accordion-hd {
+                height: 24px;
+                background: {
+                    color: $yellow;
+                };
+                border:none;
+                transition: background-color 0.2s;
+                .x-tool {
+                    display: none;
+                    // background: {
+                    //     image: url('icons/action-button-toggle-contract.png');
+                    //     repeat: no-repeat;
+                    //     size: 100%;
+                    // }
+
+
+                    img {
+                        display: none;
+                    }
+                }
+
+                .x-panel-header-text-container {
+                    font-family: "Bitter", serif;
+                    font-size: 14px;
+                    font-weight: bold;
+                }
+            }
+            &.x-collapsed {
+                .x-accordion-hd {
+                    background: {
+                        color: $gray;
+                    }
+                }
+            }
+        }
+
     }
 }
 
@@ -610,7 +648,6 @@ Derived Components: FrequentWordsList
 div.frequent-words-list {
 	@include data-table(350, 380, $databox-options-height);
 	float: left;
-	padding: 10px;
     font-family: "Open Sans", sans-serif;
 }
 
@@ -625,8 +662,14 @@ td.frequent-word-count {
 	min-width: 60px;
 	padding-right: $space_2;
     svg.lollipop {
-        width: 125px;
+        width: 100px;
         height: 17px;
+        line {
+            stroke: $darkgray;
+        }
+        circle {
+            fill: $darkgray;
+        }
     }
 }
 
