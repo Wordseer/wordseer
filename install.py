@@ -169,35 +169,34 @@ def make_virtualenv(sudo_install=False):
     else:
         print "Virtualenv already installed."
         try:
-            subprocess.call("virtualenv", shell=True)
+            subprocess.call("virtualenv")
         except OSError:
             #TODO: this is not multiplatform
             pip_output = subprocess.check_output("pip install virtualenv", shell=True)
             path = pip_output.split("\n")[0].split()[-1]
             os.environ["PATH"] += ":" + os.path.join(path, "../../../bin")
     #Initiate VENV
-    subprocess_output =  subprocess.call("virtualenv --python=python2.7 " + venv_name, shell=True)
-    if subprocess_output != '0':    
+    subprocess_output = subprocess.call("virtualenv --python=python2.7 " + venv_name, shell=True)
+    if int(subprocess_output) != 0:    
         subprocess_output =  subprocess.call("virtualenv " + venv_name, shell=True)
     #CLEAR VENV
-    subprocess_output =  subprocess.call("virtualenv --python=python2.7 --clear " + venv_name, shell=True)
-    if subprocess_output != '0':    
-        subprocess_output =  subprocess.call("virtualenv --clear " + venv_name, shell=True)    
+    #subprocess_output =  subprocess.call("virtualenv --python=python2.7 --clear " + venv_name, shell=True)
+    #if subprocess_output != '0':    
+    #    subprocess_output =  subprocess.call("virtualenv --clear " + venv_name, shell=True)    
     #VENV_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
     global VENV_DIR
     VENV_DIR= os.path.join(os.path.dirname(os.path.realpath(__file__)), venv_name)
-    print VENV_DIR
-    #TODO: this is unix-specific
-    add_to_path(os.path.join(VENV_DIR, "bin"))
-    add_to_path(os.path.join(VENV_DIR, "Scripts"))
+    #print VENV_DIR
     
     #clone python.exe to venv root (required by winpexpect)
     if "win32" in sys.platform:
+        add_to_path(os.path.join(VENV_DIR, "Scripts"))
         #clone_command = 'copy '+os.path.join(venv_dir,venv_name,'Scripts', 'python.exe ') + os.path.join(venv_dir, venv_name,'.')
         #print clone_command
         shutil.copyfile(os.path.join(VENV_DIR,'Scripts', 'python.exe '), os.path.join(VENV_DIR, 'python.exe '))
         #subprocess.call(clone_command)
-        
+    else:
+        add_to_path(os.path.join(VENV_DIR, "bin"))
 
 
 def install_python_packages(reqs=REQUIREMENTS_FULL, full=True):
@@ -395,12 +394,12 @@ def main():
 
 def check_package_exists(package):
     packages = subprocess.check_output("pip2.7 freeze", shell=True)
-    print packages
+#    print packages
     if not package in packages:
-        print "%s does not exist" % package
+#        print "%s does not exist" % package
         return False
     else:
-        print "%s does exists" % package
+#        print "%s does exists" % package
         return True
 
 if __name__ == "__main__":
