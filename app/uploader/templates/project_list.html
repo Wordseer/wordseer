@@ -21,15 +21,42 @@
     {% if process_form.selection.choices %}
         <form method="POST" role="form">
             {{ process_form.hidden_tag() }}
-            {{ macros.selection_table(process_form.selection,
-                "project",
-                "table table-striped table-hover click-anywhere",
-                "Project Name", "uploader.project_show") }}
-            <h3>Selected file actions:</h3>
-            {{ process_form.process_button(class="btn btn-primary",
-                icon="glyphicon-tasks") }}
-            {{ process_form.delete_button(class="btn btn-danger",
-                icon="glyphicon-remove") }}
+            <table class="table table-striped table-hover click-anywhere">
+                <thead>
+                    <tr>
+                        <th class="fitted">
+                        </th>
+                        <th class="emph">
+                            Project Name 
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for choice in process_form.selection %}
+                        <tr>
+                            <td class="fitted">
+                                <a href="{{ url_for("uploader.project_show",
+                                    project_id=choice.data) }}", class="btn btn-primary">
+                                    <span class="glyphicon glyphicon-eye-open"></span>
+                                    Show
+                                </a>
+                            </td>
+                            <td class="emph">
+                                <label for="{{ choice.id }}">
+                                        {{ choice.label.text }}
+                                    </a>
+                                </label>
+                            </td>
+                            <td class="fitted">
+                                <a href="delete" class="btn btn-danger">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             {{ macros.render_errors(process_form.selection.errors) }}
         </form>
     {% else %}
