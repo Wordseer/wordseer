@@ -141,3 +141,25 @@ class ProjectsUsers(db.Model, Base):
     project = db.relationship("Project", backref=db.backref("project_users",
         cascade="all, delete-orphan"))
 
+class SentenceInQuery(db.Model, Base):
+    """Association object for sentences that match queries.
+
+    Attributes:
+        query (Query): The ``Query`` for this set of sentences.
+        sentence (Sentence): The ``Sentence`` in that matches this query
+        matched (bool): Whether this sentence matches the most recent piece
+            of the query.
+        num_matches (int): The total number of query pieces tried so far.
+    """
+    query_id = db.Column(db.Integer, db.ForeignKey("query.id"))
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
+    matched = db.Column(db.Boolean)
+    num_matches = db.Column(db.Integer)
+
+    query = db.relationship("Query",
+        backref=db.backref(
+            "sentence_in_query", cascade="all, delete-orphan"))
+
+    sentence = db.relationship("Sentence",
+        backref=db.backref(
+            "sentence_in_query", cascade="all, delete-orphan"))

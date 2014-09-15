@@ -4,7 +4,7 @@ __all__ = [
     "sequences_view",
     "words_view",
     "documents_view",
-    "query_caches_view",
+    "cache_view",
     "sentences_view",
     "sets",
 ]
