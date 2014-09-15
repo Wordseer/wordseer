@@ -114,7 +114,7 @@ class DocumentProcessForm(ProcessForm):
         """
 
         if form.process_button.data == form.PROCESS:
-            if len(form.structure_file.data) == 0:
+            if len(form.structure_file.data) > 0:
                 return True
             else:
                 raise ValidationError("You must select exactly one structure file.")
