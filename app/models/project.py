@@ -35,6 +35,7 @@ class Project(db.Model, Base):
     active_project = None
 
     # Relationships
+    sentences = db.relationship("Sentence", backref="project", lazy="dynamic")
     document_files = db.relationship("DocumentFile",
         secondary="document_files_in_projects", backref="projects")
     structure_files = db.relationship("StructureFile", backref="project")

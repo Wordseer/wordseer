@@ -1,38 +1,21 @@
-import json
-
-from flask import abort
 from flask import request
-from flask.json import jsonify
-from flask.views import View
+from flask.json import jsonify, dumps, loads
+from flask.views import MethodView
 
-from app import app
-from app import db
-from .. import wordseer
-from .. import helpers
+from app import app, db
+from app.wordseer import wordseer
+from app.models import *
 
+from app.helpers.application_view import register_rest_view
 
-class SentenceView(View):
-    """Utilities and functions for getting a specific set of sentences"""
-    def __init__(self, operation):
-        """deal with all the variables"""
-        # for use in dispatch_request
-        self.operation = operation
-        
-    #===========================================================================
-    # endpoint methods
-    #===========================================================================
-    
-    def get_sentence(self):
-        # php equivalent: stripvis/getsentence.php
-        pass
-    
-    def dispatch_request(self):
-        operations = {
-            "get_sentence": self.get_sentence,
-        }
+class SentenceView(MethodView):
+    def get(self, **kwargs):
+        params = dict(kwargs, **request.args)
 
-        result = operations[self.operation](self)
-        return jsonify(result)
-
-wordseer.add_url_rule("/api/sentences/get_sentence/",
-    view_func=SentenceView.as_view("sentence_get", "get_sentence"))
+register_rest_view(
+    SentenceView,
+    wordseer,
+    'sentences',
+    'sentence',
+    parents=["project"]
+)
