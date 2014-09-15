@@ -1,6 +1,5 @@
 """Unit tests for the components of the wordseer web interface.
 """
-
 from cStringIO import StringIO
 import os
 import shutil
@@ -342,7 +341,8 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_bad_process(self, mock_process_files):
         """Test processing an unprocessable group of files.
         """
-        project = Project(name="test", users=[self.user], path="/foo")
+        project = Project(name="test", path="/foo")
+        rel = self.user.add_project(project, role=ProjectsUsers.ROLE_ADMIN)
         project.save()
 
         document_file1 = DocumentFile(projects=[project],
@@ -357,18 +357,7 @@ class ViewsTests(unittest.TestCase):
             "action": "0",
             "process-selection": ["1", "2"]
             })
-
-        assert "must include exactly one" in result.data
-
-        structure_file = StructureFile(project=project, path="/foo/bar.json")
-        structure_file.save()
-
-        result = self.client.post("/projects/1", data={
-            "process-submitted": "true",
-            "action": "0",
-            "process-structure_file": [str(structure_file.id)]
-            })
-        assert "at least one document" in result.data.lower()
+        assert "must select exactly one" in result.data
 
     def test_get_file(self):
         """Run tests on the get_file view.
