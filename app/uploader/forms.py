@@ -114,12 +114,16 @@ class DocumentProcessForm(ProcessForm):
         """
 
         if form.process_button.data == form.PROCESS:
-            is_processable(docs=form.selection.data,
-                structure_files=form.structure_file.data)
-        else:
-            if not form.selection.data and not form.structure_file.data:
-                raise ValidationError("You must select at least one file.")
-        if form.structure_button.data == form.STRUCTURE:
+            if len(form.structure_file.data) == 0:
+                return True
+            else:
+                raise ValidationError("You must select exactly one structure file.")
+        elif form.process_button.data == form.DELETE:
+            if len(form.structure_file.data) > 0 or len(form.selection.data) > 0:
+                return True
+            else:
+                raise ValidationError("You must select at least one file to delete")
+        elif form.structure_button.data == form.STRUCTURE:
             is_mappable(ids=form.selection.data)
 
 class ProjectCreateForm(Form, HiddenSubmitted):
@@ -143,17 +147,8 @@ class ProjectCreateForm(Form, HiddenSubmitted):
 class ProjectProcessForm(ProcessForm):
     """A ProcessForm configured to validate selections of projects.
     """
-    def validate_selection(form, field):
-        """If the selection is for processing, then run is_processable on the
-        files of each selected project.
-        """
-        if form.process_button.data == form.PROCESS:
-            for project_id in form.selection.data:
-                project = Project.query.filter(Project.id == project_id).one()
-                is_processable(project=project)
-        else:
-            if not form.selection.data:
-                raise ValidationError("You must select a project to delete.")
+    DELETE = "d"
+    delete_button = ButtonField("Delete", name="action")
 
 class ConfirmDeleteForm(Form, HiddenSubmitted):
     """A form that will ask users to confirm their deletions.
