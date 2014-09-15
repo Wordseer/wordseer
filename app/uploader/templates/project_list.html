@@ -27,7 +27,7 @@
                         <th class="fitted">
                         </th>
                         <th class="emph">
-                            Project Name 
+                            Project Name
                         </th>
                         <th class="fitted">
                         </th>
@@ -50,10 +50,9 @@
                                 </label>
                             </td>
                             <td class="fitted">
-                                <button type="button" class="btn btn-danger">
-                                    <span class="glyphicon glyphicon-remove"></span>
-                                    Delete
-                                </a>
+                                {{ process_form.delete_button(class="btn btn-danger",
+                                            icon="glyphicon-remove",
+                                            value="d-" + choice.data|string) }}
                             </td>
                         </tr>
                     {% endfor %}
