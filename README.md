@@ -34,7 +34,7 @@ The following packages must be installed before performing any setup:
 - [Python 2.7](https://python.org/download)
 - [Java 1.6 or later](https://www.java.com/en/download/manual.jsp)
 
-### Linux/OS X install
+### Linux/OS X
 
 Run `install.py` like so:
 
@@ -47,57 +47,25 @@ If you know what you want, run `install.py -h` to view known console flags.
 
 ### Windows
 
-We also recommend installing the python dependencies (discussed below) in a
-[virtual environment](https://pypi.python.org/pypi/virtualenv).
+Double click on `install.bat` and follow the prompts.
 
-    pip install virtualenv
-    virtualenv venv
-    source venv/bin/activate
+## Use
 
-#### Installing the application
-1.  Run:
+After installation has completed, you are ready to run WordSeer.
 
-        pip -r install requirements_win.txt
+### Linux/OS X
 
-    to install the necessary packages.
+Run `wordseer.py`:
 
-3.  Run:
+    ./wordseer.py
 
-        python database.py create
+### Windows
 
-    to create the dabase, and
+Double click on `wordseer.bat`.
 
-        python database.py migrate
-
-    to migrate the model schema into the database.
-
-### Installing the preprocessor
-
-1. `corenlp` must be installed manually. Clone the repository:
-
-        git clone https://github.com/silverasm/stanford-corenlp-python.git
-        cd stanford-corenlp-python
-        python setup.py install
-
-    This should install `corenlp` to your system.
-
-2. In order to complete the setup, version *3.2.0* of Stanford's CoreNLP
-library must simply be in a directory accessible to the backend. Download
-[this file](http://nlp.stanford.edu/software/stanford-corenlp-full-2013-06-20.zip)
-and move it to the root of the repository. Extract it and rename the folder
-from `stanford-corenlp-full-2013-06-20` to `stanford-corenlp`.
-
-3. If you followed the above directions, then you shouldn't need to worry about
-any configuration. If you installed Stanford's CoreNLP elsewhere, then make sure
-you edit `lib/wordseerbackend/wordseerbackend/config.py` for your setup.
-Particularly make sure to point `CORE_NLP_DIR` to the Stanford NLP library.
-
-4. Run the following command in the console:
-
-        python -m nltk.downloader punkt
-
-    You should then be ready to parse files. Example XML and JSON files are
-    included in `tests/data`.
+In either case, you will see a console window with an IP address. Navigate
+to that address in your browser and you should see the WordSeer welcome
+screen.
 
 ## Documentation
 Documentation is

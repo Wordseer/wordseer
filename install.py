@@ -358,7 +358,7 @@ def write_startup_scripts():
     """
     if "win32" in sys.platform:
         print "Writing windows startup file"
-        f = open('start_windows.bat', 'w')
+        f = open('wordseer.bat', 'w')
         
         if VENV_DIR != sys.prefix:
             python_path = os.path.join(VENV_DIR, "Scripts", "python.exe")
