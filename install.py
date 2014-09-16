@@ -288,7 +288,13 @@ def set_install_type(install_type):
          preferences_file.write("\n")
 
 def install_pip(sudo):
-    """Install pip.
+    """Install pip if it's not installed.
+
+    This function first checks if pip is installed, exiting if it is.
+    If it isn't, it downloads and installs using get-pip.py. If pip
+    still doesn't seem to be installed, it looks for pip in a few
+    places to try to find the executable, and adds it to the PATH
+    if found.
 
     Arguments:
         sudo (boolean): If ``True``, install pip. Otherwise, the script will
@@ -319,36 +325,49 @@ def install_pip(sudo):
     if not pip_is_installed():
         print "Pip not in PATH, attempting to find."
         for possible_path in possible_paths:
+            print "Looking for pip in %s" % possible_path
             try:
-                print "Looking for pip in %s" % possible_path
                 if "pip" in os.listdir(possible_path) or 'pip.exe' in os.listdir(possible_path):
                     print "Found pip in " + possible_path + ", adding to PATH."
                     add_to_path(possible_path)
             except OSError:
-                # print OSError
                 continue
+    
     if pip_is_installed():
         print "Pip installed successfully."
+    
     else:
         print "Pip install failed. Quitting."
         sys.exit(1)
+
 def add_to_path(new_path):
+    """Add a directory to the beginning of the system path.
+    
+    This function separates the path correctly based on the OS.
+
+    Arguments:
+        new_path (str): The path to add.
+    """
     path_sep = ':'
     if 'win32' in sys.platform:
         path_sep = ';'
     os.environ["PATH"] = new_path + path_sep + os.environ["PATH"]
+
 def write_startup_scripts():
-    print "tyring to write startup"
+    """Write a quick start script.
+    """
     if "win32" in sys.platform:
-        print "Writing startup file"
+        print "Writing windows startup file"
         f = open('start_windows.bat', 'w')
-        print VENV_DIR, sys.prefix
-        if VENV_DIR!= sys.prefix:
-            python_path = os.path.join(VENV_DIR,"Scripts","python.exe")
+        
+        if VENV_DIR != sys.prefix:
+            python_path = os.path.join(VENV_DIR, "Scripts", "python.exe")
         else:
             python_path = os.path.join(VENV_DIR, "python.exe")
-        f.write(python_path+' wordseer.py\n')
+        
+        f.write(python_path + ' wordseer.py\n')
         f.close()
+
 def main():
     """Perform the installation process.
     """
@@ -387,10 +406,8 @@ def main():
         install_python_packages(REQUIREMENTS_MIN, False)
         set_install_type(PARTIAL_INSTALL_TYPE)
     
-    
     setup_database()
     write_startup_scripts()
-    
 
 def check_package_exists(package):
     packages = subprocess.check_output("pip2.7 freeze", shell=True)
