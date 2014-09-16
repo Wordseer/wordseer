@@ -3,6 +3,7 @@
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from app import db
+import pdb
 from base import Base
 from .log import Log
 from .association_objects import ProjectsUsers
@@ -50,6 +51,15 @@ class Project(db.Model, Base):
         backref="project", lazy="dynamic")
     users = association_proxy("project_users", "user",
         creator=lambda user: ProjectsUsers(user=user))
+
+    def is_processable(self):
+        """Check if this project can be processed.
+        """
+        pdb.set_trace()
+        if (self.status == self.STATUS_UNPROCESSED and len(self.document_files) > 0 and
+                len(self.structure_files) > 0):
+            return True
+        return False
 
     def get_documents(self):
         """A method to get all the ``Document``\s that are in this project.

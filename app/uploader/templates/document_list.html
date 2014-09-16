@@ -76,13 +76,28 @@
             {{ macros.selection_table(process_form.selection, "document",
                 "table table-striped table-hover click-anywhere",
                 "File Name", "uploader.document_show", project_id=project.id) }}
-            {% if user_role > 0 and project_status == 0%}
+            {% if project.is_processable() %}
+                {% set process_button_class = "" %}
+            {% else %}
+                {% set process_button_class = " disabled" %}
+            {% endif %}
+            {% if project.status > 0 %}
+                {% set mapper_button_class = " disabled" %}
+                {% set delete_button_class = " disabled" %}    
+            {% else %}
+                {% set mapper_button_class = "" %}
+                {% set delete_button_class = "" %}
+            {% endif %} 
+    
+    
+    
+            {% if user_role > 0 %}
                 <h3>Selected file actions:</h3>
-                {{ process_form.structure_button(class="btn btn-info",
+                {{ process_form.structure_button(class="btn btn-info" + mapper_button_class,
                             icon="glyphicon-list", id='structure-button') }}
-                {{ process_form.process_button(class="btn btn-primary",
+                {{ process_form.process_button(class="btn btn-primary" + process_button_class,
                             icon="glyphicon-tasks") }}
-                {{ process_form.delete_button(class="btn btn-danger",
+                {{ process_form.delete_button(class="btn btn-danger" + delete_button_class,
                             icon="glyphicon-remove") }}
             {% endif %}
         </form>
