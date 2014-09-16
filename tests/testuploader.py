@@ -1,6 +1,6 @@
 """Unit tests for the components of the wordseer web interface.
 """
-
+import pdb
 from cStringIO import StringIO
 import os
 import shutil
@@ -110,103 +110,16 @@ class ViewsTests(unittest.TestCase):
         mock_os.path.isdir.return_value = True
 
         project1 = Project(name="test1", path=application.config["UPLOAD_DIR"])
-        project2 = Project(name="test2", path=application.config["UPLOAD_DIR"])
         self.user.add_project(project1, role=ProjectsUsers.ROLE_ADMIN)
-        self.user.add_project(project2, role=ProjectsUsers.ROLE_ADMIN)
 
         result = self.client.post("/projects/", data={
-            "action": "-1",
+            "action": "d-1",
             "process-submitted": "true",
-            "process-selection": ["1", "2"]
             })
 
         assert "no projects" in result.data
         mock_shutil.rmtree.assert_any_call(project1.path)
-        mock_shutil.rmtree.assert_any_call(project2.path)
-        assert mock_shutil.rmtree.call_count == 2
-
-    def test_projects_bad_delete(self):
-        """Test deleting without a selection.
-        """
-
-        project1 = Project(name="test1", users=[self.user])
-        project2 = Project(name="test2", users=[self.user])
-        project1.save()
-        project2.save()
-
-        result = self.client.post("/projects/", data={
-            "action": "-1",
-            "process-submitted": "true",
-            })
-
-        assert "must select" in result.data
-        assert "/projects/1" in result.data
-        assert "/projects/2" in result.data
-
-    @mock.patch("app.uploader.views.views.process_files", autospec=True)
-    def test_projects_bad_process(self, mock_process_files):
-        """Test processing an unprocessable project.
-        """
-
-        project1 = Project(name="test1", users=[self.user])
-        project1.save()
-
-        result = self.client.post("/projects/", data={
-            "action": "0",
-            "process-submitted": "true",
-            "process-selection": ["1"]
-            })
-
-        assert "include exactly one json file" in result.data
-
-    @mock.patch("app.uploader.views.views.process_files", autospec=True)
-    def test_projects_process(self, mock_process_files):
-        """Test processing a processable project.
-        """
-        project = Project(name="test")
-        rel = self.user.add_project(project, role=ProjectsUsers.ROLE_ADMIN)
-        project.save()
-
-        document_file1 = DocumentFile(projects=[project],
-            path="/test-path/1.xml")
-        structure_file1 = StructureFile(project=project,
-            path="/test-path/2.json")
-        document_file1.save()
-        structure_file1.save()
-
-        result = self.client.post("/projects/", data={
-            "process-submitted": "true",
-            "action": "0",
-            "process-selection": ["1"],
-            "process-structure_file": "2"
-            })
-
-        assert mock_process_files.call_count == 1
-        assert "alert alert-danger" not in result.data
-
-    @mock.patch("app.uploader.views.views.process_files", autospec=True)
-    def test_projects_process_no_perms(self, mock_process_files):
-        """Test processing without permissions.
-        """
-        project = Project(name="test")
-        rel = self.user.add_project(project, role=ProjectsUsers.ROLE_USER)
-        project.save()
-
-        document_file1 = DocumentFile(projects=[project],
-            path="/test-path/1.xml")
-        structure_file1 = StructureFile(project=project,
-            path="/test-path/2.json")
-        document_file1.save()
-        structure_file1.save()
-
-        result = self.client.post("/projects/", data={
-            "process-submitted": "true",
-            "action": "0",
-            "process-selection": ["1"],
-            "process-structure-file": "2"
-            })
-
-        assert "Not authorized" in result.data
+        assert mock_shutil.rmtree.call_count == 1
 
     def test_projects_delete_no_perms(self):
         """Delete projects without proper permissions.
@@ -217,7 +130,7 @@ class ViewsTests(unittest.TestCase):
 
         result = self.client.post("/projects/", data={
             "process-submitted": "true",
-            "action": "-1",
+            "action": "d-1",
             "process-selection": [str(project.id)],
             })
 
@@ -429,7 +342,8 @@ class ViewsTests(unittest.TestCase):
     def test_project_show_bad_process(self, mock_process_files):
         """Test processing an unprocessable group of files.
         """
-        project = Project(name="test", users=[self.user], path="/foo")
+        project = Project(name="test", path="/foo")
+        rel = self.user.add_project(project, role=ProjectsUsers.ROLE_ADMIN)
         project.save()
 
         document_file1 = DocumentFile(projects=[project],
@@ -444,18 +358,7 @@ class ViewsTests(unittest.TestCase):
             "action": "0",
             "process-selection": ["1", "2"]
             })
-
-        assert "must include exactly one" in result.data
-
-        structure_file = StructureFile(project=project, path="/foo/bar.json")
-        structure_file.save()
-
-        result = self.client.post("/projects/1", data={
-            "process-submitted": "true",
-            "action": "0",
-            "process-structure_file": [str(structure_file.id)]
-            })
-        assert "at least one document" in result.data.lower()
+        assert "must select exactly one" in result.data
 
     def test_get_file(self):
         """Run tests on the get_file view.
@@ -542,51 +445,15 @@ class ViewsTests(unittest.TestCase):
         result = self.client.post("/projects/1", data=data)
 
         assert "Upload" not in result.data
-        assert "Process" not in result.data
-        assert "This project is already" in result.data
+        assert "This project can&#39;t be processed" in result.data
 
         project1.status = Project.STATUS_DONE
         project1.save()
 
         result = self.client.post("/projects/1", data=data)
 
-        assert "This project is already" in result.data
+        assert "This project can&#39;t be processed" in result.data
         assert "Upload" not in result.data
-        assert "Process" not in result.data
-
-    def test_projects_process_processed(self):
-        """Test processing a processed project.
-        """
-        project = Project(name="test", status=Project.STATUS_PREPROCESSING)
-        rel = self.user.add_project(project, role=ProjectsUsers.ROLE_ADMIN)
-
-        project.save()
-
-        document_file1 = DocumentFile(projects=[project],
-            path="/test-path/1.xml")
-        document_file2 = DocumentFile(projects=[project],
-            path="/test-path/2.json")
-        document_file1.save()
-        document_file2.save()
-
-        result = self.client.post("/projects/", data={
-            "process-submitted": "true",
-            "action": "0",
-            "process-selection": ["1"]
-            })
-
-        assert "is already preprocessing" in result.data
-
-        project.status = Project.STATUS_DONE
-        project.save()
-
-        result = self.client.post("/projects/", data={
-            "process-submitted": "true",
-            "action": "0",
-            "process-selection": ["1"]
-            })
-
-        assert "is already preprocessed" in result.data
 
 class ProjectPermissionsTests(unittest.TestCase):
     """Tests for the ProjectPermissions view.

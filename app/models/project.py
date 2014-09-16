@@ -3,7 +3,6 @@
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from app import db
-import pdb
 from base import Base
 from .log import Log
 from .association_objects import ProjectsUsers
@@ -55,7 +54,6 @@ class Project(db.Model, Base):
     def is_processable(self):
         """Check if this project can be processed.
         """
-        pdb.set_trace()
         if (self.status == self.STATUS_UNPROCESSED and len(self.document_files) > 0 and
                 len(self.structure_files) > 0):
             return True

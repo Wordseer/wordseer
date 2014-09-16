@@ -215,31 +215,17 @@ class ProjectsCLPD(CLPDView):
         """For deletion, delete call delete_object on the object and delete
         its path. For processing, send the project to the processor.
         """
-        selected_projects = request.form.getlist("process-selection")
-        project_objects = [Project.query.get(id) for id in selected_projects]
-        if request.form["action"] == self.process_form.DELETE:
-            for project in project_objects:
-                rel = ProjectsUsers.query.filter_by(user=current_user,
-                    project=project).one()
+        selected_project = Project.query.get(request.form["action"][2:])
+        if request.form["action"][0] ==  self.process_form.DELETE:
+            rel = ProjectsUsers.query.filter_by(user=current_user,
+                project=selected_project).one()
 
-                if rel.role < ProjectsUsers.ROLE_ADMIN:
-                    self.process_form.selection.errors.append("Not authorized"
-                        " to delete " + project.name)
-                    continue
+            if rel.role < ProjectsUsers.ROLE_ADMIN:
+                self.process_form.selection.errors.append("Not authorized"
+                    " to delete " + selected_project.name)
+                return
 
-                self.delete_object(project, project.name)
-
-        if request.form["action"] == self.process_form.PROCESS:
-            for project in project_objects:
-                rel = ProjectsUsers.query.filter_by(user=current_user,
-                    project=project).one()
-                if rel.role < ProjectsUsers.ROLE_ADMIN:
-                    self.process_form.selection.errors.append("Not authorized"
-                        " to process " + project.name)
-                    continue
-                files = project.document_files
-                structure_file = project.structure_files[0]
-                process_files(project.path, structure_file.path, project)
+            self.delete_object(selected_project, selected_project.name)
 
 uploader.add_url_rule(app.config["PROJECT_ROUTE"],
     view_func=ProjectsCLPD.as_view("projects"))
@@ -360,10 +346,6 @@ class ProjectCLPD(CLPDView):
             for file_object in delete:
                 file_name = os.path.split(file_object.path)[1]
                 self.delete_object(file_object, file_name)
-
-        elif request.form["action"] == self.process_form.PROCESS:
-            process_files(self.project.path, structure_files[0].path,
-                self.project)
 
         elif request.form["action"] == self.process_form.STRUCTURE:
             # return the URL for structure mapping
