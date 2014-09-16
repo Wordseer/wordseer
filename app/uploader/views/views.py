@@ -347,6 +347,10 @@ class ProjectCLPD(CLPDView):
                 file_name = os.path.split(file_object.path)[1]
                 self.delete_object(file_object, file_name)
 
+        if request.form["action"] == self.process_form.PROCESS:
+            process_files(self.project.path, structure_files[0].path,
+                self.project)
+
         elif request.form["action"] == self.process_form.STRUCTURE:
             # return the URL for structure mapping
             file_id = files[0]

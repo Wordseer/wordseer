@@ -1,7 +1,6 @@
 """
 This file stores all the relevant forms for the web application.
 """
-
 import os
 
 from flask_wtf import Form

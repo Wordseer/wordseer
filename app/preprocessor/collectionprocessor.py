@@ -73,6 +73,11 @@ class CollectionProcessor(object):
             self.project_logger.info("Parsing documents")
             self.parse_documents()
 
+        self.project.status = Project.STATUS_DONE
+        self.project.save()
+
+        self.project_logger.info("Finished.")
+
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):
         """Extract metadata from each file in collection_dir, and populate the
