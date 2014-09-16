@@ -4,8 +4,8 @@
 {{ super() }}
 <script src="{{ url_for('uploader.static',
         filename='upload-input-group.js') }}"></script>
-
-</script>
+<script src="{{ url_for('uploader.static',
+        filename='tooltips.js') }}"></script>
 {% endblock %}
 {% block title %}Document List{% endblock %}
 {% block page_header %}
@@ -39,6 +39,35 @@
 
 {% block list_header %}Existing documents{% endblock %}
 {% block list_form %}
+    {% set tooltip_args = {"data-toggle": "tooltip", "data-placement": "top"} %}
+    {% set process_button_class = "" %}
+    {% set mapper_button_class = "" %}
+    {% set delete_button_class = "" %}
+    {% set analyze_button_class = "" %}
+    
+    {% if not project.is_processable() %}
+        {% set process_button_class = " disabled" %}
+        {% set process_button_tooltip = "You can't process this project" %}
+    {% endif %}
+    {% if project.status > 0 %}
+        {% set mapper_button_tooltip = "You can only do this before preprocessing" %}
+        {% set delete_button_tooltip = "You can only do this before preprocessing" %}
+        {% set mapper_button_class = " disabled" %}
+        {% set delete_button_class = " disabled" %}    
+    {% endif %} 
+    {% if project.status < 2 %}
+        {% set analyze_button_tooltip = "You can only do this after preprocessing" %}
+        {% set analyze_button_class = " disabled" %}
+    {% endif %}
+    {% if user_role == 0 %}
+        {% set mapper_button_class = " disabled" %}
+        {% set delete_button_class = " disabled" %}    
+        {% set process_button_class = " disabled" %}
+        {% set process_button_tooltip = "You don't have permission to do this" %}
+        {% set delete_button_tooltip = "You don't have permission to do this" %}
+        {% set mapper_button_tooltip = "You don't have permission to do this" %}
+    {% endif %}
+    
     {% if process_form.selection.choices %}
         {{ macros.render_errors(process_form.selection.errors) }}
         <form method="POST" role="form">
@@ -48,7 +77,8 @@
                         <th class="select">
                             Select (<a href="#" class="check-all">All</a>)
                         </th>
-                        <th>
+                        <th class="fitted"></th>
+                        <th class="emph">
                             File Name
                         </th>
                     </tr>
@@ -60,6 +90,12 @@
                                 {{ choice }}
                             </td>
                             <td>
+                                <span data-toggle="tooltip" data-placement="top" class="has-tooltip" title="{{ process_button_tooltip }}">
+                                {{ process_form.process_button(class="btn btn-primary" + process_button_class,
+                                            icon="glyphicon-tasks") }}
+                                </span>
+                            </td>
+                            <td class="emph">
                                 <label for="{{ choice.id }}">
 
                                     <a href="{{ url_for("uploader.document_show",
@@ -73,41 +109,56 @@
                 </tbody>
             </table>
             {{ process_form.hidden_tag() }}
-            {{ macros.selection_table(process_form.selection, "document",
-                "table table-striped table-hover click-anywhere",
-                "File Name", "uploader.document_show", project_id=project.id) }}
-            {% if project.is_processable() %}
-                {% set process_button_class = "" %}
-            {% else %}
-                {% set process_button_class = " disabled" %}
-            {% endif %}
-            {% if project.status > 0 %}
-                {% set mapper_button_class = " disabled" %}
-                {% set delete_button_class = " disabled" %}    
-            {% else %}
-                {% set mapper_button_class = "" %}
-                {% set delete_button_class = "" %}
-            {% endif %} 
-            {% if project.status == 2 %}
-                {% set analyze_button_class = "" %}
-            {% else %}
-                {% set analyze_button_class = " disabled" %}
-            {% endif %}
 
-            {% if user_role > 0 %}
-                <h3>Selected file actions:</h3>
-                {{ process_form.structure_button(class="btn btn-info" + mapper_button_class,
-                            icon="glyphicon-list", id='structure-button') }}
-                {{ process_form.process_button(class="btn btn-primary" + process_button_class,
-                            icon="glyphicon-tasks") }}
-                {{ process_form.delete_button(class="btn btn-danger" + delete_button_class,
-                            icon="glyphicon-remove") }}
-            {% endif %}
-            <a class="btn btn-primary {{ analyze_button_class }}" rol="button"
+            <table class="table table-striped table-hover click-anywhere">
+                <thead>
+                    <tr>
+                        <th class="select">
+                            Select (<a href="#" class="check-all">All</a>)
+                        </th>
+                        <th class="fitted"></th>
+                        <th class="emph">
+                            File Name
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for choice in process_form.selection %}
+                        <tr class="xml-entry" >
+                            <td>
+                                {{ choice }}
+                            </td>
+                            <td class="fitted">
+                                <span data-toggle="tooltip" data-placement="top" class="has-tooltip" title="{{ mapper_button_tooltip }}">
+                                    {{ process_form.structure_button(class="btn btn-info" + mapper_button_class,
+                                    icon="glyphicon-list", id='structure-button') }}
+                                </span>
+                            </td>
+                            <td class="emph">
+                                <label for="{{ choice.id }}">
+                                        <a href="{{ url_for("uploader.document_show",
+                                            document_file_id=choice.data, project_id=project.id) }}">
+                                        {{ choice.label.text }}
+                                    </a>
+                                </label>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="buttons">
+            <span data-toggle="tooltip" data-placement="top" class="has-tooltip" title="{{ delete_button_tooltip }}">
+            {{ process_form.delete_button(class="btn btn-danger" + delete_button_class,
+                        icon="glyphicon-remove") }}
+            </span>
+            <span data-toggle="tooltip" data-placement="top" class="has-tooltip" title="{{ analyzer_button_tooltip }}">
+            <a class="btn btn-primary {{ analyze_button_class }}" role="button"
                 href="{{url_for('wordseer.ext_app', project_id=project.id)}}"}>
                 <span class="glyphicon glyphicon-search"></span>
                 Explore data
-            </a>
+                </a>
+            </span>
+            </div>
         </form>
         {% if project.status == 1 %}
             <p>Project is currently processing.</p>
