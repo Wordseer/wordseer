@@ -91,13 +91,13 @@
                             </td>
                             <td>
                                 <span data-toggle="tooltip" data-placement="top" class="has-tooltip" title="{{ process_button_tooltip }}">
-                                {{ process_form.process_button(class="btn btn-primary" + process_button_class,
-                                            icon="glyphicon-tasks") }}
+                                    {{ process_form.process_button(class="btn btn-primary" + process_button_class,
+                                    icon="glyphicon-tasks",
+                                    value="p-" + choice.data|string) }}
                                 </span>
                             </td>
                             <td class="emph">
                                 <label for="{{ choice.id }}">
-
                                     <a href="{{ url_for("uploader.document_show",
                                         project_id=project.id,
                                         document_file_id=choice.data) }}">
@@ -131,13 +131,14 @@
                             <td class="fitted">
                                 <span data-toggle="tooltip" data-placement="top" class="has-tooltip" title="{{ mapper_button_tooltip }}">
                                     {{ process_form.structure_button(class="btn btn-info" + mapper_button_class,
-                                    icon="glyphicon-list", id='structure-button') }}
+                                    icon="glyphicon-list", id='structure-button',
+                                    value="s-" + choice.data|string) }}
                                 </span>
                             </td>
                             <td class="emph">
                                 <label for="{{ choice.id }}">
                                         <a href="{{ url_for("uploader.document_show",
-                                            document_file_id=choice.data, project_id=project.id) }}">
+                                            document_file_id=choice.data, project_id=project.id)}}">
                                         {{ choice.label.text }}
                                     </a>
                                 </label>

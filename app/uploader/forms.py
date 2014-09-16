@@ -2,7 +2,7 @@
 This file stores all the relevant forms for the web application.
 """
 import os
-
+import pdb
 from flask_wtf import Form
 from flask import redirect
 from flask_wtf.file import FileAllowed, FileField, FileRequired
@@ -111,25 +111,31 @@ class DocumentUploadForm(Form, HiddenSubmitted):
 class DocumentProcessForm(ProcessForm):
     """A ProcessForm configured to validate selections of documents.
     """
+    PROCESS = "p"
+    STRUCTURE = "s"
+    
     structure_file = MultiCheckboxField("Select",
         coerce=int,
         choices=[])
+    
     def validate_selection(form, field):
         """If the selection is for processing, then run is_processable on the
         selected files.
         If the selection is for structure mapping, then run reirect_to_tagger
         """
-
-        if form.process_button.data == form.PROCESS:
-            if len(form.structure_file.data) > 0:
-                project = Project.query.get(form.structure_file.data[0])
-                
+        if form.process_button.data:
+            if form.process_button.data[0] == form.PROCESS:
+                structure_file = StructureFile.query.get(form.process_button.data[2:])
+                if not structure_file:
+                    raise ValidationError("This is not a structure file.")
+                project = structure_file.project
+           
                 if project.is_processable():
                     return True
                 raise ValidationError("This project can't be processed.")
             
-            else:
-                raise ValidationError("You must select exactly one structure file.")
+            elif form.structure_button.data[0] == form.STRUCTURE:
+                is_mappable(ids=[form.structure_button.data[2:]])
         
         elif form.process_button.data == form.DELETE:
             if len(form.structure_file.data) > 0 or len(form.selection.data) > 0:
@@ -137,8 +143,6 @@ class DocumentProcessForm(ProcessForm):
             else:
                 raise ValidationError("You must select at least one file to delete")
         
-        elif form.structure_button.data == form.STRUCTURE:
-            is_mappable(ids=form.selection.data)
 
 class ProjectCreateForm(Form, HiddenSubmitted):
     """Create new projects. This is simply a one-field form, requiring the

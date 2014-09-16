@@ -274,7 +274,6 @@ class ViewsTests(unittest.TestCase):
             "action": "-1",
             })
 
-        assert "must select" in result.data
         assert "/documents/1" in result.data
         assert "/documents/2" in result.data
 
@@ -355,10 +354,9 @@ class ViewsTests(unittest.TestCase):
 
         result = self.client.post("/projects/1", data={
             "process-submitted": "true",
-            "action": "0",
-            "process-selection": ["1", "2"]
+            "action": "p-1"
             })
-        assert "must select exactly one" in result.data
+        assert "not a structure file" in result.data
 
     def test_get_file(self):
         """Run tests on the get_file view.
@@ -437,9 +435,7 @@ class ViewsTests(unittest.TestCase):
 
         data = {
             "process-submitted": "true",
-            "action": "0",
-            "process-selection": [str(document_file.id)],
-            "process-structure_file": [str(structure_file.id)]
+            "action": "p-" + str(structure_file.id),
             }
 
         result = self.client.post("/projects/1", data=data)
