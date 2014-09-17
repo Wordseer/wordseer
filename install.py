@@ -226,11 +226,8 @@ def setup_stanford_corenlp(force=False):
 
     if force:
         print "Installing CoreNLP"
-        source_file = urllib2.urlopen(CORENLP)
-
-        with open(temp_corenlp_name, "w") as local_file:
-            print "Downloading..."
-            local_file.write(source_file.read())
+        print "Downloading..."
+        download_file(CORENLP, temp_corenlp_name)
 
         with zipfile.ZipFile(temp_corenlp_name, "r") as local_zip:
             print "Extracting..."
