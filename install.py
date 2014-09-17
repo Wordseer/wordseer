@@ -102,6 +102,7 @@ def install_prerequisites(sudo):
 
     elif "darwin" in system:
         print "Mac detected. Installing lxml from binary."
+        subprocess.call("pip install --upgrade pip", shell=True)
         subprocess.call("pip install bin/macosx/lxml-3.3.6-cp27-none-macosx_10_9_intel.whl", shell=True)
 
     else:
