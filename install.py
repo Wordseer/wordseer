@@ -193,7 +193,7 @@ def make_virtualenv(sudo_install=False):
             sys.exit(1)
 
     #Initiate VENV
-    subprocess_output = subprocess.call("virtualenv --python=python2.7 " + venv_name, shell=True)
+    subprocess_output = subprocess.call("virtualenv --clear --python=python2.7 " + venv_name, shell=True)
     if int(subprocess_output) != 0:    
         subprocess_output =  subprocess.call("virtualenv " + venv_name, shell=True)
     
