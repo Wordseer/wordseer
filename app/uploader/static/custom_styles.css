@@ -40,6 +40,10 @@ input[readonly] {
     cursor: text !important;
 }
 
+.has-tooltip {
+    display: inline-block;
+}
+
 .align-top {
     display: inline-block !important;
     vertical-align: top;

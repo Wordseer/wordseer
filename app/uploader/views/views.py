@@ -1,7 +1,6 @@
 """
 These are all the view functions for the app.
 """
-
 import os
 import threading
 import shutil
@@ -333,23 +332,31 @@ class ProjectCLPD(CLPDView):
         if self.rel.role < ProjectsUsers.ROLE_ADMIN:
             self.process_form.selection.errors.append("You can't do that.")
             return
-        files = request.form.getlist("process-selection")
-        structure_file_ids = request.form.getlist("process-structure_file")
-
-        file_objects = [DocumentFile.query.get(id) for id in files]
-        structure_files = [StructureFile.query.get(id) for id in structure_file_ids]
 
         if request.form["action"] == self.process_form.DELETE:
             # Delete every selected file, its database record, and item in
             # the listing
+            files = request.form.getlist("process-selection")
+            structure_file_ids = request.form.getlist("process-structure_file")
+            file_objects = [DocumentFile.query.get(id) for id in files]
+            structure_files = [StructureFile.query.get(id) for id in structure_file_ids]
             delete = file_objects + structure_files
             for file_object in delete:
                 file_name = os.path.split(file_object.path)[1]
                 self.delete_object(file_object, file_name)
 
-        elif request.form["action"] == self.process_form.STRUCTURE:
+        if request.form["action"][0] == self.process_form.PROCESS:
+            # Make sure the user isn't doing something freaky
+            structure_file = StructureFile.query.get(request.form["action"][2:])
+            if structure_file.project != self.project:
+                self.process_form.structure_file.errors.append("You can't do that.")
+
+            process_files(self.project.path, structure_file.path,
+                self.project)
+
+        elif request.form["action"][0] == self.process_form.STRUCTURE:
             # return the URL for structure mapping
-            file_id = files[0]
+            file_id = request.form["action"][2:]
             file_model = DocumentFile.query.get(file_id)
             file_name = os.path.split(file_model.path)[1]
             url = url_for('uploader.document_map',
@@ -476,8 +483,7 @@ def document_map(project_id, document_file_id):
         return app.login_manager.unauthorized()
 
     filename = os.path.split(document.path)[1]
-    project = Project.query.join(User).filter(User.id == current_user.id).\
-        filter(DocumentFile.id == document_file_id).one()
+    project = Project.query.get(project_id) 
     map_document = forms.MapDocumentForm()
     return render_template("document_map.html",
         document=document,
