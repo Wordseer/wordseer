@@ -70,17 +70,18 @@ def install_prerequisites(sudo):
         sudo (boolean): If ``True``, use sudo.
     """
     system = sys.platform
+    success = 0
+
     if "win32" in system:
         print "Checking windows prerequisites"
-        arch, os = platform.architecture()
-        print arch, os
+        arch, operating_system = platform.architecture()
         if '32' in arch:
             if not check_package_exists("pywin"):
                 print "installing pywin32 (32bit)"
                 subprocess.call("easy_install-2.7 bin\\win32\\pywin32-219.win32-py2.7.exe", shell=True)
             if not check_package_exists("lxml"):
                 print "installing lxml (32bit)"
-                subprocess.call("easy_install-2.7 bin\\win32\\lxml-3.3.6.win32-py2.7.exe", shell=True)
+                success = subprocess.call("easy_install-2.7 bin\\win32\\lxml-3.3.6.win32-py2.7.exe", shell=True)
 
         elif '64' in arch:
             if not check_package_exists("pywin"):
@@ -88,7 +89,8 @@ def install_prerequisites(sudo):
                 subprocess.call("easy_install-2.7 bin\\win64\\pywin32-219.win-amd64-py2.7.exe", shell=True)
             if not check_package_exists("lxml"):
                 print "installing lxml (64bit)"
-                subprocess.call("easy_install-2.7 bin\\win64\\lxml-3.3.6.win-amd64-py2.7.exe", shell=True)
+                success = subprocess.call("easy_install-2.7 bin\\win64\\lxml-3.3.6.win-amd64-py2.7.exe", shell=True)
+
     elif "linux" in system and sudo:
         print "Attempting to install prerequisites for linux."
         uname = subprocess.call(["uname -a"], shell=True)
@@ -103,10 +105,14 @@ def install_prerequisites(sudo):
     elif "darwin" in system:
         print "Mac detected. Installing lxml from binary."
         subprocess.call("pip install --upgrade pip", shell=True)
-        subprocess.call("pip install bin/macosx/lxml-3.3.6-cp27-none-macosx_10_9_intel.whl", shell=True)
+        success = subprocess.call("pip install bin/macosx/lxml-3.3.6-cp27-none-macosx_10_9_intel.whl", shell=True)
 
     else:
         print "Not installing prerequisites."
+    
+    if success != 0:
+        print "Could not install prerequisites. Quitting."
+        sys.exit(1)
 
     print "Finished installing prerequisites."
 
@@ -157,6 +163,7 @@ def make_virtualenv(sudo_install=False):
             virtualenv via pip if it isn't installed already.
     """
     print "Setting up virtualenv."
+    
     venv_name = "venv"
     if not check_package_exists("virtualenv"):
         if sudo_install:
@@ -168,7 +175,7 @@ def make_virtualenv(sudo_install=False):
                 subprocess.call("sudo pip2.7 install virtualenv", shell=True)
         else:
             print "Virtualenv not found, not installing."
-            return
+            sys.exit(1)
     else:
         print "Virtualenv already installed."
         try:
@@ -179,7 +186,12 @@ def make_virtualenv(sudo_install=False):
             pip_output = subprocess.check_output("pip install virtualenv", shell=True)
             path = pip_output.split("\n")[0].split()[-1]
             os.environ["PATH"] += ":" + os.path.join(path, "../../../bin")
-    
+        try:
+            subprocess.call("virtualenv")
+        except OSError:
+            print "Virtualenv could not be located. Exiting."
+            sys.exit(1)
+
     #Initiate VENV
     subprocess_output = subprocess.call("virtualenv --python=python2.7 " + venv_name, shell=True)
     if int(subprocess_output) != 0:    
@@ -206,8 +218,12 @@ def install_python_packages(reqs=REQUIREMENTS_FULL, full=True):
 
     print "Installing python dependencies from " + reqs
     
-    subprocess.call("pip2.7 install -r " + reqs,
+    success = subprocess.call("pip2.7 install -r " + reqs,
         shell=True)
+
+    if success != 0:
+        print "Could not install python packages. Quitting."
+        sys.exit(0)
 
     if full:
         subprocess.call("python -m nltk.downloader punkt", shell=True)
@@ -381,11 +397,19 @@ def main():
         help="Install only enough to run the wordseer tool.", default=False)
 
     args = parser.parse_args()
+    
+    new_path_dirs = []
+    path_dirs = os.environ["PATH"].split(":")
+    for path_dir in path_dirs:
+        if "conda" not in path_dir:
+            new_path_dirs.append(path_dir)
+
+    os.environ["PATH"] = ":".join(new_path_dirs)
 
     if args.interactive:
         install_interactively()
 
-    if pip_is_installed():
+    if not pip_is_installed():
         install_pip(args.sudo)
 
     if args.virtualenv:
