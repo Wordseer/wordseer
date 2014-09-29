@@ -2,50 +2,15 @@
 /** The skeleton for the Word Frequency graph views.
 */
 Ext.define('WordSeer.view.visualize.wordfrequencies.WordFrequencies', {
-	extend:'Ext.panel.Panel',
+	extend:'Ext.Container',
 	layout: 'fit',
 	alias:'widget.word-frequencies',
 	autoScroll: true,
-	dockedItems: [{
-		xtype: 'toolbar',
-		dock: 'top',
-		itemId: 'tbar',
-		items: [
-			{
-				xtype: 'checkbox',
-				fieldLabel: 'Stacked',
-				labelAlign: 'right',
-				name: 'stacked',
-				itemId: 'stacked',
-				labelWidth: 50,
-			},
-			{
-				xtype: 'checkbox',
-				labelAlign: 'right',
-				fieldLabel: 'Normalized',
-				name: 'normalized',
-				itemId: 'normalized',
-				labelWidth: 60,
-			},
-			{
-				xtype: 'checkbox',
-				labelAlign: 'right',
-				fieldLabel: 'Labels',
-				name: 'labels',
-				itemId: 'labels',
-				labelWidth: 45,
-			},
-			]
-	}],
-
 	items: [
 		{
 			xtype: 'component',
 			itemId: 'canvas',
-			autoScroll: 'true',
-			style: {
-				"padding-left": "10px"
-			}
+			html: '<h1>Metadata Frequencies</h1>',
 		}
 	],
 
@@ -95,7 +60,5 @@ Ext.define('WordSeer.view.visualize.wordfrequencies.WordFrequencies', {
 		*/
 		this.addEvents('search', 'change', 'rendered');
 		this.callParent(arguments);
-		this.down('checkbox[name=stacked]').setValue(true);
-		this.down('checkbox[name=labels]').setValue(true);
 	}
 });

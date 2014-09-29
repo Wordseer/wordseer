@@ -1205,3 +1205,16 @@ div.metatag.sorting.lev1 {
 div.metatag.sorting.lev2 {
   background-color: #fff2fe;
 }
+
+/*******************************************************************************
+Visualizations - word frequencies
+*******************************************************************************/
+/* line 999, new-ui.scss */
+.viz-container {
+  float: left;
+}
+/* line 1001, new-ui.scss */
+.viz-container .wordfreq {
+  width: 500px;
+  height: 400px;
+}
