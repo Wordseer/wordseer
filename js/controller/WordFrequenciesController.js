@@ -166,8 +166,15 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					}
 
 				} else if (x.type == "number") {
-					debugger;
 					chart = nv.models.scatterChart()
+					.transitionDuration(350)
+					.showLegend(false)
+					.showYAxis(true)
+					.showXAxis(true)
+					.color(function(){ return COLOR_SCALE[0]})
+					;
+				} else { // date
+					chart = nv.models.lineChart()
 					.transitionDuration(350)
 					.showLegend(false)
 					.showYAxis(true)
