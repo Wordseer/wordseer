@@ -88,6 +88,10 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 							unique[sent[k]] = true;
 						  }
 						});
+						// sort by the x value (categorical)
+						prop.streams[0].values.sort(function(a,b){
+							return a.x < b.x ? -1 : a.x > b.x ? 1 : 0;
+						})
 						data.push(prop);
 					}
 				});
@@ -116,7 +120,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 	*/
 	draw: function(data, panel){
 		// size params
-		var width = 375, height = 300,
+		var width = 380, height = 300,
 			padding = {"top": 5, "bottom": 5, "left": 5, "right": 5},
 			margin = {"top": 0, "bottom": 0, "left": 0, "right": 15};
 
@@ -124,10 +128,14 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		var chart;
 
 		data.forEach(function(x){
-			var svg = canvas.append('div')
-				.attr("class", "viz-container")
-				.text(x.property)
-					.append('div')
+			var container = canvas.append('div')
+				.attr("class", "viz-container");
+
+			container.append('div')
+				.attr('class', 'property')
+				.text(x.property);
+
+			var svg = container.append('div')
 					.attr("class", "wordfreq")
 						.append('svg')
 						.attr("class", x.property)
@@ -135,31 +143,59 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 			var chart;
 			nv.addGraph(function() {
-			    chart = nv.models.multiBarChart()
-			      .margin({bottom: 100})
-			      .transitionDuration(300)
-			      .delay(0)
-			      .rotateLabels(45)
-			      .groupSpacing(0.1)
-				  .defaultState({"stacked": true})
-				  .showLegend(false)
-				  .showControls(false)
-			      ;
+			    if (x.type == "string") {
+					chart = nv.models.multiBarChart()
+					.transitionDuration(300)
+					.delay(0)
+					.rotateLabels(45)
+					.groupSpacing(0.45)
+					.staggerLabels(false)
+					.defaultState({"stacked": true})
+					.showLegend(false)
+					.showControls(false)
+					.showXAxis(true)
+					.reduceXTicks(true)
+					.color(function(){ return COLOR_SCALE[0]})
+					;
 
-			    chart.multibar
-			      .hideable(false);
+					chart.multibar
+					.hideable(false);
 
-			    chart.reduceXTicks(false).staggerLabels(true);
+					if (x.streams[0].values.length < 15) {
+						chart.reduceXTicks(false);
+					}
+
+				} else if (x.type == "number") {
+					debugger;
+					chart = nv.models.scatterChart()
+					.transitionDuration(350)
+					.showLegend(false)
+					.showYAxis(true)
+					.showXAxis(true)
+					.color(function(){ return COLOR_SCALE[0]})
+					;
+				}
+
 				chart.yAxis
 			        // .ticks
-					.tickFormat(d3.format(',d'));
+					.tickFormat(d3.format(',d'))
+					.highlightZero(false)
+					.axisLabel('Sentences')
+					.axisLabelDistance(40);
 
-			    svg.call(chart);
+				chart.margin({left: 55, bottom: 100, right: 45});
 
-			    nv.utils.windowResize(chart.update);
+				svg.call(chart);
 
-			    chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
+				// truncate long x labels
+				d3.selectAll('.nv-x .tick text')
+					.text(function(d){
+						if (typeof d !== 'string') { return d; }
+						if (d.length < 15) { return d; }
+						else { return d.slice(0,15) + "..."; }
+					})
 
+				nv.utils.windowResize(chart.update);
 			    return chart;
 			});
 

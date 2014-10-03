@@ -10,7 +10,10 @@ Ext.define('WordSeer.view.visualize.wordfrequencies.WordFrequencies', {
 		{
 			xtype: 'component',
 			itemId: 'canvas',
-			html: '<h1>Metadata Frequencies</h1>',
+			html: '\
+				<div class="databox-header">\
+					<h2 class="databox-header">Word Frequencies</h2>\
+				</div>',
 		}
 	],
 

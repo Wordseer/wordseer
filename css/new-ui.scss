@@ -33,7 +33,6 @@ $space_8: $space_0*power($factor,8);
 $default-border-radius: $space_1;
 
 
-
 /*******************************************************************************
 Colors
 *******************************************************************************/
@@ -648,7 +647,7 @@ Derived Components: FrequentWordsList
 div.frequent-words-list {
 	@include data-table(350, 360, $databox-options-height);
 	float: left;
-    font-family: "Open Sans", sans-serif;
+    font-family: $sans-serif-alt;
 }
 
 td.frequent-word-word {
@@ -1001,5 +1000,32 @@ Visualizations - word frequencies
     .wordfreq {
         width: 500px;
         height: 400px;
+    }
+    margin-top: $space_3;
+
+    div.property {
+        font-family: $sans-serif-alt;
+        font-size: $large-font-size;
+        font-weight: 700;
+        margin-left: 50px;
+    }
+
+    svg {
+        .nvd3 {
+            .tick {
+                line {
+                    display: none;
+                }
+            }
+
+            .nv-axis {
+                &.nv-x {
+                    path.domain {
+                        // show x-axis line
+                        stroke-opacity: inherit;
+                    }
+                }
+            }
+        }
     }
 }
