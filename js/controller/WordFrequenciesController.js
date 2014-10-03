@@ -78,7 +78,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						};
 						var unique = {};
 						sentences.forEach(function (sent) {
-						  if (!unique[sent[k]]) {
+						  if (!unique[sent[k]] && typeof sent[k] !== 'undefined') {
 						    prop.streams[0].values.push({
 								"x": sent[k],
 								"y": sentences.filter(function(s){
