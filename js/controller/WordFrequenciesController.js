@@ -147,7 +147,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					chart = nv.models.multiBarChart()
 					.transitionDuration(300)
 					.delay(0)
-					.rotateLabels(45)
 					.groupSpacing(0.45)
 					.staggerLabels(false)
 					.defaultState({"stacked": true})
@@ -161,15 +160,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					chart.multibar
 					.hideable(false);
 
-					chart.xAxis
-						.tickFormat(function(d){
-							if (typeof d !== 'string') { return d; }
-							if (d.length < 15) { return d; }
-							else { return d.slice(0,15) + "..."; }
-						})
-						;
-
-					if (x.streams[0].values.length < 15) {
+					if (x.streams[0].values.length < 25) {
 						chart.reduceXTicks(false);
 					}
 
@@ -210,7 +201,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						.showYAxis(true)
 						.useInteractiveGuideline(true)
 						.color(function(){ return COLOR_SCALE[0]})
-						// .showXAxis(true)
+						.showXAxis(true)
 						.xScale(d3.time.scale())
 						;
 
@@ -226,7 +217,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 								var format = d3.time.format(timeformats[gran])
 								return format(d3.time.scale().invert(v));
 								})
-							.rotateLabels(45)
 						;
 
 				}
@@ -238,8 +228,78 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					.axisLabel('Number of Sentences')
 					.axisLabelDistance(40);
 
+				chart.xAxis
+					// .staggerLabels(true)
+					.showMaxMin(true)
+					.rotateLabels(45)
+					;
+
 				chart.margin({left: 55, bottom: 100, right: 45});
+				chart.tooltipContent(function(key, x, y, e, graph){
+					return '<table class="nv-pointer-events-none">' +
+						'<tr class="nv-pointer-events-none">'+
+							'<td class="key nv-pointer-events-none">' +
+							x +
+							'</td>'+
+							'<td class="value nv-pointer-events-none">' +
+							y +
+							'</td>'+
+						'</tr>'+
+					'</table>';
+				});
+
 				svg.call(chart);
+
+				// fade out overflowing labels
+				svg.append("linearGradient")
+			      .attr("id", "fadeToWhiteY")
+				  .attr("x1", 0).attr("y1", 0)
+			      .attr("x2", 0).attr("y2", 1)
+			    .selectAll("stop")
+			      .data([
+			        {offset: "0%", opacity: "0"},
+			        {offset: "100%", opacity: "1"}
+			      ])
+			    .enter().append("stop")
+			      .attr("offset", function(d) { return d.offset; })
+			      .attr("stop-color", "#FFFFFF")
+				  .attr("stop-opacity", function(d){ return d.opacity; })
+				;
+				svg.append("linearGradient")
+				.attr("id", "fadeToWhiteX")
+				.attr("x1", 0).attr("y1", 0)
+				.attr("x2", 1).attr("y2", 0)
+				.selectAll("stop")
+				.data([
+					{offset: "0%", opacity: "0"},
+					{offset: "100%", opacity: "1"}
+				])
+				.enter().append("stop")
+				.attr("offset", function(d) { return d.offset; })
+				.attr("stop-color", "#FFFFFF")
+				.attr("stop-opacity", function(d){ return d.opacity; })
+				;
+
+				var fadesize = 15;
+				// bottom edge
+				svg.append('rect')
+					.attr('width', '100%')
+					.attr('height', fadesize)
+					.attr('x', 0)
+					.attr('y', function(){
+						return this.parentElement.offsetHeight - fadesize;
+					})
+					.attr('fill', 'url(#fadeToWhiteY)');
+				// right edge
+				svg.append('rect')
+					.attr('height', '100%')
+					.attr('width', fadesize)
+					.attr('x', function(){
+						return this.parentElement.offsetWidth - fadesize;
+					})
+					.attr('y', 0)
+					.attr('fill', 'url(#fadeToWhiteX)');
+
 				nv.utils.windowResize(chart.update);
 			    return chart;
 			});

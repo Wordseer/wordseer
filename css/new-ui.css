@@ -1213,24 +1213,32 @@ Visualizations - word frequencies
 .viz-container {
   float: left;
   margin-top: 12.288px;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
 /* line 1000, new-ui.scss */
 .viz-container .wordfreq {
   width: 500px;
   height: 400px;
 }
-/* line 1006, new-ui.scss */
-.viz-container div.property {
+/* line 1004, new-ui.scss */
+.viz-container .wordfreq .nvtooltip {
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
+}
+/* line 1009, new-ui.scss */
+.viz-container .wordfreq svg text {
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+}
+/* line 1015, new-ui.scss */
+.viz-container .wordfreq svg .nvd3 .tick line {
+  display: none;
+}
+/* line 1023, new-ui.scss */
+.viz-container .wordfreq svg .nvd3:not(.nv-LineChart) .nv-axis.nv-x path.domain {
+  stroke-opacity: inherit;
+}
+/* line 1036, new-ui.scss */
+.viz-container div.property {
   font-size: 18px;
   font-weight: 700;
   margin-left: 50px;
-}
-/* line 1016, new-ui.scss */
-.viz-container svg .nvd3 .tick line {
-  display: none;
-}
-/* line 1024, new-ui.scss */
-.viz-container svg .nvd3:not(.nv-LineChart) .nv-axis.nv-x path.domain {
-  stroke-opacity: inherit;
 }

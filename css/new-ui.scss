@@ -1000,34 +1000,44 @@ Visualizations - word frequencies
     .wordfreq {
         width: 500px;
         height: 400px;
-    }
-    margin-top: $space_3;
 
-    div.property {
-        font-family: $sans-serif-alt;
-        font-size: $large-font-size;
-        font-weight: 700;
-        margin-left: 50px;
-    }
+        .nvtooltip {
+            font-family: $sans-serif-alt;
+        }
 
-    svg {
-        .nvd3 {
-            .tick {
-                line {
-                    display: none;
-                }
+        svg {
+            text {
+                font-family: $sans-serif-alt;
             }
+            .nvd3 {
 
-            &:not(.nv-LineChart) {
-                .nv-axis {
-                    &.nv-x {
-                        path.domain {
-                            // show x-axis line
-                            stroke-opacity: inherit;
+                .tick {
+                    line {
+                        display: none;
+                    }
+                }
+
+                &:not(.nv-LineChart) {
+                    .nv-axis {
+                        &.nv-x {
+                            path.domain {
+                                // show x-axis line
+                                stroke-opacity: inherit;
+                            }
                         }
                     }
                 }
             }
         }
     }
+    margin-top: $space_3;
+    font-family: $sans-serif-alt;
+
+    div.property {
+        font-size: $large-font-size;
+        font-weight: 700;
+        margin-left: 50px;
+    }
+
+
 }
