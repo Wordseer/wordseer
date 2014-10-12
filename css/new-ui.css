@@ -1230,7 +1230,7 @@ Visualizations - word frequencies
 .viz-container svg .nvd3 .tick line {
   display: none;
 }
-/* line 1023, new-ui.scss */
-.viz-container svg .nvd3 .nv-axis.nv-x path.domain {
+/* line 1024, new-ui.scss */
+.viz-container svg .nvd3:not(.nv-LineChart) .nv-axis.nv-x path.domain {
   stroke-opacity: inherit;
 }

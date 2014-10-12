@@ -80,7 +80,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						sentences.forEach(function (sent) {
 						  if (!unique[sent[k]] && typeof sent[k] !== 'undefined') {
 						    prop.streams[0].values.push({
-								"x": sent[k],
+								"x": isNaN(Number(sent[k]))? sent[k] : Number(sent[k]),
 								"y": sentences.filter(function(s){
 										return s[k] == sent[k];
 									}).length,
@@ -143,7 +143,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 			var chart;
 			nv.addGraph(function() {
-			    if (x.type == "string") {
+			    if (x.type == "string" || x.type == "number") {
 					chart = nv.models.multiBarChart()
 					.transitionDuration(300)
 					.delay(0)
@@ -161,47 +161,85 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					chart.multibar
 					.hideable(false);
 
+					chart.xAxis
+						.tickFormat(function(d){
+							if (typeof d !== 'string') { return d; }
+							if (d.length < 15) { return d; }
+							else { return d.slice(0,15) + "..."; }
+						})
+						;
+
 					if (x.streams[0].values.length < 15) {
 						chart.reduceXTicks(false);
 					}
 
-				} else if (x.type == "number") {
-					chart = nv.models.scatterChart()
-					.transitionDuration(350)
-					.showLegend(false)
-					.showYAxis(true)
-					.showXAxis(true)
-					.color(function(){ return COLOR_SCALE[0]})
-					;
-				} else { // date
-					chart = nv.models.lineChart()
-					.transitionDuration(350)
-					.showLegend(false)
-					.showYAxis(true)
-					.showXAxis(true)
-					.color(function(){ return COLOR_SCALE[0]})
-					;
-				}
+				} else if (x.type.search(/^date_/) >= 0) {
+					var format = d3.time.format(x.type.slice(5));
+					// save orig streams so we can transform date granularity
+					x.datestrings = x.streams.slice();
+					x.streams.forEach(function(stream){
+						var newvalues = [];
+						d3.nest()
+							.key(function(v){
+								var date = format.parse(v.x);
+								// TODO: let user choose granularity level
+								v.x = d3.time.day(date);
+								return v.x;
+							})
+							.sortKeys(d3.ascending)
+							.rollup(function(leaves){
+								var point = {
+									'x': leaves[0].x,
+									'y': d3.sum(leaves, function(d){
+											return d.y;
+										})
+								};
+								newvalues.push(point);
+								return point;
+							})
+							.entries(stream.values)
+							;
 
+						stream.values = newvalues;
+					})
+					;
+
+					chart = nv.models.lineChart()
+						.transitionDuration(350)
+						.showLegend(false)
+						.showYAxis(true)
+						.useInteractiveGuideline(true)
+						.color(function(){ return COLOR_SCALE[0]})
+						// .showXAxis(true)
+						.xScale(d3.time.scale())
+						;
+
+					var timeformats = {
+						'day': '%x', // full date mm/dd/yyyy
+					}
+
+					chart
+						.xAxis
+							.tickFormat(function(v){
+								// TODO: let user choose granularity
+								var gran = 'day';
+								var format = d3.time.format(timeformats[gran])
+								return format(d3.time.scale().invert(v));
+								})
+							.rotateLabels(45)
+						;
+
+				}
+				// debugger;
 				chart.yAxis
 			        // .ticks
 					.tickFormat(d3.format(',d'))
-					.highlightZero(false)
-					.axisLabel('Sentences')
+					.highlightZero(true)
+					.axisLabel('Number of Sentences')
 					.axisLabelDistance(40);
 
 				chart.margin({left: 55, bottom: 100, right: 45});
-
 				svg.call(chart);
-
-				// truncate long x labels
-				d3.selectAll('.nv-x .tick text')
-					.text(function(d){
-						if (typeof d !== 'string') { return d; }
-						if (d.length < 15) { return d; }
-						else { return d.slice(0,15) + "..."; }
-					})
-
 				nv.utils.windowResize(chart.update);
 			    return chart;
 			});
