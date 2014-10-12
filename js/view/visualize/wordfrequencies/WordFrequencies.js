@@ -53,15 +53,14 @@ Ext.define('WordSeer.view.visualize.wordfrequencies.WordFrequencies', {
 		*/
 
 		/**
-		@event draw Fired when a request for data from the server
-		returns successfully.
-		@param {WordSeer.view.visualize.wordfrequencies.WordFrequencies} this view.
-		@param {Object} data An object containing one list of sentence records
-		for each search that was issued.
-
 		@event rendered Fired when the Controller is done drawing d3 content
 		*/
-		this.addEvents('search', 'change', 'rendered');
+
+		/**
+		@event changeDateDetail Fired when user changes the dropdown in a chart
+		with date granularity selection
+		*/
+		this.addEvents('search', 'change', 'rendered', 'changeDateDetail');
 		this.callParent(arguments);
 	}
 });

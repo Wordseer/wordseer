@@ -13,6 +13,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		this.control({
 			'word-frequencies': {
 				'search': this.requestWordFrequenciesData,
+				'changeDateDetail': this.changeDateDetail,
 			},
 			'word-frequencies  checkbox[name=stacked]': {
 				'change': this.change,
@@ -215,7 +216,8 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					// add dropdown selector for date granularity
 					var selector = container.append('div')
 						.attr('class', 'timeselect')
-						.append('select');
+						.append('select')
+							;
 
 					container.select('.timeselect')
 						.insert('span', ':first-child')
@@ -243,9 +245,11 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						.property('value');
 
 					var format = d3.time.format(format_string);
-					// save orig streams so we can transform date granularity
-					x.datestrings = x.streams.slice();
 					x.streams.forEach(function(stream){
+						// copy original for user transformations later
+						if (!('values_orig' in stream)) {
+							stream.values_orig = $.extend(true, [], stream.values);
+						}
 						var newvalues = [];
 						d3.nest()
 							.key(function(v){
@@ -267,7 +271,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 							})
 							.entries(stream.values)
 							;
-
 						stream.values = newvalues;
 					})
 					;
@@ -293,7 +296,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						;
 
 				}
-				// debugger;
 				chart.yAxis
 			        // .ticks
 					.tickFormat(d3.format(',d'))
@@ -374,10 +376,63 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					.attr('fill', 'url(#fadeToWhiteX)');
 
 				nv.utils.windowResize(chart.update);
+
+				if (x.type.search(/^date_/) >= 0){
+					// fire change event for timeseries granularity
+					selector.on('change', function(){
+						var choice = d3.select(this)
+							.select(":checked")
+							.property('value');
+						panel.fireEvent('changeDateDetail', chart,
+										choice, date_detail, format);
+
+					});
+				}
 			    return chart;
 			});
 
 		});
 	},
+
+	changeDateDetail: function(chart, choice, date_detail, format) {
+		var data = d3.select(chart.container).datum();
+		data.forEach(function(stream){
+			var newvalues = [];
+			d3.nest()
+				.key(function(d){
+					var date = format.parse(String(d.x));
+					return d3.time[choice](date);
+				})
+				.sortKeys(d3.ascending)
+				.rollup(function(leaves){
+					var date = format.parse(String(leaves[0].x));
+					var point = {
+						'x': d3.time[choice](date),
+						'y': d3.sum(leaves, function(d){
+								return d.y;
+							})
+					};
+					newvalues.push(point);
+					return point;
+				})
+				.entries(stream.values_orig)
+				;
+
+			stream.values = newvalues;
+		})
+		;
+		// bind new data
+		d3.select(chart.container).datum(data);
+		// update x axis ticks
+		chart.xAxis
+			.tickFormat(function(v){
+				var format = d3.time.format(
+					date_detail.get(choice)
+				);
+				return format(d3.time.scale().invert(v));
+			})
+		;
+		chart.update();
+	}
 
 });
