@@ -139,7 +139,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			var svg = container.append('div')
 					.attr("class", "wordfreq")
 						.append('svg')
-						.attr("class", x.property)
+						.attr("class", x.property + " nvd3")
 						.datum(x.streams);
 
 			var chart;
