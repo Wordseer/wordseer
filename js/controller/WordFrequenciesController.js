@@ -246,6 +246,14 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 					var format = d3.time.format(format_string);
 					x.streams.forEach(function(stream){
+
+						// sort values first
+						stream.values.sort(function(a,b){
+							var aa = format.parse(String(a.x)),
+								bb = format.parse(String(b.x));
+							return aa - bb;
+						})
+
 						// copy original for user transformations later
 						if (!('values_orig' in stream)) {
 							stream.values_orig = $.extend(true, [], stream.values);
@@ -257,11 +265,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 								// TODO: let user choose granularity level
 								v.x = d3.time[selected_date_detail](date);
 								return v.x;
-							})
-							.sortKeys(function(a,b){
-								var aa = new Date(a),
-									bb = new Date(b);
-								return aa - bb;
 							})
 							.rollup(function(leaves){
 								var point = {
@@ -407,7 +410,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					var date = format.parse(String(d.x));
 					return d3.time[choice](date);
 				})
-				.sortKeys(d3.ascending)
 				.rollup(function(leaves){
 					var date = format.parse(String(leaves[0].x));
 					var point = {
