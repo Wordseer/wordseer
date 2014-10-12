@@ -997,6 +997,13 @@ Visualizations - word frequencies
 
 .viz-container{
     float: left;
+    position: relative; 
+    .timeselect {
+        position: absolute;
+        top: 7px;
+        right: 5px;
+    }
+
     .wordfreq {
         width: 500px;
         height: 400px;

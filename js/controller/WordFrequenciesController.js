@@ -166,7 +166,83 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 				} else if (x.type.search(/^date_/) >= 0) {
 					// retrieve format string from type
-					var format = d3.time.format(x.type.slice(5));
+					var format_string = x.type.slice(5);
+
+					// determine date granularity options
+					date_detail = d3.map();
+					// start with compound string format codes
+					if (format_string.indexOf('%c') >= 0) {
+						date_detail.set('second', "%x %X");
+						date_detail.set('minute', '%x %H:%M');
+						date_detail.set('hour', '%x %H:00');
+						date_detail.set('day', '%x')
+						date_detail.set('month', '%m/%Y')
+						date_detail.set('year', '%Y')
+					} else {
+						// piece by piece
+						// time
+						if (format_string.indexOf('%X') >= 0 ||
+								format_string.indexOf('%S') >= 0) {
+							date_detail.set('second', "%x %X");
+							date_detail.set('minute', '%x %H:%M');
+							date_detail.set('hour', '%x %H:00');
+						} else if (format_string.indexOf('%M') >= 0){
+							date_detail.set('minute', '%x %H:%M');
+							date_detail.set('hour', '%x %H:00');
+						} else if (format_string.indexOf('%H') >= 0 ||
+									format_string.indexOf('%I') >= 0) {
+							date_detail.set('hour', '%x %H:00');
+						}
+						// date
+						if (format_string.indexOf('%x') >= 0 ||
+								format_string.indexOf('%j') >= 0 ||
+								format_string.indexOf('%d') >= 0 ||
+								format_string.indexOf('%e') >= 0) {
+							date_detail.set('day', '%x')
+							date_detail.set('month', '%m/%Y')
+							date_detail.set('year', '%Y')
+						} else if (format_string.indexOf('%m') >= 0 ||
+									format_string.indexOf('%b') >= 0 ||
+									format_string.indexOf('%B') >= 0) {
+							date_detail.set('month', '%m/%Y')
+							date_detail.set('year', '%Y')
+						} else if (format_string.indexOf('%y') >= 0 ||
+									format_string.indexOf('%Y') >= 0) {
+							date_detail.set('year', '%Y')
+						}
+					}
+
+					// add dropdown selector for date granularity
+					var selector = container.append('div')
+						.attr('class', 'timeselect')
+						.append('select');
+
+					container.select('.timeselect')
+						.insert('span', ':first-child')
+						.text('detail level: ')
+
+					selector.selectAll('option')
+						.data(date_detail.keys()).enter()
+						.append('option')
+						.attr('value', function(d){ return d; })
+						.text(function(d){ return d; });
+
+					// default selection
+					if (date_detail.has('day')) {
+						selector.select('option[value=day]')
+							.property('selected', 'selected')
+					} else if (date_detail.has('month')) {
+						selector.select('option[value=month]')
+							.property('selected', 'selected')
+					} else if (date_detail.has('year')) {
+						selector.select('option[value=year]')
+							.property('selected', 'selected')
+					}
+
+					var selected_date_detail = selector.select(':checked')
+						.property('value');
+
+					var format = d3.time.format(format_string);
 					// save orig streams so we can transform date granularity
 					x.datestrings = x.streams.slice();
 					x.streams.forEach(function(stream){
@@ -175,7 +251,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 							.key(function(v){
 								var date = format.parse(String(v.x));
 								// TODO: let user choose granularity level
-								v.x = d3.time.day(date);
+								v.x = d3.time[selected_date_detail](date);
 								return v.x;
 							})
 							.sortKeys(d3.ascending)
@@ -206,16 +282,12 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						.xScale(d3.time.scale())
 						;
 
-					var timeformats = {
-						'day': '%x', // full date mm/dd/yyyy
-					}
-
 					chart
 						.xAxis
 							.tickFormat(function(v){
-								// TODO: let user choose granularity
-								var gran = 'day';
-								var format = d3.time.format(timeformats[gran])
+								var format = d3.time.format(
+										date_detail.get(selected_date_detail)
+										)
 								return format(d3.time.scale().invert(v));
 								})
 						;
