@@ -258,7 +258,11 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 								v.x = d3.time[selected_date_detail](date);
 								return v.x;
 							})
-							.sortKeys(d3.ascending)
+							.sortKeys(function(a,b){
+								var aa = new Date(a),
+									bb = new Date(b);
+								return aa - bb;
+							})
 							.rollup(function(leaves){
 								var point = {
 									'x': leaves[0].x,
