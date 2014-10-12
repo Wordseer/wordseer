@@ -165,6 +165,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					}
 
 				} else if (x.type.search(/^date_/) >= 0) {
+					// retrieve format string from type
 					var format = d3.time.format(x.type.slice(5));
 					// save orig streams so we can transform date granularity
 					x.datestrings = x.streams.slice();
@@ -172,7 +173,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						var newvalues = [];
 						d3.nest()
 							.key(function(v){
-								var date = format.parse(v.x);
+								var date = format.parse(String(v.x));
 								// TODO: let user choose granularity level
 								v.x = d3.time.day(date);
 								return v.x;
