@@ -290,6 +290,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						.color(function(){ return COLOR_SCALE[0]})
 						.showXAxis(true)
 						.xScale(d3.time.scale())
+						.forceY(0)
 						;
 
 					chart
@@ -302,6 +303,10 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 								})
 						;
 
+					chart
+						.lines
+							.interpolate('monotone')
+							;
 				}
 				chart.yAxis
 			        // .ticks
@@ -331,7 +336,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				});
 
 				svg.call(chart);
-
+				debugger;
 				// fade out overflowing labels
 				svg.append("linearGradient")
 			      .attr("id", "fadeToWhiteY")

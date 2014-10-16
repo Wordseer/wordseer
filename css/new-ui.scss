@@ -1024,12 +1024,21 @@ Visualizations - word frequencies
                     }
                 }
 
-                &:not(.nv-LineChart) {
-                    .nv-axis {
-                        &.nv-x {
-                            path.domain {
-                                // show x-axis line
-                                stroke-opacity: inherit;
+                .nv-axis {
+                    &.nv-x {
+                        path.domain {
+                            // show x-axis line
+                            stroke-opacity: inherit;
+                        }
+                    }
+                }
+
+                &.nv-line {
+                    .nvd3.nv-scatter {
+                        .nv-groups {
+                            .nv-point {
+                                fill-opacity: 1;
+                                stroke-opacity: 1;
                             }
                         }
                     }
