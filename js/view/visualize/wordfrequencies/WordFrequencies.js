@@ -2,50 +2,18 @@
 /** The skeleton for the Word Frequency graph views.
 */
 Ext.define('WordSeer.view.visualize.wordfrequencies.WordFrequencies', {
-	extend:'Ext.panel.Panel',
+	extend:'Ext.Container',
 	layout: 'fit',
 	alias:'widget.word-frequencies',
 	autoScroll: true,
-	dockedItems: [{
-		xtype: 'toolbar',
-		dock: 'top',
-		itemId: 'tbar',
-		items: [
-			{
-				xtype: 'checkbox',
-				fieldLabel: 'Stacked',
-				labelAlign: 'right',
-				name: 'stacked',
-				itemId: 'stacked',
-				labelWidth: 50,
-			},
-			{
-				xtype: 'checkbox',
-				labelAlign: 'right',
-				fieldLabel: 'Normalized',
-				name: 'normalized',
-				itemId: 'normalized',
-				labelWidth: 60,
-			},
-			{
-				xtype: 'checkbox',
-				labelAlign: 'right',
-				fieldLabel: 'Labels',
-				name: 'labels',
-				itemId: 'labels',
-				labelWidth: 45,
-			},
-			]
-	}],
-
 	items: [
 		{
 			xtype: 'component',
 			itemId: 'canvas',
-			autoScroll: 'true',
-			style: {
-				"padding-left": "10px"
-			}
+			html: '\
+				<div class="databox-header">\
+					<h2 class="databox-header">Metadata Profile</h2>\
+				</div>',
 		}
 	],
 
@@ -85,17 +53,14 @@ Ext.define('WordSeer.view.visualize.wordfrequencies.WordFrequencies', {
 		*/
 
 		/**
-		@event draw Fired when a request for data from the server
-		returns successfully.
-		@param {WordSeer.view.visualize.wordfrequencies.WordFrequencies} this view.
-		@param {Object} data An object containing one list of sentence records
-		for each search that was issued.
-
 		@event rendered Fired when the Controller is done drawing d3 content
 		*/
-		this.addEvents('search', 'change', 'rendered');
+
+		/**
+		@event changeDateDetail Fired when user changes the dropdown in a chart
+		with date granularity selection
+		*/
+		this.addEvents('search', 'change', 'rendered', 'changeDateDetail');
 		this.callParent(arguments);
-		this.down('checkbox[name=stacked]').setValue(true);
-		this.down('checkbox[name=labels]').setValue(true);
 	}
 });

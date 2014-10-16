@@ -76,7 +76,7 @@ Ext.application({
                                 },
                                 {
                                     widget_xtype: 'word-frequencies-widget',
-                                    text: 'Word Frequencies',
+                                    text: 'Metadata Profile',
                                 },
                                 {
                                     widget_xtype: 'search-widget',
@@ -108,7 +108,7 @@ Ext.application({
                     },
                     {
                         widget_xtype: 'word-frequencies-widget',
-                        text: 'Word Frequencies',
+                        text: 'Metadata Profile',
                         inputClass: [
                             'word',
                             'phrase-set',
