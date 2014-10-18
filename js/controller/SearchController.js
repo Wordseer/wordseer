@@ -106,7 +106,18 @@ Ext.define('WordSeer.controller.SearchController', {
 		formValues.widget_xtype = 'sentence-list-widget';
 		if (record instanceof WordSeer.model.PhraseModel ||
 			record instanceof WordSeer.model.WordModel) {
-			formValues.phrases.push(record);
+			// will be different property if single word or phrase
+			var gov = record.data.word ? record.data.word : record.data.sequence;
+
+			var values = {
+				"gov": gov,
+				"govtype": "word",
+				"dep": "",
+				"deptype": "word",
+				"relation": "",
+			};
+			Ext.apply(formValues, values);
+			formValues.search.push(values);
 		} else if (record instanceof WordSeer.model.MetadataModel ){
 			formValues.metadata.push(record);
 		}
