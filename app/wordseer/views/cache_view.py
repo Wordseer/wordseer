@@ -35,10 +35,10 @@ class QueryCacheView(MethodView):
         sentence_query = project.sentences
         some_filtering_happened = False
         if 'search' in keys:
-            sentences = self.apply_search_filters(params['search'][0],
-                sentence_query)
+            sentence_query = self.apply_search_filters(params['search'][0],
+                                                       sentence_query)
             some_filtering_happened = True
-        if (some_filtering_happened):
+        if some_filtering_happened:
             query.sentences = sentence_query
             query.save()
         return jsonify({ "ok": True, "query_id": query.id })
@@ -47,10 +47,11 @@ class QueryCacheView(MethodView):
         json_parsed_search_params = loads(search_string)
         for search_query_dict in json_parsed_search_params:
             if Query.is_grammatical_search_query(search_query_dict):
-                filtered_sentences = Sentence.apply_grammatical_search_filter(
-                    search_query_dict, filtered_sentences)
+                filtered_sentences = Sentence.\
+                    apply_grammatical_search_filter(search_query_dict,
+                        filtered_sentences)
             else:
-                filtered_sentences = Sentence.apply_non_grammatical_search_filter(
+                filtered_sentences = Word.apply_non_grammatical_search_filter(
                     search_query_dict, filtered_sentences)
         return filtered_sentences
 

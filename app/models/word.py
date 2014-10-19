@@ -47,7 +47,6 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         """Retrieves sentences that contain this word within the scope of the
         current active project.
         """
-
         return Sentence.query.join(WordInSentence).join(Word).\
             filter(WordInSentence.project==Project.active_project).\
             filter(WordInSentence.word==self).all()
@@ -78,6 +77,37 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
             for word in w:
                 words.append(word.id)
         return words
+
+    @staticmethod
+    def apply_non_grammatical_search_filter(search_query_dict, sentence_query):
+        """ Gets the sentences that contain the query specified by the given
+        parameters.
+
+        Arguments:
+            search_query_dict (dict): A dictionary representation of a search
+                query. Contains the keys:
+                    - gov: The governor word in the case of grammatical search
+                        or the string search query in the case of a
+                        non-grammatical search. 
+                    - dep: The dependent word in the case of grammatical search
+                        (ignored for a non-grammatical search)
+                    - relation: The grammatical relationships. A space-separated
+                        list of grammatical relationship identifiers. If this
+                        is "" or not present, the search is assumed to be
+                        non-grammatical.
+        Returns:
+            A query object with sentences that match the given query parameters.
+        """
+        if "gov" in search_query_dict:
+            matching_word_ids = Word.get_matching_word_ids(
+                search_query_dict["gov"],
+                is_set_id = search_query_dict["govtype"] != "word")    
+            sentence_query = sentence_query.\
+                join(WordInSentence,
+                    WordInSentence.sentence_id == Sentence.id).\
+                filter(WordInSentence.word_id.in_(matching_word_ids))
+            return sentence_query
+        return sentence_query
 
     def get_counts(self, project=None):
 

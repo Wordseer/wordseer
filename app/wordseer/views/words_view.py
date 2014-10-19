@@ -42,8 +42,10 @@ class WordsView(MethodView):
             order_by(desc("sentence_count"))
         if "query_id" in params:
             query = Query.query.get(params["query_id"])
-            words_query.filter(SentenceInQuery.query_id == query.id)
-            words_query.filter(SentenceInQuery.sentence_id == Sentence.id)
+            words_query = words_query.filter(
+                SentenceInQuery.query_id == query.id)
+            words_query = words_query.filter(
+                SentenceInQuery.sentence_id == Sentence.id)
 
         results = []
         for word in words_query:
