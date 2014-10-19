@@ -13,7 +13,7 @@ Ext.define('WordSeer.store.SentenceSearchResultStore', {
         },
         reader: {
             type: 'json',
-            root: 'sentences',
+            root: 'results',
             totalProperty: 'total'
         }
     },

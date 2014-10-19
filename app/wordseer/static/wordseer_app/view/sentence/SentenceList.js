@@ -130,22 +130,13 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
                 }
             }
             var i = 0;
-            html = html.replace(/class='word'/g,
+            html = html.replace(/class='word/g,
                 function(match) {
-                    cls = "word ";
-                    if (sentence.gov_index.contains(i.toString())) {
-                        // cls += "gov-highlight ";
-                        cls += ' search-highlight';
-                    }
-                    if (sentence.dep_index == i) {
-                        // cls += "dep-highlight ";
-                        cls += ' search-highlight';
-                    }
                     i += 1;
                     return (' onclick="Ext.getCmp(\'' +
                         me.id +'\').fireEvent(\'wordclicked\', this, ' +
                         'Ext.getCmp(\'' + me.id +'\'));"' +
-                   "container-id='" +me.id+"' class='" + cls + "'");
+                   "container-id='" +me.id+"' class='word");
                 });
                 return {
                     tag: 'td',

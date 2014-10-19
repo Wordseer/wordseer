@@ -9,6 +9,7 @@ from .sentence import Sentence
 from .sequence import Sequence
 from .association_objects import WordInSentence
 from .association_objects import WordInSequence
+from .sets import SequenceSet
 from .counts import WordCount
 from .mixins import NonPrimaryKeyEquivalenceMixin
 
@@ -36,7 +37,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
 
     id = db.Column(db.Integer, primary_key=True, index=True)
     lemma = db.Column(db.String, index=True)
-    surface = db.Column(db.String)
+    surface = db.Column(db.String, index=True)
     part_of_speech = db.Column(db.String)
 
     # Scoped Pseudo-relationships
@@ -60,6 +61,23 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         return Sequence.query.join(WordInSequence).join(Word).\
             filter(WordInSequence.project==Project.active_project).\
             filter(WordInSequence.word==self).all()
+
+    @staticmethod
+    def get_matching_word_ids(query_string=None, is_set_id=False):
+        """Returns a list of Word instances that match the given query"""
+        words = []
+        if is_set_id:
+            sequences = SequenceSet.query.get(query_string).sequences.\
+            filter(Sequence.length == 1)
+            for sequence in sequences:
+                for word in sequence:
+                    words.append(word.id)
+        if query_string is not None:
+            w = Word.query.filter(
+                Word.surface.like(query_string.lower()))
+            for word in w:
+                words.append(word.id)
+        return words
 
     def get_counts(self, project=None):
 

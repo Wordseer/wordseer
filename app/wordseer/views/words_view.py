@@ -31,7 +31,8 @@ class WordsView(MethodView):
                 filter(Sentence.id == WordInSentence.sentence_id)
             if "query_id" in keys:
                 query = Query.query.get(params["query_id"])
-                words_query.filter(Sentence.query_id == query.id)
+                words_query.filter(SentenceInQuery.query_id == query.id)
+                words_query.filter(SentenceInQuery.sentence_id == Sentence.id)
 
             #words = project.frequent_words(part_of_speech, limit)
 

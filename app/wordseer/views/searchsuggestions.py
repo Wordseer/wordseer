@@ -7,7 +7,7 @@ from flask.json import jsonify
 from flask.views import MethodView
 from sqlalchemy import not_
 from sqlalchemy import func
-from sqlalchemy.sql.expression import asc
+from sqlalchemy.sql.expression import asc, desc
 from sqlalchemy.sql.expression import literal_column
 
 from app.wordseer import wordseer
@@ -58,7 +58,7 @@ class AutoSuggest(MethodView):
             like_query = "%" + query_string + "%"
             self.set_name_filter = Set.name.like(like_query)
             self.property_value_filter = Property.value.like(like_query)
-            self.sequence_filter = Sequence.sequence.like(like_query)
+            self.sequence_filter = Sequence.sequence.like(query_string + "%")
 
             suggestions = self.get_suggested_sets()
             suggestions.extend(self.get_suggested_properties())
@@ -143,13 +143,14 @@ class AutoSuggest(MethodView):
         """
         suggested_metadata = []
         #TODO: document_count, sentence_count
-        metadata = db.session.query(PropertyMetadata.display_name,
+        metadata = db.session.query(
+            PropertyMetadata.display_name,
             Property.name,
             Property.value,
             literal_column("'metadata'").label("class"),
             func.count(Property.unit_id.distinct()).label("unit_count")).\
                 filter(self.property_value_filter).\
-                filter(Property.name == PropertyMetadata.property_name).\
+                filter(Property.metadata_id == PropertyMetadata.id).\
                 filter(PropertyMetadata.is_category == True).\
                 filter(not_(Property.name.like("%_set"))).\
                 group_by(Property.value).\
@@ -167,7 +168,7 @@ class AutoSuggest(MethodView):
 
         return suggested_metadata
 
-    def get_suggested_sequences():
+    def get_suggested_sequences(self):
         """Return a list of dicts of suggestions of ``Sequence``\s that
         match the query.
 
@@ -199,17 +200,18 @@ class AutoSuggest(MethodView):
             literal_column("'sequence'").label("class"),
             func.count(SequenceInSentence.sentence_id).\
                 label("sentence_count")).\
-                    join(SequenceInSentence).\
-                    filter(Sequence.sequence.like(query + "%")).\
-                    order_by("sentence_count").\
-                    order_by(asc(Sequence.length)).\
-                    limit(50).\
-                    all()
+        filter(SequenceInSentence.sequence_id == Sequence.id).\
+        filter(self.sequence_filter).\
+        group_by(Sequence.sequence).\
+        order_by(desc("sentence_count")).\
+        order_by(asc(Sequence.length)).\
+        limit(50)
 
+        sequence_list = {}
         for sequence in sequences:
             text = sequence.text.lower()
-
-            if text in sequence_list and text is not None:
+            print text
+            if text not in sequence_list and text is not None:
                 sequence_list[text] = 1
                 suggested_sequences.append(sequence._asdict())
 
