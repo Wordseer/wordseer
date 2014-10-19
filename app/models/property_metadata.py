@@ -13,7 +13,8 @@ class PropertyMetadata(db.Model, Base):
 
     Attributes:
         type (str): The type of these ``Property``\s (string, int, date, etc.)
-        is_category (boolean): no idea
+        is_category (boolean): whether this property can be used to sort and
+            filter items.
         display_name (str): The name of the property that this object is
             describing; this is the same as the ``name`` of the
             ``Property`` object described.
@@ -22,7 +23,11 @@ class PropertyMetadata(db.Model, Base):
             the reading view on the frontend.
     """
     
-    type = db.Column(db.String)
+    property_name = db.Column(db.String, index=True)
+    data_type = db.Column(db.String)
+    date_format = db.Column(db.String)
     is_category = db.Column(db.Boolean)
     display_name = db.Column(db.String)
     display = db.Column(db.Boolean)
+    unit_type = db.Column(db.String)
+

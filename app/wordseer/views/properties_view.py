@@ -9,7 +9,7 @@ from app.models import *
 from app.helpers.application_view import register_rest_view
 
 class PropertiesView(MethodView):
-
+    """ Lists the property types that apply to a type of unit. """
     def get(self, **kwargs):
 
         params = dict(kwargs, **request.args)
@@ -34,25 +34,18 @@ class PropertiesView(MethodView):
 
         elif "project_id" in kwargs.keys():
             project = Project.query.get(kwargs["project_id"])
-
             if not project:
                 # TODO: real error response
                 print("Project not found")
-
             properties = []
-
             if "unit" in params.keys():
-
                 if params["unit"] == "document":
                     for document in project.get_documents():
                         properties.extend(document.properties)
-
                 elif params["unit"] == "sentence":
                     sentences = []
-
                     for document in project.get_documents():
                         sentences.extend(document.all_sentences)
-
                     for sentence in sentences:
                             properties.extend(sentence.properties)
             else:
