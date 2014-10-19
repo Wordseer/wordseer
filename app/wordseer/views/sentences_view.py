@@ -36,16 +36,23 @@ class SentencesView(MethodView):
             return jsonify(results = results, total = len(results))
 
     def make_sentence_dict(self, sentence, matching_words):
-        # TODO: add search params to make highlighting easier.
         sentence_dict = {}
-        html = []
-        for word in sentence.word_in_sentence:
+        html = ["<span class='sentence'>"]
+        for word_in_sentence in sentence.word_in_sentence:
             html_classes = ["word"]
-            if word.word.id in matching_words:
+            if word_in_sentence.word.id in matching_words:
                 html_classes.append("search-highlight")
-            word_html = "".join(["<span ", "class='", " ".join(html_classes), "'>",
-                word.space_before, word.surface, "</span>"])
+            word_html = "".join([
+                word_in_sentence.space_before, 
+                "<span ",
+                " word-id='", str(word_in_sentence.word.id),  "' ",
+                " position='", str(word_in_sentence.position), "' ",
+                " sentence-id='", str(sentence.id), "' ",
+                "class='"," ".join(html_classes), "'>",
+                word_in_sentence.surface,
+                "</span>"])
             html.append(word_html)
+        html.append("</span>")
         sentence_dict["words"] = "".join(html)
         return sentence_dict
 
