@@ -1,6 +1,7 @@
 from flask.views import MethodView
 from flask.json import jsonify, dumps
 from flask import request
+from sqlalchemy import func
 
 from app import app, db
 from app.wordseer import wordseer
@@ -15,17 +16,28 @@ class WordsView(MethodView):
         keys = params.keys()
 
         if "project_id" in keys:
-
             project = Project.query.get(params["project_id"])
             part_of_speech = params["pos"][0]
             position = params["start"][0]
             limit = params["limit"][0]
+            words_query = db.session.query(
+                Word.lemma.label("lemma"),
+                WordInSentence.surface.label("word"),
+                func.count(Sentence.id).label("sentence_count")).\
+                group_by(Word.lemma).\
+                filter(Word.part_of_speech.like("%" + part_of_speech + "%")).\
+                filter(Sentence.project_id == project.id).\
+                filter(Word.id == WordInSentence.word_id).\
+                filter(Sentence.id == WordInSentence.sentence_id)
+            if "query_id" in keys:
+                query = Query.query.get(params["query_id"])
+                words_query.filter(Sentence.query_id == query.id)
 
-            words = project.frequent_words(part_of_speech, limit)
+            #words = project.frequent_words(part_of_speech, limit)
 
             results = []
 
-            for word in words:
+            for word in words_query:
                 results.append({
                     "word": word.word,
                     "count": word.sentence_count,

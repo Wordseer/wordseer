@@ -35,8 +35,18 @@ Ext.define('WordSeer.controller.SearchController', {
 	*/
 	server_side_caching: true,
 
+	/**
+	@property {Number} current_query_id The ID of the query currently being
+	displayed. Whenever this controller sends a set of query parameters (i.e.
+	FormValues) to the server, the server assigns a query id to that set of
+	parameters and sends it back. Future views that use the same set of query
+	parameters just have to send the query ID, and the server can quickly
+	compute the data needed for the view, since the data has already been pre-
+	filtered to match those parameters.
+	*/
+	current_query_id: 0,
+
 	init: function() {
-//		console.log("Initialized search controller");
 		Ext.Ajax.request({
 			url: ws_api_path + ws_project_path + project_id + '/properties',
 			method:'GET',
@@ -325,12 +335,11 @@ Ext.define('WordSeer.controller.SearchController', {
 					// clear the previous query ID from the cache.
 					Ext.Ajax.request({
 						method: 'GET',
-						url: '/caches/' + this.current_query_id,
+						url: ws_project_path + project_id  + '/caches/' +
+							this.current_query_id,
 						timeout: 90000000,
 						params: {
 							user: getUsername(),
-							instance: getInstance(),
-							query_id: this.current_query_id,
 							clear: 'true',
 						}
 					});

@@ -12,38 +12,17 @@ from app.wordseer.helpers import parse_phrase_strings
 class SentencesView(MethodView):
 
     def get(self, **kwargs):
-        params = dict(kwargs, **request.args)
-        keys = params.keys()
-
-        Project.active_project = Project.query.get(params["project_id"])
-
-        phrases = params["phrases"][0]
-
-        if phrases:
-            phrases = loads(phrases)
-            sequence_texts = parse_phrase_strings(phrases)
-
-            sequences = list()
-
-            for text in sequence_texts:
-                sequences.append(Sequence.query.filter_by(sequence=text).first())
-
-            sentences = set()
-
-            for sequence in sequences:
-                for sentence in sequence.sentences:
-                    sentences.add(sentence)
-
+        params = dict(kwargs, **request.args)        
+        query = Query.query.get(params["query_id"])
+        if query:
             results = []
-
-            for sentence in sentences:
+            for sentence in query.sentences:
                 results.append({
                     "sentence": sentence.text,
                     "sentence_id": sentence.id,
                     "document_id": sentence.document_id,
-                    "sentence_set": "testing"
+                    "sentence_set": " ".join(sentence.sets)                 
                 })
-
             return jsonify(results = results)
 
     def post(self):

@@ -10,7 +10,8 @@ Ext.define('WordSeer.store.PhrasesAutoSuggestStore', {
 		type: 'ajax',
 		noCache: false,
 		timeout: 90000,
-		url: ws_api_path + 'search-suggestions/autosuggest/',
+		url: ws_api_path + ws_project_path + project_id +
+		'/autosuggestions',
 		extraParams: {
 			instance: getInstance(),
 			user: getUsername(),

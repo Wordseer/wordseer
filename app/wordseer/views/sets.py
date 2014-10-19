@@ -96,40 +96,37 @@ class SetsView(MethodView):
             - root: bool
         """
         # php equivalent: subsets/read.php:listCollections()
-        # check for required args
 
-        # project = Project.query.get(self.project)
-
-        # if self.collection_type and self.user_id:
-        #
-        #     # retrieve Set records from this level
-        #     setlist = []
-        #
-        #     sets = Set.query.filter_by(parent_id=parent_id,
-        #         user_id=self.user_id, type=self.collection_type).all()
-        #
-        #     for s in sets:
-        #         setinfo = self.read(s.id)
-        #
-        #         # TODO: get sentence and document counts
-        #
-        #         # recurse through any nested Sets
-        #         setinfo["children"] = self.list(s.id)
-        #         setlist.append(setinfo)
-        #
-        #     if parent_id == None:
-        #         # wrap setlist in the special root-level row
-        #         all_sets = {
-        #             "text": '',
-        #             "id": 0,
-        #             "children": setlist,
-        #             "root": True
-        #             }
-        #         return all_sets
-        #     else:
-        #         return setlist
-        # else:
-        #     abort(400)
+        project = Project.query.get(self.project)
+        if self.collection_type:
+            # retrieve Set records from this level
+            setlist = []
+        
+            sets = Set.query.filter_by(parent_id=parent_id, project=project,
+                type=self.collection_type).all()
+        
+            for s in sets:
+                setinfo = self.read(s.id)
+        
+                # TODO: get sentence and document counts
+        
+                # recurse through any nested Sets
+                setinfo["children"] = self.list(s.id)
+                setlist.append(setinfo)
+        
+            if parent_id == None:
+                # wrap setlist in the special root-level row
+                all_sets = {
+                    "text": '',
+                    "id": 0,
+                    "children": setlist,
+                    "root": True
+                    }
+                return all_sets
+            else:
+                return setlist
+        else:
+            abort(400)
 
     def list_flat(self):
         """Performs ``read`` method on all ``Set``\s belonging to current
@@ -153,16 +150,16 @@ class SetsView(MethodView):
         """
         # php equivalent: subsets/read.php:listCollectionsFlat()
         # check for required args
-        if self.collection_type and self.user_id:
-
-            sets = Set.query.filter_by(user_id=self.user_id,
-                type=self.collection_type).order_by(Set.name).all()
+        project = Project.query.get(self.project)
+        if self.collection_type:
+            sets = Set.query.filter_by(project=project,
+                type=self.collection_type).all()
 
             result = [self.read(s.id) for s in sets]
 
             # prepend special "all" set for document sets
             # TODO: frontend may send type as "document", need to change
-            if self.collection_type == "documentset":
+            if self.collection_type == "document":
                 alldocs = {
                     "text": "all",
                     "date": "",

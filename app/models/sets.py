@@ -37,7 +37,7 @@ class Set(db.Model, Base):
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
 
     # Relationships
-    project = db.relationship("Project")
+    project = db.relationship("Project", backref=db.backref("sets"))
     children = db.relationship("Set", backref=db.backref("parent",
         remote_side=[id]))
 
@@ -68,7 +68,7 @@ class SequenceSet(Set):
         backref="sets")
 
     __mapper_args__ = {
-        "polymorphic_identity": "sequenceset",
+        "polymorphic_identity": "phrase",
     }
 
     def get_items(self):
@@ -95,7 +95,7 @@ class SentenceSet(Set):
         backref="sets")
 
     __mapper_args__ = {
-        "polymorphic_identity": "sentenceset",
+        "polymorphic_identity": "sentence",
     }
 
     def get_items(self):
@@ -110,7 +110,7 @@ class SentenceSet(Set):
 class DocumentSet(Set):
     """A Set that can have a list of ``Document``\s in it.
 
-    The ``type`` attribute of a ``DocumentSet`` is set to ``sentenceset``.
+    The ``type`` attribute of a ``DocumentSet`` is set to ``documentset``.
 
     Attributes:
         documents (list): A list of ``Document``\s in this ``DocumentSet``.
@@ -122,7 +122,7 @@ class DocumentSet(Set):
         backref="sets")
 
     __mapper_args__ = {
-        "polymorphic_identity": "documentset",
+        "polymorphic_identity": "document",
     }
 
     def get_items(self):

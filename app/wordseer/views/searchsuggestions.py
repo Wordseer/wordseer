@@ -4,55 +4,35 @@
 from flask import abort
 from flask import request
 from flask.json import jsonify
-from flask.views import View
+from flask.views import MethodView
 from sqlalchemy import not_
 from sqlalchemy import func
 from sqlalchemy.sql.expression import asc
 from sqlalchemy.sql.expression import literal_column
 
-from .. import wordseer
-from ...models import PropertyMetadata, Property, Sequence, SequenceInSentence
+from app.wordseer import wordseer
 from app import db
+from app.models import *
+from app.helpers.application_view import register_rest_view
+
 
 # TODO: update existing code, refactor
 
-class AutoSuggest(View):
+class AutoSuggest(MethodView):
     """Retrieve a list of suggested ``Set``\s, ``Sequence``\s, and
     ``Property``\s.
     """
-    def __init__(self):
-        """Get necessary query variables and set filters.
+    def get(self, **kwargs):
+        """Return a JSON list of suggestions of phrases, sets, and metadata
+        property values that match the query.
 
         The ``query`` will be queried using a ``LIKE`` clause with ``%`` on
         either side of the string; so the ``query`` could be anywhere
         in the suggestions.
 
-        If ``user`` is not supplied, a 400 error will be raised.
-
-        Keyword Arguments:
-            user (str): The name of the user performing the query.
-            query (str): (optional) The word that the user has entered into the
-                search bar so far.
-
-        """
-        self.query = request.args.get("query")
-        #TODO: can we use userid instead?
-        self.user = request.args.get("user")
-
-        self.workingset_name_filter = True
-        self.property_value_filter = True
-
-        if self.query:
-            like_query = "%" + query + "%"
-            self.workingset_name_filter = WorkingSet.name.like(like_query)
-            self.property_value_filter = Property.value.like(like_query)
-
-
-    def dispatch_request(self):
-        """Return a JSON list of suggestions.
-
-        The list has a maximum of three types of suggestions: ``Set``\s,
-        ``Property``\s, and ``Sequence``\s. The response is formed like so::
+        The returned list has a maximum of three types of suggestions: 
+        ``Set``\s, ``Property``\s, and ``Sequence``\s. The response is formed
+        like so::
 
             {
                 "results": [
@@ -67,23 +47,26 @@ class AutoSuggest(View):
         ``get_suggested_properties``, and ``get_suggested_sequences``. Each
         function returns a list, all the lists are joined together into one.
 
-        Note that ``get_suggested_sequences`` is only run if the length of the
-        ``query`` is >= 2.
-
         Returns:
             A JSON response, or a 400 error if ``user`` is not supplied.
         """
+        params = dict(kwargs, **request.args)
+        self.project = Project.query.get(params["project_id"])
 
-        if not self.user:
-            abort(400)
+        if "query" in params and len(params["query"]) > 0:
+            query_string = params["query"][0]
+            like_query = "%" + query_string + "%"
+            self.set_name_filter = Set.name.like(like_query)
+            self.property_value_filter = Property.value.like(like_query)
+            self.sequence_filter = Sequence.sequence.like(like_query)
 
-        suggestions = get_suggested_sets()
-        suggestions.extend(get_suggested_properties())
+            suggestions = self.get_suggested_sets()
+            suggestions.extend(self.get_suggested_properties())
+            suggestions.extend(self.get_suggested_sequences())
 
-        if len(query) >= 2:
-            suggestions.extend(get_suggested_sequences())
-
-        return jsonify(results=suggestions)
+            return jsonify(results=suggestions)
+        else:
+            return "[]"
 
     def get_suggested_sets(self):
         """Return a list of dicts of suggestions of ``Set``\s that may
@@ -116,18 +99,15 @@ class AutoSuggest(View):
                     ...etc...
                 ]
         """
-        #TODO: Mystery clause
-        #TODO: document_count
-        sets = db.session.query(WorkingSet.id,
+        sets = db.session.query(Set.id,
             Property.name.label("text"),
-            literal_column("'phrase-set'").label("class"),
+            literal_column("'metadata'").label("class"),
             func.count(Property.unit_id.distinct()).label("unit_count")).\
-                filter(Property.unit_name == "sentence").\
-                filter(Property.value == WorkingSet.id).\
-                filter(WorkingSet.username == user).\
-                filter(Property.name == "phrase_set").\
-                filter(self.workingset_name_filter).\
-                group_by(WorkingSet.name).\
+                filter(Property.value == Set.id).\
+                filter(Set.project == self.project).\
+                filter(Property.name.like("%_set")).\
+                filter(self.set_name_filter).\
+                group_by(Set.name).\
                 all()
 
         return [set._asdict() for set in sets]
@@ -235,6 +215,10 @@ class AutoSuggest(View):
 
         return suggested_sequences
 
-wordseer.add_url_rule("/search-suggestions/autosuggest",
-    view_func=AutoSuggest.as_view("autosuggest"))
-
+register_rest_view(
+    AutoSuggest,
+    wordseer,
+    'searchsuggestions',
+    'autosuggestion',
+    parents=["project"]
+)

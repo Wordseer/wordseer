@@ -3,7 +3,8 @@ from inflect import engine as inflect_engine
 
 inflect = inflect_engine()
 
-def register_rest_view(view, blueprint, endpoint, name, parents=[], pk='', pk_type='int'):
+def register_rest_view(view, blueprint, endpoint, name, parents=[], pk='',
+    pk_type='int'):
     view_func = view.as_view(endpoint)
 
     if pk == '':
@@ -23,6 +24,10 @@ def register_rest_view(view, blueprint, endpoint, name, parents=[], pk='', pk_ty
                 view_func=view_func,
                 methods=['GET',]
             )
+            blueprint.add_url_rule('%s<%s:%s>%s<%s:%s>' %
+                (parent_url, pk_type, parent_pk, url, pk_type, pk),
+                view_func=view_func,
+                methods=['GET', 'PUT', 'DELETE'])
 
     blueprint.add_url_rule(url, defaults={pk: None},
              view_func=view_func, methods=['GET',])

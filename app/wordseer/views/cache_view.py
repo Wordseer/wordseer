@@ -9,20 +9,18 @@ from app.models import *
 from app.helpers.application_view import register_rest_view
 
 class QueryCacheView(MethodView):
-
-
     def get(self, **kwargs):
         params = dict(kwargs, **request.args)
-        self.dispatch(params)
+        return self.dispatch(params)
 
     def dispatch(self, params):
-        if params["clear"]:
-            self.clear_old_query(params)
+        if "clear" in params:
+            return self.clear_old_query(params)
         else:
-            self.new_query(params)
+            return self.new_query(params)
 
     def clear_old_query(self, params):
-        query = Query.get(params["cache_id"])
+        query = Query.query.get(params["query_id"])
         if query:
             query.delete()
             return jsonify({ "ok": True })
@@ -37,9 +35,9 @@ class QueryCacheView(MethodView):
         sentence_query = project.sentences
         some_filtering_happened = False
         if 'search' in keys:
-            some_filtering_happened = True
             sentences = self.apply_search_filters(params['search'][0],
                 sentence_query)
+            some_filtering_happened = True
         if (some_filtering_happened):
             query.sentences = sentence_query
             query.save()
@@ -65,5 +63,6 @@ register_rest_view(
     wordseer,
     'cache_view',
     'cache',
+    pk="query_id",
     parents=["project"]
 )

@@ -21,7 +21,7 @@ class PropertyMetadata(db.Model, Base):
             by this object should have their names and values described in
             the reading view on the frontend.
     """
-
+    
     type = db.Column(db.String)
     is_category = db.Column(db.Boolean)
     display_name = db.Column(db.String)

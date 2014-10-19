@@ -5,6 +5,7 @@ __all__ = [
     "words_view",
     "documents_view",
     "cache_view",
+    "searchsuggestions",
     "sentences_view",
     "sets",
 ]
