@@ -105,7 +105,7 @@ class DependencyCount(Count):
     # Belongs to a dependency
     dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id"))
     dependency = db.relationship("Dependency")
-
+    
     __mapper_args__ = {
         "polymorphic_identity": "dependency_count",
     }

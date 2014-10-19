@@ -3,9 +3,10 @@ models.
 """
 
 import logging
+from sqlalchemy import func
 
 from app import db
-from app.models import Document, Dependency, Sequence
+from app.models import *
 from .logger import ProjectLogger
 from app.models import Document, Dependency, Sequence, Word
 
@@ -61,36 +62,35 @@ def count_dependencies(project, commit_interval):
     logger = logging.getLogger(__name__)
     project_logger = ProjectLogger(logger, project)
 
-    dependencies_in_sentences = db.session.execute("""
-        SELECT dependency_id,
-            COUNT(DISTINCT document_id) AS document_count,
-            COUNT(DISTINCT sentence_id) AS sentence_count
-        FROM dependency_in_sentence
-        WHERE project_id = %s
-        GROUP BY dependency_id
-    """ % project.id).fetchall()
+    dependency_counts = db.session.query(
+        Dependency.id.label("dependency_id"),
+        func.count(Sentence.document_id.distinct()).label("document_count"),
+        func.count(DependencyInSentence.sentence_id).label("sentence_count")).\
+    filter(DependencyInSentence.dependency_id == Dependency.id).\
+    filter(DependencyInSentence.sentence_id == Sentence.id).\
+    filter(Sentence.project_id == project.id).\
+    group_by(Dependency.id)
+
+    num_dependencies = db.session.query(Dependency.id).count()
 
     project_logger.info("Calculating counts for dependencies")
 
-    for row in dependencies_in_sentences:
-        dependency = Dependency.query.get(row.dependency_id)
-        dependency_counts = dependency.get_counts(project)
-
-        dependency_counts.document_count = row.document_count
-        dependency_counts.sentence_count = row.sentence_count
-
-        dependency_counts.save(False)
-        dependency.save(False)
-
+    for row in dependency_counts:
         count += 1
+        dependency = Dependency.query.get(row.dependency_id)
+        dep_count = DependencyCount(
+            dependency=dependency,
+            project=project,
+            document_count=row.document_count,
+            sentence_count=row.sentence_count)
+        dep_count.save(False)
+        dependency.save(False)
         if count % commit_interval == 0:
             db.session.commit()
             project_logger.info("Calculating count for dependency %s/%s", count,
-                len(dependencies_in_sentences))
-
+                num_dependencies)
     db.session.commit()
-    project_logger.info('Counted %s dependencies.',
-        len(dependencies_in_sentences))
+    project_logger.info('Counted %s dependencies.', count)
 
 def count_sequences(project, commit_interval):
     """Calculate counts for sequences.
@@ -104,37 +104,37 @@ def count_sequences(project, commit_interval):
     logger = logging.getLogger(__name__)
     project_logger = ProjectLogger(logger, project)
     #pdb.set_trace()
-    sequences_in_sentences = db.session.execute("""
-        SELECT sequence_id,
-            COUNT(DISTINCT document_id) AS document_count,
-            COUNT(DISTINCT sentence_id) AS sentence_count
-        FROM sequence_in_sentence
-        WHERE project_id = %s
-        GROUP BY sequence_id
-    """ % project.id).fetchall()
+    sequence_counts = db.session.query(
+        Sequence.id.label("sequence_id"),
+        func.count(Sentence.document_id.distinct()).label("document_count"),
+        func.count(SequenceInSentence.sentence_id).label("sentence_count")).\
+    filter(SequenceInSentence.sequence_id == Sequence.id).\
+    filter(SequenceInSentence.sentence_id == Sentence.id).\
+    filter(Sentence.project_id == project.id).\
+    group_by(Sequence.id)
+
+    num_sequences = db.session.query(Sequence.id).count()
 
     project_logger.info("Calculating counts for sequences")
 
-    for row in sequences_in_sentences:
+    for row in sequence_counts:
         count += 1
-
         sequence = Sequence.query.get(row.sequence_id)
-        sequence_counts = sequence.get_counts(project)
-
-        sequence_counts.document_count = row.document_count
-        sequence_counts.sentence_count = row.sentence_count
-
-        sequence_counts.save(False)
+        sequence_count = SequenceCount(
+            project=project,
+            sequence=sequence,
+            document_count=row.document_count,
+            sentence_count=row.sentence_count)
+        sequence_count.save(False)
         sequence.save(False)
 
         if count % commit_interval == 0:
             db.session.commit()
             project_logger.info("Calculating count for sequence %s/%s", count,
-                len(sequences_in_sentences))
+                num_sequences)
 
     db.session.commit()
-    project_logger.info('Counted %s sequences.',
-        len(sequences_in_sentences))
+    project_logger.info('Counted %s sequences.', count)
 
 def count_words(project, commit_interval):
     """Calculate counts for words.
@@ -148,30 +148,31 @@ def count_words(project, commit_interval):
     logger = logging.getLogger(__name__)
     project_logger = ProjectLogger(logger, project)
 
-    words_in_sentences = db.session.execute("""
-        SELECT word_id,
-            COUNT(DISTINCT sentence_id) AS sentence_count
-        FROM word_in_sentence
-        WHERE project_id = %s
-        GROUP BY word_id
-    """ % project.id).fetchall()
+    num_words = db.session.query(Word.id).count()
+    word_counts = db.session.query(
+        Word.id.label("word_id"),
+        func.count(Sentence.document_id.distinct()).label("document_count"),
+        func.count(WordInSentence.sentence_id).label("sentence_count")).\
+    filter(WordInSentence.word_id == Word.id).\
+    filter(WordInSentence.sentence_id == Sentence.id).\
+    filter(Sentence.project_id == project.id).\
+    group_by(Word.id)
 
-    for row in words_in_sentences:
+    for row in word_counts:
         count += 1
         word = Word.query.get(row.word_id)
-        word_counts = word.get_counts(project)
-
-        word_counts.sentence_count = row.sentence_count
-
-        word_counts.save(False)
+        word_count = WordCount(
+            project=project,
+            word=word,
+            document_count=row.document_count,
+            sentence_count=row.sentence_count)
+        word_count.save(False)
         word.save(False)
-
         if count % commit_interval == 0:
             db.session.commit()
             project_logger.info("Calculating count for word %s/%s", count,
-                len(words_in_sentences))
+                num_words)
 
     db.session.commit()
-    project_logger.info('Counted %s words.',
-        len(words_in_sentences))
+    project_logger.info('Counted %s words.', count)
 

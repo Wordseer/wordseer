@@ -22,7 +22,6 @@ class Property(db.Model, Base):
 
     # Attributes
     unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
-    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     metadata_id = db.Column(db.Integer, db.ForeignKey("property_metadata.id"))
 
     name = db.Column(db.String, index=True)

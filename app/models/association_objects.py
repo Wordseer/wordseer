@@ -163,3 +163,22 @@ class SentenceInQuery(db.Model, Base):
     sentence = db.relationship("Sentence",
         backref=db.backref(
             "sentence_in_query", cascade="all, delete-orphan"))
+
+class PropertyOfSentence(db.Model, Base):
+    """Association object for properties belonging to sentences.
+
+    Attributes:
+        property (Property): The ``Property'' object that applies to this
+            sentence.
+        sentence (Sentence): The ``Sentence'' object that has this property.
+    """
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
+    sentence = db.relationship("Sentence",
+        backref=db.backref("property_of_sentence"),
+        cascade="all")
+    property_id = db.Column(db.Integer, db.ForeignKey("property.id"))
+    property = db.relationship("Property",
+        backref=db.backref("sentences_with_property",
+            cascade="all, delete-orphan"))
+
+

@@ -35,8 +35,14 @@ class SentencesView(MethodView):
                 })
             return jsonify(results = results, total = len(results))
 
-    def make_sentence_dict(self, sentence, matching_words):
-        sentence_dict = {}
+    def make_sentence_html(self, sentence, matching_words):
+        """ Constructs an HTML string to display to the user, in which each
+        word is enclosed by a <span class='word' word-id=<word_id>
+        sentence-id=<sentence_id>></span> and the whole
+        sentence is enclosed by a <span class='sentence'>. We sould send the
+        raw data, and have the javascript create and render the HTML, but
+        creating the HTML server side turns out to be much faster in practice.
+        """
         html = ["<span class='sentence'>"]
         for word_in_sentence in sentence.word_in_sentence:
             html_classes = ["word"]
@@ -53,7 +59,19 @@ class SentencesView(MethodView):
                 "</span>"])
             html.append(word_html)
         html.append("</span>")
-        sentence_dict["words"] = "".join(html)
+        return "".join(html)
+
+    def add_metadata_properties(self, sentence, sentence_dict):
+        """Adds the properties of each sentence to the dictionary being sent to
+        the client."""
+        for property in sentence.properties:
+            sentence_dict[property.name] = property.value
+
+    def make_sentence_dict(self, sentence, matching_words):
+        sentence_dict = {}
+        sentence_dict["words"] = self.make_sentence_html(sentence,
+                                                         matching_words)
+        self.add_metadata_properties(sentence, sentence_dict)
         return sentence_dict
 
     def post(self):

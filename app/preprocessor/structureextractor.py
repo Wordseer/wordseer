@@ -8,6 +8,7 @@ from lxml import etree
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 
+from app.models.association_objects import PropertyOfSentence
 from app.models.project import Project
 from app.models.document import Document
 from app.models.documentfile import DocumentFile
@@ -366,23 +367,25 @@ def assign_sentences(document):
     :param Document document: The document to use
     """
 
-    document.all_sentences = _get_sentences(document)
+    document.all_sentences = _assign_sentence_metadata(document, [])
 
-def _get_sentences(unit):
+def _assign_sentence_metadata(unit, all_parent_properties):
     """Recursively traverse the unit tree for sentences.
 
     :param Unit unit: The unt to use
     :return list: A nested list of sentences
     """
-
-    if not unit.children:
-        return unit.sentences
-
-    else:
-        sentences = list(unit.sentences)
-
-        for child in unit.children:
-            sentences.extend(_get_sentences(child))
-
-        return sentences
+    properties = all_parent_properties[:]
+    properties.extend(unit.properties)
+    sentences = list(unit.sentences)
+    for sentence in sentences:
+        for property in properties:
+            property_of_sentence = PropertyOfSentence(
+                property=property,
+                sentence=sentence)
+            property_of_sentence.save()
+            
+    for child in unit.children:
+        sentences.extend(_assign_sentence_metadata(child, properties))
+    return sentences
 

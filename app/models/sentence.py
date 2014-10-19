@@ -57,7 +57,8 @@ class Sentence(db.Model, Base):
     document = db.relationship("Document", foreign_keys=[document_id],
         backref="all_sentences")
 
-    properties = db.relationship("Property", backref="sentence")
+    properties = association_proxy("property_of_sentence", "property",
+        creator=lambda property: PropertyOfSentence(property=property))
 
     def __repr__(self):
         """Representation of the sentence, showing its text.
