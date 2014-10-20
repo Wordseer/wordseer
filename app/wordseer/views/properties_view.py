@@ -1,48 +1,32 @@
 from flask.views import MethodView
 from flask.json import jsonify, dumps
 from flask import request
+from sqlalchemy import func
 
 from app import app
 from app.wordseer import wordseer
 from app.models import *
+
 
 from app.helpers.application_view import register_rest_view
 
 class PropertiesView(MethodView):
     """ Lists the property types that apply to a type of unit. """
     def get(self, **kwargs):
-
         params = dict(kwargs, **request.args)
-
-        if "sentence_id" in kwargs.keys():
-            sentence = Sentence.query.get(params["sentence_id"])
-
-            if not sentence:
-                # TODO: handle
-                print("Sentence not found")
-
-            return jsonify(properties = dumps(sentence.properties))
-
-        elif "document_id" in kwargs.keys():
-            document = Document.query.get(kwargs["document_id"])
-
-            if not document:
-                # TODO: handle
-                print("Document not found")
-
-            return jsonify(result = document.properties)
-
-        elif "project_id" in kwargs.keys():
+        project = None
+        if "project_id" in kwargs.keys():
             project = Project.query.get(kwargs["project_id"])
-            if not project:
-                # TODO: real error response
-                print("Project not found")
-            properties = PropertyMetadata.query.\
-                filter(PropertyMetadata.is_category == True)
-            if "unit" in params.keys() and params["unit"][0] == "document":
+        if project is None:
+            # TODO: real error response
+            print("Project not found")
+
+        properties = PropertyMetadata.query.\
+            filter(PropertyMetadata.is_category == True)
+        if "unit" in params.keys():
+            if params["unit"][0] == "document":
                 properties = properties.filter(
                     PropertyMetadata.unit_type == "document")
-
             result = []
             for prop in properties:
                 result.append({
@@ -51,14 +35,7 @@ class PropertiesView(MethodView):
                     "type": prop.data_type,
                     "valueIsDisplayed": prop.display,
                 })
-            return jsonify(results = result)
-
-
-        elif "property_id" in kwargs.keys():
-            pass
-
-        else:
-            return
+        return jsonify(results = result)
 
     def post(self):
         pass
@@ -72,39 +49,61 @@ class PropertiesView(MethodView):
 class PropertiesMetaView(MethodView):
 
     def get(self, **kwargs):
-
         params = dict(kwargs, **request.args)
-
+        project = None
         if "project_id" in kwargs.keys():
             project = Project.query.get(kwargs["project_id"])
+        if project is None:
+            # TODO: real error response
+            print("Project not found")
 
-            if not project:
-                # TODO: real error response
-                print("Project not found")
+        view_type = params.get("view")[0]
 
-            # TODO: this sucks but PropertyMetadata is not being populated by
-            # the preprocessor so this is the only alternative
-            property_meta = { i.name: i.data_type for i in Property.query.all() }
+        properties = db.session.query(
+            PropertyMetadata.property_name.label("property_name"),
+            PropertyMetadata.data_type.label("data_type"),
+            PropertyMetadata.date_format.label("date_format")).\
+        join(Property, Property.property_metadata_id == PropertyMetadata.id).\
+        filter(Property.project_id == project.id).\
+        filter(PropertyMetadata.is_category == True).\
+        group_by(PropertyMetadata.property_name)
 
-            result = []
+        results = []
+        for property in properties:
+            type = property.data_type
+            if type == "date":
+                type += "_" + property.date_format
 
-            for prop in property_meta.keys():
-                ctype = property_meta[prop]
-                if ctype == None:
-                    ctype = "string"
-                result.append({
-                    "propertyName": prop,
-                    "text":  prop,
-                    "type": ctype
-                })
-
-            return jsonify(results = result)
-
-        elif "property_id" in kwargs.keys():
-            pass
-
-        else:
-            return
+            values = db.session.query(
+                Property.value.label("value"),
+                func.count(Property.unit_id.distinct()).label("unit_count")).\
+            filter(Property.project_id == project.id).\
+            filter(Property.name == property.property_name).\
+            group_by(Property.value)
+            metadata = {
+                "propertyName": property.property_name,
+                "displayName": property.property_name,
+                "text": property.property_name,
+                "type": type,
+                "children": []
+            }
+            for value in values:
+                property_value = {
+                        "count": value.unit_count,
+                        "document_count": value.unit_count,
+                        "propertyName": property.property_name,
+                        "displayName": property.property_name,
+                        "text": value.value,
+                        "value": value.value,
+                        "leaf": True
+                        }
+                if view_type == "list":
+                    results.append(property_value)
+                elif view_type == "tree":
+                    metadata["children"].append(property_value)
+            if view_type == "tree":
+                results.append(metadata)
+        return jsonify(children = results)
 
     def post(self):
         pass

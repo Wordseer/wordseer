@@ -26,6 +26,7 @@ class StructureExtractor(object):
         :return StructureExtractor: a StructureExtractor instance
         """
         self.str_proc = str_proc
+        self.project = str_proc.project
         self.structure_file = open(structure_file, "r")
         self.document_structure = json.load(self.structure_file)
         self.logger = logging.getLogger(__name__)
@@ -107,7 +108,7 @@ class StructureExtractor(object):
                 current_unit = Unit(name=structure["structureName"])
                 # Get the metadataget
                 current_unit.properties = get_metadata(
-                    structure, node, current_unit.name)
+                    structure, node, current_unit.name, self.project)
                 # If there are child units, retrieve them and put them in a
                 # list, otherwise get the sentences
                 children = []
@@ -138,7 +139,7 @@ class StructureExtractor(object):
 
             for sentence in new_sentences:
                 sentence.properties = get_metadata(
-                    structure, combined_nodes[0], "sentence")
+                    structure, combined_nodes[0], "sentence", self.project)
                 units[-1].sentences.append(sentence)
 
             combined_sentence = ""
@@ -196,7 +197,7 @@ class StructureExtractor(object):
                 if node_text != None:
                     sentence_text += node_text.strip() + "\n"
                     sentence_metadata.extend(get_metadata(structure,
-                        sentence_node, "sentence"))
+                        sentence_node, "sentence", self.project))
 
 #        if tokenize:
 #            sents = self.str_proc.tokenize(sentence_text)
@@ -216,7 +217,7 @@ class StructureExtractor(object):
 
         return result_sentences
 
-def get_metadata(structure, node, unit_type):
+def get_metadata(structure, node, unit_type, project):
     """Return a list of Property objects of the metadata of the Tags in
     node according to the rules in metadata_structure.
 
@@ -267,6 +268,7 @@ def get_metadata(structure, node, unit_type):
                 extracted = get_xpath_text(xpath, node)
             for val in extracted:
                 property = Property(
+                    project=project,
                     value=val,
                     name=property_name,
                     property_metadata = metadata)

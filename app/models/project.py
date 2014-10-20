@@ -48,6 +48,8 @@ class Project(db.Model, Base):
         backref="project", lazy="dynamic")
     dependency_in_sentence = db.relationship("DependencyInSentence",
         backref="project", lazy="dynamic")
+    properties = db.relationship("Property",
+        backref="project", lazy="dynamic")
     users = association_proxy("project_users", "user",
         creator=lambda user: ProjectsUsers(user=user))
 

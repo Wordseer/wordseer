@@ -9,13 +9,13 @@ Ext.define("WordSeer.store.MetadataListStore", {
 	proxy: {
 		type: 'ajax',
 		noCache: false,
-		url: ws_project_path + project_id + '/properties',
+		url: ws_project_path + project_id + '/meta_properties',
 		extraParams: {
-			user: getUsername(),
+			view: "list",
 		},
 		reader: {
           type: 'json',
-          root: 'results',
+          root: 'children',
       },
 	},
 	sorters: [{property:'count', direction: 'DESC'}],
