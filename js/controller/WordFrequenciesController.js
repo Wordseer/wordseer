@@ -155,7 +155,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					.showControls(false)
 					.showXAxis(true)
 					.reduceXTicks(true)
-					.color(function(){ return COLOR_SCALE[0]})
+					.color(function(){ return '#1a1a1a'; })
 					;
 
 					chart.multibar
@@ -286,8 +286,8 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						.transitionDuration(350)
 						.showLegend(false)
 						.showYAxis(true)
-						.useInteractiveGuideline(true)
-						.color(function(){ return COLOR_SCALE[0]})
+						// .useInteractiveGuideline(true)
+						.color(function(){ return '#1a1a1a'; })
 						.showXAxis(true)
 						.xScale(d3.time.scale())
 						.forceY(0)
@@ -336,7 +336,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				});
 
 				svg.call(chart);
-				debugger;
 				// fade out overflowing labels
 				svg.append("linearGradient")
 			      .attr("id", "fadeToWhiteY")
