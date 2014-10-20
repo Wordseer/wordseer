@@ -26,13 +26,15 @@ class SentencesView(MethodView):
         if query:
             results = []
             for sentence in query.sentences:
-                results.append({
+                result = {
                     "sentence": self.make_sentence_dict(sentence,
                                                         matching_words),
                     "id": sentence.id,
                     "document_id": sentence.document_id,
                     "sentence_set": " ".join(sentence.sets)                 
-                })
+                }
+                self.add_metadata_properties(sentence, result)
+                results.append(result)
             return jsonify(results = results, total = len(results))
 
     def make_sentence_html(self, sentence, matching_words):
@@ -61,17 +63,16 @@ class SentencesView(MethodView):
         html.append("</span>")
         return "".join(html)
 
-    def add_metadata_properties(self, sentence, sentence_dict):
+    def add_metadata_properties(self, sentence, result):
         """Adds the properties of each sentence to the dictionary being sent to
         the client."""
         for property in sentence.properties:
-            sentence_dict[property.name] = property.value
+            result[property.name] = property.value
 
     def make_sentence_dict(self, sentence, matching_words):
         sentence_dict = {}
         sentence_dict["words"] = self.make_sentence_html(sentence,
                                                          matching_words)
-        self.add_metadata_properties(sentence, sentence_dict)
         return sentence_dict
 
     def post(self):

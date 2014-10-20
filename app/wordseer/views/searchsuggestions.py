@@ -55,6 +55,8 @@ class AutoSuggest(MethodView):
 
         if "query" in params and len(params["query"]) > 0:
             query_string = params["query"][0]
+            if len(query_string) == 0:
+                return "[]"
             like_query = "%" + query_string + "%"
             self.set_name_filter = Set.name.like(like_query)
             self.property_value_filter = Property.value.like(like_query)
@@ -64,7 +66,8 @@ class AutoSuggest(MethodView):
             suggestions.extend(self.get_suggested_properties())
             suggestions.extend(self.get_suggested_sequences())
 
-            return jsonify(results=suggestions)
+            return jsonify(results= sorted(suggestions,
+                key=lambda s: -1*s["sentence_count"]))
         else:
             return "[]"
 
@@ -144,26 +147,30 @@ class AutoSuggest(MethodView):
         suggested_metadata = []
         #TODO: document_count, sentence_count
         metadata = db.session.query(
-            PropertyMetadata.display_name,
-            Property.name,
-            Property.value,
-            literal_column("'metadata'").label("class"),
-            func.count(Property.unit_id.distinct()).label("unit_count")).\
+            PropertyMetadata.property_name.label("name"),
+            PropertyMetadata.display_name.label("display_name"),
+            Property.value.label("value"),
+            func.count(PropertyOfSentence.sentence_id.distinct()).label("sentence_count")).\
                 filter(self.property_value_filter).\
-                filter(Property.metadata_id == PropertyMetadata.id).\
+                filter(PropertyOfSentence.property_id == Property.id).\
+                filter(Property.property_metadata_id == PropertyMetadata.id).\
                 filter(PropertyMetadata.is_category == True).\
                 filter(not_(Property.name.like("%_set"))).\
                 group_by(Property.value).\
                 limit(50).\
                 all()
 
-        for metadatum in metadata:
-            property_name = metadata.name
-            if metadatum.display_name:
-                property_name = metadatum.display_name
-
-            suggestion = metadatum._asdict()
-            suggestion["text"] = {property_name.lower(): metadatum.value}
+        for datum in metadata:
+            name = datum.name
+            if datum.display_name is not None:
+                name = datum.display_name
+            suggestion = {
+                "class": "metadata",
+                "sentence_count": datum.sentence_count,
+                "property_name": name,
+                "text": "%s: %s" % (name, str(datum.value)),
+                "value": datum.value
+            }
             suggested_metadata.append(suggestion)
 
         return suggested_metadata

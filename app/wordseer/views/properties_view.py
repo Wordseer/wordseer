@@ -37,36 +37,20 @@ class PropertiesView(MethodView):
             if not project:
                 # TODO: real error response
                 print("Project not found")
-            properties = []
-            if "unit" in params.keys():
-                if params["unit"] == "document":
-                    for document in project.get_documents():
-                        properties.extend(document.properties)
-                elif params["unit"] == "sentence":
-                    sentences = []
-                    for document in project.get_documents():
-                        sentences.extend(document.all_sentences)
-                    for sentence in sentences:
-                            properties.extend(sentence.properties)
-            else:
-                properties = project.get_documents()[0].properties
+            properties = PropertyMetadata.query.\
+                filter(PropertyMetadata.is_category == True)
+            if "unit" in params.keys() and params["unit"][0] == "document":
+                properties = properties.filter(
+                    PropertyMetadata.unit_type == "document")
 
             result = []
-
             for prop in properties:
-                dt = prop.data_type
-                if dt == None:
-                    dt = "string"
-
                 result.append({
-                    "count": 0,
-                    "document_count": 0,
-                    "leaf": True,
-                    "propertyName": prop.name,
-                    "text": prop.value,
-                    "value": prop.value,
+                    "nameToDisplay": prop.display_name,
+                    "propertyName": prop.property_name,
+                    "type": prop.data_type,
+                    "valueIsDisplayed": prop.display,
                 })
-
             return jsonify(results = result)
 
 

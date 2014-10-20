@@ -253,7 +253,7 @@ def get_metadata(structure, node, unit_type):
                 date_format=date_format,
                 is_category=spec.get("isCategory"),
                 display_name=spec.get("displayName"),
-                display=spec.get(spec.get("valueIsDisplayed")),
+                display=spec.get("valueIsDisplayed"),
                 unit_type=unit_type)
             metadata.save()
 
