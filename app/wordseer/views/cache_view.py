@@ -41,9 +41,11 @@ class QueryCacheView(MethodView):
         if 'phrases' in keys:
             sentence_query = self.apply_phrase_filters(params['phrases'][0],
                                                        sentence_query)
+            some_filtering_happened = True
         if 'metadata' in keys:
             sentence_query = self.apply_property_filters(params['metadata'][0],
                                                          sentence_query)
+            some_filtering_happened = True
         if some_filtering_happened:
             query.sentences = sentence_query
             query.save()
@@ -69,16 +71,19 @@ class QueryCacheView(MethodView):
         that contain the specified phrases.
         """
         json_parsed_phrase_filters = loads(phrase_filters_string)
+        matching_sentences = None
         for phrase_filter in json_parsed_phrase_filters:
             # Each phrase filter has the format <word|phrase>_<id>_surface
             components = phrase_filter.split("_")
             sequence_id = components[1]
             sequence = Sequence.query.get(sequence_id)
-            matching_sentences = SequenceInSentence.query.filter(
-                SequenceInSentence.sequence_id == sequence_id).subquery()
+            print sequence
+            matching_sentences = db.session.query(
+                SequenceInSentence.sentence_id).filter(
+                SequenceInSentence.sequence_id == sequence.id).subquery()
             filtered_sentences = filtered_sentences.join(
                 matching_sentences,
-                matching_sentences.c.sentence_id == Sentence.id)
+                Sentence.id == matching_sentences.c.sentence_id)
         return filtered_sentences
 
     def apply_property_filters(self, property_filters_string,
@@ -118,7 +123,7 @@ class QueryCacheView(MethodView):
             filtered_sentences = filtered_sentences.join(
                 matching_sentences,
                 Sentence.id == matching_sentences.c.sentence_id)
-            return filtered_sentences
+        return filtered_sentences
 
     def put(self, id):
         pass
