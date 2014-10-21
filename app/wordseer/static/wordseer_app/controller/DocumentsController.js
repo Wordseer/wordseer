@@ -26,7 +26,7 @@ Ext.define('WordSeer.controller.DocumentsController', {
 	init: function() {
 //		console.log('Document controller initialized');
 		Ext.Ajax.request({
-			url: ws_project_path + project_id + '/properties/',
+			url: ws_project_path + project_id + '/meta_properties/',
 			method:'GET',
 			disableCaching: false,
 			params:{

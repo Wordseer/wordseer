@@ -10,7 +10,7 @@ from app.models import *
 
 from app.helpers.application_view import register_rest_view
 
-class PropertiesView(MethodView):
+class PropertiesMetaView(MethodView):
     """ Lists the property types that apply to a type of unit. """
     def get(self, **kwargs):
         params = dict(kwargs, **request.args)
@@ -46,8 +46,13 @@ class PropertiesView(MethodView):
     def put(self, id):
         pass
 
-class PropertiesMetaView(MethodView):
-
+class PropertiesView(MethodView):
+    """ Lists all the property values of the sentences specified by the
+    parameters. Depending on the view that is asked for, returns them as a
+    list of property values (view=list) or as a hierarchy, where the list
+    of property names is the top level and the values for a given property are
+    under it. 
+    """
     def get(self, **kwargs):
         params = dict(kwargs, **request.args)
         project = None
@@ -80,6 +85,17 @@ class PropertiesMetaView(MethodView):
             filter(Property.project_id == project.id).\
             filter(Property.name == property.property_name).\
             group_by(Property.value)
+
+            if "query_id" in params:
+                # Restrict to just the sentences that match the given query.
+                values = values.join(
+                PropertyOfSentence,
+                    PropertyOfSentence.property_id == Property.id).\
+                join(SentenceInQuery,
+                    PropertyOfSentence.sentence_id ==
+                    SentenceInQuery.sentence_id).\
+                filter(SentenceInQuery.query_id == params["query_id"][0])
+
             metadata = {
                 "propertyName": property.property_name,
                 "displayName": property.property_name,
@@ -115,17 +131,17 @@ class PropertiesMetaView(MethodView):
         pass
 
 register_rest_view(
-    PropertiesView,
-    wordseer,
-    'properties_view',
-    'property',
-    parents=["project", "document", "sentence"],
-)
-
-register_rest_view(
     PropertiesMetaView,
     wordseer,
     'properties_meta_view',
     'meta_property',
+    parents=["project", "document", "sentence"],
+)
+
+register_rest_view(
+    PropertiesView,
+    wordseer,
+    'properties_view',
+    'property',
     parents=["project", "document", "sentence"],
 )

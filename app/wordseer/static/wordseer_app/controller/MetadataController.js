@@ -141,17 +141,9 @@ Ext.define('WordSeer.controller.MetadataController', {
     which the metadata belongs.
     */
     getMetadata:function(formValues, panel){
-        var params = Ext.apply({
-            instance:getInstance(),
-            user:getUsername(),
-            onlyMetadata:"true"
-        }, formValues.serialize());
-        panel.getLayoutPanelModel().getMetadataTreeStore().getProxy()
-            .extraParams = params;
-        panel.getLayoutPanelModel().getMetadataTreeStore().load();
-        panel.getLayoutPanelModel().getMetadataListStore().getProxy()
-            .extraParams = params;
-        panel.getLayoutPanelModel().getMetadataListStore().load();
+        var params = {params: formValues.serialize()};
+        panel.getLayoutPanelModel().getMetadataTreeStore().load(params);
+        panel.getLayoutPanelModel().getMetadataListStore().load(params);
     },
 
     /** Responds to a search query by calling the {@link #getMetadata} function

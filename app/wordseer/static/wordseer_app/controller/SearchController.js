@@ -48,7 +48,7 @@ Ext.define('WordSeer.controller.SearchController', {
 
 	init: function() {
 		Ext.Ajax.request({
-			url: ws_api_path + ws_project_path + project_id + '/properties',
+			url: ws_api_path + ws_project_path + project_id + '/meta_properties',
 			method:'GET',
 			disableCaching: false,
 			params:{
