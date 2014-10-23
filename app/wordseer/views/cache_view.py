@@ -75,12 +75,30 @@ class QueryCacheView(MethodView):
         for phrase_filter in json_parsed_phrase_filters:
             # Each phrase filter has the format <word|phrase>_<id>_surface
             components = phrase_filter.split("_")
-            sequence_id = components[1]
-            sequence = Sequence.query.get(sequence_id)
-            print sequence
-            matching_sentences = db.session.query(
-                SequenceInSentence.sentence_id).filter(
-                SequenceInSentence.sequence_id == sequence.id).subquery()
+            if components[0] == "phrase":
+                sequence_id = components[1]
+                sequence = Sequence.query.get(sequence_id)
+                matching_sentences = db.session.query(
+                    SequenceInSentence.sentence_id).filter(
+                    SequenceInSentence.sequence_id == sequence.id).subquery()
+            elif components[0] == "word":
+                word_id = components[1]
+                word = Word.query.get(word_id)
+                if "." in word_id:
+                    # Indicates that we should use the lemmatized form
+                    # see views/words_view.py
+                    word_id = word_id.replace(".", "")
+                    word = Word.query.get(word_id)
+                    matching_sentences = db.session.query(
+                        WordInSentence.sentence_id).\
+                    join(Word, WordInSentence.word_id == Word.id).\
+                    filter(Word.lemma == word.lemma).subquery()
+                else:
+                    matching_sentences = db.session.query(
+                        WordInSentence.sentence_id).\
+                    filter(WordInSentence.word_id == word.id).subquery()
+
+
             filtered_sentences = filtered_sentences.join(
                 matching_sentences,
                 Sentence.id == matching_sentences.c.sentence_id)
