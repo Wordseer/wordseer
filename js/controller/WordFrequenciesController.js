@@ -15,21 +15,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				'search': this.requestWordFrequenciesData,
 				'changeDateDetail': this.changeDateDetail,
 			},
-			'word-frequencies  checkbox[name=stacked]': {
-				'change': this.change,
-			},
-			'word-frequencies  checkbox[name=normalized]': {
-				'change': this.changeNormalized,
-			},
-			'word-frequencies  checkbox[name=labels]': {
-				'change': this.toggleLabels,
-			},
-			'word-frequencies checkbox[action=hide-show-chart]': {
-				'change': this.hideShowChart,
-			},
-			'word-frequencies  combobox': {
-				'change': this.changeTopN,
-			}
 		});
 	},
 
@@ -98,7 +83,15 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				});
 
 				word_frequencies_panel.data = data;
-		        this.draw(data, word_frequencies_panel);
+
+
+				// new or update
+				if (word_frequencies_panel.down('#canvas').el.dom.childElementCount == 1){
+					this.draw(data, word_frequencies_panel);
+				} else {
+					this.updateCharts(data);
+				}
+
 				word_frequencies_panel.fireEvent('rendered', word_frequencies_panel);
 		    },
 		    reset:function(response) {
@@ -132,7 +125,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			var container = canvas.append('div')
 				.attr("class", "viz-container");
 
-			container.append('div')
+			var viztitle = container.append('div')
 				.attr('class', 'property')
 				.text(x.property);
 
@@ -146,24 +139,100 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			nv.addGraph(function() {
 			    if (x.type == "string" || x.type == "number") {
 					chart = nv.models.multiBarChart()
-					.transitionDuration(300)
-					.delay(0)
-					.groupSpacing(0.45)
-					.staggerLabels(false)
-					.defaultState({"stacked": true})
-					.showLegend(false)
-					.showControls(false)
-					.showXAxis(true)
-					.reduceXTicks(true)
-					.color(function(){ return '#1a1a1a'; })
-					;
-
-					chart.multibar
-					.hideable(false);
+						.delay(0)
+						.groupSpacing(0.45)
+						.staggerLabels(false)
+						.showLegend(false)
+						.showControls(false)
+						.showXAxis(true)
+						.reduceXTicks(true)
+						.color(function(){ return '#1a1a1a'; })
+						;
 
 					if (x.streams[0].values.length < 25) {
 						chart.reduceXTicks(false);
 					}
+
+					chart.xAxis
+						.scale(d3.scale.ordinal());
+
+					// add a sorting control to the viz title
+					var sort_control = viztitle.append('span')
+						.attr('class', 'sort')
+							.append('i')
+							.attr('class', 'sort-control fa fa-sort-alpha-asc')
+							;
+
+					// default sorting
+					sort_control
+						// add a menu to change sorting
+						.append('span')
+						.attr('class', 'sort-menu')
+						.selectAll('i')
+							.data([
+								'fa-sort-alpha-asc',
+								'fa-sort-alpha-desc',
+								'fa-sort-amount-asc',
+								'fa-sort-amount-desc'
+							])
+							.enter()
+							.append('i')
+							.attr('class', function(d, i){
+								var classval = 'fa ' + d;
+								if (i == 0) { classval += ' selected'; }
+								return classval;
+							})
+							.on('click', function(d, i){
+								svg.datum(function(data){
+									switch (i) {
+										case 0:
+											// alpha asc
+											data[0].values.sort(function(a,b){
+												return d3.ascending(a.x, b.x);
+												});
+											break;
+										case 1:
+											// alpha desc
+											data[0].values.sort(function(a,b){
+												return d3.descending(a.x, b.x);
+												});
+											break;
+										case 2:
+											// value asc
+											data[0].values.sort(function(a,b){
+												return d3.ascending(a.y, b.y);
+												});
+											break;
+										case 3:
+											// value desc
+											data[0].values.sort(function(a,b){
+												return d3.descending(a.y, b.y);
+												});
+											break;
+										default:
+											// don't do nothin
+											break;
+									}
+									return data;
+								});
+
+								// update menu display and current sort icon
+								d3.select(this.parentElement)
+									.selectAll('i')
+									.classed('selected', false)
+									;
+
+								d3.select(this)
+									.classed('selected', true)
+									;
+
+								sort_control.attr('class', 'sort-control fa ' + d);
+								chart.update();
+
+							})
+							;
+
+
 
 				} else if (x.type.search(/^date_/) >= 0) {
 					// retrieve format string from type
@@ -283,10 +352,8 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					;
 
 					chart = nv.models.lineChart()
-						.transitionDuration(350)
 						.showLegend(false)
 						.showYAxis(true)
-						// .useInteractiveGuideline(true)
 						.color(function(){ return '#1a1a1a'; })
 						.showXAxis(true)
 						.xScale(d3.time.scale())
@@ -302,11 +369,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 								return format(d3.time.scale().invert(v));
 								})
 						;
-
-					chart
-						.lines
-							.interpolate('monotone')
-							;
 				}
 				chart.yAxis
 			        // .ticks
@@ -317,11 +379,12 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 				chart.xAxis
 					// .staggerLabels(true)
-					.showMaxMin(true)
+					// .showMaxMin(true)
 					.rotateLabels(45)
 					;
 
 				chart.margin({left: 55, bottom: 100, right: 45});
+				chart.transitionDuration(500);
 				chart.tooltipContent(function(key, x, y, e, graph){
 					return '<table class="nv-pointer-events-none">' +
 						'<tr class="nv-pointer-events-none">'+
@@ -336,6 +399,8 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				});
 
 				svg.call(chart);
+
+
 				// fade out overflowing labels
 				svg.append("linearGradient")
 			      .attr("id", "fadeToWhiteY")
@@ -443,6 +508,17 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			})
 		;
 		chart.update();
+	},
+
+	updateCharts: function(data){
+		var svg = d3.selectAll('.viz-container svg');
+		svg.datum(function(d,i){
+			return data[i].streams;
+		})
+		nv.graphs.forEach(function(g){
+			g.update();
+		})
+
 	}
 
 });

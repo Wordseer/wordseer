@@ -1053,6 +1053,44 @@ Visualizations - word frequencies
         font-size: $large-font-size;
         font-weight: 700;
         margin-left: 50px;
+
+        span.sort {
+            display: inline-block;
+            margin-left: 10px;
+            text-transform: uppercase;
+            position: relative;
+
+            .sort-control {
+                color: #e41a1c;
+
+                .sort-menu {
+                    position: absolute;
+                    top: -9px;
+                    padding: 4px 0;
+                    background-color: bisque;
+                    width: 34px;
+                    right: -9px;
+                    display: none;
+                    color: $black;
+
+                    i {
+                        padding: 5px;
+                        width: 100%;
+                        text-align: center;
+
+                        &.selected {
+                            background-color: burlywood;
+                        }
+                    }
+                }
+
+                &:hover {
+                    .sort-menu {
+                        display: block;
+                    }
+                }
+            }
+        }
     }
 
 
