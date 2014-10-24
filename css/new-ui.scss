@@ -1062,31 +1062,45 @@ Visualizations - word frequencies
 
             .sort-control {
                 color: #e41a1c;
+                padding-right: 15px;
 
                 .sort-menu {
                     position: absolute;
                     top: -9px;
                     padding: 4px 0;
-                    background-color: bisque;
+                    background-color: $gray;
                     width: 34px;
-                    right: -9px;
-                    display: none;
+                    right: -28px;
+                    opacity: 0;
                     color: $black;
+                    visibility: hidden;
+                    transition: visibility 0s ease 0.3s,opacity 0.3s ease;
 
                     i {
                         padding: 5px;
                         width: 100%;
                         text-align: center;
+                        background-color: $gray;
+                        transition: background-color 0.3s ease, color 0.3s ease;
+
 
                         &.selected {
-                            background-color: burlywood;
+                            color: #e41a1c;
+                        }
+
+                        &:hover {
+                            background-color: $background-lightblue;
+                            color: $gray;
                         }
                     }
                 }
 
                 &:hover {
                     .sort-menu {
-                        display: block;
+                        opacity: 1;
+                        visibility: visible;
+                        transition-delay:0s;
+
                     }
                 }
             }

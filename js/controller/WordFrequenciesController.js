@@ -166,7 +166,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					// default sorting
 					sort_control
 						// add a menu to change sorting
-						.append('span')
+						.append('div')
 						.attr('class', 'sort-menu')
 						.selectAll('i')
 							.data([
