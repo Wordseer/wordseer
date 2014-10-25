@@ -22,11 +22,11 @@ var NodeModel = function() {
     //main keys to included in structure file for each node type. Primary is included for all
     var primaryKeys = ['id', 'tag', 'type', 'xpaths', 'xpathsFull', 'name', 'isActive', 'dataType', 'dateFormat'],
             document_keys = ['structureName', 'titleXpaths', 'titleXpathsFull', 'filename'],
-            subunit_keys = ['structureName', 'titleXpaths', 'titleXpathsFull', 'combine'],
+            subunit_keys = ['structureName', 'titleXpaths', 'titleXpathsFull', 'combine', 'useTitleAsProperty'],
             metadata_keys = ['attr', 'propertyName', 'displayName', 'dataType',
                 'dateFormat', 'nameIsDisplayed', 'valueIsDisplayed',
-                'isCategory']//main keys to included in structure file for document node types;
-    self.attributes = {filename: '', url: '', xml: {}, id: '', paretnId: '', tag: '', type: '',
+                'isCategory','useTitleAsProperty']//main keys to included in structure file for document node types;
+    self.attributes = {filename: '', url: '', xml: {}, id: '', paretnId: '', tag: '', type: '', useTitleAsProperty: false,
         xpaths: [], xpathsFull: [], name: '', titleXpaths: [], titleXpathsFull: [], titleId: '',
         units: [], metadata: [], children: [], sub_xpaths: [], attrs: {}, attr: '',
         belongsTo: '', isAttribute: false, isActive: false, combine: false, hasChildElements: function() {
@@ -198,6 +198,39 @@ var NodeModel = function() {
         });
     };
     /**
+     * remove a child from this node (either unit or metadata based on node type)
+     * @param {NodeModel} node
+     * @returns {undefined}
+     */
+    self.removeChild = function(node)
+    {
+//        self.attributes.sub_xpaths.push(node.attributes.xpathsFull[0]);
+        delete self.attributes.sub_xpaths[self.attributes.sub_xpaths.indexOf(node.attributes.xpathsFull[0])];
+//        if(!self.attributes.children)
+        _.each(self.attributes.children, function(item, index) {
+            if (item.attributes.id == node.attributes.id)
+                delete self.attributes.children[index]
+        });
+        if (node.attributes.type === METADATA_TAG)
+            _.each(self.attributes.metadata, function(item, index) {
+                if (item.attributes.id == node.attributes.id)
+                    delete self.attributes.metadata[index]
+            });
+//            self.attributes.metadata.push(node);
+        else
+            _.each(self.attributes.units, function(item, index) {
+                if (item.attributes.id == node.attributes.id)
+                    delete self.attributes.untis[index]
+            });
+//            self.attributes.units.push(node);
+        delete self.map[node.attributes.id]
+//        _.each(node.map, function(item, key)
+//        {
+//            if (!self.map[key])
+//                self.map[key] = item;
+//        });
+    };
+    /**
      * If if this node has any unit or metadata childrent
      * @returns {Boolean}
      */
@@ -345,6 +378,40 @@ var NodeModel = function() {
         self.attributes.titleId = '';
         self.attributes.titleXpaths = self.attributes.titleXpathsFull = [];
 
+    };
+    self.useTitleAsProperty = function(useTitleAsProperty, property_title)
+    {
+        self.attributes.useTitleAsProperty = useTitleAsProperty;
+        property_title = (property_title) ? property_title : 'property_title';
+        var node = new NodeModel();
+        //setup basic attributes
+        node.attributes.isRoot = false;
+        node.attributes.parentId = self.attributes.id;
+        node.attributes.type = METADATA_TAG;
+        node.attributes.tag = self.attributes.tag;
+        node.attributes.name = self.attributes.name;
+        node.attributes.id = self.attributes.id + '_property_title';
+        node.attributes.xpaths.push(self.attributes.xpaths[0] + '/name()');//setup initial XPath
+        node.attributes.xpathsFull.push(self.attributes.xpathsFull[0] + '/name()');
+        node.attributes.structureName = self.attributes.tag;
+        node.attributes.displayName = self.attributes.structureName;
+        node.attributes.propertyName = property_title;
+        node.attributes.dataType = DATA_TYPES.STRING;//default node type is String
+        
+        if (useTitleAsProperty)
+        {
+            node.attributes.isActive = true
+            console.log('using title as prop')
+            self.addChild(node);
+        }
+        else
+        {
+            console.log('removing title as prop')
+            self.attributes.useTitleAsProperty = useTitleAsProperty;
+            if (self.hasChild(node.attributes.id))
+                self.removeChild(node);
+        }
+        console.log(self.attributes.metadata)
     };
     /**
      * set data type

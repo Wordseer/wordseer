@@ -34,6 +34,15 @@
 
             </div>
         </div>
+        <br>
+        <br>
+        <div class="input-group"> 
+            
+            <span class="input-group-addon">
+                <input type='checkbox' id='use-title-as-meta' value="0" <% if(node.attributes.useTitleAsProperty){%> checked <%}%> /> Use tag title as a Property
+            </span>
+            <input type="text" id='use-title-as-meta-title' data-id='<%=node.attributes.titleId%>' class="form-control" placeholder="Property tag title" value='property_title' disabled>
+        </div>
         <button id='combine-form-cancel-btn' class='btn btn-danger' onclick="hideCombineForm(true, '<%=node.attributes.id%>', '<%=node.attributes.nodeType%>')">Cancel</button>
         <button id='combine-form-save-btn' class='btn btn-success' onclick="saveCombineForm()">Save</button>
     </div>

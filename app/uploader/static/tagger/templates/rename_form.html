@@ -24,7 +24,7 @@
                    <% if(dataType!=='date'){%>style="display:none"<%}%> >
 
                    <a id='selected-property-date-format-help' href='https://github.com/mbostock/d3/wiki/Time-Formatting' target='_blank' class='input-group-addon tagger-tooltip' 
-                      title='Enter the date format according to d3 standards. Click to view'
+                   title='Enter the date format according to d3 standards. Click to view'
                    <% if(dataType!=='date'){%>style="display:none"<%}%>>?</a>
 
         </div>
@@ -36,10 +36,17 @@
         <div id='title-tree-xml-preview' class='tagger-tooltip panel panel-default' title='Previe XML document'></div>
         <div class="input-group">
             <span class="input-group-addon">Title Element</span>
-            <input type="text" id='selected-property-title' data-id='<%=titleId%>' class="form-control" placeholder="Title Element" value='<%+displayName%>'>
+            <input type="text" id='selected-property-title' data-id='<%=titleId%>' class="form-control" placeholder="Title Element" value='<%=displayName%>'>
 
         </div>
         <%}%>
+        <br>
+        <div class="input-group"> 
+            <span class="input-group-addon">
+               <input type='checkbox' id='use-title-as-meta' value="0" <% if(useTitleAsProperty){%> checked <%}%> /> Use tag title as a Property
+            </span>
+            <input type="text" id='use-title-as-meta-title' data-id='<%=titleId%>' class="form-control" placeholder="Property tag title" value='property_title' disabled>
+        </div>
         <br/>
         <button id='rename-form-clear-title' class="btn btn-info" >Clear</button>
         <button id='rename-form-cancel-btn' class='btn btn-danger' onclick="hideRenameDialogue(true, '<%=id%>', '<%=nodeType%>')">Cancel</button>

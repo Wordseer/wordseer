@@ -760,17 +760,20 @@ function saveRenameDialogue()
             new_target_id = $('#selected-property-title').attr('data-id'),
             data_type = $('#selected-property-data-type').attr('data-type'),
             date_format = $('#selected-property-date-format').val(),
-            node = nodes.map[id];
+            node = nodes.map[id],
+            use_title = $('#use-title-as-meta').is(':checked'),
+            use_title_text = $('#use-title-as-meta-title').val();
+    console.log(use_title)
+    console.log(use_title_text)
     //rename node
     if (new_name.length > 0)
         node.rename(new_name);
-
+    
     if (nodes.map[new_target_id])
     {
         //update node title and data type
         node.setTitleAsXPath(nodes.map[new_target_id].attributes.xpaths[0]);
         node.setTitleNode(new_target_id);
-
         nodes.map[new_target_id].setDataType(data_type);
         var tag;
 //        refreshElement(id);
@@ -790,6 +793,7 @@ function saveRenameDialogue()
     if (data_type === DATA_TYPES.DATE) {
         node.setDateFormat(date_format);
     }
+    node.useTitleAsProperty(use_title, use_title_text);
     refreshElement(id);//refresh the node UI after updating the model
     hideRenameDialogue();
 }
@@ -889,8 +893,13 @@ function loadCombineFormEvents()
  */
 function saveCombineForm()
 {
-    var id = $('#combine-form').attr('data-id'), node = nodes.map[id], combine = $('#select-text-display-modes>.active').attr('data-combine') === 'true';
+    var id = $('#combine-form').attr('data-id'), node = nodes.map[id],
+            combine = $('#select-text-display-modes>.active').attr('data-combine') === 'true',
+            use_title = $('#use-title-as-meta').is(':checked'),
+            use_title_text = $('#use_-title-as-meta-title').val();
+    console.log(use_title);
     node.setCombine(combine);
+    node.useTitleAsProperty(use_title, use_title_text);
     refreshElement(id);
     hideCombineForm();
 }
