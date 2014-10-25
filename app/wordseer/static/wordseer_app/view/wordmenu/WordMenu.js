@@ -176,10 +176,9 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
             Ext.Ajax.request({
                 method: 'GET',
                 disableCaching: false,
-                url: '../../src/php/grammaticalsearch/get-search-options.php',
+                url: ws_api_path + ws_project_path + project_id +
+                    '/grammatical_search_options',
                 params: {
-                    instance: getInstance(),
-                    user: getUsername(),
                     word: (cls == 'word' ?
                         me.current.get('word'):me.curent.get('id')),
                     class: cls,
@@ -203,7 +202,8 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
             Ext.Ajax.request({
                     method: 'GET',
                     disableCaching: false,
-                    url: '../../src/php/associated-words/get-associated-words.php',
+                    url: ws_api_path + ws_project_path + project_id +
+                    '/associated_words',
                     params: params,
                     scope: me,
                     callback: me.addRelatedWordsOption,

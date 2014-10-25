@@ -16,17 +16,17 @@ class WordsView(MethodView):
         params = dict(kwargs, **request.args)
         keys = params.keys()
 
+        project = None
         if "project_id" in keys:
             project = Project.query.get(params["project_id"])
-            part_of_speech = params["pos"][0]
-            
-            # TODO(silverasm): when there's no query_id use the word counts
-            # table directly.
-            results = self.get_frequent_words(params, project, part_of_speech,
-                is_lemmatized = False)
-            results.extend(self.get_frequent_words(params, project,
-                part_of_speech, is_lemmatized = True))
-            return jsonify(results = results)
+        if project is None:
+            return # 500 error
+        part_of_speech = params["pos"][0]
+        results = self.get_frequent_words(params, project, part_of_speech,
+            is_lemmatized = False)
+        results.extend(self.get_frequent_words(params, project,
+            part_of_speech, is_lemmatized = True))
+        return jsonify(results = results)
 
     def get_frequent_words(
         self, params, project, part_of_speech, is_lemmatized):
@@ -91,6 +91,7 @@ class WordsView(MethodView):
 
     def put(self, id):
         pass
+
 
 register_rest_view(
     WordsView,

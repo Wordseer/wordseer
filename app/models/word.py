@@ -63,20 +63,20 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
 
     @staticmethod
     def get_matching_word_ids(query_string=None, is_set_id=False):
-        """Returns a list of Word instances that match the given query"""
-        words = []
+        """Returns a list of Word ids that match the given query"""
+        word_ids = []
         if is_set_id:
             sequences = SequenceSet.query.get(query_string).sequences.\
             filter(Sequence.length == 1)
             for sequence in sequences:
                 for word in sequence:
-                    words.append(word.id)
+                    word_ids.append(word.id)
         if query_string is not None:
             w = Word.query.filter(
                 Word.surface.like(query_string.lower()))
             for word in w:
-                words.append(word.id)
-        return words
+                word_ids.append(word.id)
+        return word_ids
 
     @staticmethod
     def apply_non_grammatical_search_filter(search_query_dict, sentence_query):
