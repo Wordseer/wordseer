@@ -65,9 +65,9 @@ class GrammaticalSearchOptionsView(MethodView):
 
         response = {}
         for relation in deps:
-            self.add_relation_to_response(response, "dep", relation);
-        for relation in govs:
             self.add_relation_to_response(response, "gov", relation);
+        for relation in govs:
+            self.add_relation_to_response(response, "dep", relation);
 
         response["search"] = WordInSentence.query.filter(
             WordInSentence.word_id.in_(word_ids)).count()

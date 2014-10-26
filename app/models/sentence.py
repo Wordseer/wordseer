@@ -169,27 +169,3 @@ class Sentence(db.Model, Base):
 
         return sequence_in_sentence
 
-    @staticmethod
-    def apply_grammatical_search_filter(search_queryt_dict, sentence_query):
-        """ Gets the sentences that contain the dependency relations specified
-        by the query parameters.
-
-        Arguments:
-            search_query_dict (dict): A dictionary representation of a search
-                query. Contains the keys:
-                    - gov: The governor word in the case of grammatical search
-                        or the string search query in the case of a
-                        non-grammatical search. 
-                    - dep: The dependent word in the case of grammatical search
-                        (ignored for a non-grammatical search)
-                    - relation: The grammatical relationships. A space-separated
-                        list of grammatical relationship identifiers. If this
-                        is "" or not present, the search is assumed to be
-                        non-grammatical.
-        Returns:
-            A list of Sentence objects that contain the dependencies specified
-            by the query parameters.
-        """
-        sentence_query = Sentence.query
-        return sentence_query
-

@@ -58,7 +58,7 @@ class QueryCacheView(MethodView):
         json_parsed_search_params = loads(search_string)
         for search_query_dict in json_parsed_search_params:
             if Query.is_grammatical_search_query(search_query_dict):
-                filtered_sentences = Sentence.\
+                filtered_sentences = Dependency.\
                     apply_grammatical_search_filter(search_query_dict,
                         filtered_sentences)
             else:
