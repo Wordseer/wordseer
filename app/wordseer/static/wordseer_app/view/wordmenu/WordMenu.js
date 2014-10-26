@@ -110,11 +110,9 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
                 Ext.Ajax.request({
                     method: 'GET',
                     disableCaching: false,
-                    url: '../../src/php/phrases/get-phrases.php',
+                    url: ws_api_path + ws_project_path + project_id +
+                        '/containing_sequences',
                     params: {
-                        instance: getInstance(),
-                        user: getUsername(),
-                        in_sentence: true,
                         sentence_id: current.get('sentenceID'),
                         start_position: current.get('position') -1
                     },
@@ -208,12 +206,16 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
                     scope: me,
                     callback: me.addRelatedWordsOption,
                 });
+            /**
+            // Similar words. We don't compute these in the back end right
+            // now.
             if (cls == "word") {
                 menuItems.push({
                     text: "<span class='wordmenu-label'>Loading similar</span> words...",
                     itemId: "similar-words-placeholder",
                 });
             }
+            */
         }
 
         // If this is a product of a nearby words query, add an option to see
@@ -253,6 +255,7 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
             data: related_words,
             items:[],
         }]);
+        /**
         itemId = "similar-words-placeholder";
         placeholder = this.getComponent(itemId);
         if (placeholder && related_words.Synsets.length > 0) {
@@ -264,6 +267,7 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
             items:[],
         }]);
         }
+        */
     },
 
     addPhraseOptions: function(opts, success, response) {

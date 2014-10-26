@@ -40,7 +40,6 @@ class GrammaticalSearchOptionsView(MethodView):
             return
         word_ids = Word.get_matching_word_ids(params.get("word")[0],
             is_set_id = params.get("class")[0] == "phrase-set")
-        print word_ids
 
         deps = db.session.query(
             GrammaticalRelationship.name.label("relationship"),
@@ -50,7 +49,8 @@ class GrammaticalSearchOptionsView(MethodView):
         filter(GrammaticalRelationship.id ==
             Dependency.grammatical_relationship_id).\
         filter(Dependency.governor_id.in_(word_ids)).\
-        filter(DependencyInSentence.dependency_id ==  Word.surface)
+        filter(DependencyInSentence.dependency_id == Dependency.id).\
+        group_by(GrammaticalRelationship.name, Word.surface)
 
         govs = db.session.query(
             GrammaticalRelationship.name.label("relationship"),

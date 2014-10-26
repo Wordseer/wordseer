@@ -11,7 +11,6 @@ from app.models import *
 from app.helpers.application_view import register_rest_view
 
 class SequencesView(MethodView):
-
     def get(self, **kwargs):
         params = dict(kwargs, **request.args)
         keys = params.keys()
@@ -84,10 +83,62 @@ class SequencesView(MethodView):
         pass
 
 
+class ContainingSequencesView(MethodView):
+    def get(self, **kwargs):
+        params = dict(kwargs, **request.args)
+        keys = params.keys()
+
+        project = None
+        if "project_id" in keys:
+            project = Project.query.get(params["project_id"])    
+        if project is None:
+            return "[]"
+        
+        sequences = SequenceInSentence.query.\
+            filter(SequenceInSentence.sentence_id ==
+                   params.get("sentence_id")[0]).\
+            filter(SequenceInSentence.position ==
+                   params.get("start_position")[0]).\
+            subquery()
+
+        counts = db.session.query(
+            Sequence.id.label("id"),
+            Sequence.sequence.label("sequence"),
+            func.count(SequenceInSentence.sentence_id.distinct()).label("sentence_count")).\
+        filter(SequenceInSentence.sequence_id == Sequence.id).\
+        filter(Sequence.lemmatized == False).\
+        join(sequences, SequenceInSentence.sequence_id ==
+                       sequences.c.sequence_id).\
+        group_by(Sequence.id).\
+        order_by(asc(Sequence.length))
+
+
+        results = []
+        for sequence in counts:
+            results.append(sequence._asdict());
+        return jsonify(results = results)
+
+    def post(self):
+        pass
+
+    def delete(self, id):
+        pass
+
+    def put(self, id):
+        pass
+
 register_rest_view(
     SequencesView,
     wordseer,
     'sequences_view',
     'sequence',
+    parents=["project"],
+)
+
+register_rest_view(
+    ContainingSequencesView,
+    wordseer,
+    'containing_sequences_view',
+    'containing_sequence',
     parents=["project"],
 )

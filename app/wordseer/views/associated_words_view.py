@@ -46,23 +46,24 @@ class AssociatedWordsView(MethodView):
                         sentences.c.sentence_id).\
         group_by(Word.id).\
         order_by(desc("score"))
-        
+
         for word in associated_words:
             print word.pos
 
         associated_sequences = db.session.query(
             Sequence.id.label("sequence_id"),
             Sequence.sequence.label("word"),
-            func.count(SequenceInSentence.sentence_id).label("score")).\
+            func.count(SequenceInSentence.sentence_id.distinct()).label("score")).\
         filter(SequenceInSentence.sequence_id == Sequence.id).\
         join(sentences, SequenceInSentence.sentence_id ==
                         sentences.c.sentence_id).\
         filter(Sequence.length > 1).\
+        filter(Sequence.lemmatized == False).\
         filter(Sequence.all_function_words == False).\
         group_by(Sequence.id).\
         order_by(desc("score"))
         
-        response = {"Phrases":[]}
+        response = {"Phrases":[], "Synsets": []}
         for word in associated_words:
             category = self.get_category(word.pos)
             if category is None:
