@@ -13,7 +13,7 @@ Ext.define('WordSeer.store.PhraseSetListStore', {
       type: 'ajax',
       url: ws_project_path + project_id +  '/sets/',
       extraParams:{
-         type:'listflat',
+         operation:'listflat',
          collectiontype:'phrase',
          instance:getInstance(),
          user: getUsername(),

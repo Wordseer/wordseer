@@ -7,7 +7,7 @@ __all__ = [
     "searchsuggestions",
     "sentences_view",
     "sequences_view",
-    "sets",
+    "sets_view",
     "words_view",
     "wordmenu_view",
 ]

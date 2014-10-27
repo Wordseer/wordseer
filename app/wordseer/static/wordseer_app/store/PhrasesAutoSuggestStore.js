@@ -11,7 +11,7 @@ Ext.define('WordSeer.store.PhrasesAutoSuggestStore', {
 		noCache: false,
 		timeout: 90000,
 		url: ws_api_path + ws_project_path + project_id +
-		'/autosuggestions',
+		'/searchsuggestions',
 		extraParams: {
 			instance: getInstance(),
 			user: getUsername(),

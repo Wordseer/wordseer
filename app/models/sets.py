@@ -1,9 +1,16 @@
 """Set models.
 """
+import datetime
 
 from app import db
+from .association_objects import SequenceInSentence, PropertyOfSentence
 from .base import Base
 from .project import Project
+from .sequence import Sequence
+from .sentence import Sentence
+from .document import Document
+from .property import Property
+from .property_metadata import PropertyMetadata
 
 class Set(db.Model, Base):
     """This is the basic ``Set`` class.
@@ -31,7 +38,7 @@ class Set(db.Model, Base):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     name = db.Column(db.String)
-    creation_date = db.Column(db.Date)
+    creation_date = db.Column(db.Date, default=datetime.date.today)
     type = db.Column(db.String)
     parent_id = db.Column(db.Integer, db.ForeignKey("set.id"))
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
@@ -77,8 +84,33 @@ class SequenceSet(Set):
         Returns:
             list of Sequences
         """
-
         return self.sequences
+
+    def add_items(self, sequences):
+        """ Adds the given sequences to this set and adds metadata properties
+        for the sentences in which this sequence is found that those sentences
+        are in this set."""
+        sequences = Sequence.query.filter(Sequence.sequence.in_(sequences))
+        self.sequences.extend(sequences)
+        self.save()
+        sequence_ids = map(lambda s : s.id, sequences)
+        matching_sentences = SequenceInSentence.query.filter(
+            SequenceInSentence.sequence_id.in_(sequence_ids))
+        metadata = PropertyMetadata.query.filter_by(
+            property_name = "phrase_set").first()
+        property = Property(
+            project = self.project,
+            property_metadata = metadata,
+            name = "phrase_set",
+            value = str(self.id))
+        for sentence in matching_sentences:
+            sentence.sentence.unit.properties.append(property)
+            sentence.sentence.properties.append(property)
+            sentence.sentence.save()
+            sentence.sentence.unit.save()
+        property.save()
+
+
 
 class SentenceSet(Set):
     """A ``Set`` that can have a list of ``Sentences`` in it.
@@ -104,8 +136,28 @@ class SentenceSet(Set):
         Returns:
             list of Sentences
         """
-
         return self.sentences
+
+    def add_items(self, sentence_ids):
+        """ Adds the sentences with the given ids to this set and adds metadata
+        properties saying that these sentences are in this set."""
+        sentences = Sentence.query.filter(
+            Sentence.id.in_(sentence_ids))
+        self.sentences.extend(sentences)
+        self.save()
+        metadata = PropertyMetadata.query.filter_by(
+            property_name = "sentence_set")
+        property = Property(
+            project = self.project,
+            property_metadata = metadata,
+            name = "sentence_set",
+            value = str(self.id))
+        for sentence in sentences:
+            sentence.unit.properties.append(property)
+            sentence.properties.append(property)
+            sentence.save()
+            sentence.unit.save()
+        property.save()
 
 class DocumentSet(Set):
     """A Set that can have a list of ``Document``\s in it.
@@ -131,5 +183,29 @@ class DocumentSet(Set):
         Returns:
             list of Documents
         """
-
         return self.documents
+
+    def add_items(self, document_ids):
+        """ Adds the documents with the given ids to this set and adds metadata
+        properties saying that these documents and the affected sentences are in
+        in this set."""
+        documents = Document.query.filter(
+           Document.id.in_(document_ids))
+        self.documents.extend(documents)
+        self.save()
+        metadata = PropertyMetadata.query.filter_by(
+           property_name = "document_set")
+        property = Property(
+           project = self.project,
+           property_metadata = metadata,
+           name = "document_set",
+           value = str(self.id))
+        for document in documents:
+            document.properties.append(property)
+            documnent.save()
+            for sentence in document.sentences:
+                sentence.properties.append(property)
+                sentence.save()
+        property.save() 
+
+

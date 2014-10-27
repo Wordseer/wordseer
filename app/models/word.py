@@ -66,11 +66,11 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         """Returns a list of Word ids that match the given query"""
         word_ids = []
         if is_set_id:
-            sequences = SequenceSet.query.get(query_string).sequences.\
-            filter(Sequence.length == 1)
+            sequences = SequenceSet.query.get(query_string).sequences
             for sequence in sequences:
-                for word in sequence:
-                    word_ids.append(word.id)
+                if sequence.length == 1:
+                    for word in sequence.words:
+                        word_ids.append(word.id)
         if query_string is not None:
             w = Word.query.filter(
                 Word.surface.like(query_string.lower()))

@@ -8,6 +8,7 @@ from .project import Project
 from .association_objects import DependencyInSentence
 from .association_objects import SequenceInSentence
 from .association_objects import WordInSentence
+from .association_objects import PropertyOfSentence
 from .counts import WordCount, DependencyCount, SequenceCount
 
 class Sentence(db.Model, Base):

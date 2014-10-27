@@ -15,7 +15,7 @@ Ext.define('WordSeer.store.SentenceSetStore', {
             user: getUsername(),
             collectiontype: 'sentence',
             instance: getInstance(),
-            type: 'list',
+            operation: 'list',
         },
         reader: {
             type: 'json',

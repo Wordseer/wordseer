@@ -262,7 +262,7 @@ Ext.define('WordSeer.controller.SearchController', {
 			}
 			okToSearch = true
 		}
-		else if (item.getClass() == 'phrase-set'){
+		else if (item.getClass().indexOf("phrase_set") >=0 ){
 			values.gov = item.get('id');
 			values.govtype = 'phrase-set';
 			okToSearch = true;
@@ -446,7 +446,7 @@ Ext.define('WordSeer.controller.SearchController', {
 		if(!searchbox.getRecord() || searchbox.getRecord().get('class') === "phrase") {
 			searchbox.up('form').down('textfield[name="'+field+'"]')
 				.setValue('word');
-		} else if (searchbox.getRecord().get('class') === "phrase-set") {
+		} else if (searchbox.getRecord().get('class') === "phrase_set") {
 			searchbox.up('form').down('textfield[name="'+field+'"]')
 				.setValue('phrase-set');
 		}

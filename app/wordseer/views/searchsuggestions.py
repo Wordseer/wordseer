@@ -103,9 +103,9 @@ class AutoSuggest(MethodView):
                 ]
         """
         sets = db.session.query(Set.id,
-            Property.name.label("text"),
-            literal_column("'metadata'").label("class"),
-            func.count(Property.unit_id.distinct()).label("unit_count")).\
+            Set.name.label("text"),
+            Property.name.label("class"),
+            func.count(Property.unit_id).label("sentence_count")).\
                 filter(Property.value == Set.id).\
                 filter(Set.project == self.project).\
                 filter(Property.name.like("%_set")).\
@@ -228,6 +228,6 @@ register_rest_view(
     AutoSuggest,
     wordseer,
     'searchsuggestions',
-    'autosuggestion',
+    'searchsuggestion',
     parents=["project"]
 )

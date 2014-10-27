@@ -15,7 +15,7 @@ Ext.define('WordSeer.store.DocumentSetStore', {
             user: getUsername(),
             collectiontype: 'document',
             instance: getInstance(),
-            type: 'list',
+            operation: 'list',
         },
         reader: {
             type: 'json',

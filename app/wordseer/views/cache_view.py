@@ -11,9 +11,6 @@ from app.helpers.application_view import register_rest_view
 class QueryCacheView(MethodView):
     def get(self, **kwargs):
         params = dict(kwargs, **request.args)
-        return self.dispatch(params)
-
-    def dispatch(self, params):
         if "clear" in params:
             return self.clear_old_query(params)
         else:

@@ -81,7 +81,7 @@ class PropertiesView(MethodView):
 
             values = db.session.query(
                 Property.value.label("value"),
-                func.count(Property.unit_id.distinct()).label("unit_count")).\
+                func.count(Property.unit_id).label("unit_count")).\
             filter(Property.project_id == project.id).\
             filter(Property.name == property.property_name).\
             group_by(Property.value)
@@ -104,12 +104,16 @@ class PropertiesView(MethodView):
                 "children": []
             }
             for value in values:
+                text = value.value
+                if "_set" in property.property_name:
+                    set = Set.query.get(value.value)
+                    text = set.name
                 property_value = {
                         "count": value.unit_count,
                         "document_count": value.unit_count,
                         "propertyName": property.property_name,
                         "displayName": property.property_name,
-                        "text": value.value,
+                        "text": text,
                         "value": value.value,
                         "leaf": True
                         }

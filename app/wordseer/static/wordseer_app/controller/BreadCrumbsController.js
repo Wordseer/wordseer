@@ -284,7 +284,7 @@ Ext.define('WordSeer.controller.BreadCrumbsController', {
                var govHTML = record.gov;
                if (record.govtype == 'phrase-set') {
                     var govItem = Ext.StoreManager.getByKey('PhraseSetStore').getById(
-                      record.gov);
+                      parseInt(record.gov));
                     if (govItem) {
                        govHTML = govItem.get('text');
                     }
@@ -299,7 +299,7 @@ Ext.define('WordSeer.controller.BreadCrumbsController', {
                var depHTML = record.dep;
                if (record.deptype == 'phrase-set') {
                    depHTML = Ext.StoreManager.getByKey('PhraseSetStore')
-                    .getById(record.dep)
+                    .getById(parseInt(record.dep))
                     .get('text');
                }
                if (breadcrumb_class == "word") {

@@ -9,7 +9,7 @@
       type: 'ajax',
       url: ws_project_path + project_id +  '/sets/',
       extraParams:{
-         type:'listflat',
+         operation:'listflat',
          collectiontype:'sentence',
          instance:getInstance(),
          user: getUsername(),

@@ -20,10 +20,10 @@ Ext.define('WordSeer.model.SubsetModel', {
     extend:'Ext.data.Model',
     proxy: {
         type: 'ajax',
-        url: '../../src/php/subsets/crud.php',
+        url: ws_api_path + ws_project_path + project_id + '/sets',
         extraParams: {
             instance: getInstance(),
-            type: 'read',
+            operation: 'read',
             user: getUsername(),
         },
         reader: {
@@ -35,7 +35,7 @@ Ext.define('WordSeer.model.SubsetModel', {
         {name:'text', type:'string'},
         {name:'id', type:'int'},
         {name: 'ids', type:'auto'},
-        {name:'date', type:'date', dateFormat:'Y-m-d H:i:s', defaultValue:0},
+        {name:'date', type:'date', dateFormat:'Y-m-d', defaultValue:0},
         {name:'sentence_count', type:'int', defaultValue:0},
         {name:'document_count', type:'int', defaultValue: 0},
     ],
@@ -134,7 +134,7 @@ Ext.define('WordSeer.model.SubsetModel', {
         var create_operation = new Ext.data.Operation({
             action: 'read',
             params:{
-                type:'create',
+                operation:'create',
                 name: name,
                 parent:this.get('id'),
                 collectiontype:this.getSubsetType(),
@@ -156,7 +156,7 @@ Ext.define('WordSeer.model.SubsetModel', {
         var delete_operation = new Ext.data.Operation({
             action: 'read',
             params:{
-                type:'delete',
+                operation:'delete',
                 id: this.get('id'),
                 user: getUsername(),
             },
@@ -183,7 +183,7 @@ Ext.define('WordSeer.model.SubsetModel', {
         var rename_operation = new Ext.data.Operation({
             action: 'read',
             params:{
-                type:'update',
+                operation:'update',
                 update: 'rename',
                 id: this.get('id'),
                 newName: new_name,
@@ -202,7 +202,7 @@ Ext.define('WordSeer.model.SubsetModel', {
         var read_operation = new Ext.data.Operation({
             action: 'read',
             params:{
-                type:'read',
+                operation:'read',
                 id: this.get('id'),
                 user: getUsername(),
             },
@@ -222,7 +222,7 @@ Ext.define('WordSeer.model.SubsetModel', {
         var remove_operation = new Ext.data.Operation({
             action: 'read',
             params: {
-              type: 'update',
+              operation: 'update',
               update: 'delete',
               id: this.get('id'),
               item: ids.join("___"),
@@ -257,7 +257,7 @@ Ext.define('WordSeer.model.SubsetModel', {
         var add_operation = new Ext.data.Operation({
           action: 'read',
           params: {
-            type: 'update',
+            operation: 'update',
             update: 'add',
             id: this.get('id'),
             item: ids.join("___"),

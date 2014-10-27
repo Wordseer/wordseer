@@ -37,11 +37,6 @@ class SetsView(MethodView):
             - ids: If it's not a ``SequenceSet``, then a list of the item IDs in
                 the ``Set``.
         """
-        # php equivalent: subsets/read.php:listSubsetContents()
-        #TODO: why don't we just return a list of IDs in both cases?
-        #TODO: why do we need to return the ID?
-
-        # check for required args
         if not set_id:
             if self.set_id:
                 set_id = self.set_id
@@ -56,16 +51,15 @@ class SetsView(MethodView):
 
         contents["text"] = requested_set.name
         contents["id"] = requested_set.id
-        contents["date"] = requested_set.creation_date
+        contents["date"] = str(requested_set.creation_date)
         contents["type"] = requested_set.type
 
-        if requested_set.type == "sequenceset":
+        if requested_set.type == "phrase":
             contents["phrases"] = [sequence.sequence for sequence in
                 requested_set.sequences]
 
         else:
             contents["ids"] = [item.id for item in requested_set.get_items()]
-
         return contents
 
     def sent_and_doc_counts(self):
@@ -74,7 +68,7 @@ class SetsView(MethodView):
         # can we do that here?
         pass
 
-    def list(self, parent_id=None):
+    def list(self, parent_id=0):
         """Returns a recursive list of extant ``Set``\s of a given type
 
         Requires:
@@ -97,15 +91,16 @@ class SetsView(MethodView):
         """
         # php equivalent: subsets/read.php:listCollections()
 
-        project = Project.query.get(self.project)
         if self.collection_type:
             # retrieve Set records from this level
             setlist = []
+            print parent_id
         
-            sets = Set.query.filter_by(parent_id=parent_id, project=project,
+            sets = Set.query.filter_by(parent_id=parent_id, project=self.project,
                 type=self.collection_type).all()
-        
+            
             for s in sets:
+                print s
                 setinfo = self.read(s.id)
         
                 # TODO: get sentence and document counts
@@ -114,13 +109,14 @@ class SetsView(MethodView):
                 setinfo["children"] = self.list(s.id)
                 setlist.append(setinfo)
         
-            if parent_id == None:
+            if parent_id == 0:
                 # wrap setlist in the special root-level row
                 all_sets = {
                     "text": '',
                     "id": 0,
                     "children": setlist,
-                    "root": True
+                    "root": True,
+                    "results": ''
                     }
                 return all_sets
             else:
@@ -150,9 +146,8 @@ class SetsView(MethodView):
         """
         # php equivalent: subsets/read.php:listCollectionsFlat()
         # check for required args
-        project = Project.query.get(self.project)
         if self.collection_type:
-            sets = Set.query.filter_by(project=project,
+            sets = Set.query.filter_by(project=self.project,
                 type=self.collection_type).all()
 
             result = [self.read(s.id) for s in sets]
@@ -170,7 +165,7 @@ class SetsView(MethodView):
             # TODO: jsonify does not allow top-level lists for security reasons;
             # http://flask.pocoo.org/docs/security/#json-security
             # need to update the frontend accordingly
-            return {"sets": result}
+            return result
         else:
             abort(400)
 
@@ -189,26 +184,42 @@ class SetsView(MethodView):
             - "date": str, date of creation of this ``Set``
         """
         # php equivalent: subsets/create.php:create()
+        if self.set_name and self.parent_id and self.collection_type:
+            new_set = None
+            set_type = None
+            if self.collection_type == "phrase":
+                set_type = SequenceSet
+            elif self.collection_type == "sentence":
+                set_type = SentenceSet
+            elif self.collection_type == "document":
+                set_type = DocumentSet
+            new_set = set_type(
+                    name=self.set_name,
+                    parent_id=self.parent_id,
+                    type=self.collection_type,
+                    project=self.project)
+            new_set.save()
 
-        if self.user_id and self.set_name and self.parent_id \
-            and self.collection_type:
+            #TODO: updateMainMetadataCounts?
+            metadata = PropertyMetadata.query.filter_by(
+                property_name = self.collection_type + "_set").first()
+            if metadata is None:
+                unit_type = self.collection_type
+                if self.collection_type == "phrase":
+                    unit_type = "sentence"
 
-            user = User.query.get(self.user_id)
-
-            # TODO: set current creation date by default in model
-            new_set = Set(name=self.set_name, parent_id=self.parent_id,
-                type=self.collection_type, user=user)
-
-            # TODO: should this be a model method?
-            db.session.add(new_set)
-            db.session.commit()
-
-            #TODO: updateMainMetadataCounts? what does that even do?
+                metadata = PropertyMetadata(
+                    property_name = self.collection_type + "_set",
+                    data_type = "string",
+                    is_category = True,
+                    display_name = self.collection_type.capitalize() +" Set",
+                    unit_type = unit_type)
+                metadata.save()
 
             return {
                     "status": "ok", #TODO: let's get rid of this, 200 code is ok
                     "id": new_set.id,
-                    "date": new_set.creation_date
+                    "date": str(new_set.creation_date)
                 }
         else:
             abort(400)
@@ -251,33 +262,6 @@ class SetsView(MethodView):
         else:
             abort(400)
 
-    def update(self):
-        """Methods for adding, modifying, and deleting items within ``Set``\s;
-        Has its own dispatch dict for various update types
-        """
-        if self.update_type:
-
-            # TODO: all of these update methods are going to require a more
-            # generic way to access items in different set types
-            utypes = {
-                "add": update_add_to_set,
-                "delete": None,
-                "addNote": None,
-                "addTag": None,
-                "editNote": None,
-                "deleteNote": None,
-                "deleteTag": None,
-                "rename": None,
-                "move": None,
-                "merge": None
-            }
-
-            # TODO: return utypes and dispatch the methods, when they exist
-            return utypes[self.update_type](self)
-
-        else:
-            abort(400)
-
     def update_add_to_set(self):
         """Adds the given id's to the set with the given ID.
 
@@ -286,21 +270,38 @@ class SetsView(MethodView):
             - new_item: a ___-delimited string of various item attributes
         Returns:
         """
-        # php equivalent: subsets/update.php:addItemToSubset()
 
         if self.set_id and self.new_item:
             # do something
             target_set = Set.query.get(self.set_id)
-            items = split("___", trim(self.new_item))
-
-            # TODO: model method needed: a generic "add item to set" method
-            # that is overloaded by subclasses; otherwise I have to check the
-            # set type and hard-code every possible option to a different
-            # operation (target_set.sequences.append,
-            # target_set.sentences.append, etc)
-
-            #for now
+            items = self.new_item.strip().split("___")
+            # set = None
+            # if target_set.type == "phrase":
+            #     set = SequenceSet.query.get(self.set_id)
+            # elif target_set.type == "sentence":
+            #     set = SentenceSet.query.get(self.set_id)
+            # elif target_set.tye == "document":
+            #     set = DocumentSet.query.get(self.set_id)
+            target_set.add_items(items)
+            return {"status": "ok"}
+        else:
             abort(400)
+
+    def update(self):
+        """Methods for adding, modifying, and deleting items within ``Set``\s;
+        Has its own dispatch dict for various update types
+        """
+        if self.update_type:
+            update_types = {
+                "add": self.update_add_to_set,
+                "delete": None,
+                "rename": None,
+                "move": None,
+                "merge": None
+            }
+
+            # TODO: return utypes and dispatch the methods, when they exist
+            return update_types[self.update_type]()
 
         else:
             abort(400)
@@ -351,8 +352,8 @@ class SetsView(MethodView):
 
         # required args
         try:
-            self.operation = request.args["type"]
-            self.project = kwargs["project_id"]
+            self.operation = request.args["operation"]
+            self.project = Project.query.get(kwargs["project_id"])
         except ValueError as e:
             print "\n\n\n\n", e, '\n\n\n\n'
             abort(400)
@@ -374,7 +375,10 @@ class SetsView(MethodView):
         self.merge_into = request.args.get("mergeInto")
 
         result = self.operations[self.operation](self)
-        return jsonify(result)
+        if "results" in result:
+            return jsonify(result)
+        else:
+            return jsonify(results = result)
 
     def post(self):
         pass
@@ -385,8 +389,6 @@ class SetsView(MethodView):
     def put(self, id):
         pass
 
-# routing instructions
-# wordseer.add_url_rule('/sets/', view_func=SetsView.as_view("sets"))
 register_rest_view(
     SetsView,
     wordseer,

@@ -41,7 +41,7 @@ Ext.define('WordSeer.view.autosuggest.PhrasesAutoSuggest', {
 			cls = this.record.get('class');
 			if (cls === 'phrase') {
 				return this.record.get('text');
-			} else if (cls == 'phrase-set') {
+			} else if (cls == 'phrase_set') {
 				return this.record.get('id');
 			} else if (cls == 'metadata') {
 				return ''
