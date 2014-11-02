@@ -22,6 +22,5 @@ Ext.define("WordSeer.store.MetadataTreeStore", {
 	sorters: [{property:'text', direction:'ASC'}],
 	constructor: function(config) {
 		this.callParent(arguments);
-		this.getProxy().setExtraParam('user', getUsername());
 	},
 });

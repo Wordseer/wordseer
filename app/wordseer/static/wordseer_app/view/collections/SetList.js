@@ -17,8 +17,12 @@ Ext.define('WordSeer.view.collections.SetList', {
 	collapsible: true,
 	selectable: false,
 	constructor: function(cfg) {
-		this.callParent(arguments);
-		this.autoEl.cls += ' sets-list';
+		var me = this;
+		me.callParent(arguments);
+		me.autoEl.cls += ' sets-list';
+		me.getMetadataStore().on('load', function(store) {
+			me.populate();
+		});
 	},
 	options: [
 		{

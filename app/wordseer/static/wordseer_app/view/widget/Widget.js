@@ -47,7 +47,6 @@ Ext.define('WordSeer.view.widget.Widget',{
     alias:'widget.widget',
     requires: [
         'WordSeer.view.frequentwords.FrequentWordsList',
-        'WordSeer.view.widget.SidePanel',
         'WordSeer.view.phrases.PhrasesList',
         'WordSeer.view.search.BreadCrumbsPane',
     ],

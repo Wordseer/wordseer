@@ -8,6 +8,7 @@ Ext.define('WordSeer.store.PhraseSetListStore', {
     requires:[
         'WordSeer.model.PhraseSetModel',
     ],
+    autoLoad: true,
     model: 'WordSeer.model.PhraseSetModel',
     proxy: {
       type: 'ajax',
@@ -25,7 +26,6 @@ Ext.define('WordSeer.store.PhraseSetListStore', {
     },
     constructor: function() {
       this.callParent(arguments);
-      this.getProxy().setExtraParam('user', getUsername());
     }
 
 });

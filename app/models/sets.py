@@ -38,7 +38,7 @@ class Set(db.Model, Base):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     name = db.Column(db.String)
-    creation_date = db.Column(db.Date, default=datetime.date.today)
+    creation_date = db.Column(db.DateTime)
     type = db.Column(db.String)
     parent_id = db.Column(db.Integer, db.ForeignKey("set.id"))
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
@@ -59,6 +59,13 @@ class Set(db.Model, Base):
         """
 
         raise NotImplementedError()
+
+    def delete_metadata(self):
+        properties = Property.query.filter_by(name = self.type +"_set",
+                                              value = self.id).all()
+        for property in properties:
+            property.delete()
+        db.session.commit()
 
 class SequenceSet(Set):
     """A ``Set`` that can have a list of ``Sequences`` in it.

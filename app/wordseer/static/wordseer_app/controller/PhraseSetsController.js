@@ -12,11 +12,7 @@ The data for the word sets is stored in one master store: the
 Ext.define('WordSeer.controller.PhraseSetsController', {
 	extend: 'WordSeer.controller.SetsController',
 	views: [
-		'collections.words.PhraseSetCanvas',
-		'collections.words.PhraseSetList',
 		'collections.words.PhraseSet',
-		'collections.words.PhraseSetWord',
-		'widget.PhraseSetsWidget',
 		'wordmenu.WordMenu',
 	],
 	stores: [
@@ -27,8 +23,6 @@ Ext.define('WordSeer.controller.PhraseSetsController', {
 		'PhraseSetModel',
 	],
 	init: function() {
-		this.refreshPhraseSetList();
-//		console.log('PhraseSet controller initialized');
 		this.control({
 			'phrase-set-tag-list': {
 				optionEvent: function(view, event,  option, option_el) {
@@ -247,13 +241,7 @@ Ext.define('WordSeer.controller.PhraseSetsController', {
 	comboboxes.
 	*/
 	refreshPhraseSetList: function() {
-		Ext.getStore('PhraseSetListStore').load(
-			{params:{user:getUsername()}});
-		Ext.getStore('PhraseSetStore').load(
-			{params:{user:getUsername()}});
-		Ext.ComponentQuery.query('phrasesetcombobox').forEach(function(box){
-			box.getStore().load({params:{user:getUsername()}});
-		});
+		Ext.getStore('PhraseSetStore').load();
 	},
 
 	// Word menu functionality.
@@ -324,8 +312,7 @@ Ext.define('WordSeer.controller.PhraseSetsController', {
 			var y = total_y * Math.random();
 			position = [x, y];
 		}
-		var window_id = WordSeer.view.collections.words
-			.PhraseSetCanvas.makeWindowId(record.get('id'));
+		var window_id = "phrase-set-window-" +record.get('id');
 		var win = null;
 		if (Ext.getCmp(window_id) === undefined) {
 			win = Ext.create(

@@ -7,9 +7,8 @@ Ext.define('WordSeer.view.search.PhraseSetComboBox',{
     extend:'Ext.form.field.ComboBox',
     alias:'widget.PhraseSetcombobox',
     initComponent:function(){
-        this.store = Ext.create('WordSeer.store.PhraseSetListStore');
+        this.store = Ext.getStore('PhraseSetListStore');
         this.typeIsWord = true;
-        this.getStore().load({params:{user:getUsername()}});
         this.callParent(arguments);
     },
     queryMode:'local',

@@ -112,8 +112,9 @@ class QueryCacheView(MethodView):
             # Values have the format "text__value" for string properties
             # They have the format [start_value, end_value] for number and
             # date properties.
-            (type, property_name) = identifier.split("_")
-            print property_name
+            components = identifier.split("_")
+            type = components[0]
+            property_name = "_".join(components[1:])
             matching_sentences = None
             if type == "string":
                 values = []

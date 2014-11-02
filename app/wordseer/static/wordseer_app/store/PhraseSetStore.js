@@ -12,9 +12,7 @@ Ext.define('WordSeer.store.PhraseSetStore', {
         type: 'ajax',
         url: ws_project_path + project_id +  '/sets/',
         extraParams: {
-            user: getUsername(),
             collectiontype: 'phrase',
-            instance: getInstance(),
             operation: 'list',
         },
         reader: {
@@ -29,10 +27,9 @@ Ext.define('WordSeer.store.PhraseSetStore', {
     },
     listeners: {
         load: function() {
-            Ext.getStore('PhraseSetListStore').load(
-                {params:{user:getUsername()}});
+            Ext.getStore('PhraseSetListStore').load();
             Ext.ComponentQuery.query('PhraseSetcombobox').forEach(function(box){
-                box.getStore().load({params:{user:getUsername()}});
+                box.getStore().load();
             });
         },
     }

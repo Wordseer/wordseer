@@ -173,9 +173,7 @@ class PropertyOfSentence(db.Model, Base):
         sentence (Sentence): The ``Sentence'' object that has this property.
     """
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
-    sentence = db.relationship("Sentence",
-        backref=db.backref("property_of_sentence"),
-        cascade="all")
+    sentence = db.relationship("Sentence", backref=db.backref("property_of_sentence"))
     property_id = db.Column(db.Integer, db.ForeignKey("property.id"))
     property = db.relationship("Property",
         backref=db.backref("sentences_with_property",

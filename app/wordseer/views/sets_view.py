@@ -4,6 +4,7 @@ from flask import abort
 from flask import request
 from flask.json import jsonify
 from flask.views import MethodView
+from sqlalchemy import func
 
 from app import db
 from app.models.flask_security import User
@@ -36,30 +37,39 @@ class SetsView(MethodView):
                 of phrases in this ``Set``.
             - ids: If it's not a ``SequenceSet``, then a list of the item IDs in
                 the ``Set``.
+            - sentence count
+            - document count
         """
         if not set_id:
             if self.set_id:
                 set_id = self.set_id
             else:
                 abort(400)
-
-        contents = {}
         requested_set = Set.query.get(set_id)
-
         if not requested_set:
             abort(400)
 
+        contents = {}
         contents["text"] = requested_set.name
         contents["id"] = requested_set.id
         contents["date"] = str(requested_set.creation_date)
         contents["type"] = requested_set.type
-
         if requested_set.type == "phrase":
             contents["phrases"] = [sequence.sequence for sequence in
                 requested_set.sequences]
-
         else:
             contents["ids"] = [item.id for item in requested_set.get_items()]
+
+        count = db.session.query(
+            func.count(PropertyOfSentence.sentence_id.distinct()).label("sentence_count"),
+            func.count(Sentence.document_id.distinct()).label("document_count")).\
+            filter(Sentence.id == PropertyOfSentence.sentence_id).\
+            filter(Property.name == requested_set.type + "_set").\
+            filter(Property.value == requested_set.id).\
+            filter(PropertyOfSentence.property_id == Property.id).first()
+        contents["sentence_count"] = count.sentence_count
+        contents["document_count"] = count.document_count
+
         return contents
 
     def sent_and_doc_counts(self):
@@ -162,9 +172,6 @@ class SetsView(MethodView):
                 }
                 result.insert(0, alldocs)
 
-            # TODO: jsonify does not allow top-level lists for security reasons;
-            # http://flask.pocoo.org/docs/security/#json-security
-            # need to update the frontend accordingly
             return result
         else:
             abort(400)
@@ -195,6 +202,7 @@ class SetsView(MethodView):
                 set_type = DocumentSet
             new_set = set_type(
                     name=self.set_name,
+                    creation_date=datetime.date.today(),
                     parent_id=self.parent_id,
                     type=self.collection_type,
                     project=self.project)
@@ -224,7 +232,7 @@ class SetsView(MethodView):
         else:
             abort(400)
 
-    def delete(self):
+    def delete_set(self):
         """Delete the specified ``Set``
 
         Requires:
@@ -243,18 +251,10 @@ class SetsView(MethodView):
             if not target_set:
                 abort(400)
 
+            target_set.delete_metadata()
+
             # delete the set
             db.session.delete(target_set)
-
-            # delete its entire subtree
-            # TODO: this should be done at the model or DB level with cascades;
-            # http://docs.sqlalchemy.org/en/rel_0_9/orm/session.html#delete
-            # currently it is just moving children up a level in the tree
-
-            # TODO: delete any metadata that associates it with text units
-            # this probably needs to be handled by the model also?
-#           are we actually using any properties or metadata for this?
-
             db.session.commit()
 
             return {"status": "ok"}
@@ -312,7 +312,7 @@ class SetsView(MethodView):
         "list": list,
         "listflat": list_flat,
         "create": create,
-        "delete": delete,
+        "delete": delete_set,
         "update": update,
     }
 
@@ -375,7 +375,7 @@ class SetsView(MethodView):
         self.merge_into = request.args.get("mergeInto")
 
         result = self.operations[self.operation](self)
-        if "results" in result:
+        if type(result) == dict:
             return jsonify(result)
         else:
             return jsonify(results = result)
