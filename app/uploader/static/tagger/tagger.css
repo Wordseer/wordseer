@@ -239,3 +239,6 @@ and open the template in the editor.
     display:inline-block;
     margin-bottom: 5px;
 }
+#use-title-as-meta-title{
+    display:none;
+}
