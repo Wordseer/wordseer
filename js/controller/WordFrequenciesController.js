@@ -145,13 +145,9 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						.showLegend(false)
 						.showControls(false)
 						.showXAxis(true)
-						.reduceXTicks(true)
+						.reduceXTicks(false)
 						.color(function(){ return '#1a1a1a'; })
 						;
-
-					if (x.streams[0].values.length < 25) {
-						chart.reduceXTicks(false);
-					}
 
 					chart.xAxis
 						.scale(d3.scale.ordinal());
@@ -378,9 +374,25 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					.axisLabelDistance(40);
 
 				chart.xAxis
-					// .staggerLabels(true)
-					// .showMaxMin(true)
 					.rotateLabels(45)
+					.tickValues(function(d){
+						var ticks = [];
+						if (d[0].values.length < 20) {
+							d[0].values.forEach(function(v){
+								ticks.push(v.x);
+							})
+						} else {
+							var interval = Math.ceil(d[0].values.length / 20);
+							d[0].values.forEach(function(v,i){
+								if (i % interval == 0) {
+									ticks.push(v.x);
+								} else {
+									ticks.push('');
+								}
+							})
+						}
+						return ticks;
+					})
 					;
 
 				chart.margin({left: 55, bottom: 100, right: 45});
