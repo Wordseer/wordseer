@@ -18,6 +18,50 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		});
 	},
 
+	/** Helper function to decode datetime format string returned by server
+	**/
+	formatDateTime: function(x, selected_date_detail){
+		// retrieve format string from type
+		var format_string = x.type.slice(5);
+
+		var format = d3.time.format(format_string);
+		x.streams.forEach(function(stream){
+			// sort values first
+			stream.values.sort(function(a,b){
+				var aa = format.parse(String(a.x)),
+					bb = format.parse(String(b.x));
+				return aa - bb;
+			})
+
+			// copy original for user transformations later
+			if (!('values_orig' in stream)) {
+				stream.values_orig = $.extend(true, [], stream.values);
+			}
+			var newvalues = [];
+			d3.nest()
+				.key(function(v){
+					var date = format.parse(String(v.x));
+					v.x = d3.time[selected_date_detail](date);
+					return v.x;
+				})
+				.rollup(function(leaves){
+					var point = {
+						'x': leaves[0].x,
+						'y': d3.sum(leaves, function(d){
+								return d.y;
+							})
+					};
+					newvalues.push(point);
+					return point;
+				})
+				.entries(stream.values)
+				;
+			stream.values = newvalues;
+		})
+		;
+		return format;
+	},
+
 	/** Fetches WordFrequencies data from the server in response to a search request.
 	When the server returns the data, calls the draw code.
 
@@ -113,6 +157,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 	view in which the wordfrequencies is currently being drawn.
 	*/
 	draw: function(data, panel){
+		var me = this;
 		// size params
 		var width = 380, height = 300,
 			padding = {"top": 5, "bottom": 5, "left": 5, "right": 5},
@@ -309,43 +354,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					var selected_date_detail = selector.select(':checked')
 						.property('value');
 
-					var format = d3.time.format(format_string);
-					x.streams.forEach(function(stream){
-
-						// sort values first
-						stream.values.sort(function(a,b){
-							var aa = format.parse(String(a.x)),
-								bb = format.parse(String(b.x));
-							return aa - bb;
-						})
-
-						// copy original for user transformations later
-						if (!('values_orig' in stream)) {
-							stream.values_orig = $.extend(true, [], stream.values);
-						}
-						var newvalues = [];
-						d3.nest()
-							.key(function(v){
-								var date = format.parse(String(v.x));
-								// TODO: let user choose granularity level
-								v.x = d3.time[selected_date_detail](date);
-								return v.x;
-							})
-							.rollup(function(leaves){
-								var point = {
-									'x': leaves[0].x,
-									'y': d3.sum(leaves, function(d){
-											return d.y;
-										})
-								};
-								newvalues.push(point);
-								return point;
-							})
-							.entries(stream.values)
-							;
-						stream.values = newvalues;
-					})
-					;
+					var format = me.formatDateTime(x, selected_date_detail);
 
 					chart = nv.models.lineChart()
 						.showLegend(false)
@@ -523,14 +532,24 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 	},
 
 	updateCharts: function(data){
+		var me = this;
 		var svg = d3.selectAll('.viz-container svg');
 		svg.datum(function(d,i){
-			return data[i].streams;
+			datum = data[i];
+			if (datum.type.search(/^date_/) >= 0){
+				var selected_date_detail = d3.select(this.offsetParent)
+					.select('.timeselect')
+						.select(':checked')
+						.property('value');
+
+				me.formatDateTime(datum, selected_date_detail);
+			}
+			return datum.streams;
 		})
 		nv.graphs.forEach(function(g){
 			g.update();
 		})
 
-	}
+	},
 
 });
