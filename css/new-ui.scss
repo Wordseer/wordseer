@@ -588,6 +588,8 @@ div.overlay {
     div.x-accordion-layout-ct {
         margin-top: 22px;
         .x-accordion-item {
+
+
             .x-accordion-hd {
                 height: 24px;
                 background: {
@@ -632,6 +634,7 @@ Derived Components: FrequentWordsList
 *******************************************************************************/
 @mixin data-table($height, $width, $databox-options-height) {
 	table.table {
+        height: 100%!important;
 		tbody {
 			overflow: auto;
 			display:block;
@@ -645,9 +648,11 @@ Derived Components: FrequentWordsList
 }
 
 div.frequent-words-list {
-	@include data-table(350, 360, $databox-options-height);
+	@include data-table(100%, 360, $databox-options-height);
 	float: left;
     font-family: $sans-serif-alt;
+    height: 100%;
+    padding-bottom: 20px;
 }
 
 td.frequent-word-word {
