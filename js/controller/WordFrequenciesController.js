@@ -20,12 +20,11 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 	/** Helper function to decode datetime format string returned by server
 	**/
-	formatDateTime: function(x, selected_date_detail, format){
-		if (format == undefined) {
-			// retrieve format string from type
-			var format_string = x.type.slice(5);
-			format = d3.time.format(format_string);
-		}
+	formatDateTime: function(x, selected_date_detail){
+		// retrieve format string from type
+		var format_string = x.type.slice(5);
+
+		var format = d3.time.format(format_string);
 		x.streams.forEach(function(stream){
 			// sort values first
 			stream.values.sort(function(a,b){
@@ -38,17 +37,16 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			if (!('values_orig' in stream)) {
 				stream.values_orig = $.extend(true, [], stream.values);
 			}
-
 			var newvalues = [];
-			var nested = d3.nest()
+			d3.nest()
 				.key(function(v){
 					var date = format.parse(String(v.x));
-					var formatted = d3.time[selected_date_detail](date);
-					return formatted;
+					v.x = d3.time[selected_date_detail](date);
+					return v.x;
 				})
 				.rollup(function(leaves){
 					var point = {
-						'x': format.parse(String(leaves[0].x)),
+						'x': leaves[0].x,
 						'y': d3.sum(leaves, function(d){
 								return d.y;
 							})
@@ -56,7 +54,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					newvalues.push(point);
 					return point;
 				})
-				.map(stream.values_orig, d3.map)
+				.entries(stream.values)
 				;
 			stream.values = newvalues;
 		})
@@ -184,97 +182,100 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 			var chart;
 			nv.addGraph(function() {
-				chart = nv.models.multiBarChart()
-					.delay(0)
-					.groupSpacing(0.45)
-					.staggerLabels(false)
-					.showLegend(false)
-					.showControls(false)
-					.showXAxis(true)
-					.reduceXTicks(false)
-					.color(function(){ return '#1a1a1a'; })
-					;
-
-				chart.xAxis
-					.scale(d3.scale.ordinal());
-
-				// add a sorting control to the viz title
-				var sort_control = viztitle.append('span')
-					.attr('class', 'sort')
-						.append('i')
-						.attr('class', 'sort-control fa fa-sort-alpha-asc')
+			    if (x.type == "string" || x.type == "number") {
+					chart = nv.models.multiBarChart()
+						.delay(0)
+						.groupSpacing(0.45)
+						.staggerLabels(false)
+						.showLegend(false)
+						.showControls(false)
+						.showXAxis(true)
+						.reduceXTicks(false)
+						.color(function(){ return '#1a1a1a'; })
 						;
 
-				// default sorting
-				sort_control
-					// add a menu to change sorting
-					.append('div')
-					.attr('class', 'sort-menu')
-					.selectAll('i')
-						.data([
-							'fa-sort-alpha-asc',
-							'fa-sort-alpha-desc',
-							'fa-sort-amount-asc',
-							'fa-sort-amount-desc'
-						])
-						.enter()
-						.append('i')
-						.attr('class', function(d, i){
-							var classval = 'fa ' + d;
-							if (i == 0) { classval += ' selected'; }
-							return classval;
-						})
-						.on('click', function(d, i){
-							svg.datum(function(data){
-								switch (i) {
-									case 0:
-										// alpha asc
-										data[0].values.sort(function(a,b){
-											return d3.ascending(a.x, b.x);
-											});
-										break;
-									case 1:
-										// alpha desc
-										data[0].values.sort(function(a,b){
-											return d3.descending(a.x, b.x);
-											});
-										break;
-									case 2:
-										// value asc
-										data[0].values.sort(function(a,b){
-											return d3.ascending(a.y, b.y);
-											});
-										break;
-									case 3:
-										// value desc
-										data[0].values.sort(function(a,b){
-											return d3.descending(a.y, b.y);
-											});
-										break;
-									default:
-										// don't do nothin
-										break;
-								}
-								return data;
-							});
+					chart.xAxis
+						.scale(d3.scale.ordinal());
 
-							// update menu display and current sort icon
-							d3.select(this.parentElement)
-								.selectAll('i')
-								.classed('selected', false)
-								;
+					// add a sorting control to the viz title
+					var sort_control = viztitle.append('span')
+						.attr('class', 'sort')
+							.append('i')
+							.attr('class', 'sort-control fa fa-sort-alpha-asc')
+							;
 
-							d3.select(this)
-								.classed('selected', true)
-								;
+					// default sorting
+					sort_control
+						// add a menu to change sorting
+						.append('div')
+						.attr('class', 'sort-menu')
+						.selectAll('i')
+							.data([
+								'fa-sort-alpha-asc',
+								'fa-sort-alpha-desc',
+								'fa-sort-amount-asc',
+								'fa-sort-amount-desc'
+							])
+							.enter()
+							.append('i')
+							.attr('class', function(d, i){
+								var classval = 'fa ' + d;
+								if (i == 0) { classval += ' selected'; }
+								return classval;
+							})
+							.on('click', function(d, i){
+								svg.datum(function(data){
+									switch (i) {
+										case 0:
+											// alpha asc
+											data[0].values.sort(function(a,b){
+												return d3.ascending(a.x, b.x);
+												});
+											break;
+										case 1:
+											// alpha desc
+											data[0].values.sort(function(a,b){
+												return d3.descending(a.x, b.x);
+												});
+											break;
+										case 2:
+											// value asc
+											data[0].values.sort(function(a,b){
+												return d3.ascending(a.y, b.y);
+												});
+											break;
+										case 3:
+											// value desc
+											data[0].values.sort(function(a,b){
+												return d3.descending(a.y, b.y);
+												});
+											break;
+										default:
+											// don't do nothin
+											break;
+									}
+									return data;
+								});
 
-							sort_control.attr('class', 'sort-control fa ' + d);
-							chart.update();
+								// update menu display and current sort icon
+								d3.select(this.parentElement)
+									.selectAll('i')
+									.classed('selected', false)
+									;
 
-						})
-						;
+								d3.select(this)
+									.classed('selected', true)
+									;
 
-				if (x.type.search(/^date_/) >= 0) {
+								sort_control.attr('class', 'sort-control fa ' + d);
+								chart.update();
+
+							})
+							;
+
+
+
+				} else if (x.type.search(/^date_/) >= 0) {
 					// retrieve format string from type
 					var format_string = x.type.slice(5);
 
@@ -355,10 +356,13 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 					var format = me.formatDateTime(x, selected_date_detail);
 
-					chart = nv.models.historicalBarChart()
+					chart = nv.models.lineChart()
 						.showLegend(false)
-						.showXAxis(true)
+						.showYAxis(true)
 						.color(function(){ return '#1a1a1a'; })
+						.showXAxis(true)
+						.xScale(d3.time.scale())
+						.forceY(0)
 						;
 
 					chart
@@ -401,7 +405,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					;
 
 				chart.margin({left: 55, bottom: 100, right: 45});
-				// chart.transitionDuration(500);
+				chart.transitionDuration(500);
 				chart.tooltipContent(function(key, x, y, e, graph){
 					return '<table class="nv-pointer-events-none">' +
 						'<tr class="nv-pointer-events-none">'+
@@ -416,26 +420,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				});
 
 				svg.call(chart);
-				if (x.type.search(/^date_/) >= 0){
-					var timebars = d3.select(chart.container).selectAll('.nv-bars rect');
-					var stream = x.streams[0];
-					var start = format.parse(String(stream.values_orig[0].x));
-					var end = format.parse(String(
-						stream.values_orig[stream.values_orig.length - 1].x));
-					var ticks = d3.time[selected_date_detail].range(start,end);
-					var barwidth = chart.xAxis.scale().range()[1] /
-						ticks.length;
-					barwidth = Math.ceil(barwidth * 0.4);
-					timebars
-						.transition()
-						.attr('width', barwidth)
-						.attr('x', function(){
-							return d3.select(this)
-								.attr("x") + barwidth;
-							})
-						;
 
-				}
 
 				// fade out overflowing labels
 				svg.append("linearGradient")
@@ -501,9 +486,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					});
 				}
 			    return chart;
-			}, function(chart){
-				var bars = d3.select(chart.container).selectAll('.nv-bars rect');
-
 			});
 
 		});
@@ -511,7 +493,30 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 	changeDateDetail: function(chart, choice, date_detail, format) {
 		var data = d3.select(chart.container).datum();
-		this.formatDateTime({streams: data}, choice, format);
+		data.forEach(function(stream){
+			var newvalues = [];
+			d3.nest()
+				.key(function(d){
+					var date = format.parse(String(d.x));
+					return d3.time[choice](date);
+				})
+				.rollup(function(leaves){
+					var date = format.parse(String(leaves[0].x));
+					var point = {
+						'x': d3.time[choice](date),
+						'y': d3.sum(leaves, function(d){
+								return d.y;
+							})
+					};
+					newvalues.push(point);
+					return point;
+				})
+				.entries(stream.values_orig)
+				;
+
+			stream.values = newvalues;
+		})
+		;
 		// bind new data
 		d3.select(chart.container).datum(data);
 		// update x axis ticks
