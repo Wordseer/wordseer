@@ -1048,6 +1048,13 @@ Visualizations - word frequencies
                         }
                     }
                 }
+                &.nv-lineChart {
+                    .nv-x {
+                        .tick {
+                            display: none;
+                        }
+                    }
+                }
             }
         }
     }
