@@ -209,10 +209,14 @@ class DocumentSet(Set):
            value = str(self.id))
         for document in documents:
             document.properties.append(property)
-            documnent.save()
-            for sentence in document.sentences:
+            document.save()
+            sentences = Sentence.query.filter(
+                Sentence.document_id == document.id)
+            for sentence in sentences:
                 sentence.properties.append(property)
+                sentence.unit.properties.append(property)
                 sentence.save()
+                sentence.unit.save()
         property.save() 
 
 

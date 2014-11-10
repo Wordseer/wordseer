@@ -31,7 +31,7 @@ class SentencesView(MethodView):
                                                         matching_words),
                     "id": sentence.id,
                     "document_id": sentence.document_id,
-                    "sentence_set": " ".join(sentence.sets)                 
+                    "sentence_set": " ".join([str(set.id) for set in sentence.sets])                 
                 }
                 self.add_metadata_properties(sentence, result)
                 results.append(result)
