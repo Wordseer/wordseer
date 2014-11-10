@@ -149,16 +149,24 @@ Ext.define('WordSeer.controller.SearchController', {
 		});
 		// Add any autocompleted metadata values
 		var autosuggest = form.down('phrases-autosuggest');
-		var was_metadata_search = false;
+		var was_search_with_record = false;
 		if (autosuggest.record) {
 			if (autosuggest.record.get('class') == 'metadata') {
-				was_metadata_search = true;
+				was_search_with_record = true;
 				var record = Ext.create('WordSeer.model.MetadataModel', {
 				    text: autosuggest.record.get('value'),
 				    value: autosuggest.record.get('value'),
 				    propertyName: autosuggest.record.get('property_name')
 				});
 				formValues.metadata.push(record);
+			}
+			if (autosuggest.record.get('class') == 'phrase') {
+				was_search_with_record = true;
+				var record = Ext.create('WordSeer.model.PhraseModel', {
+					id: autosuggest.record.get('id'),
+					sequence: autosuggest.record.get('text'),
+				});
+				formValues.phrases.push(record);
 			}
 		}
 		// close the autosuggest menu
@@ -167,7 +175,7 @@ Ext.define('WordSeer.controller.SearchController', {
 		var target = values.target;
 		if (target == 'new') {
 			// Make a new history item from the values.
-			if (!was_metadata_search) {
+			if (!was_search_with_record) {
 				formValues.search = [values];
 			}
 			var history_item = this.getController('HistoryController')
@@ -199,7 +207,7 @@ Ext.define('WordSeer.controller.SearchController', {
 				|| formValues.widget_xtype == 'word-frequencies-widget')) {
 				formValues.search.push(values);
 			} else {
-				if (was_metadata_search) {
+				if (was_search_with_record) {
 					formValues.search = [values];
 				}
 			}

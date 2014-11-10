@@ -204,7 +204,7 @@ class AutoSuggest(MethodView):
         sequences = db.session.query(Sequence.id,
             Sequence.sequence.label("text"),
             Sequence.length,
-            literal_column("'sequence'").label("class"),
+            literal_column("'phrase'").label("class"),
             func.count(SequenceInSentence.sentence_id).\
                 label("sentence_count")).\
         filter(SequenceInSentence.sequence_id == Sequence.id).\
