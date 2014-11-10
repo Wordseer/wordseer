@@ -38,7 +38,7 @@ Ext.define('WordSeer.model.DocumentModel', {
 		type:'ajax',
 		noCache: false,
 		reader: 'json',
-		url: '../../src/php/document/get-document.php',
+		url: ws_project_path + project_id + "/document_contents/",
 		extraParams: {
 			instance:getInstance(),
 			include_text: 'false',

@@ -122,6 +122,7 @@ Ext.define('WordSeer.view.sentence.Sentence', {
                 }else if(i== sentence.dep_index) {
                     cls += ' dep-highlight';
                 }
+                string_buffer.append(word.space_before);
                 string_buffer.append('<span class="' + cls +'" '
                     + ' onclick="Ext.getCmp(\''
                         + container_id +'\').fireEvent(\'wordclicked\', this);"'
@@ -132,7 +133,6 @@ Ext.define('WordSeer.view.sentence.Sentence', {
                     + '" sentence-id="' + sentence.sentence_id + '">'
                     + word.word
                     + '</span>');
-                string_buffer.append(word.space_after);
             }
             string_buffer.append('</span>');
             sets.forEach(function(s) {
@@ -158,14 +158,14 @@ Ext.define('WordSeer.view.sentence.Sentence', {
                 sentenceID:this.getSentenceID(),
                 class:cls,
             });
+            var space = words[i].space_before;
+            if(space.length > 0){
+                items.push({xtype:'space', html:space})
+            };
             items.push({
                 xtype:'word',
                 record: word,
             });
-            var space = words[i].space_after;
-            if(space.length > 0){
-                items.push({xtype:'space', html:space})
-            };
         }
         this.items = items;
         sentenceInfo = {

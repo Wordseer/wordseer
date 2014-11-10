@@ -153,7 +153,7 @@ class SentenceSet(Set):
         self.sentences.extend(sentences)
         self.save()
         metadata = PropertyMetadata.query.filter_by(
-            property_name = "sentence_set")
+            property_name = "sentence_set").first()
         property = Property(
             project = self.project,
             property_metadata = metadata,
@@ -201,7 +201,7 @@ class DocumentSet(Set):
         self.documents.extend(documents)
         self.save()
         metadata = PropertyMetadata.query.filter_by(
-           property_name = "document_set")
+           property_name = "document_set").first()
         property = Property(
            project = self.project,
            property_metadata = metadata,

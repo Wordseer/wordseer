@@ -11,16 +11,6 @@ Ext.define('WordSeer.model.SentenceSetModel', {
         {name:'iconCls', type:'string', defaultValue:'document-browser-16'},
         {name:'type', type:'string', defaultValue:'sentence'},
     ],
-    proxy: {
-      type: 'ajax',
-      url: '../../src/php/subsets/crud.php',
-       extraParams: {
-          instance: getInstance(),
-          type: 'read',
-          user: getUsername(),
-      },
-      reader: 'json',
-    },
     subsetType:'sentence',
     getClass:function(){
         return this.items.length == 0 ? 'empty-sentence-set':'sentence-set';

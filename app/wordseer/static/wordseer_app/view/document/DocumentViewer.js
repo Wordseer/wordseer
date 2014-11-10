@@ -100,7 +100,7 @@ Ext.define('WordSeer.view.document.DocumentViewer', {
             var child_id= child_info.id;
             var child_name = child_info.name;
             var subUnit = this.data.units[child_name][child_id];
-            if(subUnit.unit_name == "sentence"){
+            if(subUnit.unit_name == "sentence" && subUnit.sentence_id){
                 this.renderSentence(subUnit, html);
             } else {
                 this.renderUnit(subUnit, html);
