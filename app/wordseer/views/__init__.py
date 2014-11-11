@@ -10,4 +10,5 @@ __all__ = [
     "sets_view",
     "words_view",
     "wordmenu_view",
+    "wordtree"
 ]

@@ -47,7 +47,7 @@ Ext.define('WordSeer.controller.WordTreeController', {
 	*/
 	requestWordTreeData: function(formValues, word_tree_panel) {
 		Ext.Ajax.request({
-		url:'../../src/php/wordtree/get-tree.php',
+		url:ws_project_path + project_id +  '/wordtrees/',
 		method:'GET',
 		disableCaching: false,
 		timeout: 9000000,

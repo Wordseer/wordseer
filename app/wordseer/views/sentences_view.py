@@ -1,6 +1,7 @@
 from flask.views import MethodView
 from flask.json import jsonify, dumps, loads
 from flask import request
+from nltk import word_tokenize
 
 from app import app
 from app.wordseer import wordseer
