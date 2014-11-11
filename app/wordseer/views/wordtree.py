@@ -23,12 +23,17 @@ class WordTreeView(MethodView):
             return []
         search = searches[-1]
         if "gov" in search:
-            sequence_ids = Sequence.get_matching_sequence_ids(
-                search["gov"], search["gov"],
+            sequence_ids = Word.get_matching_sequence_ids(
+                search["gov"],
                 is_set_id = search["govtype"] != "word")
             for sequence_id in sequence_ids:
                 wordtree_center_strings.append(
                     Sequence.query.get(sequence_id).sequence)
+            if search["govtype"] != "word":
+                self.query = SequenceSet.query.get(search["gov"]).name
+            else:
+                self.query = wordtree_center_strings[-1]
+                
         return wordtree_center_strings
 
     def get_center_strings_from_phrase_filters(self, phrase_filters,
@@ -41,7 +46,7 @@ class WordTreeView(MethodView):
             abort(500)
         if components[0] == "phrase":
             wordtree_center_strings.append(
-                Sequence.query.get(components[1])).sequence
+                Sequence.query.get(components[1]).sequence)
             self.query = wordtree_center_strings[-1]
         elif components[0] == "word":
             word_id = components[1]
@@ -62,7 +67,7 @@ class WordTreeView(MethodView):
         wordtree_center_strings):
         if "string_phrase_set" in metadata_filters:
             for value_expression in metadata_filters["string_phrase_set"]:
-                (text, value) == value_expression.split("__")
+                (text, value) = value_expression.split("__")
                 set = SequenceSet.query.get(value)
                 if set is not None:
                     self.query = set.name

@@ -30,7 +30,7 @@ class AssociatedWordsView(MethodView):
         if project is None:
             return # 500 error
 
-        sequence_ids = Sequence.get_matching_sequence_ids(
+        sequence_ids = Word.get_matching_sequence_ids(
             params.get("word")[0],
             is_set_id = params.get("class")[0] == "phrase-set")
         sentences = SequenceInSentence.query.filter(

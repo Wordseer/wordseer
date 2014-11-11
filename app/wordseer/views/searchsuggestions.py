@@ -102,7 +102,7 @@ class AutoSuggest(MethodView):
                     ...etc...
                 ]
         """
-        sets = db.session.query(Set.id,
+        sets = db.session.query(SequenceSet.id,
             Set.name.label("text"),
             Property.name.label("class"),
             func.count(Property.unit_id).label("sentence_count")).\
@@ -155,7 +155,7 @@ class AutoSuggest(MethodView):
                 filter(PropertyOfSentence.property_id == Property.id).\
                 filter(Property.property_metadata_id == PropertyMetadata.id).\
                 filter(PropertyMetadata.is_category == True).\
-                filter(not_(Property.name.like("%_set"))).\
+                filter(not_(Property.name.like("phrase_set"))).\
                 group_by(Property.value).\
                 limit(50).\
                 all()
