@@ -89,17 +89,22 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		        // reconfigure data for nv.d3
 				var resp = Ext.decode(response.responseText),
 		        	data = [],
-					sentences = resp.counts[0].sentences,
-					prop_names = [];
+					sentences = resp.counts[0].sentences;
 
 				d3.keys(sentences[0]).forEach(function(k){
 					if (k.indexOf('__') >= 0) {
 						var components = k.split('__');
 						var type = components[0],
 							name = components[1];
-						prop_names.push(name);
+						if (resp.for_normalization[name] != undefined) {
+							var display_name = resp.for_normalization[name]
+								.displayName;
+						} else {
+							var display_name = name;
+						}
+
 						var prop = {
-							'property': name,
+							'property': display_name,
 							'type': type,
 							'streams': [{
 								'key': resp.counts[0].query.gov,
