@@ -104,7 +104,8 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						}
 
 						var prop = {
-							'property': display_name,
+							'property': name,
+							'displayName': display_name,
 							'type': type,
 							'streams': [{
 								'key': resp.counts[0].query.gov,
@@ -177,7 +178,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 			var viztitle = container.append('div')
 				.attr('class', 'property')
-				.text(x.property);
+				.text(x.displayName);
 
 			var svg = container.append('div')
 					.attr("class", "wordfreq")
