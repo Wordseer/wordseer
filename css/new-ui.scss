@@ -997,7 +997,7 @@ div.metatag {
 
 
 /*******************************************************************************
-Visualizations - word frequencies
+Visualizations - metadata profile
 *******************************************************************************/
 
 .viz-container{
@@ -1061,10 +1061,16 @@ Visualizations - word frequencies
     margin-top: $space_3;
     font-family: $sans-serif-alt;
 
+    // title
     div.property {
         font-size: $large-font-size;
         font-weight: 700;
         margin-left: 50px;
+
+        a.download {
+            padding-left: 10px;
+            color: $background-lightblue;
+        }
 
         span.sort {
             display: inline-block;
@@ -1073,7 +1079,7 @@ Visualizations - word frequencies
             position: relative;
 
             .sort-control {
-                color: #e41a1c;
+                color: $background-lightblue;
                 padding-right: 15px;
 
                 .sort-menu {
@@ -1097,7 +1103,7 @@ Visualizations - word frequencies
 
 
                         &.selected {
-                            color: #e41a1c;
+                            color: $background-lightblue;
                         }
 
                         &:hover {

@@ -180,6 +180,15 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				.attr('class', 'property')
 				.text(x.displayName);
 
+			var download_link = viztitle.append('a')
+				.attr('class', 'download')
+				.attr('download', function(){
+					return "sentence counts across " + x.displayName + '.csv';
+				});
+
+			download_link.append('i')
+				.attr('class', 'fa fa-download');
+
 			var svg = container.append('div')
 					.attr("class", "wordfreq")
 						.append('svg')
@@ -481,7 +490,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				nv.utils.windowResize(chart.update);
 
 				if (x.type.search(/^date_/) >= 0){
-					// fire change event for timeseries granularity
+					// fire change event for timdebugger;eseries granularity
 					selector.on('change', function(){
 						var choice = d3.select(this)
 							.select(":checked")
@@ -491,6 +500,61 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 					});
 				}
+
+				// Make the export data.
+				var data_export = [];
+
+				// need to handle dates differently than other datatypes
+				if (x.type == "string" || x.type == "number") {
+					var keys = chart.xAxis.domain();
+					for (var i = 0; i < keys.length; i++){
+						var row = {};
+						row[x.property] = keys[i];
+						// add each stream freq
+						x.streams.forEach(function(stream){
+							var matching_value = stream.values.filter(function(v){
+								return v.x == keys[i];
+							});
+							row[stream.key] = matching_value[0].y;
+						});
+
+						data_export.push(row);
+					}
+				} else if (x.type.search(/^date_/) >= 0) {
+					// make a set of all date values from all streams
+					var all_dates = d3.set();
+					x.streams.forEach(function(stream){
+						stream.values_orig.forEach(function(v){
+							all_dates.add(v.x);
+						});
+					});
+
+					// find matching values for each stream, or 0 if none
+					all_dates.forEach(function(this_date){
+						var row = {};
+						row[x.property] = this_date;
+						// add each stream freq
+						x.streams.forEach(function(stream){
+							var matching_value = stream.values_orig.filter(function(v){
+								return v.x == this_date;
+							});
+							if (matching_value.length) {
+								row[stream.key] = matching_value[0].y;
+							} else {
+								row[stream.key] = 0;
+							}
+						});
+						data_export.push(row);
+					});
+
+				}
+
+				// attach to download button as data url
+				file_data = d3.csv.format(data_export); // requires d3 >= 3.1
+				var data_url = "data:application/octet-stream," +
+					escape(file_data);
+				download_link.attr("href", data_url);
+
 			    return chart;
 			});
 

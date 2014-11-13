@@ -1221,7 +1221,7 @@ div.metatag.sorting.lev2 {
 }
 
 /*******************************************************************************
-Visualizations - word frequencies
+Visualizations - metadata profile
 *******************************************************************************/
 /* line 1003, new-ui.scss */
 .viz-container {
@@ -1266,25 +1266,30 @@ Visualizations - word frequencies
 .viz-container .wordfreq svg .nvd3.nv-lineChart .nv-x .tick {
   display: none;
 }
-/* line 1064, new-ui.scss */
+/* line 1065, new-ui.scss */
 .viz-container div.property {
   font-size: 18px;
   font-weight: 700;
   margin-left: 50px;
 }
-/* line 1069, new-ui.scss */
+/* line 1070, new-ui.scss */
+.viz-container div.property a.download {
+  padding-left: 10px;
+  color: #64839f;
+}
+/* line 1075, new-ui.scss */
 .viz-container div.property span.sort {
   display: inline-block;
   margin-left: 10px;
   text-transform: uppercase;
   position: relative;
 }
-/* line 1075, new-ui.scss */
+/* line 1081, new-ui.scss */
 .viz-container div.property span.sort .sort-control {
-  color: #e41a1c;
+  color: #64839f;
   padding-right: 15px;
 }
-/* line 1079, new-ui.scss */
+/* line 1085, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu {
   position: absolute;
   top: -9px;
@@ -1297,7 +1302,7 @@ Visualizations - word frequencies
   visibility: hidden;
   transition: visibility 0s ease 0.3s,opacity 0.3s ease;
 }
-/* line 1091, new-ui.scss */
+/* line 1097, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu i {
   padding: 5px;
   width: 100%;
@@ -1305,16 +1310,16 @@ Visualizations - word frequencies
   background-color: #eeeeee;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-/* line 1099, new-ui.scss */
+/* line 1105, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu i.selected {
-  color: #e41a1c;
+  color: #64839f;
 }
-/* line 1103, new-ui.scss */
+/* line 1109, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu i:hover {
   background-color: #64839f;
   color: #eeeeee;
 }
-/* line 1111, new-ui.scss */
+/* line 1117, new-ui.scss */
 .viz-container div.property span.sort .sort-control:hover .sort-menu {
   opacity: 1;
   visibility: visible;
@@ -1327,7 +1332,7 @@ NV.D3 defaults
 /********************
  * HTML CSS
  */
-/* line 1136, new-ui.scss */
+/* line 1142, new-ui.scss */
 .chartWrap {
   margin: 0;
   padding: 0;
@@ -1337,7 +1342,7 @@ NV.D3 defaults
 /********************
   Box shadow and border radius styling
 */
-/* line 1145, new-ui.scss */
+/* line 1151, new-ui.scss */
 .nvtooltip.with-3d-shadow, .with-3d-shadow .nvtooltip {
   -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
@@ -1350,7 +1355,7 @@ NV.D3 defaults
 /********************
  * TOOLTIP CSS
  */
-/* line 1159, new-ui.scss */
+/* line 1165, new-ui.scss */
 .nvtooltip {
   position: absolute;
   background-color: white;
@@ -1373,7 +1378,7 @@ NV.D3 defaults
 /*Give tooltips that old fade in transition by
     putting a "with-transitions" class on the container div.
 */
-/* line 1184, new-ui.scss */
+/* line 1190, new-ui.scss */
 .nvtooltip.with-transitions, .with-transitions .nvtooltip {
   transition: opacity 250ms linear;
   -moz-transition: opacity 250ms linear;
@@ -1383,13 +1388,13 @@ NV.D3 defaults
   -webkit-transition-delay: 250ms;
 }
 
-/* line 1195, new-ui.scss */
+/* line 1201, new-ui.scss */
 .nvtooltip.x-nvtooltip,
 .nvtooltip.y-nvtooltip {
   padding: 8px;
 }
 
-/* line 1199, new-ui.scss */
+/* line 1205, new-ui.scss */
 .nvtooltip h3 {
   margin: 0;
   padding: 4px 14px;
@@ -1403,43 +1408,43 @@ NV.D3 defaults
   border-radius: 5px 5px 0 0;
 }
 
-/* line 1214, new-ui.scss */
+/* line 1220, new-ui.scss */
 .nvtooltip p {
   margin: 0;
   padding: 5px 14px;
   text-align: center;
 }
 
-/* line 1220, new-ui.scss */
+/* line 1226, new-ui.scss */
 .nvtooltip span {
   display: inline-block;
   margin: 2px 0;
 }
 
-/* line 1225, new-ui.scss */
+/* line 1231, new-ui.scss */
 .nvtooltip table {
   margin: 6px;
   border-spacing: 0;
 }
 
-/* line 1231, new-ui.scss */
+/* line 1237, new-ui.scss */
 .nvtooltip table td {
   padding: 2px 9px 2px 0;
   vertical-align: middle;
 }
 
-/* line 1236, new-ui.scss */
+/* line 1242, new-ui.scss */
 .nvtooltip table td.key {
   font-weight: normal;
 }
 
-/* line 1239, new-ui.scss */
+/* line 1245, new-ui.scss */
 .nvtooltip table td.value {
   text-align: right;
   font-weight: bold;
 }
 
-/* line 1244, new-ui.scss */
+/* line 1250, new-ui.scss */
 .nvtooltip table tr.highlight td {
   padding: 1px 9px 1px 0;
   border-bottom-style: solid;
@@ -1448,20 +1453,20 @@ NV.D3 defaults
   border-top-width: 1px;
 }
 
-/* line 1252, new-ui.scss */
+/* line 1258, new-ui.scss */
 .nvtooltip table td.legend-color-guide div {
   width: 8px;
   height: 8px;
   vertical-align: middle;
 }
 
-/* line 1258, new-ui.scss */
+/* line 1264, new-ui.scss */
 .nvtooltip .footer {
   padding: 3px;
   text-align: center;
 }
 
-/* line 1264, new-ui.scss */
+/* line 1270, new-ui.scss */
 .nvtooltip-pending-removal {
   position: absolute;
   pointer-events: none;
@@ -1470,7 +1475,7 @@ NV.D3 defaults
 /********************
  * SVG CSS
  */
-/* line 1275, new-ui.scss */
+/* line 1281, new-ui.scss */
 svg.nvd3 {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -1483,16 +1488,16 @@ svg.nvd3 {
   width: 100%;
   height: 100%;
 }
-/* line 1287, new-ui.scss */
+/* line 1293, new-ui.scss */
 svg.nvd3 text {
   font: normal 12px Arial;
 }
-/* line 1291, new-ui.scss */
+/* line 1297, new-ui.scss */
 svg.nvd3 .title {
   font: bold 14px Arial;
 }
 
-/* line 1298, new-ui.scss */
+/* line 1304, new-ui.scss */
 .nvd3 .nv-background {
   fill: white;
   fill-opacity: 0;
@@ -1501,7 +1506,7 @@ svg.nvd3 .title {
   */
 }
 
-/* line 1306, new-ui.scss */
+/* line 1312, new-ui.scss */
 .nvd3.nv-noData {
   font-size: 18px;
   font-weight: bold;
@@ -1510,7 +1515,7 @@ svg.nvd3 .title {
 /**********
 *  Brush
 */
-/* line 1316, new-ui.scss */
+/* line 1322, new-ui.scss */
 .nv-brush .extent {
   fill-opacity: .125;
   shape-rendering: crispEdges;
@@ -1519,12 +1524,12 @@ svg.nvd3 .title {
 /**********
 *  Legend
 */
-/* line 1327, new-ui.scss */
+/* line 1333, new-ui.scss */
 .nvd3 .nv-legend .nv-series {
   cursor: pointer;
 }
 
-/* line 1331, new-ui.scss */
+/* line 1337, new-ui.scss */
 .nvd3 .nv-legend .disabled circle {
   fill-opacity: 0;
 }
@@ -1532,12 +1537,12 @@ svg.nvd3 .title {
 /**********
 *  Axes
 */
-/* line 1340, new-ui.scss */
+/* line 1346, new-ui.scss */
 .nvd3 .nv-axis {
   pointer-events: none;
 }
 
-/* line 1344, new-ui.scss */
+/* line 1350, new-ui.scss */
 .nvd3 .nv-axis path {
   fill: none;
   stroke: #000;
@@ -1545,35 +1550,35 @@ svg.nvd3 .title {
   shape-rendering: crispEdges;
 }
 
-/* line 1351, new-ui.scss */
+/* line 1357, new-ui.scss */
 .nvd3 .nv-axis path.domain {
   stroke-opacity: .75;
 }
 
-/* line 1355, new-ui.scss */
+/* line 1361, new-ui.scss */
 .nvd3 .nv-axis.nv-x path.domain {
   stroke-opacity: 0;
 }
 
-/* line 1359, new-ui.scss */
+/* line 1365, new-ui.scss */
 .nvd3 .nv-axis line {
   fill: none;
   stroke: #e5e5e5;
   shape-rendering: crispEdges;
 }
 
-/* line 1366, new-ui.scss */
+/* line 1372, new-ui.scss */
 .nvd3 .nv-axis .zero line,
 .nvd3 .nv-axis line.zero {
   stroke-opacity: .75;
 }
 
-/* line 1370, new-ui.scss */
+/* line 1376, new-ui.scss */
 .nvd3 .nv-axis .nv-axisMaxMin text {
   font-weight: bold;
 }
 
-/* line 1376, new-ui.scss */
+/* line 1382, new-ui.scss */
 .nvd3 .x .nv-axis .nv-axisMaxMin text,
 .nvd3 .x2 .nv-axis .nv-axisMaxMin text,
 .nvd3 .x3 .nv-axis .nv-axisMaxMin text {
@@ -1583,7 +1588,7 @@ svg.nvd3 .title {
 /**********
 *  Brush
 */
-/* line 1386, new-ui.scss */
+/* line 1392, new-ui.scss */
 .nv-brush .resize path {
   fill: #eee;
   stroke: #666;
@@ -1592,12 +1597,12 @@ svg.nvd3 .title {
 /**********
 *  Bars
 */
-/* line 1397, new-ui.scss */
+/* line 1403, new-ui.scss */
 .nvd3 .nv-bars .negative rect {
   zfill: brown;
 }
 
-/* line 1401, new-ui.scss */
+/* line 1407, new-ui.scss */
 .nvd3 .nv-bars rect {
   zfill: steelblue;
   fill-opacity: .75;
@@ -1606,22 +1611,22 @@ svg.nvd3 .title {
   -webkit-transition: fill-opacity 250ms linear;
 }
 
-/* line 1410, new-ui.scss */
+/* line 1416, new-ui.scss */
 .nvd3 .nv-bars rect.hover {
   fill-opacity: 1;
 }
 
-/* line 1414, new-ui.scss */
+/* line 1420, new-ui.scss */
 .nvd3 .nv-bars .hover rect {
   fill: lightblue;
 }
 
-/* line 1418, new-ui.scss */
+/* line 1424, new-ui.scss */
 .nvd3 .nv-bars text {
   fill: rgba(0, 0, 0, 0);
 }
 
-/* line 1422, new-ui.scss */
+/* line 1428, new-ui.scss */
 .nvd3 .nv-bars .hover text {
   fill: black;
 }
@@ -1629,7 +1634,7 @@ svg.nvd3 .title {
 /**********
 *  Bars
 */
-/* line 1433, new-ui.scss */
+/* line 1439, new-ui.scss */
 .nvd3 .nv-multibar .nv-groups rect,
 .nvd3 .nv-multibarHorizontal .nv-groups rect,
 .nvd3 .nv-discretebar .nv-groups rect {
@@ -1639,14 +1644,14 @@ svg.nvd3 .title {
   -webkit-transition: fill-opacity 250ms linear;
 }
 
-/* line 1443, new-ui.scss */
+/* line 1449, new-ui.scss */
 .nvd3 .nv-multibar .nv-groups rect:hover,
 .nvd3 .nv-multibarHorizontal .nv-groups rect:hover,
 .nvd3 .nv-discretebar .nv-groups rect:hover {
   fill-opacity: 1;
 }
 
-/* line 1448, new-ui.scss */
+/* line 1454, new-ui.scss */
 .nvd3 .nv-discretebar .nv-groups text,
 .nvd3 .nv-multibarHorizontal .nv-groups text {
   font-weight: bold;
@@ -1657,7 +1662,7 @@ svg.nvd3 .title {
 /***********
 *  Pie Chart
 */
-/* line 1458, new-ui.scss */
+/* line 1464, new-ui.scss */
 .nvd3.nv-pie path {
   stroke-opacity: 0;
   transition: fill-opacity 250ms linear, stroke-width 250ms linear, stroke-opacity 250ms linear;
@@ -1665,30 +1670,30 @@ svg.nvd3 .title {
   -webkit-transition: fill-opacity 250ms linear, stroke-width 250ms linear, stroke-opacity 250ms linear;
 }
 
-/* line 1466, new-ui.scss */
+/* line 1472, new-ui.scss */
 .nvd3.nv-pie .nv-slice text {
   stroke: #000;
   stroke-width: 0;
 }
 
-/* line 1471, new-ui.scss */
+/* line 1477, new-ui.scss */
 .nvd3.nv-pie path {
   stroke: #fff;
   stroke-width: 1px;
   stroke-opacity: 1;
 }
 
-/* line 1477, new-ui.scss */
+/* line 1483, new-ui.scss */
 .nvd3.nv-pie .hover path {
   fill-opacity: .7;
 }
 
-/* line 1480, new-ui.scss */
+/* line 1486, new-ui.scss */
 .nvd3.nv-pie .nv-label {
   pointer-events: none;
 }
 
-/* line 1483, new-ui.scss */
+/* line 1489, new-ui.scss */
 .nvd3.nv-pie .nv-label rect {
   fill-opacity: 0;
   stroke-opacity: 0;
@@ -1697,7 +1702,7 @@ svg.nvd3 .title {
 /**********
 * Lines
 */
-/* line 1492, new-ui.scss */
+/* line 1498, new-ui.scss */
 .nvd3 .nv-groups path.nv-line {
   fill: none;
   stroke-width: 1.5px;
@@ -1715,12 +1720,12 @@ svg.nvd3 .title {
   */
 }
 
-/* line 1509, new-ui.scss */
+/* line 1515, new-ui.scss */
 .nvd3 .nv-groups path.nv-line.nv-thin-line {
   stroke-width: 1px;
 }
 
-/* line 1514, new-ui.scss */
+/* line 1520, new-ui.scss */
 .nvd3 .nv-groups path.nv-area {
   stroke: none;
   /*
@@ -1738,7 +1743,7 @@ svg.nvd3 .title {
   */
 }
 
-/* line 1531, new-ui.scss */
+/* line 1537, new-ui.scss */
 .nvd3 .nv-line.hover path {
   stroke-width: 6px;
 }
@@ -1749,26 +1754,26 @@ svg.nvd3 .title {
   stroke-opacity: 0.1;
 }
   */
-/* line 1542, new-ui.scss */
+/* line 1548, new-ui.scss */
 .nvd3.nv-line .nvd3.nv-scatter .nv-groups .nv-point {
   fill-opacity: 0;
   stroke-opacity: 0;
 }
 
-/* line 1547, new-ui.scss */
+/* line 1553, new-ui.scss */
 .nvd3.nv-scatter.nv-single-point .nv-groups .nv-point {
   fill-opacity: .5 !important;
   stroke-opacity: .5 !important;
 }
 
-/* line 1553, new-ui.scss */
+/* line 1559, new-ui.scss */
 .with-transitions .nvd3 .nv-groups .nv-point {
   transition: stroke-width 250ms linear, stroke-opacity 250ms linear;
   -moz-transition: stroke-width 250ms linear, stroke-opacity 250ms linear;
   -webkit-transition: stroke-width 250ms linear, stroke-opacity 250ms linear;
 }
 
-/* line 1561, new-ui.scss */
+/* line 1567, new-ui.scss */
 .nvd3.nv-scatter .nv-groups .nv-point.hover,
 .nvd3 .nv-groups .nv-point.hover {
   stroke-width: 7px;
@@ -1776,7 +1781,7 @@ svg.nvd3 .title {
   stroke-opacity: .95 !important;
 }
 
-/* line 1568, new-ui.scss */
+/* line 1574, new-ui.scss */
 .nvd3 .nv-point-paths path {
   stroke: #aaa;
   stroke-opacity: 0;
@@ -1784,7 +1789,7 @@ svg.nvd3 .title {
   fill-opacity: 0;
 }
 
-/* line 1577, new-ui.scss */
+/* line 1583, new-ui.scss */
 .nvd3 .nv-indexLine {
   cursor: ew-resize;
 }
@@ -1792,7 +1797,7 @@ svg.nvd3 .title {
 /**********
 * Distribution
 */
-/* line 1586, new-ui.scss */
+/* line 1592, new-ui.scss */
 .nvd3 .nv-distribution {
   pointer-events: none;
 }
@@ -1805,13 +1810,13 @@ svg.nvd3 .title {
   pointer-events: none;
 }
 */
-/* line 1602, new-ui.scss */
+/* line 1608, new-ui.scss */
 .nvd3 .nv-groups .nv-point.hover {
   stroke-width: 20px;
   stroke-opacity: .5;
 }
 
-/* line 1607, new-ui.scss */
+/* line 1613, new-ui.scss */
 .nvd3 .nv-scatter .nv-point.hover {
   fill-opacity: 1;
 }
@@ -1824,7 +1829,7 @@ svg.nvd3 .title {
 /**********
 *  Stacked Area
 */
-/* line 1622, new-ui.scss */
+/* line 1628, new-ui.scss */
 .nvd3.nv-stackedarea path.nv-area {
   fill-opacity: .7;
   /*
@@ -1842,7 +1847,7 @@ svg.nvd3 .title {
   */
 }
 
-/* line 1642, new-ui.scss */
+/* line 1648, new-ui.scss */
 .nvd3.nv-stackedarea path.nv-area.hover {
   fill-opacity: .9;
   /*
@@ -1855,7 +1860,7 @@ svg.nvd3 .title {
   stroke-opacity: 0;
 }
   */
-/* line 1656, new-ui.scss */
+/* line 1662, new-ui.scss */
 .nvd3.nv-stackedarea .nv-groups .nv-point {
   stroke-opacity: 0;
   fill-opacity: 0;
@@ -1870,12 +1875,12 @@ svg.nvd3 .title {
 /**********
 *  Line Plus Bar
 */
-/* line 1674, new-ui.scss */
+/* line 1680, new-ui.scss */
 .nvd3.nv-linePlusBar .nv-bar rect {
   fill-opacity: .75;
 }
 
-/* line 1678, new-ui.scss */
+/* line 1684, new-ui.scss */
 .nvd3.nv-linePlusBar .nv-bar rect:hover {
   fill-opacity: 1;
 }
@@ -1883,73 +1888,73 @@ svg.nvd3 .title {
 /**********
 *  Bullet
 */
-/* line 1687, new-ui.scss */
+/* line 1693, new-ui.scss */
 .nvd3.nv-bullet {
   font: 10px sans-serif;
 }
 
-/* line 1688, new-ui.scss */
+/* line 1694, new-ui.scss */
 .nvd3.nv-bullet .nv-measure {
   fill-opacity: .8;
 }
 
-/* line 1689, new-ui.scss */
+/* line 1695, new-ui.scss */
 .nvd3.nv-bullet .nv-measure:hover {
   fill-opacity: 1;
 }
 
-/* line 1690, new-ui.scss */
+/* line 1696, new-ui.scss */
 .nvd3.nv-bullet .nv-marker {
   stroke: #000;
   stroke-width: 2px;
 }
 
-/* line 1691, new-ui.scss */
+/* line 1697, new-ui.scss */
 .nvd3.nv-bullet .nv-markerTriangle {
   stroke: #000;
   fill: #fff;
   stroke-width: 1.5px;
 }
 
-/* line 1692, new-ui.scss */
+/* line 1698, new-ui.scss */
 .nvd3.nv-bullet .nv-tick line {
   stroke: #666;
   stroke-width: .5px;
 }
 
-/* line 1693, new-ui.scss */
+/* line 1699, new-ui.scss */
 .nvd3.nv-bullet .nv-range.nv-s0 {
   fill: #eee;
 }
 
-/* line 1694, new-ui.scss */
+/* line 1700, new-ui.scss */
 .nvd3.nv-bullet .nv-range.nv-s1 {
   fill: #ddd;
 }
 
-/* line 1695, new-ui.scss */
+/* line 1701, new-ui.scss */
 .nvd3.nv-bullet .nv-range.nv-s2 {
   fill: #ccc;
 }
 
-/* line 1696, new-ui.scss */
+/* line 1702, new-ui.scss */
 .nvd3.nv-bullet .nv-title {
   font-size: 14px;
   font-weight: bold;
 }
 
-/* line 1697, new-ui.scss */
+/* line 1703, new-ui.scss */
 .nvd3.nv-bullet .nv-subtitle {
   fill: #999;
 }
 
-/* line 1700, new-ui.scss */
+/* line 1706, new-ui.scss */
 .nvd3.nv-bullet .nv-range {
   fill: #bababa;
   fill-opacity: .4;
 }
 
-/* line 1704, new-ui.scss */
+/* line 1710, new-ui.scss */
 .nvd3.nv-bullet .nv-range:hover {
   fill-opacity: .7;
 }
@@ -1957,35 +1962,35 @@ svg.nvd3 .title {
 /**********
 * Sparkline
 */
-/* line 1714, new-ui.scss */
+/* line 1720, new-ui.scss */
 .nvd3.nv-sparkline path {
   fill: none;
 }
 
-/* line 1718, new-ui.scss */
+/* line 1724, new-ui.scss */
 .nvd3.nv-sparklineplus g.nv-hoverValue {
   pointer-events: none;
 }
 
-/* line 1722, new-ui.scss */
+/* line 1728, new-ui.scss */
 .nvd3.nv-sparklineplus .nv-hoverValue line {
   stroke: #333;
   stroke-width: 1.5px;
 }
 
-/* line 1728, new-ui.scss */
+/* line 1734, new-ui.scss */
 .nvd3.nv-sparklineplus,
 .nvd3.nv-sparklineplus g {
   pointer-events: all;
 }
 
-/* line 1732, new-ui.scss */
+/* line 1738, new-ui.scss */
 .nvd3 .nv-hoverArea {
   fill-opacity: 0;
   stroke-opacity: 0;
 }
 
-/* line 1738, new-ui.scss */
+/* line 1744, new-ui.scss */
 .nvd3.nv-sparklineplus .nv-xValue,
 .nvd3.nv-sparklineplus .nv-yValue {
   /*
@@ -1996,24 +2001,24 @@ svg.nvd3 .title {
   font-weight: normal;
 }
 
-/* line 1747, new-ui.scss */
+/* line 1753, new-ui.scss */
 .nvd3.nv-sparklineplus .nv-yValue {
   stroke: #f66;
 }
 
-/* line 1751, new-ui.scss */
+/* line 1757, new-ui.scss */
 .nvd3.nv-sparklineplus .nv-maxValue {
   stroke: #2ca02c;
   fill: #2ca02c;
 }
 
-/* line 1756, new-ui.scss */
+/* line 1762, new-ui.scss */
 .nvd3.nv-sparklineplus .nv-minValue {
   stroke: #d62728;
   fill: #d62728;
 }
 
-/* line 1761, new-ui.scss */
+/* line 1767, new-ui.scss */
 .nvd3.nv-sparklineplus .nv-currentValue {
   /*
   stroke: #444;
@@ -2026,39 +2031,39 @@ svg.nvd3 .title {
 /**********
 * historical stock
 */
-/* line 1774, new-ui.scss */
+/* line 1780, new-ui.scss */
 .nvd3.nv-ohlcBar .nv-ticks .nv-tick {
   stroke-width: 2px;
 }
 
-/* line 1778, new-ui.scss */
+/* line 1784, new-ui.scss */
 .nvd3.nv-ohlcBar .nv-ticks .nv-tick.hover {
   stroke-width: 4px;
 }
 
-/* line 1782, new-ui.scss */
+/* line 1788, new-ui.scss */
 .nvd3.nv-ohlcBar .nv-ticks .nv-tick.positive {
   stroke: #2ca02c;
 }
 
-/* line 1786, new-ui.scss */
+/* line 1792, new-ui.scss */
 .nvd3.nv-ohlcBar .nv-ticks .nv-tick.negative {
   stroke: #d62728;
 }
 
-/* line 1790, new-ui.scss */
+/* line 1796, new-ui.scss */
 .nvd3.nv-historicalStockChart .nv-axis .nv-axislabel {
   font-weight: bold;
 }
 
-/* line 1794, new-ui.scss */
+/* line 1800, new-ui.scss */
 .nvd3.nv-historicalStockChart .nv-dragTarget {
   fill-opacity: 0;
   stroke: none;
   cursor: move;
 }
 
-/* line 1800, new-ui.scss */
+/* line 1806, new-ui.scss */
 .nvd3 .nv-brush .extent {
   /*
   cursor: ew-resize !important;
@@ -2066,7 +2071,7 @@ svg.nvd3 .title {
   fill-opacity: 0 !important;
 }
 
-/* line 1807, new-ui.scss */
+/* line 1813, new-ui.scss */
 .nvd3 .nv-brushBackground rect {
   stroke: #000;
   stroke-width: .4;
@@ -2080,30 +2085,30 @@ svg.nvd3 .title {
 /**
  * TODO: the following 3 selectors are based on classes used in the example.  I should either make them standard and leave them here, or move to a CSS file not included in the library
  */
-/* line 1824, new-ui.scss */
+/* line 1830, new-ui.scss */
 .nvd3.nv-indentedtree .name {
   margin-left: 5px;
 }
 
-/* line 1828, new-ui.scss */
+/* line 1834, new-ui.scss */
 .nvd3.nv-indentedtree .clickable {
   color: #08C;
   cursor: pointer;
 }
 
-/* line 1833, new-ui.scss */
+/* line 1839, new-ui.scss */
 .nvd3.nv-indentedtree span.clickable:hover {
   color: #005580;
   text-decoration: underline;
 }
 
-/* line 1839, new-ui.scss */
+/* line 1845, new-ui.scss */
 .nvd3.nv-indentedtree .nv-childrenCount {
   display: inline-block;
   margin-left: 5px;
 }
 
-/* line 1844, new-ui.scss */
+/* line 1850, new-ui.scss */
 .nvd3.nv-indentedtree .nv-treeicon {
   cursor: pointer;
   /*
@@ -2111,7 +2116,7 @@ svg.nvd3 .title {
   */
 }
 
-/* line 1851, new-ui.scss */
+/* line 1857, new-ui.scss */
 .nvd3.nv-indentedtree .nv-treeicon.nv-folded {
   cursor: pointer;
   /*
@@ -2122,7 +2127,7 @@ svg.nvd3 .title {
 /**********
 * Parallel Coordinates
 */
-/* line 1862, new-ui.scss */
+/* line 1868, new-ui.scss */
 .nvd3 .background path {
   fill: none;
   stroke: #ccc;
@@ -2130,28 +2135,28 @@ svg.nvd3 .title {
   shape-rendering: crispEdges;
 }
 
-/* line 1869, new-ui.scss */
+/* line 1875, new-ui.scss */
 .nvd3 .foreground path {
   fill: none;
   stroke: steelblue;
   stroke-opacity: .7;
 }
 
-/* line 1875, new-ui.scss */
+/* line 1881, new-ui.scss */
 .nvd3 .brush .extent {
   fill-opacity: .3;
   stroke: #fff;
   shape-rendering: crispEdges;
 }
 
-/* line 1881, new-ui.scss */
+/* line 1887, new-ui.scss */
 .nvd3 .axis line, .axis path {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
 
-/* line 1887, new-ui.scss */
+/* line 1893, new-ui.scss */
 .nvd3 .axis text {
   text-shadow: 0 1px 0 #fff;
 }
@@ -2159,12 +2164,12 @@ svg.nvd3 .title {
 /****
 Interactive Layer
 */
-/* line 1894, new-ui.scss */
+/* line 1900, new-ui.scss */
 .nvd3 .nv-interactiveGuideLine {
   pointer-events: none;
 }
 
-/* line 1897, new-ui.scss */
+/* line 1903, new-ui.scss */
 .nvd3 line.nv-guideline {
   stroke: #ccc;
 }
