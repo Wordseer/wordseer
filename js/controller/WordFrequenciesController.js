@@ -178,9 +178,58 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		var canvas = d3.select(panel.getComponent('canvas').getEl().dom);
 		var chart;
 
+		// create visibility toggles
+		var controls = d3.select('.panel-header .controls');
+		var toggles = controls.selectAll('div')
+			.data(data)
+			.enter()
+				.append('span')
+				.attr('class', 'viz-toggle')
+				;
+		toggles.append('input')
+			.attr('type', 'checkbox')
+			.property('checked', 'checked')
+			.attr('id', function(d){
+				return makeClassName(d.property)+'check'; // in util.js
+			})
+			.property('value', function(d){
+				return makeClassName(d.property); // in util.js
+			})
+			.on('change', function(d){
+				var check = this;
+				var target = canvas.select('.viz-container.' + check.value);
+				if (check.checked){
+					target.transition()
+						.style('margin-left', 0)
+							.transition()
+							.style('opacity', 1)
+							;
+				} else {
+					target.transition()
+						.style('opacity', 0)
+							.transition()
+							.style('margin-left', -9999)
+							;
+				}
+			})
+			;
+
+		toggles.append('label')
+			.text(function(d){
+				return d.displayName;
+			})
+			.attr('for', function(d){
+				return makeClassName(d.property)+'check'; // in util.js
+			})
+			;
+
+		// debugger;
+
 		data.forEach(function(x){
 			var container = canvas.append('div')
-				.attr("class", "viz-container");
+				.classed("viz-container", true)
+				.classed(makeClassName(x.property), true) // in util.js
+				;
 
 			var viztitle = container.append('div')
 				.attr('class', 'property')
@@ -198,7 +247,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			var svg = container.append('div')
 					.attr("class", "wordfreq")
 						.append('svg')
-						.attr("class", x.property + " nvd3")
+						.attr("class", "nvd3")
 						.datum(x.streams);
 
 			var chart;

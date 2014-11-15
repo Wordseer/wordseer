@@ -213,3 +213,8 @@ function colorLoop(index) {
 		return index;
 	}
 }
+
+/* make a string safe to use as css class name */
+function makeClassName(text) {
+	return text.toLowerCase().replace(' ', '_');
+}

@@ -1000,9 +1000,24 @@ div.metatag {
 Visualizations - metadata profile
 *******************************************************************************/
 
+.panel-header {
+    .controls{
+        font-family: $slab-serif;
+        font-size: $medium-font-size;
+        color: $background-lightblue;
+
+        .viz-toggle {
+            display: inline-block;
+            margin-left: $space_3;
+        }
+
+    }
+}
+
 .viz-container{
     float: left;
     position: relative;
+
     .timeselect {
         position: absolute;
         top: 7px;
@@ -1058,7 +1073,7 @@ Visualizations - metadata profile
             }
         }
     }
-    margin-top: $space_3;
+    margin-top: $space_5;
     font-family: $sans-serif-alt;
 
     // title
