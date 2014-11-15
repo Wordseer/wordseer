@@ -9,11 +9,17 @@ Ext.define('WordSeer.view.visualize.wordfrequencies.WordFrequencies', {
 	items: [
 		{
 			xtype: 'component',
-			itemId: 'canvas',
+			itemId: 'panel-header',
 			html: '\
 				<div class="databox-header">\
 					<h2 class="databox-header">Metadata Profile</h2>\
+					<div class="controls"></div>\
 				</div>',
+			cls: 'panel-header'
+		}, {
+			xtype: 'component',
+			itemId: 'canvas',
+			cls: 'canvas'
 		}
 	],
 

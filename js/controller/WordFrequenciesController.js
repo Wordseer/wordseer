@@ -136,7 +136,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 
 				// new or update
-				if (word_frequencies_panel.down('#canvas').el.dom.childElementCount == 1){
+				if (word_frequencies_panel.down('#canvas').el.dom.childElementCount == 0){
 					this.draw(data, word_frequencies_panel);
 				} else {
 					this.updateCharts(data);
@@ -148,8 +148,14 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 		    },
 		    failure: function(response) {
-
-		    	console.log("request to bar-charts failed.");
+				// debugger;
+				var canvas = word_frequencies_panel.down('#canvas');
+				canvas.getEl()
+					.createChild({
+						tag: 'h3',
+						html: "request to server failed. please try again or try another query."
+					});
+				word_frequencies_panel.fireEvent('rendered', word_frequencies_panel);
 		    }
 		})
 	},
