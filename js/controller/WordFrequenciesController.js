@@ -102,6 +102,8 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						} else {
 							var display_name = name;
 						}
+						var total_count = resp.for_normalization[
+							Object.keys(resp.for_normalization)[0]].count;
 
 						var prop = {
 							'property': name,
@@ -111,8 +113,10 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 								'key': resp.counts[0].query.gov,
 								'values': [],
 							}],
+							'total_count': total_count,
 						};
-						var unique = {};
+
+												var unique = {};
 						sentences.forEach(function (sent) {
 						  if (!unique[sent[k]] && typeof sent[k] !== 'undefined') {
 						    prop.streams[0].values.push({
@@ -139,7 +143,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				if (word_frequencies_panel.down('#canvas').el.dom.childElementCount == 0){
 					this.draw(data, word_frequencies_panel);
 				} else {
-					this.updateCharts(data);
+					this.updateCharts(data, word_frequencies_panel.id);
 				}
 
 				word_frequencies_panel.fireEvent('rendered', word_frequencies_panel);
@@ -179,8 +183,8 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		var chart;
 
 		// create visibility toggles
-		var controls = d3.select('.panel-header .controls');
-		var toggles = controls.selectAll('div')
+		var controls = d3.select('#' + panel.id + ' .panel-header .controls');
+		var toggles = controls.selectAll('span')
 			.data(data)
 			.enter()
 				.append('span')
@@ -223,7 +227,59 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			})
 			;
 
-		// debugger;
+		// create normalize toggle
+		var display = d3.select('#' + panel.id + ' .panel-header .display');
+		var norm = display.selectAll('span')
+			.data([{'value': 'raw', 'label': 'Raw Counts'},
+				   {'value': 'norm', 'label': '% of Total'}
+			])
+			.enter()
+				.append('span')
+				.attr('class', 'viz-toggle')
+				;
+		norm.append('input')
+			.attr('type', 'radio')
+			.attr('value', function(d){
+				return d.value;
+			})
+			.attr('name', 'display_' + panel.id)
+			.attr('id', function(d){
+				return d.value + '_' + panel.id;
+			})
+			.property('checked', function(d){
+				return d.value == 'raw';
+			})
+			.on('change', function(d,i){
+				var total = data[i].total_count;
+				if (d.value == "norm") {
+					// change data in all SVGs to percentages
+					var svg = d3.selectAll('#'+panel.id+' .viz-container svg');
+					svg.datum(function(datum){
+						datum.forEach(function(query,i,a){
+							query.values.forEach(function(v,i,a){
+								a[i].y = (v.y / total) * 100;
+							});
+							if (query.values_orig != undefined) {
+								query.values_orig.forEach(function(v,i,a){
+									a[i].y = (v.y / total) * 100;
+								});
+							}
+						});
+						return datum;
+					});
+				}
+				me.updateCharts();
+				debugger;
+			})
+			;
+		norm.append('label')
+			.attr('for', function(d){
+				return d.value + '_' + panel.id;
+			})
+			.text(function(d){
+				return d.label;
+			})
+			;
 
 		data.forEach(function(x){
 			var container = canvas.append('div')
@@ -656,9 +712,9 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		chart.update();
 	},
 
-	updateCharts: function(data){
+	updateCharts: function(data, panel_id){
 		var me = this;
-		var svg = d3.selectAll('.viz-container svg');
+		var svg = d3.selectAll('#' + panel_id + ' .viz-container svg');
 		svg.datum(function(d,i){
 			datum = data[i];
 			if (datum.type.search(/^date_/) >= 0){

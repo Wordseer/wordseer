@@ -1224,13 +1224,13 @@ div.metatag.sorting.lev2 {
 Visualizations - metadata profile
 *******************************************************************************/
 /* line 1004, new-ui.scss */
-.panel-header .controls {
+.panel-header .controls, .panel-header .display {
   font-family: "Bitter";
   font-size: 12px;
   color: #64839f;
 }
 /* line 1009, new-ui.scss */
-.panel-header .controls .viz-toggle {
+.panel-header .controls .viz-toggle, .panel-header .display .viz-toggle {
   display: inline-block;
   margin-left: 12.288px;
 }
