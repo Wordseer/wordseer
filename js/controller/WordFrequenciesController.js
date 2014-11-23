@@ -99,11 +99,15 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						if (resp.for_normalization[name] != undefined) {
 							var display_name = resp.for_normalization[name]
 								.displayName;
+							var total_counts = {};
+							resp.for_normalization[name].children.forEach(function(d){
+								total_counts[d.text] = d.count;
+							})
 						} else {
-							var display_name = name;
+							var display_name = name,
+								total_counts = {};
+
 						}
-						var total_count = resp.for_normalization[
-							Object.keys(resp.for_normalization)[0]].count;
 
 						var prop = {
 							'property': name,
@@ -113,10 +117,10 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 								'key': resp.counts[0].query.gov,
 								'values': [],
 							}],
-							'total_count': total_count,
+							'total_counts': total_counts,
 						};
 
-												var unique = {};
+						var unique = {};
 						sentences.forEach(function (sent) {
 						  if (!unique[sent[k]] && typeof sent[k] !== 'undefined') {
 						    prop.streams[0].values.push({
@@ -251,25 +255,33 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			})
 			.on('change', function(d,i){
 				var total = data[i].total_count;
+				var svg = d3.selectAll('#'+panel.id+' .viz-container svg');
 				if (d.value == "norm") {
-					// change data in all SVGs to percentages
-					var svg = d3.selectAll('#'+panel.id+' .viz-container svg');
-					svg.datum(function(datum){
-						datum.forEach(function(query,i,a){
-							query.values.forEach(function(v,i,a){
-								a[i].y = (v.y / total) * 100;
-							});
-							if (query.values_orig != undefined) {
-								query.values_orig.forEach(function(v,i,a){
-									a[i].y = (v.y / total) * 100;
+					// normalize data to total for profile
+					svg.datum(function(datum,index){
+						if (data[index].type == "string" || data[index].type == "number") {
+							datum.forEach(function(query,i,a){
+								query.values.forEach(function(v,i,a){
+									a[i].y = (v.y / data[index].total_counts[v.x]) * 100;
 								});
-							}
-						});
+								// if (query.values_orig != undefined) {
+								// 	query.values_orig.forEach(function(v,i,a){
+								// 		a[i].y = (v.y / total) * 100;
+								// 	});
+								// }
+							});
+						}
 						return datum;
 					});
 				}
+				// display data as percentages
+				nv.graphs.forEach(function(chart){
+					chart.yAxis.tickFormat(function(d){
+						return d.toFixed(2) + "%";
+					});
+				});
+
 				me.updateCharts();
-				debugger;
 			})
 			;
 		norm.append('label')
