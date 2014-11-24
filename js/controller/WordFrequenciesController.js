@@ -264,22 +264,28 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 								query.values.forEach(function(v,i,a){
 									a[i].y = (v.y / data[index].total_counts[v.x]) * 100;
 								});
-								// if (query.values_orig != undefined) {
-								// 	query.values_orig.forEach(function(v,i,a){
-								// 		a[i].y = (v.y / total) * 100;
-								// 	});
-								// }
 							});
 						}
+						// TODO: we don't really have the proper data returned to
+						// normalize reliably at all intervals for dates
 						return datum;
 					});
-				}
-				// display data as percentages
-				nv.graphs.forEach(function(chart){
-					chart.yAxis.tickFormat(function(d){
-						return d.toFixed(2) + "%";
+
+					// display data as percentages
+					nv.graphs.forEach(function(chart){
+						if (chart.multibar != undefined){
+							// bar charts only, because this doesn't work on
+							// timeseries right now
+							chart
+								.yAxis.tickFormat(function(d){
+									return d.toFixed(2) + "%";
+								})
+								.axisLabel('% of profile match')
+								;
+						}
+
 					});
-				});
+				} 
 
 				me.updateCharts();
 			})
@@ -517,8 +523,9 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			        // .ticks
 					.tickFormat(d3.format(',d'))
 					.highlightZero(true)
-					.axisLabel('Number of Sentences')
-					.axisLabelDistance(40);
+					.axisLabel('Sentence count')
+					.rotateYLabel(false)
+					;
 
 				chart.xAxis
 					.rotateLabels(45)

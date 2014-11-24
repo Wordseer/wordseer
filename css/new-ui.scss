@@ -1051,6 +1051,12 @@ Visualizations - metadata profile
                             stroke-opacity: inherit;
                         }
                     }
+                    &.nv-y {
+                        .nv-axislabel {
+                            text-anchor: middle !important;
+                            font-size: 10px;
+                        }
+                    }
                 }
 
                 &.nv-line {
