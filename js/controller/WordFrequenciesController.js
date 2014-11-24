@@ -259,16 +259,22 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				if (d.value == "norm") {
 					// normalize data to total for profile
 					svg.datum(function(datum,index){
+						var new_datum = [];
 						if (data[index].type == "string" || data[index].type == "number") {
 							datum.forEach(function(query,i,a){
-								query.values.forEach(function(v,i,a){
+								// deep copy the original object
+								var new_query = $.extend(true, {}, query);
+								new_query.values.forEach(function(v,i,a){
 									a[i].y = (v.y / data[index].total_counts[v.x]) * 100;
 								});
+								new_datum[i] = new_query;
 							});
+						} else {
+							new_datum = datum;
 						}
 						// TODO: we don't really have the proper data returned to
 						// normalize reliably at all intervals for dates
-						return datum;
+						return new_datum;
 					});
 
 					// display data as percentages
@@ -285,7 +291,29 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						}
 
 					});
-				} 
+				} else if (d.value == "raw") {
+					// de-normalize data
+					svg.datum(function(datum,index){
+						if (data[index].type == "string" || data[index].type == "number") {
+							datum = data[index].streams;
+						}
+						return datum;
+					});
+					// display data as raw counts
+					nv.graphs.forEach(function(chart){
+						if (chart.multibar != undefined){
+							// bar charts only, because this doesn't work on
+							// timeseries right now
+							chart
+							.yAxis.tickFormat(function(d){
+								return d;
+							})
+							.axisLabel('Sentence count')
+							;
+						}
+
+					});
+				}
 
 				me.updateCharts();
 			})
