@@ -333,18 +333,11 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 							totals = d3.map(data[index].total_counts);
 
-							datum.forEach(function(row){
-								row.values = row.values.map(function(v){
-									return {
-										x: v.x,
-										y: v.y * parseInt(totals.get(v.x))
-									};
-								})
-							})
+							datum.forEach(function(row, i){
+								// restore original data
+								row.values = data[index].streams[i].values;
+							});
 						}
-
-
-
 						return datum;
 					});
 
@@ -390,7 +383,14 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					.attr("class", "wordfreq")
 						.append('svg')
 						.attr("class", "nvd3")
-						.datum(x.streams);
+						.datum(function(){
+							// deep copy of the original data to avoid
+							// overwriting on normalization
+							return $.map(x.streams, function (obj) {
+								return $.extend(true, {}, obj);
+							});
+						})
+						;
 
 			var chart;
 			nv.addGraph(function() {
@@ -572,6 +572,13 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						.property('value');
 
 					var format = me.formatDateTime(x, selected_date_detail);
+
+					// rebind formatted dates to svg
+					svg.datum(function(d,i){
+						return $.map(x.streams, function (obj) {
+							return $.extend(true, {}, obj);
+						});
+					})
 
 					chart = nv.models.lineChart()
 						.showLegend(false)
@@ -808,7 +815,11 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		var me = this;
 		var svg = d3.selectAll('#' + panel_id + ' .viz-container svg');
 		svg.datum(function(d,i){
-			datum = data[i];
+			// var datum = data[i];
+
+			// Deep copy so we don't overwrite original data objects
+			var datum = $.extend(true, {}, data[i]);
+
 			if (datum.type.search(/^date_/) >= 0){
 				var selected_date_detail = d3.select(this.offsetParent)
 					.select('.timeselect')
