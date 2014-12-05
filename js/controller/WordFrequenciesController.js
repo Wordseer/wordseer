@@ -274,13 +274,13 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 									});
 								});
 
+								remainders.forEach(function(k,v){
+									if (typeof v == 'string'){
+										remainders.remove(k);
+									}
+								});
+
 								if (remainders.size() > 0){
-									// debugger;
-									remainders.forEach(function(k,v){
-										if (typeof v == 'string'){
-											remainders.remove(k);
-										}
-									});
 
 									var other_values = [];
 									remainders.forEach(function(k,v){
