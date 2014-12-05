@@ -576,7 +576,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					chart = nv.models.lineChart()
 						.showLegend(false)
 						.showYAxis(true)
-						.color(COLOR_SCALE[0])
+						.color(function(d,i){ return COLOR_SCALE[i] })
 						.showXAxis(true)
 						.xScale(d3.time.scale())
 						.forceY(0)
