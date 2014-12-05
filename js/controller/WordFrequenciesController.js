@@ -258,61 +258,101 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				var svg = d3.selectAll('#'+panel.id+' .viz-container svg');
 				if (d.value == "norm") {
 					// normalize data to total for profile
-					svg.datum(function(datum,index){
-						var new_datum = [];
-						if (data[index].type == "string" || data[index].type == "number") {
-							datum.forEach(function(query,i,a){
-								// deep copy the original object
-								var new_query = $.extend(true, {}, query);
-								new_query.values.forEach(function(v,i,a){
-									a[i].y = (v.y / data[index].total_counts[v.x]) * 100;
+					svg
+						.datum(function(datum,index){
+							if (data[index].type == "string" || data[index].type == "number") {
+								totals = d3.map(data[index].total_counts);
+								remainders = d3.map(data[index].total_counts);
+
+								datum.forEach(function(query){
+									query.values.forEach(function(v,i,a){
+										// console.log(v.x, v.y)
+										if (totals.has(v.x)){
+											var rem = remainders.get(v.x);
+											remainders.set(v.x, rem - v.y);
+										}
+									});
 								});
-								new_datum[i] = new_query;
+
+								if (remainders.size() > 0){
+									// debugger;
+									remainders.forEach(function(k,v){
+										if (typeof v == 'string'){
+											remainders.remove(k);
+										}
+									});
+
+									var other_values = [];
+									remainders.forEach(function(k,v){
+										other_values.push({'x': k, 'y': v});
+									});
+									var other = {
+										'key': '(other)',
+										'values': other_values
+									};
+									datum.push(other);
+
+									datum.forEach(function(row){
+										row.values = row.values.map(function(v){
+											return {
+												x: v.x,
+												y: v.y / parseInt(totals.get(v.x))
+											};
+										})
+									})
+								}
+							}
+							// TODO: we don't really have the proper data returned to
+							// normalize reliably at all intervals for dates
+							return datum;
+						})
+						;
+					nv.graphs.forEach(function(g){
+						var has_other = g.container.__data__.some(function(v){
+							return v.key == "(other)" && v.values != [];
+						});
+						if (has_other) {
+							g.stacked(true);
+							var pct_format = d3.format(".0%");
+							g.yAxis.tickFormat(function(d){
+								return pct_format(d);
 							});
-						} else {
-							new_datum = datum;
-						}
-						// TODO: we don't really have the proper data returned to
-						// normalize reliably at all intervals for dates
-						return new_datum;
-					});
-
-					// display data as percentages
-					nv.graphs.forEach(function(chart){
-						if (chart.multibar != undefined){
-							// bar charts only, because this doesn't work on
-							// timeseries right now
-							chart
-								.yAxis.tickFormat(function(d){
-									return d.toFixed(2) + "%";
-								})
-								.axisLabel('% of profile match')
-								;
 						}
 
 					});
+
 				} else if (d.value == "raw") {
-					// de-normalize data
+					// restore original data
 					svg.datum(function(datum,index){
-						if (data[index].type == "string" || data[index].type == "number") {
-							datum = data[index].streams;
+						if (datum.some(function(v){
+							return v.key == '(other)';
+						})){
+							datum = datum.filter(function(v){
+								return v.key != "(other)";
+							});
+
+							totals = d3.map(data[index].total_counts);
+
+							datum.forEach(function(row){
+								row.values = row.values.map(function(v){
+									return {
+										x: v.x,
+										y: v.y * parseInt(totals.get(v.x))
+									};
+								})
+							})
 						}
+
+
+
 						return datum;
 					});
-					// display data as raw counts
-					nv.graphs.forEach(function(chart){
-						if (chart.multibar != undefined){
-							// bar charts only, because this doesn't work on
-							// timeseries right now
-							chart
-							.yAxis.tickFormat(function(d){
-								return d;
-							})
-							.axisLabel('Sentence count')
-							;
-						}
 
-					});
+					nv.graphs.forEach(function(g){
+						g.yAxis.tickFormat(function(d){
+							return d;
+						})
+					})
 				}
 
 				me.updateCharts();
@@ -363,7 +403,12 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						.showControls(false)
 						.showXAxis(true)
 						.reduceXTicks(false)
-						.color(function(){ return '#1a1a1a'; })
+						.color(function(d,i){
+							if (d.key == "(other)") {
+								return '#a1a1a1'
+							}
+							return COLOR_SCALE[i];
+							})
 						;
 
 					chart.xAxis
@@ -531,7 +576,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					chart = nv.models.lineChart()
 						.showLegend(false)
 						.showYAxis(true)
-						.color(function(){ return '#1a1a1a'; })
+						.color(COLOR_SCALE[0])
 						.showXAxis(true)
 						.xScale(d3.time.scale())
 						.forceY(0)
