@@ -1036,47 +1036,6 @@ Visualizations - metadata profile
             text {
                 font-family: $sans-serif-alt;
             }
-            .nvd3 {
-
-                .tick {
-                    line {
-                        display: none;
-                    }
-                }
-
-                .nv-axis {
-                    &.nv-x {
-                        path.domain {
-                            // show x-axis line
-                            stroke-opacity: inherit;
-                        }
-                    }
-                    &.nv-y {
-                        .nv-axislabel {
-                            text-anchor: middle !important;
-                            font-size: 10px;
-                        }
-                    }
-                }
-
-                &.nv-line {
-                    .nvd3.nv-scatter {
-                        .nv-groups {
-                            .nv-point {
-                                fill-opacity: 1;
-                                stroke-opacity: 1;
-                            }
-                        }
-                    }
-                }
-                &.nv-lineChart {
-                    .nv-x {
-                        .tick {
-                            display: none;
-                        }
-                    }
-                }
-            }
         }
     }
     margin-top: $space_5;

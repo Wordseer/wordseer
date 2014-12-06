@@ -20,12 +20,12 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 	/** Helper function to decode datetime format string returned by server
 	**/
-	formatDateTime: function(x, selected_date_detail){
+	formatDateTime: function(prop, selected_date_detail){
 		// retrieve format string from type
-		var format_string = x.type.slice(5);
+		var format_string = prop.type.slice(5);
 
 		var format = d3.time.format(format_string);
-		x.streams.forEach(function(stream){
+		prop.streams.forEach(function(stream){
 			// sort values first
 			stream.values.sort(function(a,b){
 				var aa = format.parse(String(a.x)),
@@ -113,29 +113,33 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 							'property': name,
 							'displayName': display_name,
 							'type': type,
-							'streams': [{
-								'key': resp.counts[0].query.gov,
-								'values': [],
-							}],
+							'columns': [
+								['x'],
+								[resp.counts[0].query.gov],
+							],
+							'color': {
+								'pattern': [COLOR_SCALE[0]]
+							},
 							'total_counts': total_counts,
 						};
 
 						var unique = {};
 						sentences.forEach(function (sent) {
 						  if (!unique[sent[k]] && typeof sent[k] !== 'undefined') {
-						    prop.streams[0].values.push({
-								"x": isNaN(Number(sent[k]))? sent[k] : Number(sent[k]),
-								"y": sentences.filter(function(s){
-										return s[k] == sent[k];
-									}).length,
-								});
+						    prop.columns[1].push(
+								sentences.filter(function(s){
+									return s[k] == sent[k];
+								}).length
+							);
+							var cat = isNaN(Number(sent[k]))? sent[k] : Number(sent[k]);
+							prop.columns[0].push(cat);
 							unique[sent[k]] = true;
 						  }
 						});
-						// sort by the x value (categorical)
-						prop.streams[0].values.sort(function(a,b){
-							return a.x < b.x ? -1 : a.x > b.x ? 1 : 0;
-						})
+						// // sort by the x value (categorical)
+						// prop.streams[0].values.sort(function(a,b){
+						// 	return a.x < b.x ? -1 : a.x > b.x ? 1 : 0;
+						// })
 						data.push(prop);
 					}
 				});
@@ -177,14 +181,14 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 	view in which the wordfrequencies is currently being drawn.
 	*/
 	draw: function(data, panel){
+		c3_charts = [];
 		var me = this;
 		// size params
-		var width = 380, height = 300,
-			padding = {"top": 5, "bottom": 5, "left": 5, "right": 5},
+		var width = 500, height = 350,
+			padding = {"bottom": 30},
 			margin = {"top": 0, "bottom": 0, "left": 0, "right": 15};
 
 		var canvas = d3.select(panel.getComponent('canvas').getEl().dom);
-		var chart;
 
 		// create visibility toggles
 		var controls = d3.select('#' + panel.id + ' .panel-header .controls');
@@ -360,41 +364,83 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			})
 			;
 
-		data.forEach(function(x){
+		data.forEach(function(prop){
 			var container = canvas.append('div')
 				.classed("viz-container", true)
-				.classed(makeClassName(x.property), true) // in util.js
+				.classed(makeClassName(prop.property), true) // in util.js
 				;
 
 			var viztitle = container.append('div')
 				.attr('class', 'property')
-				.text(x.displayName);
+				.text(prop.displayName);
 
 			var download_link = viztitle.append('a')
 				.attr('class', 'download')
 				.attr('download', function(){
-					return "sentence counts across " + x.displayName + '.csv';
+					return "sentence counts across " + prop.displayName + '.csv';
 				});
 
 			download_link.append('i')
 				.attr('class', 'fa fa-download');
 
-			var svg = container.append('div')
+			var profile = container.append('div')
 					.attr("class", "wordfreq")
-						.append('svg')
-						.attr("class", "nvd3")
-						.datum(function(){
-							// deep copy of the original data to avoid
-							// overwriting on normalization
-							return $.map(x.streams, function (obj) {
-								return $.extend(true, {}, obj);
-							});
-						})
+						// .datum(function(){
+						// 	// deep copy of the original data to avoid
+						// 	// overwriting on normalization
+						// 	return $.map(prop.streams, function (obj) {
+						// 		return $.extend(true, {}, obj);
+						// 	});
+						// })
 						;
 
+			var chart_opts = {
+				bindto: profile,
+				size: {
+					width: width,
+					height: height
+				},
+				padding: padding,
+				data: {
+					x: 'x',
+					columns: prop.columns,
+					type: 'bar',
+					xSort: true,
+				},
+				axis: {
+					x: {
+						type: 'category',
+						tick: {
+							culling: {
+								max: 10
+							},
+							fit: true,
+						},
+					}
+				},
+				color: prop.color,
+				legend: {
+					position: 'bottom'
+				}
+			};
+
+			if (prop.type.search(/^date_/) >= 0) {
+				chart_opts.data.type = 'line';
+				chart_opts.data['xFormat'] = prop.type.slice(5);
+				chart_opts.axis.x.type = 'timeseries';
+				chart_opts.axis.x.tick['format'] = prop.type.slice(5);
+				chart_opts.axis.x.tick.culling.max = 2;
+			}
+
+			var chart = c3.generate(chart_opts);
+
+			// store in global variable to access later
+			c3_charts.push(chart);
+
+			/*
 			var chart;
 			nv.addGraph(function() {
-			    if (x.type == "string" || x.type == "number") {
+			    if (prop.type == "string" || prop.type == "number") {
 					chart = nv.models.multiBarChart()
 						.delay(0)
 						.groupSpacing(0.45)
@@ -492,9 +538,9 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 
 
-				} else if (x.type.search(/^date_/) >= 0) {
+				} else if (prop.type.search(/^date_/) >= 0) {
 					// retrieve format string from type
-					var format_string = x.type.slice(5);
+					var format_string = prop.type.slice(5);
 
 					// determine date granularity options
 					date_detail = d3.map();
@@ -575,7 +621,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 					// rebind formatted dates to svg
 					svg.datum(function(d,i){
-						return $.map(x.streams, function (obj) {
+						return $.map(prop.streams, function (obj) {
 							return $.extend(true, {}, obj);
 						});
 					})
@@ -699,7 +745,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 				nv.utils.windowResize(chart.update);
 
-				if (x.type.search(/^date_/) >= 0){
+				if (prop.type.search(/^date_/) >= 0){
 					// fire change event for timdebugger;eseries granularity
 					selector.on('change', function(){
 						var choice = d3.select(this)
@@ -715,13 +761,13 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				var data_export = [];
 
 				// need to handle dates differently than other datatypes
-				if (x.type == "string" || x.type == "number") {
+				if (prop.type == "string" || prop.type == "number") {
 					var keys = chart.xAxis.domain();
 					for (var i = 0; i < keys.length; i++){
 						var row = {};
-						row[x.property] = keys[i];
+						row[prop.property] = keys[i];
 						// add each stream freq
-						x.streams.forEach(function(stream){
+						prop.streams.forEach(function(stream){
 							var matching_value = stream.values.filter(function(v){
 								return v.x == keys[i];
 							});
@@ -730,10 +776,10 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 						data_export.push(row);
 					}
-				} else if (x.type.search(/^date_/) >= 0) {
+				} else if (prop.type.search(/^date_/) >= 0) {
 					// make a set of all date values from all streams
 					var all_dates = d3.set();
-					x.streams.forEach(function(stream){
+					prop.streams.forEach(function(stream){
 						stream.values_orig.forEach(function(v){
 							all_dates.add(v.x);
 						});
@@ -742,9 +788,9 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					// find matching values for each stream, or 0 if none
 					all_dates.forEach(function(this_date){
 						var row = {};
-						row[x.property] = this_date;
+						row[prop.property] = this_date;
 						// add each stream freq
-						x.streams.forEach(function(stream){
+						prop.streams.forEach(function(stream){
 							var matching_value = stream.values_orig.filter(function(v){
 								return v.x == this_date;
 							});
@@ -767,7 +813,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 			    return chart;
 			});
-
+*/
 		});
 	},
 
