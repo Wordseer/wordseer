@@ -141,10 +141,16 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						// sort property data by the x value
 						var row_headers = _.zip(prop.columns)[0];
 						var rows = _.rest(_.zip(prop.columns));
+						// cast numbers to numbers
+						if (prop.type == "number") {
+							_.each(rows, function(row){
+								row[0] = +row[0];
+							});
+						}
 						rows = _.sortBy(rows, 0);
 						// append header on rows
 						rows.unshift(row_headers);
-						prop.columns = _.zip(rows)
+						prop.columns = _.zip(rows);
 
 						data.push(prop);
 					}
@@ -191,7 +197,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		var me = this;
 		// size params
 		var width = 500, height = 350,
-			padding = {"bottom": 30},
+			padding = {"bottom": 25},
 			margin = {"top": 0, "bottom": 0, "left": 0, "right": 15};
 
 		var canvas = d3.select(panel.getComponent('canvas').getEl().dom);
@@ -426,10 +432,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				color: prop.color,
 				legend: {
 					position: 'bottom',
-					inset: {
-						x: 10,
-						y: 10,
-					}
 				}
 			};
 
@@ -438,7 +440,19 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				chart_opts.data['xFormat'] = prop.type.slice(5);
 				chart_opts.axis.x.type = 'timeseries';
 				chart_opts.axis.x.tick['format'] = prop.type.slice(5);
-				chart_opts.axis.x.tick.culling.max = 2;
+				chart_opts.axis.x.tick.fit = false;
+				chart_opts.axis.x.tick.rotate = 45;
+				chart_opts.axis.x.tick.multiline = false;
+			}
+
+			if (prop.type == "number") {
+				chart_opts.axis.x.type = "indexed";
+				chart_opts.axis.x.tick.fit = false;
+				chart_opts['bar'] = {
+					width: {
+						ratio: 5 / _.last(prop.columns[0])
+					}
+				}
 			}
 
 
@@ -446,7 +460,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			// store in global variable to access later
 			c3_charts.push(chart);
 
-			if (prop.type == "string" || prop.type == "number") {
+			if (prop.type == "string") {
 				// add a sort control
 				var sort_control = viztitle.append('span')
 					.attr('class', 'sort')
