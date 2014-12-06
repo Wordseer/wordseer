@@ -123,6 +123,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 							'total_counts': total_counts,
 						};
 
+
 						var unique = {};
 						sentences.forEach(function (sent) {
 						  if (!unique[sent[k]] && typeof sent[k] !== 'undefined') {
@@ -136,10 +137,15 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 							unique[sent[k]] = true;
 						  }
 						});
-						// // sort by the x value (categorical)
-						// prop.streams[0].values.sort(function(a,b){
-						// 	return a.x < b.x ? -1 : a.x > b.x ? 1 : 0;
-						// })
+
+						// sort property data by the x value
+						var row_headers = _.zip(prop.columns)[0];
+						var rows = _.rest(_.zip(prop.columns));
+						rows = _.sortBy(rows, 0);
+						// append header on rows
+						rows.unshift(row_headers);
+						prop.columns = _.zip(rows)
+
 						data.push(prop);
 					}
 				});
@@ -262,97 +268,101 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				var svg = d3.selectAll('#'+panel.id+' .viz-container svg');
 				if (d.value == "norm") {
 					// normalize data to total for profile
-					svg
-						.datum(function(datum,index){
-							if (data[index].type == "string" || data[index].type == "number") {
-								totals = d3.map(data[index].total_counts);
-								remainders = d3.map(data[index].total_counts);
+					_.each(c3_charts, function(chart, index){
+						if (data[index].type == "string" || data[index].type == "number") {
+							var totals = d3.map(data[index].total_counts);
+							var remainders = d3.map(data[index].total_counts);
 
-								datum.forEach(function(query){
-									query.values.forEach(function(v,i,a){
-										// console.log(v.x, v.y)
-										if (totals.has(v.x)){
-											var rem = remainders.get(v.x);
-											remainders.set(v.x, rem - v.y);
-										}
-									});
-								});
+							var datum = chart.data();
 
-								remainders.forEach(function(k,v){
-									if (typeof v == 'string'){
-										remainders.remove(k);
-									}
-								});
-
-								if (remainders.size() > 0){
-
-									var other_values = [];
-									remainders.forEach(function(k,v){
-										other_values.push({'x': k, 'y': v});
-									});
-									var other = {
-										'key': '(other)',
-										'values': other_values
-									};
-									datum.push(other);
-
-									datum.forEach(function(row){
-										row.values = row.values.map(function(v){
-											return {
-												x: v.x,
-												y: v.y / parseInt(totals.get(v.x))
-											};
-										})
-									})
-								}
-							}
-							// TODO: we don't really have the proper data returned to
-							// normalize reliably at all intervals for dates
-							return datum;
-						})
-						;
-					nv.graphs.forEach(function(g){
-						var has_other = g.container.__data__.some(function(v){
-							return v.key == "(other)" && v.values != [];
-						});
-						if (has_other) {
-							g.stacked(true);
-							var pct_format = d3.format(".0%");
-							g.yAxis.tickFormat(function(d){
-								return pct_format(d);
-							});
 						}
-
-					});
-
-				} else if (d.value == "raw") {
-					// restore original data
-					svg.datum(function(datum,index){
-						if (datum.some(function(v){
-							return v.key == '(other)';
-						})){
-							datum = datum.filter(function(v){
-								return v.key != "(other)";
-							});
-
-							totals = d3.map(data[index].total_counts);
-
-							datum.forEach(function(row, i){
-								// restore original data
-								row.values = data[index].streams[i].values;
-							});
-						}
-						return datum;
-					});
-
-					nv.graphs.forEach(function(g){
-						g.yAxis.tickFormat(function(d){
-							return d;
-						})
 					})
 				}
-
-				me.updateCharts();
+				// 				datum.forEach(function(query){
+				// 					query.values.forEach(function(v,i,a){
+				// 						// console.log(v.x, v.y)
+				// 						if (totals.has(v.x)){
+				// 							var rem = remainders.get(v.x);
+				// 							remainders.set(v.x, rem - v.y);
+				// 						}
+				// 					});
+				// 				});
+				//
+				// 				remainders.forEach(function(k,v){
+				// 					if (typeof v == 'string'){
+				// 						remainders.remove(k);
+				// 					}
+				// 				});
+				//
+				// 				if (remainders.size() > 0){
+				//
+				// 					var other_values = [];
+				// 					remainders.forEach(function(k,v){
+				// 						other_values.push({'x': k, 'y': v});
+				// 					});
+				// 					var other = {
+				// 						'key': '(other)',
+				// 						'values': other_values
+				// 					};
+				// 					datum.push(other);
+				//
+				// 					datum.forEach(function(row){
+				// 						row.values = row.values.map(function(v){
+				// 							return {
+				// 								x: v.x,
+				// 								y: v.y / parseInt(totals.get(v.x))
+				// 							};
+				// 						})
+				// 					})
+				// 				}
+				// 			}
+				// 			// TODO: we don't really have the proper data returned to
+				// 			// normalize reliably at all intervals for dates
+				// 			return datum;
+				// 		})
+				// 		;
+				// 	nv.graphs.forEach(function(g){
+				// 		var has_other = g.container.__data__.some(function(v){
+				// 			return v.key == "(other)" && v.values != [];
+				// 		});
+				// 		if (has_other) {
+				// 			g.stacked(true);
+				// 			var pct_format = d3.format(".0%");
+				// 			g.yAxis.tickFormat(function(d){
+				// 				return pct_format(d);
+				// 			});
+				// 		}
+				//
+				// 	});
+				//
+				// } else if (d.value == "raw") {
+				// 	// restore original data
+				// 	svg.datum(function(datum,index){
+				// 		if (datum.some(function(v){
+				// 			return v.key == '(other)';
+				// 		})){
+				// 			datum = datum.filter(function(v){
+				// 				return v.key != "(other)";
+				// 			});
+				//
+				// 			totals = d3.map(data[index].total_counts);
+				//
+				// 			datum.forEach(function(row, i){
+				// 				// restore original data
+				// 				row.values = data[index].streams[i].values;
+				// 			});
+				// 		}
+				// 		return datum;
+				// 	});
+				//
+				// 	nv.graphs.forEach(function(g){
+				// 		g.yAxis.tickFormat(function(d){
+				// 			return d;
+				// 		})
+				// 	})
+				// }
+				//
+				// me.updateCharts();
 			})
 			;
 		norm.append('label')
@@ -385,13 +395,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 			var profile = container.append('div')
 					.attr("class", "wordfreq")
-						// .datum(function(){
-						// 	// deep copy of the original data to avoid
-						// 	// overwriting on normalization
-						// 	return $.map(prop.streams, function (obj) {
-						// 		return $.extend(true, {}, obj);
-						// 	});
-						// })
 						;
 
 			var chart_opts = {
@@ -415,12 +418,18 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 								max: 10
 							},
 							fit: true,
+							multiline: true,
+							width: 40,
 						},
 					}
 				},
 				color: prop.color,
 				legend: {
-					position: 'bottom'
+					position: 'bottom',
+					inset: {
+						x: 10,
+						y: 10,
+					}
 				}
 			};
 
@@ -432,10 +441,138 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				chart_opts.axis.x.tick.culling.max = 2;
 			}
 
-			var chart = c3.generate(chart_opts);
 
+			var chart = c3.generate(chart_opts);
 			// store in global variable to access later
 			c3_charts.push(chart);
+
+			if (prop.type == "string" || prop.type == "number") {
+				// add a sort control
+				var sort_control = viztitle.append('span')
+					.attr('class', 'sort')
+					.append('i')
+					.attr('class', 'sort-control fa fa-sort-alpha-asc')
+					;
+
+				// default sorting
+				sort_control
+					// add a menu to change sorting
+					.append('div')
+					.attr('class', 'sort-menu')
+					.selectAll('i')
+					.data([
+						'fa-sort-alpha-asc',
+						'fa-sort-alpha-desc',
+						'fa-sort-amount-asc',
+						'fa-sort-amount-desc'
+					])
+					.enter()
+					.append('i')
+						.attr('class', function(d, i){
+							var classval = 'fa ' + d;
+							if (i == 0) { classval += ' selected'; }
+							return classval;
+						})
+						.on('click', function(d){
+							// the X column is always first
+							var row_headers = _.zip(chart_opts.data.columns)[0];
+							var rows = _.rest(_.zip(chart_opts.data.columns));
+							switch(d){
+								case 'fa-sort-alpha-asc':
+									rows = _.sortBy(rows, 0);
+									break;
+								case 'fa-sort-alpha-desc':
+									rows = _.sortBy(rows, 0).reverse();
+									break;
+								case 'fa-sort-amount-asc':
+									rows = _.sortBy(rows, 1);
+									break;
+								case 'fa-sort-amount-desc':
+									rows = _.sortBy(rows, 1).reverse();
+									break;
+							}
+
+							// append header on rows
+							rows.unshift(row_headers);
+							// unzip the rows back into columns and reload
+							chart.load({
+								columns: _.zip(rows)
+							})
+
+							// update menu display and current sort icon
+							d3.select(this.parentElement)
+								.selectAll('i')
+								.classed('selected', false)
+								;
+
+							d3.select(this)
+								.classed('selected', true)
+								;
+
+							sort_control.attr('class', 'sort-control fa ' + d);
+
+						})
+						;
+
+			}
+
+			if (prop.type == "string" || prop.type == "number") {
+				// add a sorting control to the viz title
+
+
+
+							// var payload = []
+							// payload.push(['x'].concat(newdata[0].values.map(function(v){ return v.category })))
+
+							// svg.datum(function(data){
+							// 	switch (i) {
+							// 		case 0:
+							// 			// alpha asc
+							// 			data[0].values.sort(function(a,b){
+							// 				return d3.ascending(a.x, b.x);
+							// 			});
+							// 			break;
+							// 		case 1:
+							// 			// alpha desc
+							// 			data[0].values.sort(function(a,b){
+							// 				return d3.descending(a.x, b.x);
+							// 			});
+							// 			break;
+							// 		case 2:
+							// 			// value asc
+							// 			data[0].values.sort(function(a,b){
+							// 				return d3.ascending(a.y, b.y);
+							// 			});
+							// 			break;
+							// 		case 3:
+							// 			// value desc
+							// 			data[0].values.sort(function(a,b){
+							// 				return d3.descending(a.y, b.y);
+							// 			});
+							// 			break;
+							// 		default:
+							// 			// don't do nothin
+							// 			break;
+							// 	}
+							// 	return data;
+							// });
+							//
+							// // update menu display and current sort icon
+							// d3.select(this.parentElement)
+							// 	.selectAll('i')
+							// 	.classed('selected', false)
+							// 	;
+							//
+							// d3.select(this)
+							// 	.classed('selected', true)
+							// 	;
+							//
+							// sort_control.attr('class', 'sort-control fa ' + d);
+							// chart.update();
+
+						// })
+						// ;
+			}
 
 			/*
 			var chart;
@@ -460,81 +597,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					chart.xAxis
 						.scale(d3.scale.ordinal());
 
-					// add a sorting control to the viz title
-					var sort_control = viztitle.append('span')
-						.attr('class', 'sort')
-							.append('i')
-							.attr('class', 'sort-control fa fa-sort-alpha-asc')
-							;
 
-					// default sorting
-					sort_control
-						// add a menu to change sorting
-						.append('div')
-						.attr('class', 'sort-menu')
-						.selectAll('i')
-							.data([
-								'fa-sort-alpha-asc',
-								'fa-sort-alpha-desc',
-								'fa-sort-amount-asc',
-								'fa-sort-amount-desc'
-							])
-							.enter()
-							.append('i')
-							.attr('class', function(d, i){
-								var classval = 'fa ' + d;
-								if (i == 0) { classval += ' selected'; }
-								return classval;
-							})
-							.on('click', function(d, i){
-								svg.datum(function(data){
-									switch (i) {
-										case 0:
-											// alpha asc
-											data[0].values.sort(function(a,b){
-												return d3.ascending(a.x, b.x);
-												});
-											break;
-										case 1:
-											// alpha desc
-											data[0].values.sort(function(a,b){
-												return d3.descending(a.x, b.x);
-												});
-											break;
-										case 2:
-											// value asc
-											data[0].values.sort(function(a,b){
-												return d3.ascending(a.y, b.y);
-												});
-											break;
-										case 3:
-											// value desc
-											data[0].values.sort(function(a,b){
-												return d3.descending(a.y, b.y);
-												});
-											break;
-										default:
-											// don't do nothin
-											break;
-									}
-									return data;
-								});
-
-								// update menu display and current sort icon
-								d3.select(this.parentElement)
-									.selectAll('i')
-									.classed('selected', false)
-									;
-
-								d3.select(this)
-									.classed('selected', true)
-									;
-
-								sort_control.attr('class', 'sort-control fa ' + d);
-								chart.update();
-
-							})
-							;
 
 
 
