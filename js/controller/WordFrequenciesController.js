@@ -421,12 +421,18 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						type: 'category',
 						tick: {
 							culling: {
-								max: 10
+								max: 9
 							},
 							fit: true,
 							multiline: true,
-							width: 40,
+							width: 45,
 						},
+					},
+					y: {
+						label: '# of sentences',
+						tick: {
+							// format: function(tick) { return parseInt(tick) } 
+						}
 					}
 				},
 				color: prop.color,
@@ -450,7 +456,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				chart_opts.axis.x.tick.fit = false;
 				chart_opts['bar'] = {
 					width: {
-						ratio: 5 / _.last(prop.columns[0])
+						ratio: 7 / _.last(prop.columns[0])
 					}
 				}
 			}
