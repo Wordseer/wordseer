@@ -218,3 +218,33 @@ function colorLoop(index) {
 function makeClassName(text) {
 	return text.toLowerCase().replace(' ', '_');
 }
+
+/* convert a date format string from PHP strftime to moment.js tokens */
+function momentFormat(fstring){
+	var key, value, mFormat = fstring;
+	var replacements = {
+		'%a': 'ddd',
+		'%A': 'dddd',
+		'%b': 'MMM',
+		'%B': 'MMMM',
+		'%d': 'DD',
+		'%H': 'HH',
+		'%I': 'hh',
+		'%j': 'DDDD',
+		'%m': 'MM',
+		'%M': 'mm',
+		'%p': 'A',
+		'%S': 'ss',
+		'%Z': 'z',
+		'%w': 'd',
+		'%y': 'YY',
+		'%Y': 'YYYY',
+		'%%': '%'
+	};
+
+	for (key in replacements) {
+		value = replacements[key];
+		mFormat = mFormat.replace(key, value);
+	}
+	return mFormat;
+}

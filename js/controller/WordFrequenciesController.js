@@ -20,46 +20,39 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 	/** Helper function to decode datetime format string returned by server
 	**/
-	formatDateTime: function(prop, selected_date_detail){
+	aggregateDates: function(prop, selected_date_detail){
 		// retrieve format string from type
-		var format_string = prop.type.slice(5);
+		var fstring = momentFormat(prop.type.slice(5));
 
-		var format = d3.time.format(format_string);
-		prop.streams.forEach(function(stream){
-			// sort values first
-			stream.values.sort(function(a,b){
-				var aa = format.parse(String(a.x)),
-					bb = format.parse(String(b.x));
-				return aa - bb;
+		// convert dates to desired interval
+		var row_headers = _.zip(prop.columns)[0];
+		var rows = _.rest(_.zip(prop.columns));
+
+		var new_rows = d3.nest()
+			.key(function(d){
+				return moment(d[0], fstring)
+					.startOf(selected_date_detail)
+					.valueOf();
 			})
+			.sortKeys(d3.ascending)
+			.rollup(function(leaves){
+				return d3.sum(leaves, function(d){
+					return d[1];
+				})
+			})
+			.entries(rows)
+			;
 
-			// copy original for user transformations later
-			if (!('values_orig' in stream)) {
-				stream.values_orig = $.extend(true, [], stream.values);
-			}
-			var newvalues = [];
-			d3.nest()
-				.key(function(v){
-					var date = format.parse(String(v.x));
-					v.x = d3.time[selected_date_detail](date);
-					return v.x;
-				})
-				.rollup(function(leaves){
-					var point = {
-						'x': leaves[0].x,
-						'y': d3.sum(leaves, function(d){
-								return d.y;
-							})
-					};
-					newvalues.push(point);
-					return point;
-				})
-				.entries(stream.values)
-				;
-			stream.values = newvalues;
-		})
-		;
-		return format;
+		rows = _.map(new_rows, function(row){
+			return [parseInt(row.key), row.values]
+		});
+
+		console.log(rows)
+
+		rows.unshift(row_headers);
+		var new_columns = _.zip(rows)
+
+		return {columns: new_columns};
 	},
 
 	/** Fetches WordFrequencies data from the server in response to a search request.
@@ -431,7 +424,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					y: {
 						label: '# of sentences',
 						tick: {
-							// format: function(tick) { return parseInt(tick) } 
+							// format: function(tick) { return parseInt(tick) }
 						}
 					}
 				},
@@ -442,14 +435,132 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			};
 
 			if (prop.type.search(/^date_/) >= 0) {
+				var dformat = prop.type.slice(5);
+				var dformat_moment = momentFormat(dformat); // in util.js
+
 				chart_opts.data.type = 'line';
-				chart_opts.data['xFormat'] = prop.type.slice(5);
 				chart_opts.axis.x.type = 'timeseries';
-				chart_opts.axis.x.tick['format'] = prop.type.slice(5);
 				chart_opts.axis.x.tick.fit = false;
 				chart_opts.axis.x.tick.rotate = 45;
 				chart_opts.axis.x.tick.multiline = false;
+
+				// calculate intervals (requires moment.js)
+				// check the range,
+				// and also make sure the diffs aren't all exactly the next largest interval
+				var dmin = moment(prop.columns[0][1], dformat_moment),
+					dmax = moment(_.last(prop.columns[0]), dformat_moment)
+					;
+
+				prop.intervals = {
+					'year': dmax.diff(dmin, 'years') > 0,
+					'month': dmax.diff(dmin, 'months') > 0 && _.some(_.rest(prop.columns[0]),
+						function(v,i,a){
+							console.log(a[i+i])
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+									next = moment(a[i+1], dformat_moment)
+									;
+								return current.diff(next, 'years', true) != current.diff(next, 'years');
+							} else {
+								return false;
+							}
+						}
+					),
+					'day': dmax.diff(dmin, 'day') > 0 && _.some(_.rest(prop.columns[0]),
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+								next = moment(a[i+1], dformat_moment)
+								;
+								return current.diff(next, 'months', true) != current.diff(next, 'months');
+							} else {
+								return false;
+							}
+						}
+					),
+					'hour': dmax.diff(dmin, 'hours') > 0 && _.some(_.rest(prop.columns[0]),
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+								next = moment(a[i+1], dformat_moment)
+								;
+								return current.diff(next, 'days', true) != current.diff(next, 'days');
+							} else {
+								return false;
+							}
+						}
+					),
+					'minute': dmax.diff(dmin, 'minutes') > 0 && _.some(_.rest(prop.columns[0]),
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+								next = moment(a[i+1], dformat_moment)
+								;
+								return current.diff(next, 'hours', true) != current.diff(next, 'hours');
+							} else {
+								return false;
+							}
+						}
+					),
+					'second': dmax.diff(dmin, 'seconds') > 0 && _.some(_.rest(prop.columns[0]),
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+								next = moment(a[i+1], dformat_moment)
+								;
+								return current.diff(next, 'minutes', true) != current.diff(next, 'minutes');
+							} else {
+								return false;
+							}
+						}
+					)
+				}
+
+				var tickFormats = {
+					'second': "%x %X",
+					'minute': '%x %H:%M',
+					'hour': '%x %H:00',
+					'day': '%x',
+					'month': '%m/%Y',
+					'year': '%Y',
+				};
+
+				console.log(prop.intervals)
+				// add dropdown selector for date granularity
+				var selector = container.append('div')
+					.attr('class', 'timeselect')
+					.append('select')
+					;
+
+				container.select('.timeselect')
+					.insert('span', ':first-child')
+					.text('detail level: ')
+
+				var intervals_order = ['year', 'month', 'day', 'hour', 'minute', 'second'];
+
+				selector.selectAll('option')
+					.data(_.filter(intervals_order, function(k){
+							return prop.intervals[k];
+						})
+					)
+					.enter()
+					.append('option')
+					.attr('value', function(d){ return d; })
+					.text(function(d){ return d; })
+					.property('checked', function(d,i){ return i == 0; })
+					;
+
+				// aggregate dates into the largest meaningful interval
+				var selected_date_detail = selector.selectAll(':checked')
+					.property('value');
+
+				var agg = me.aggregateDates(prop, selected_date_detail);
+				console.log(agg)
+				chart_opts.data.columns = agg.columns;
+				chart_opts.axis.x.tick['format'] = tickFormats[selected_date_detail];
 			}
+
+
 
 			if (prop.type == "number") {
 				chart_opts.axis.x.type = "indexed";
@@ -536,198 +647,8 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 			}
 
-			if (prop.type == "string" || prop.type == "number") {
-				// add a sorting control to the viz title
-
-
-
-							// var payload = []
-							// payload.push(['x'].concat(newdata[0].values.map(function(v){ return v.category })))
-
-							// svg.datum(function(data){
-							// 	switch (i) {
-							// 		case 0:
-							// 			// alpha asc
-							// 			data[0].values.sort(function(a,b){
-							// 				return d3.ascending(a.x, b.x);
-							// 			});
-							// 			break;
-							// 		case 1:
-							// 			// alpha desc
-							// 			data[0].values.sort(function(a,b){
-							// 				return d3.descending(a.x, b.x);
-							// 			});
-							// 			break;
-							// 		case 2:
-							// 			// value asc
-							// 			data[0].values.sort(function(a,b){
-							// 				return d3.ascending(a.y, b.y);
-							// 			});
-							// 			break;
-							// 		case 3:
-							// 			// value desc
-							// 			data[0].values.sort(function(a,b){
-							// 				return d3.descending(a.y, b.y);
-							// 			});
-							// 			break;
-							// 		default:
-							// 			// don't do nothin
-							// 			break;
-							// 	}
-							// 	return data;
-							// });
-							//
-							// // update menu display and current sort icon
-							// d3.select(this.parentElement)
-							// 	.selectAll('i')
-							// 	.classed('selected', false)
-							// 	;
-							//
-							// d3.select(this)
-							// 	.classed('selected', true)
-							// 	;
-							//
-							// sort_control.attr('class', 'sort-control fa ' + d);
-							// chart.update();
-
-						// })
-						// ;
-			}
-
 			/*
-			var chart;
-			nv.addGraph(function() {
-			    if (prop.type == "string" || prop.type == "number") {
-					chart = nv.models.multiBarChart()
-						.delay(0)
-						.groupSpacing(0.45)
-						.staggerLabels(false)
-						.showLegend(false)
-						.showControls(false)
-						.showXAxis(true)
-						.reduceXTicks(false)
-						.color(function(d,i){
-							if (d.key == "(other)") {
-								return '#a1a1a1'
-							}
-							return COLOR_SCALE[i];
-							})
-						;
 
-					chart.xAxis
-						.scale(d3.scale.ordinal());
-
-
-
-
-
-				} else if (prop.type.search(/^date_/) >= 0) {
-					// retrieve format string from type
-					var format_string = prop.type.slice(5);
-
-					// determine date granularity options
-					date_detail = d3.map();
-					// start with compound string format codes
-					if (format_string.indexOf('%c') >= 0) {
-						date_detail.set('second', "%x %X");
-						date_detail.set('minute', '%x %H:%M');
-						date_detail.set('hour', '%x %H:00');
-						date_detail.set('day', '%x')
-						date_detail.set('month', '%m/%Y')
-						date_detail.set('year', '%Y')
-					} else {
-						// piece by piece
-						// time
-						if (format_string.indexOf('%X') >= 0 ||
-								format_string.indexOf('%S') >= 0) {
-							date_detail.set('second', "%x %X");
-							date_detail.set('minute', '%x %H:%M');
-							date_detail.set('hour', '%x %H:00');
-						} else if (format_string.indexOf('%M') >= 0){
-							date_detail.set('minute', '%x %H:%M');
-							date_detail.set('hour', '%x %H:00');
-						} else if (format_string.indexOf('%H') >= 0 ||
-									format_string.indexOf('%I') >= 0) {
-							date_detail.set('hour', '%x %H:00');
-						}
-						// date
-						if (format_string.indexOf('%x') >= 0 ||
-								format_string.indexOf('%j') >= 0 ||
-								format_string.indexOf('%d') >= 0 ||
-								format_string.indexOf('%e') >= 0) {
-							date_detail.set('day', '%x')
-							date_detail.set('month', '%m/%Y')
-							date_detail.set('year', '%Y')
-						} else if (format_string.indexOf('%m') >= 0 ||
-									format_string.indexOf('%b') >= 0 ||
-									format_string.indexOf('%B') >= 0) {
-							date_detail.set('month', '%m/%Y')
-							date_detail.set('year', '%Y')
-						} else if (format_string.indexOf('%y') >= 0 ||
-									format_string.indexOf('%Y') >= 0) {
-							date_detail.set('year', '%Y')
-						}
-					}
-
-					// add dropdown selector for date granularity
-					var selector = container.append('div')
-						.attr('class', 'timeselect')
-						.append('select')
-							;
-
-					container.select('.timeselect')
-						.insert('span', ':first-child')
-						.text('detail level: ')
-
-					selector.selectAll('option')
-						.data(date_detail.keys()).enter()
-						.append('option')
-						.attr('value', function(d){ return d; })
-						.text(function(d){ return d; });
-
-					// default selection
-					if (date_detail.has('day')) {
-						selector.select('option[value=day]')
-							.property('selected', 'selected')
-					} else if (date_detail.has('month')) {
-						selector.select('option[value=month]')
-							.property('selected', 'selected')
-					} else if (date_detail.has('year')) {
-						selector.select('option[value=year]')
-							.property('selected', 'selected')
-					}
-
-					var selected_date_detail = selector.select(':checked')
-						.property('value');
-
-					var format = me.formatDateTime(x, selected_date_detail);
-
-					// rebind formatted dates to svg
-					svg.datum(function(d,i){
-						return $.map(prop.streams, function (obj) {
-							return $.extend(true, {}, obj);
-						});
-					})
-
-					chart = nv.models.lineChart()
-						.showLegend(false)
-						.showYAxis(true)
-						.color(function(d,i){ return COLOR_SCALE[i] })
-						.showXAxis(true)
-						.xScale(d3.time.scale())
-						.forceY(0)
-						;
-
-					chart
-						.xAxis
-							.tickFormat(function(v){
-								var format = d3.time.format(
-										date_detail.get(selected_date_detail)
-										)
-								return format(d3.time.scale().invert(v));
-								})
-						;
-				}
 				chart.yAxis
 			        // .ticks
 					.tickFormat(d3.format(',d'))
@@ -963,6 +884,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			g.update();
 		})
 
-	},
+	}
 
 });
