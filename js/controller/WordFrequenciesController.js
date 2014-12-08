@@ -36,18 +36,20 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			})
 			.sortKeys(d3.ascending)
 			.rollup(function(leaves){
-				return d3.sum(leaves, function(d){
-					return d[1];
-				})
+				var totals = []
+				for (var i = 1; i < leaves[0].length; i++) {
+					totals.push(d3.sum(leaves, function(d){
+						return d[i];
+					}));
+				}
+				return totals
 			})
 			.entries(rows)
 			;
 
 		rows = _.map(new_rows, function(row){
-			return [parseInt(row.key), row.values]
+			return _.flatten([parseInt(row.key), row.values])
 		});
-
-		console.log(rows)
 
 		rows.unshift(row_headers);
 		var new_columns = _.zip(rows)
@@ -102,20 +104,19 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 						}
 
+						var word = resp.counts[0].query.gov;
 						var prop = {
 							'property': name,
 							'displayName': display_name,
 							'type': type,
 							'columns': [
 								['x'],
-								[resp.counts[0].query.gov],
+								[word],
 							],
-							'color': {
-								'pattern': [COLOR_SCALE[0]]
-							},
+							'color': {},
 							'total_counts': total_counts,
 						};
-
+						prop.color[word] = COLOR_SCALE[0];
 
 						var unique = {};
 						sentences.forEach(function (sent) {
@@ -190,7 +191,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		var me = this;
 		// size params
 		var width = 500, height = 350,
-			padding = {"bottom": 25},
+			padding = {bottom: 25, right: 20},
 			margin = {"top": 0, "bottom": 0, "left": 0, "right": 15};
 
 		var canvas = d3.select(panel.getComponent('canvas').getEl().dom);
@@ -265,103 +266,78 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			.on('change', function(d,i){
 				var total = data[i].total_count;
 				var svg = d3.selectAll('#'+panel.id+' .viz-container svg');
+				// reset all the sort controls
+				d3.selectAll('.sort-control')
+					.attr('class', 'sort-control fa fa-sort-alpha-asc')
+					.selectAll('.sort-menu i')
+						.classed('selected', function(d){
+							return d == 'fa-sort-alpha-asc';
+						});
+
 				if (d.value == "norm") {
 					// normalize data to total for profile
 					_.each(c3_charts, function(chart, index){
 						if (data[index].type == "string" || data[index].type == "number") {
-							var totals = d3.map(data[index].total_counts);
-							var remainders = d3.map(data[index].total_counts);
+							var totals = _.cloneDeep(data[index].total_counts);
+							var remainders = _.cloneDeep(data[index].total_counts);
+							var cols = _.cloneDeep(data[index].columns);
 
-							var datum = chart.data();
+							_.each(cols[0], function(key,i){
+								if (i > 0){
+									_.each(_.rest(cols), function(c){
+										remainders[key] -= c[i]
+									})
+								}
+							})
 
+							remainders = _.reject(remainders, function(v){
+								return typeof v == 'string'
+							});
+							if (remainders.length > 0){
+								data[index]['c3_format_norm'] = true
+								var other = _.toArray(remainders);
+								other.unshift("(other)");
+								cols.push(other);
+
+								// normalize to 100%
+								_.each(cols[0], function(key,i){
+									if (i > 0){
+										_.each(_.rest(cols), function(c){
+											c[i] = c[i] / totals[key];
+										})
+									}
+								})
+								chart.load({
+									columns: cols
+								});
+
+								// formatting changes
+								chart.data.colors({'(other)': '#d4d4d4'})
+								var groups = _.pluck(chart.data(), 'id');
+								groups.push("(other)");
+								chart.groups([groups]);
+								chart.axis.max({y: 0.99})
+							}
+						}
+					})
+				} else if (d.value == "raw"){
+					// de-normalize the data
+					_.each(c3_charts, function(chart, index){
+						if (data[index].type == "string" || data[index].type == "number") {
+							var cols = _.clone(data[index].columns);
+							data[index]['c3_format_norm'] = false;
+							// unstack the bars
+							chart.groups([]);
+							// reset axis to max value
+							var all_vals = _.flatten(_.rest(cols));
+							chart.axis.max({y: _.max(all_vals)});
+							chart.load({
+								unload: ['(other)'],
+								columns: cols
+							})
 						}
 					})
 				}
-				// 				datum.forEach(function(query){
-				// 					query.values.forEach(function(v,i,a){
-				// 						// console.log(v.x, v.y)
-				// 						if (totals.has(v.x)){
-				// 							var rem = remainders.get(v.x);
-				// 							remainders.set(v.x, rem - v.y);
-				// 						}
-				// 					});
-				// 				});
-				//
-				// 				remainders.forEach(function(k,v){
-				// 					if (typeof v == 'string'){
-				// 						remainders.remove(k);
-				// 					}
-				// 				});
-				//
-				// 				if (remainders.size() > 0){
-				//
-				// 					var other_values = [];
-				// 					remainders.forEach(function(k,v){
-				// 						other_values.push({'x': k, 'y': v});
-				// 					});
-				// 					var other = {
-				// 						'key': '(other)',
-				// 						'values': other_values
-				// 					};
-				// 					datum.push(other);
-				//
-				// 					datum.forEach(function(row){
-				// 						row.values = row.values.map(function(v){
-				// 							return {
-				// 								x: v.x,
-				// 								y: v.y / parseInt(totals.get(v.x))
-				// 							};
-				// 						})
-				// 					})
-				// 				}
-				// 			}
-				// 			// TODO: we don't really have the proper data returned to
-				// 			// normalize reliably at all intervals for dates
-				// 			return datum;
-				// 		})
-				// 		;
-				// 	nv.graphs.forEach(function(g){
-				// 		var has_other = g.container.__data__.some(function(v){
-				// 			return v.key == "(other)" && v.values != [];
-				// 		});
-				// 		if (has_other) {
-				// 			g.stacked(true);
-				// 			var pct_format = d3.format(".0%");
-				// 			g.yAxis.tickFormat(function(d){
-				// 				return pct_format(d);
-				// 			});
-				// 		}
-				//
-				// 	});
-				//
-				// } else if (d.value == "raw") {
-				// 	// restore original data
-				// 	svg.datum(function(datum,index){
-				// 		if (datum.some(function(v){
-				// 			return v.key == '(other)';
-				// 		})){
-				// 			datum = datum.filter(function(v){
-				// 				return v.key != "(other)";
-				// 			});
-				//
-				// 			totals = d3.map(data[index].total_counts);
-				//
-				// 			datum.forEach(function(row, i){
-				// 				// restore original data
-				// 				row.values = data[index].streams[i].values;
-				// 			});
-				// 		}
-				// 		return datum;
-				// 	});
-				//
-				// 	nv.graphs.forEach(function(g){
-				// 		g.yAxis.tickFormat(function(d){
-				// 			return d;
-				// 		})
-				// 	})
-				// }
-				//
-				// me.updateCharts();
 			})
 			;
 		norm.append('label')
@@ -373,7 +349,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			})
 			;
 
-		data.forEach(function(prop){
+		data.forEach(function(prop, index){
 			var container = canvas.append('div')
 				.classed("viz-container", true)
 				.classed(makeClassName(prop.property), true) // in util.js
@@ -408,6 +384,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					columns: prop.columns,
 					type: 'bar',
 					xSort: true,
+					colors: prop.color,
 				},
 				axis: {
 					x: {
@@ -424,11 +401,16 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					y: {
 						label: '# of sentences',
 						tick: {
-							// format: function(tick) { return parseInt(tick) }
+							format: function(tick) {
+								if (data[index].c3_format_norm) {
+									return d3.format('.1%')(tick)
+								} else {
+									return parseInt(tick);
+								}
+							}
 						}
 					}
 				},
-				color: prop.color,
 				legend: {
 					position: 'bottom',
 				}
@@ -455,7 +437,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					'year': dmax.diff(dmin, 'years') > 0,
 					'month': dmax.diff(dmin, 'months') > 0 && _.some(_.rest(prop.columns[0]),
 						function(v,i,a){
-							console.log(a[i+i])
 							if (a[i+1] != undefined){
 								var current = moment(v, dformat_moment),
 									next = moment(a[i+1], dformat_moment)
@@ -525,7 +506,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					'year': '%Y',
 				};
 
-				console.log(prop.intervals)
 				// add dropdown selector for date granularity
 				var selector = container.append('div')
 					.attr('class', 'timeselect')
@@ -555,7 +535,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					.property('value');
 
 				var agg = me.aggregateDates(prop, selected_date_detail);
-				console.log(agg)
 				chart_opts.data.columns = agg.columns;
 				chart_opts.axis.x.tick['format'] = tickFormats[selected_date_detail];
 			}
@@ -605,9 +584,14 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 							return classval;
 						})
 						.on('click', function(d){
-							// the X column is always first
-							var row_headers = _.zip(chart_opts.data.columns)[0];
-							var rows = _.rest(_.zip(chart_opts.data.columns));
+							// TODO: use chart.data, it's live
+							var cols_obj = _.pluck(chart.data(), 'values');
+							var cols = _.map(cols_obj, function(col){
+								return _.pluck(col, 'value');
+							})
+							var x_col = chart.categories();
+							cols.unshift(x_col);
+							var rows = _.zip(cols);
 							switch(d){
 								case 'fa-sort-alpha-asc':
 									rows = _.sortBy(rows, 0);
@@ -622,9 +606,10 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 									rows = _.sortBy(rows, 1).reverse();
 									break;
 							}
-
 							// append header on rows
-							rows.unshift(row_headers);
+							var row_labels = _.pluck(chart.data(), 'id');
+							row_labels.unshift("x");
+							rows.unshift(row_labels);
 							// unzip the rows back into columns and reload
 							chart.load({
 								columns: _.zip(rows)
