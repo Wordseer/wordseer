@@ -1,0 +1,1899 @@
+@import "compass";
+@import "compass/css3/border-radius";
+@import "compass/css3/box-shadow";
+@import "compass/css3/opacity";
+
+/*******************************************************************************
+Padding and Spacing
+*******************************************************************************/
+@function power ($x, $n) {
+    $ret: 1;
+    @if $n >= 0 {
+        @for $i from 1 through $n {
+            $ret: $ret * $x;
+        }
+    } @else {
+        @for $i from $n to 0 {
+            $ret: $ret / $x;
+        }
+    }
+    @return $ret;
+}
+$space_0: 3px;
+$factor: 1.6;
+$space_1: $space_0*power($factor,1);
+$space_2: $space_0*power($factor,2);
+$space_3: $space_0*power($factor,3);
+$space_4: $space_0*power($factor,4);
+$space_5: $space_0*power($factor,5);
+$space_6: $space_0*power($factor,6);
+$space_7: $space_0*power($factor,7);
+$space_8: $space_0*power($factor,8);
+
+$default-border-radius: $space_1;
+
+
+/*******************************************************************************
+Colors
+*******************************************************************************/
+$gray: #EEEEEE;
+$yellow: #F7D04A;
+$black: #000000;
+$darkblue: #1D3040;
+$background-blue: #526b84;
+$background-lightblue: #64839f;
+$pink: #ffd8fc;
+$darkgray: #ababab;
+
+/*******************************************************************************
+Fonts
+*******************************************************************************/
+$slab-serif: 'Bitter';
+$sans-serif: Helvetica, Arial, sans-serif;
+$sans-serif-alt: 'Open Sans', Helvetica, Arial, sans-serif;
+$small-font-size: 10px;
+$medium-font-size: 12px;
+$large-font-size: 18px;
+
+body {
+	font-family: $sans-serif !important;
+	font-size: $small-font-size;
+}
+.background {
+background-color:  $background-blue; // Old browsers
+//@include filter-gradient($background-blue, $background-lightblue, vertical); // IE6-9
+//@include background-image(linear-gradient(top,  $background-blue 0%,
+//	$background-lightblue 100%));
+}
+/*******************************************************************************
+Buttons
+*******************************************************************************/
+$button-height: 21px;
+$button-width: $button-height;
+$navbutton-margin:$space_0;
+
+.button {
+	width: $button-height;
+	height: $button-width;
+	display: inline-block;
+	&:hover {
+		cursor: pointer;
+	}
+}
+
+@each $type in see-more, save, save-picture, toggle-expand, toggle-contract {
+	.action-button-#{$type} {
+		@extend .button;
+		position:relative;
+		top: 5px;
+		margin: $navbutton-margin/2;
+		background: {
+			image: url('icons/action-button-#{$type}.png');
+			repeat: no-repeat;
+		}
+		&:hover {
+			// background: {
+			// 	image: url('icons/action-button-#{$type}-hover.png');
+			// 	repeat: no-repeat;
+			// }
+			cursor: pointer;
+		}
+	}
+}
+
+
+/*******************************************************************************
+Base components: Data Box
+*******************************************************************************/
+$databox-header-height:32px;
+
+div.databox {
+	//border: 1px solid black ;
+	padding: 0;
+	background-color: white;
+	margin-top: $space_3;
+	margin-bottom: $space_2;
+}
+div.databox-header {
+	display: block;
+	width: 100%;
+    margin-top: 10px;
+	background-color: white;
+	z-index: 1000;
+}
+
+h2.databox-header {
+	display: inline-block;
+	font-family: $slab-serif, serif;
+	font-weight: 400;
+	text-transform: uppercase;
+	font-size: $large-font-size;
+	padding-top: $space_1;
+	padding-bottom: $space_0;
+	margin-top:0;
+	margin-bottom: 0;
+	margin-right: 2*$navbutton-margin;
+}
+
+// .databox-body {
+// 	width: 100%;
+// 	height: 100%;
+// }
+
+/*******************************************************************************
+Base components: Options Data Box
+*******************************************************************************/
+$databox-options-height: 23px;
+div.databox-options {
+	display: block;
+	top: $databox-header-height;
+	span.databox-option {
+		margin-right: $space_2;
+		span.databox-option-label {
+			margin-right: $space_1;
+		}
+		span.button {
+			padding: $space_1;
+			cursor: pointer;
+			width: auto;
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+		span.disabled {
+			color: $gray;
+			&:hover {
+				text-decoration: none;
+			}
+		}
+	}
+	div.databox-body {
+		top: $databox-header-height + $databox-options-height;
+	}
+	font-size: $small-font-size;
+}
+span.checkbox {
+	display: inline-block;
+	height: 16px;
+	width: 16px;
+	position: relative;
+	top: 3px;
+	background-image: url('icons/checkbox.png');
+	&.checked {
+		background-image: url('icons/checkbox-checked.png');
+	}
+}
+
+/*******************************************************************************
+Other Component Styling
+*******************************************************************************/
+
+/*****************
+Things with selectable rows: Tables, multitables.
+*******************/
+$selected-row-bg: $yellow;
+$hovered-row-bg: $gray;
+@mixin selectable-row {
+	cursor: default;
+	&.selected {
+		background-color: $selected-row-bg;
+	}
+	&.selected:hover {
+		background-color: $selected-row-bg;
+	}
+	&:hover {
+		background-color: $hovered-row-bg;
+	}
+}
+
+@mixin header-cell {
+	border-bottom: 1px solid $gray;
+	cursor: pointer;
+	padding-bottom: $space_1;
+	text-transform: uppercase;
+	font-weight: bold;
+	font-size: $small-font-size*0.9;
+}
+
+/*****************
+Tag List
+*******************/
+@mixin overview-databox{
+	position:static !important;
+	background-color: transparent;
+	display: block;
+	div.databox-header {
+		color:white;
+		background-color: transparent;
+	}
+}
+div.overview {
+	div.tag-list {
+		@include overview-databox;
+	}
+}
+
+ul.tag-list-body {
+	width: 100%;
+	list-style-type: none;
+	padding: {
+		left: $space_0;
+	}
+}
+
+li.tag-list {
+	display: inline-block;
+	margin: $space_0;
+	padding: $space_0;
+	font-weight: bold;
+	background-color: $gray;
+	@include border-radius($default-border-radius);
+	cursor: pointer;
+	&:hover {
+		background-color: $yellow;
+	}
+}
+
+span.tag-list-number {
+	padding: {
+		left: $space_0
+	}
+}
+
+/*****************
+Table
+*******************/
+
+
+table.table {
+	border-collapse: collapse;
+	width: 100%;
+	thead {
+		text-align: left;
+		font: {
+			weight: bold;
+		}
+		tr {
+			//display: block;
+			th {
+				padding-left: $space_1;
+				padding-right:$space_1;
+				@include header-cell;
+			}
+		}
+	}
+	tbody {
+		font-size: $medium-font-size;
+		overflow: scroll;
+		tr:nth-child(1) {
+			td {
+				padding-top:$space_1;
+			}
+		}
+		tr {
+			@include selectable-row;
+			&.hovered {
+				background-color: $gray;
+				color: black;
+			}
+			td {
+				padding-left: $space_1;
+				cursor: default;
+				tr.selected & {
+					color: $black;
+				}
+				max-width: 350px;
+				overflow: auto;
+			}
+		}
+	}
+}
+
+
+
+span.table-header-sorter {
+		display: inline-block;
+		width:16px;
+		height:16px;
+		position:relative;
+		top: $space_2;
+		margin-left: $space_2;
+	@each $direction in ascending, descending {
+		&.#{$direction} {
+			background: {
+				image: url('icons/#{$direction}.png');
+				repeat: no-repeat;
+			}
+		}
+	}
+}
+
+/*
+For jquery.resizableColumns.js
+*/
+.rc-handle-container {
+  position: relative;
+}
+
+.rc-handle {
+  position: absolute;
+  width: 7px;
+  cursor: ew-resize;
+  margin-left: -3px;
+  z-index: 2;
+  &:hover {
+  	border-left: 1px dotted $darkblue;
+  }
+}
+
+table.rc-table-resizing {
+  cursor: ew-resize;
+
+  thead, thead > th, thead > th > a {
+    cursor: ew-resize;
+  }
+}
+
+/*******************************************************************************
+Base components: Layout panel
+*******************************************************************************/
+$nav-button-size: 21px;
+$panel-padding: $space_0;
+$panel-margin: $space_1;
+$panel-header-height: 2*$nav-button-size + $space_0 + 2*$panel-padding;
+$breadcrumbs-height: $panel-header-height + 2*$space_3;
+
+$panel-inner-background-color: white;
+$inactive-panel-inner-background-color: #EEEEEE;
+
+$menubutton-margin: $space_1; // used by menu buttons in the panel header
+$menubutton-padding: $space_2;
+
+$select-box-height: $space_5; // 30px
+
+@mixin panel-inner {
+	padding: $panel-padding;
+	background-color: $panel-inner-background-color;
+}
+
+div.panel {
+	position: absolute;
+	margin: $panel-margin;
+	padding: $panel-padding;
+	div.panel-render-target {
+		position:absolute;
+		top: $panel-header-height + $breadcrumbs-height;
+		left: $panel-padding;
+		right: $panel-padding;
+		bottom: $panel-margin;
+		@include panel-inner;
+		div.inner {
+			// position: absolute;
+			max-height: 100%;
+			max-width: 100%;
+		}
+	}
+	&.active {
+		background-color: $yellow;
+	}
+}
+
+div.panelheader {
+	height: $panel-header-height;
+	width: 100%;
+	span.panel-header-menubutton {
+		@include border-radius($default-border-radius);
+		font-family: $slab-serif;
+		font-weight:700;
+		text-transform: uppercase;
+		float: left;
+		padding: $menubutton-padding;
+		padding-top: $menubutton-padding - 3;
+		margin: {
+			top: $menubutton-margin - 2;
+			bottom: $menubutton-margin;
+			left: $menubutton-margin/2;
+			right: $menubutton-margin/2;
+		}
+		height:$panel-header-height - ($menubutton-margin*2);
+		background-color: $darkblue;
+		color: white;
+		&.open {
+			background-color: white;
+			color: black;
+		}
+		&:hover {
+			background-color: white;
+			color: $darkblue;
+			cursor: pointer;
+		}
+	}
+	select.panel-header-widget-select {
+		margin: ($panel-header-height - $select-box-height)/2;
+		height: $select-box-height;
+	}
+
+	div.panel-header-navcontrols {
+		float: right;
+		clear: right;
+		width: 92px;
+		height: $panel-header-height;
+		@include panel-inner;
+		@include border-top-left-radius($default-border-radius);
+		@include border-top-right-radius($default-border-radius);
+	}
+}
+
+div.breadcrumbs {
+	height: $breadcrumbs-height;
+	width: 100%;
+	@include panel-inner;
+	padding-left: $panel-margin;
+	padding-top:$panel-margin;
+
+	span.breadcrumb {
+		float: left;
+		min-height: $breadcrumbs-height - 3*$panel-padding;
+		@include border-radius($default-border-radius);
+		background-color: $gray;
+		font-weight: bold;
+		font-size: $medium-font-size;
+		padding: $space_2;
+		min-width: 100px;
+		margin-right: $space_2;
+		span.breadcrumb-contents {
+			display: inline-block;
+			width: 80%;
+			padding-right: $space_2;
+			span.relation, span.property {
+				font-weight: normal;
+				width: 100%;
+				display:block;
+				font-size: $small-font-size;
+			}
+		}
+		span.breadcrumb-controls {
+			float: right;
+			clear: right;
+			width: 10px;
+			height: 50%;
+			z-index: 100;
+		}
+	}
+}
+
+@each $type in close, toggle-on, toggle-off {
+	span.breadcrumb-#{$type} {
+		float: right;
+		clear:right;
+		height:12px;
+		width: 12px;
+		cursor: pointer;
+		margin-bottom: 5px;
+		background: {
+			image: url('icons/breadcrumb-#{$type}.png');
+			repeat: no-repeat;
+		}
+	}
+}
+
+@each $type in move, save, close, back, forward, pinned {
+	span.nav-button-#{$type} {
+		float: right;
+		@extend .button;
+		margin: $space_0;
+		background: {
+			image: url('icons/nav-button-#{$type}.png');
+			repeat: no-repeat;
+		}
+		&[enabled=false], &.disabled {
+			@include opacity(0.2);
+			cursor: default;
+		}
+		// &:hover {
+		// 	background: {
+		// 		image: url('icons/nav-button-#{$type}-hover.png');
+		// 		repeat: no-repeat;
+		// 	}
+		// }
+	}
+}
+
+$switch-button-size: 2*$panel-padding + $panel-margin;
+span.switch-button {
+	@extend .button;
+	width: $switch-button-size;
+	height: $switch-button-size;
+	position: absolute;
+	top: 50%;
+	right: (-$switch-button-size + $panel-padding);
+	background: {
+		image: url('icons/switch-button.png');
+		repeat: no-repeat;
+	}
+	&:hover {
+		background: {
+			image: url('icons/switch-button-hover.png');
+			repeat: no-repeat;
+		}
+	}
+	&.invisible {
+		display: none;
+	}
+}
+
+span.word:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+span.menu-word {
+	background-color: $yellow;
+}
+span.word.search {
+	background-color: #fffaa5;
+}
+span.word.match {
+	background-color: #FFDAB9;
+}
+
+/*******************************************************************************
+Base Components: Overlay
+*******************************************************************************/
+$overlay-padding: $space_2;
+div.overlay {
+	padding: $overlay-padding;
+	position:absolute;
+	width: 400px;
+	background-color: white;
+	div.overlay-render-target {
+		width: 100%;
+		height: 100%;
+	}
+	span.nav-button-pinned, span.nav-button-close {
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 10000;
+	}
+	span.overlay-title {
+		font-family: $slab-serif;
+		font-weight: 300;
+		font-size: $large-font-size;
+		text-transform: uppercase;
+		position: absolute;
+		top: $space_2;
+		left: $space_2 + $nav-button-size;
+	}
+
+    div.x-accordion-layout-ct {
+        margin-top: 22px;
+        .x-accordion-item {
+
+
+            .x-accordion-hd {
+                height: 24px;
+                background: {
+                    color: $yellow;
+                };
+                border:none;
+                transition: background-color 0.2s;
+                .x-tool {
+                    display: none;
+                    // background: {
+                    //     image: url('icons/action-button-toggle-contract.png');
+                    //     repeat: no-repeat;
+                    //     size: 100%;
+                    // }
+
+
+                    img {
+                        display: none;
+                    }
+                }
+
+                .x-panel-header-text-container {
+                    font-family: "Bitter", serif;
+                    font-size: 14px;
+                    font-weight: bold;
+                }
+            }
+            &.x-collapsed {
+                .x-accordion-hd {
+                    background: {
+                        color: $gray;
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+/*******************************************************************************
+Derived Components: FrequentWordsList
+*******************************************************************************/
+@mixin data-table($height, $width, $databox-options-height) {
+	table.table {
+        height: 100%!important;
+		tbody {
+			overflow: auto;
+			display:block;
+			height: $height;
+			width: $width;
+		}
+		thead > tr {
+			display: block;
+		}
+	}
+}
+
+div.frequent-words-list {
+	@include data-table(100%, 360, $databox-options-height);
+	float: left;
+    font-family: $sans-serif-alt;
+    height: 100%;
+    padding-bottom: 20px;
+}
+
+td.frequent-word-word {
+	min-width: 120px;
+	max-width: 120px;
+	overflow: hidden;
+	font-weight: bold;
+	color: $background-lightblue;
+}
+td.frequent-word-count {
+	min-width: 60px;
+	padding-right: $space_2;
+    svg.lollipop {
+        width: 100px;
+        height: 17px;
+        line {
+            stroke: $darkgray;
+        }
+        circle {
+            fill: $darkgray;
+        }
+    }
+}
+
+th.frequent-word-word {
+	min-width: 120px;
+}
+th.frequent-word-count {
+	min-width: 60px;
+	padding-right: $space_2;
+	font-size: $medium-font-size;
+}
+
+/*******************************************************************************
+Derived Components: RelatedWordsList
+*******************************************************************************/
+div.related-words-list {
+	@include data-table(300px, 220px, 0);
+}
+
+
+/*******************************************************************************
+Derived Components: Treepanel
+*******************************************************************************/
+
+@each $level in 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 {
+	tr[level='#{$level}'] {
+		td.content:nth-of-type(1) {
+			padding-left: $level*$space_2;
+		}
+	}
+}
+
+/*******************************************************************************
+Derived Components: Set List
+*******************************************************************************/
+
+div.sets-list {
+	@include data-table(150px, 400px, $databox-options-height);
+}
+
+/*******************************************************************************
+Base Components: MultiTable
+*******************************************************************************/
+
+ul.multitable {
+	@extend div.databox;
+	margin: 0px;
+	padding: 0px;
+	li {
+		list-style-type: none;
+		&.collapsed ul {
+			display: none;
+		}
+		&.expanded ul {
+			display: visible;
+		}
+	}
+	ul {
+		padding-left: 0px;
+		max-height:200px;
+		overflow: auto;
+	}
+	li.multitable-header {
+		@include header-cell;
+	}
+	span.multitable-row {
+		display: block;
+	}
+	span.multitable-cell {
+		display: inline-block;
+		padding-left: $space_1;
+		padding-right: $space_1;
+	}
+	li.multitable-level-2 {
+		@include selectable-row;
+		padding-top:$space_1;
+		padding-bottom: $space_1;
+	}
+}
+
+/*******************************************************************************
+Derived Components: Metadata multitable
+*******************************************************************************/
+@mixin metadata-category {
+	font-weight: bold;
+	color: $background-lightblue;
+	font-size: $medium-font-size;
+	font-family: $sans-serif;
+	margin-bottom: $space_3;
+	text-transform: capitalize;
+	span.action-button-toggle-expand, span.action-button-toggle-contract {
+		top: 8px;
+	}
+	span.metadata-category {
+		padding-left: $space_1;
+		padding-right: $space_1;
+	}
+}
+
+li span.metadata-count {
+	max-width: 60px;
+	min-width: 60px;
+}
+li span.metadata-value {
+	max-width: 120px;
+	min-width: 120px;
+	&.multitable-cell, &.multitable-header-cell {
+		color: $background-lightblue;
+		font-weight: bold;
+	}
+}
+li span.multitable-level-1 {
+	@include metadata-category;
+}
+
+/*******************************************************************************
+Base Components: Landing Page
+*******************************************************************************/
+$main-header-height: 109px;
+$huge-font-size: 40;
+$landing-page-margin: $panel-margin;
+$landing-page-padding: $panel-padding;
+div.landing-page {
+	overflow: scroll;
+	background-color: $background-lightblue;
+	position: absolute;
+	margin: $landing-page-margin;
+	padding: $landing-page-padding;
+	div.landingpage-render-target {
+		position:absolute;
+		top: $main-header-height;
+		left: $landing-page-padding;
+		right: $landing-page-padding;
+		bottom: $landing-page-margin;
+	}
+	div.main-header {
+		height: $main-header-height;
+		width: 100%;
+		font-family: $slab-serif;
+		font-weight: 700;
+		color: white;
+		font-size: $huge-font-size;
+		h1 {
+			margin: 0px;
+		}
+	}
+}
+
+/*******************************************************************************
+Base Components: Menu
+*******************************************************************************/
+$menu-padding: $overlay-padding;
+
+.menu {
+	padding:1px;
+	border:2px solid $yellow;
+	background:#fff;
+}
+
+/* creates the larger triangle */
+.menu:before {
+	top:10px; /* controls vertical position */
+	bottom:auto;
+	left:-30px; /* value = - border-left-width - border-right-width */
+	border-width:15px 30px 15px 0;
+	border-color:transparent $yellow;
+}
+
+/* creates the smaller  triangle */
+.menu:after {
+	top:16px; /* value = (:before top) + (:before border-top) - (:after border-top) */
+	bottom:auto;
+	left:-21px; /* value = - border-left-width - border-right-width */
+	border-width:9px 21px 9px 0;
+	border-color:transparent #fff;
+}
+
+.menuitem {
+	cursor: pointer;
+	display: block;
+	&.hovered {
+		background: $yellow;
+	}
+	padding: $space_2;
+}
+
+/*******************************************************************************
+Derived Components: AutoSuggest Menu
+*******************************************************************************/
+
+.autosuggest-menu {
+	@extend .menu;
+	border: 0px;
+	@include box-shadow(10px, 0px, 5px);
+}
+
+.autosuggest-menuitem {
+	@extend .menuitem;
+}
+
+/*******************************************************************************
+Base Components: Overviews
+*******************************************************************************/
+$overview-header-height: 100px;
+div.overview {
+	position: static;
+	margin: $landing-page-margin;
+	padding: $landing-page-padding;
+	margin-right: 50px;
+	div.overview-render-target {
+		position:absolute;
+		top: $overview-header-height;
+		left: $landing-page-padding;
+		right: $landing-page-padding;
+		bottom: $landing-page-margin;
+	}
+	div.overview-header {
+		height: $main-header-height;
+		width: 100%;
+		font-family: $slab-serif;
+		font-size: 20px;
+		font-weight: 700;
+		color: white;
+	}
+	div.range-facet {
+		@include overview-databox;
+		.axis text {
+			fill: $gray;
+		}
+		.axis line, .axis path {
+		  stroke: $gray;
+		}
+		.brush rect.extent {
+			fill: #000000;
+		}
+		.background.bar {
+		  stroke: $gray;
+		}
+		.title span {
+			color: $gray;
+		}
+	}
+}
+
+/*******************************************************************************
+Derived Components: Range Facets
+*******************************************************************************/
+div.range-facet {
+	@extend div.databox;
+	height: 100px;
+	&.x-box-item {
+		position: static !important;
+	}
+	div.chart.collapsed {
+		display:none;
+	}
+}
+
+div.rangefacets {
+	div.range-facet {
+		div.databox-header {
+			@include metadata-category
+		}
+	}
+}
+
+/*******************************************************************************
+Base Components: Sentence List Widget
+*******************************************************************************/
+div.sentence {
+    font-family: $slab-serif;
+    line-height: 1.5;
+    font-size: $large-font-size;
+    margin-bottom: 6px;
+}
+
+div.metatag {
+    font-family: $sans-serif-alt;
+    float:left;
+    margin-right: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #808080;
+    cursor: pointer;
+    span {
+        display: table-cell;
+        padding: 2px 6px;
+        color: #808080;
+        &.key {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            border-right: 1px solid #808080;
+        }
+        &.value {
+            font-size: 12px;
+            font-weight: 400;
+        }
+        &.dir {
+            display: inline;
+        }
+    }
+    &:last-child {
+        margin-bottom: 36px;
+    }
+    &.active {
+        background-color: $yellow;
+    }
+    &.sorting {
+        background-color: lighten($pink, 5%);
+        &.lev0 {
+            background-color: $pink;
+        }
+        &.lev1 {
+            background-color: lighten($pink, 3%);
+        }
+        &.lev2 {
+            background-color: lighten($pink, 5%);
+        }
+    }
+}
+
+
+/*******************************************************************************
+Visualizations - word frequencies
+*******************************************************************************/
+
+.viz-container{
+    float: left;
+    position: relative;
+    .timeselect {
+        position: absolute;
+        top: 7px;
+        right: 5px;
+    }
+
+    .wordfreq {
+        width: 500px;
+        height: 400px;
+
+        .nvtooltip {
+            font-family: $sans-serif-alt;
+        }
+
+        svg {
+            text {
+                font-family: $sans-serif-alt;
+            }
+            .nvd3 {
+
+                .tick {
+                    line {
+                        display: none;
+                    }
+                }
+
+                .nv-axis {
+                    &.nv-x {
+                        path.domain {
+                            // show x-axis line
+                            stroke-opacity: inherit;
+                        }
+                    }
+                }
+
+                &.nv-line {
+                    .nvd3.nv-scatter {
+                        .nv-groups {
+                            .nv-point {
+                                fill-opacity: 1;
+                                stroke-opacity: 1;
+                            }
+                        }
+                    }
+                }
+                &.nv-lineChart {
+                    .nv-x {
+                        .tick {
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    margin-top: $space_3;
+    font-family: $sans-serif-alt;
+
+    div.property {
+        font-size: $large-font-size;
+        font-weight: 700;
+        margin-left: 50px;
+
+        span.sort {
+            display: inline-block;
+            margin-left: 10px;
+            text-transform: uppercase;
+            position: relative;
+
+            .sort-control {
+                color: #e41a1c;
+                padding-right: 15px;
+
+                .sort-menu {
+                    position: absolute;
+                    top: -9px;
+                    padding: 4px 0;
+                    background-color: $gray;
+                    width: 34px;
+                    right: -28px;
+                    opacity: 0;
+                    color: $black;
+                    visibility: hidden;
+                    transition: visibility 0s ease 0.3s,opacity 0.3s ease;
+
+                    i {
+                        padding: 5px;
+                        width: 100%;
+                        text-align: center;
+                        background-color: $gray;
+                        transition: background-color 0.3s ease, color 0.3s ease;
+
+
+                        &.selected {
+                            color: #e41a1c;
+                        }
+
+                        &:hover {
+                            background-color: $background-lightblue;
+                            color: $gray;
+                        }
+                    }
+                }
+
+                &:hover {
+                    .sort-menu {
+                        opacity: 1;
+                        visibility: visible;
+                        transition-delay:0s;
+
+                    }
+                }
+            }
+        }
+    }
+
+
+}
+
+
+/*******************************************************************************
+NV.D3 defaults
+*******************************************************************************/
+
+
+/********************
+ * HTML CSS
+ */
+
+
+.chartWrap {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/********************
+  Box shadow and border radius styling
+*/
+.nvtooltip.with-3d-shadow, .with-3d-shadow .nvtooltip {
+  -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+}
+
+/********************
+ * TOOLTIP CSS
+ */
+
+.nvtooltip {
+  position: absolute;
+  background-color: rgba(255,255,255,1.0);
+  padding: 1px;
+  border: 1px solid rgba(0,0,0,.2);
+  z-index: 10000;
+
+  font-family: Arial;
+  font-size: 13px;
+  text-align: left;
+  pointer-events: none;
+
+  white-space: nowrap;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/*Give tooltips that old fade in transition by
+    putting a "with-transitions" class on the container div.
+*/
+.nvtooltip.with-transitions, .with-transitions .nvtooltip {
+  transition: opacity 250ms linear;
+  -moz-transition: opacity 250ms linear;
+  -webkit-transition: opacity 250ms linear;
+
+  transition-delay: 250ms;
+  -moz-transition-delay: 250ms;
+  -webkit-transition-delay: 250ms;
+}
+
+.nvtooltip.x-nvtooltip,
+.nvtooltip.y-nvtooltip {
+  padding: 8px;
+}
+
+.nvtooltip h3 {
+  margin: 0;
+  padding: 4px 14px;
+  line-height: 18px;
+  font-weight: normal;
+  background-color: rgba(247,247,247,0.75);
+  text-align: center;
+
+  border-bottom: 1px solid #ebebeb;
+
+  -webkit-border-radius: 5px 5px 0 0;
+  -moz-border-radius: 5px 5px 0 0;
+  border-radius: 5px 5px 0 0;
+}
+
+.nvtooltip p {
+  margin: 0;
+  padding: 5px 14px;
+  text-align: center;
+}
+
+.nvtooltip span {
+  display: inline-block;
+  margin: 2px 0;
+}
+
+.nvtooltip table {
+  margin: 6px;
+  border-spacing:0;
+}
+
+
+.nvtooltip table td {
+  padding: 2px 9px 2px 0;
+  vertical-align: middle;
+}
+
+.nvtooltip table td.key {
+  font-weight:normal;
+}
+.nvtooltip table td.value {
+  text-align: right;
+  font-weight: bold;
+}
+
+.nvtooltip table tr.highlight td {
+  padding: 1px 9px 1px 0;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-top-style: solid;
+  border-top-width: 1px;
+}
+
+.nvtooltip table td.legend-color-guide div {
+  width: 8px;
+  height: 8px;
+  vertical-align: middle;
+}
+
+.nvtooltip .footer {
+  padding: 3px;
+  text-align: center;
+}
+
+
+.nvtooltip-pending-removal {
+  position: absolute;
+  pointer-events: none;
+}
+
+
+/********************
+ * SVG CSS
+ */
+
+
+svg.nvd3 {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Trying to get SVG to act like a greedy block in all browsers */
+  display: block;
+  width:100%;
+  height:100%;
+
+  text {
+    font: normal 12px Arial;
+  }
+
+  .title {
+   font: bold 14px Arial;
+  }
+}
+
+
+
+.nvd3 .nv-background {
+  fill: white;
+  fill-opacity: 0;
+  /*
+  pointer-events: none;
+  */
+}
+
+.nvd3.nv-noData {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+
+/**********
+*  Brush
+*/
+
+.nv-brush .extent {
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
+
+
+/**********
+*  Legend
+*/
+
+.nvd3 .nv-legend .nv-series {
+  cursor: pointer;
+}
+
+.nvd3 .nv-legend .disabled circle {
+  fill-opacity: 0;
+}
+
+
+
+/**********
+*  Axes
+*/
+.nvd3 .nv-axis {
+  pointer-events:none;
+}
+
+.nvd3 .nv-axis path {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .75;
+  shape-rendering: crispEdges;
+}
+
+.nvd3 .nv-axis path.domain {
+  stroke-opacity: .75;
+}
+
+.nvd3 .nv-axis.nv-x path.domain {
+  stroke-opacity: 0;
+}
+
+.nvd3 .nv-axis line {
+  fill: none;
+  stroke: #e5e5e5;
+  shape-rendering: crispEdges;
+}
+
+.nvd3 .nv-axis .zero line,
+/*this selector may not be necessary*/ .nvd3 .nv-axis line.zero {
+  stroke-opacity: .75;
+}
+
+.nvd3 .nv-axis .nv-axisMaxMin text {
+  font-weight: bold;
+}
+
+.nvd3 .x  .nv-axis .nv-axisMaxMin text,
+.nvd3 .x2 .nv-axis .nv-axisMaxMin text,
+.nvd3 .x3 .nv-axis .nv-axisMaxMin text {
+  text-anchor: middle
+}
+
+
+
+/**********
+*  Brush
+*/
+
+.nv-brush .resize path {
+  fill: #eee;
+  stroke: #666;
+}
+
+
+
+/**********
+*  Bars
+*/
+
+.nvd3 .nv-bars .negative rect {
+    zfill: brown;
+}
+
+.nvd3 .nv-bars rect {
+  zfill: steelblue;
+  fill-opacity: .75;
+
+  transition: fill-opacity 250ms linear;
+  -moz-transition: fill-opacity 250ms linear;
+  -webkit-transition: fill-opacity 250ms linear;
+}
+
+.nvd3 .nv-bars rect.hover {
+  fill-opacity: 1;
+}
+
+.nvd3 .nv-bars .hover rect {
+  fill: lightblue;
+}
+
+.nvd3 .nv-bars text {
+  fill: rgba(0,0,0,0);
+}
+
+.nvd3 .nv-bars .hover text {
+  fill: rgba(0,0,0,1);
+}
+
+
+/**********
+*  Bars
+*/
+
+.nvd3 .nv-multibar .nv-groups rect,
+.nvd3 .nv-multibarHorizontal .nv-groups rect,
+.nvd3 .nv-discretebar .nv-groups rect {
+  stroke-opacity: 0;
+
+  transition: fill-opacity 250ms linear;
+  -moz-transition: fill-opacity 250ms linear;
+  -webkit-transition: fill-opacity 250ms linear;
+}
+
+.nvd3 .nv-multibar .nv-groups rect:hover,
+.nvd3 .nv-multibarHorizontal .nv-groups rect:hover,
+.nvd3 .nv-discretebar .nv-groups rect:hover {
+  fill-opacity: 1;
+}
+
+.nvd3 .nv-discretebar .nv-groups text,
+.nvd3 .nv-multibarHorizontal .nv-groups text {
+  font-weight: bold;
+  fill: rgba(0,0,0,1);
+  stroke: rgba(0,0,0,0);
+}
+
+/***********
+*  Pie Chart
+*/
+
+.nvd3.nv-pie path {
+  stroke-opacity: 0;
+  transition: fill-opacity 250ms linear, stroke-width 250ms linear, stroke-opacity 250ms linear;
+  -moz-transition: fill-opacity 250ms linear, stroke-width 250ms linear, stroke-opacity 250ms linear;
+  -webkit-transition: fill-opacity 250ms linear, stroke-width 250ms linear, stroke-opacity 250ms linear;
+
+}
+
+.nvd3.nv-pie .nv-slice text {
+  stroke: #000;
+  stroke-width: 0;
+}
+
+.nvd3.nv-pie path {
+  stroke: #fff;
+  stroke-width: 1px;
+  stroke-opacity: 1;
+}
+
+.nvd3.nv-pie .hover path {
+  fill-opacity: .7;
+}
+.nvd3.nv-pie .nv-label {
+  pointer-events: none;
+}
+.nvd3.nv-pie .nv-label rect {
+  fill-opacity: 0;
+  stroke-opacity: 0;
+}
+
+/**********
+* Lines
+*/
+
+.nvd3 .nv-groups path.nv-line {
+  fill: none;
+  stroke-width: 1.5px;
+  /*
+  stroke-linecap: round;
+  shape-rendering: geometricPrecision;
+
+  transition: stroke-width 250ms linear;
+  -moz-transition: stroke-width 250ms linear;
+  -webkit-transition: stroke-width 250ms linear;
+
+  transition-delay: 250ms
+  -moz-transition-delay: 250ms;
+  -webkit-transition-delay: 250ms;
+  */
+}
+
+.nvd3 .nv-groups path.nv-line.nv-thin-line {
+  stroke-width: 1px;
+}
+
+
+.nvd3 .nv-groups path.nv-area {
+  stroke: none;
+  /*
+  stroke-linecap: round;
+  shape-rendering: geometricPrecision;
+
+  stroke-width: 2.5px;
+  transition: stroke-width 250ms linear;
+  -moz-transition: stroke-width 250ms linear;
+  -webkit-transition: stroke-width 250ms linear;
+
+  transition-delay: 250ms
+  -moz-transition-delay: 250ms;
+  -webkit-transition-delay: 250ms;
+  */
+}
+
+.nvd3 .nv-line.hover path {
+  stroke-width: 6px;
+}
+
+/*
+.nvd3.scatter .groups .point {
+  fill-opacity: 0.1;
+  stroke-opacity: 0.1;
+}
+  */
+
+.nvd3.nv-line .nvd3.nv-scatter .nv-groups .nv-point {
+  fill-opacity: 0;
+  stroke-opacity: 0;
+}
+
+.nvd3.nv-scatter.nv-single-point .nv-groups .nv-point {
+  fill-opacity: .5 !important;
+  stroke-opacity: .5 !important;
+}
+
+
+.with-transitions .nvd3 .nv-groups .nv-point {
+  transition: stroke-width 250ms linear, stroke-opacity 250ms linear;
+  -moz-transition: stroke-width 250ms linear, stroke-opacity 250ms linear;
+  -webkit-transition: stroke-width 250ms linear, stroke-opacity 250ms linear;
+
+}
+
+.nvd3.nv-scatter .nv-groups .nv-point.hover,
+.nvd3 .nv-groups .nv-point.hover {
+  stroke-width: 7px;
+  fill-opacity: .95 !important;
+  stroke-opacity: .95 !important;
+}
+
+
+.nvd3 .nv-point-paths path {
+  stroke: #aaa;
+  stroke-opacity: 0;
+  fill: #eee;
+  fill-opacity: 0;
+}
+
+
+
+.nvd3 .nv-indexLine {
+  cursor: ew-resize;
+}
+
+
+/**********
+* Distribution
+*/
+
+.nvd3 .nv-distribution {
+  pointer-events: none;
+}
+
+
+
+/**********
+*  Scatter
+*/
+
+/* **Attempting to remove this for useVoronoi(false), need to see if it's required anywhere
+.nvd3 .nv-groups .nv-point {
+  pointer-events: none;
+}
+*/
+
+.nvd3 .nv-groups .nv-point.hover {
+  stroke-width: 20px;
+  stroke-opacity: .5;
+}
+
+.nvd3 .nv-scatter .nv-point.hover {
+  fill-opacity: 1;
+}
+
+/*
+.nv-group.hover .nv-point {
+  fill-opacity: 1;
+}
+*/
+
+
+/**********
+*  Stacked Area
+*/
+
+.nvd3.nv-stackedarea path.nv-area {
+  fill-opacity: .7;
+  /*
+  stroke-opacity: .65;
+  fill-opacity: 1;
+  */
+  stroke-opacity: 0;
+
+  transition: fill-opacity 250ms linear, stroke-opacity 250ms linear;
+  -moz-transition: fill-opacity 250ms linear, stroke-opacity 250ms linear;
+  -webkit-transition: fill-opacity 250ms linear, stroke-opacity 250ms linear;
+
+  /*
+  transition-delay: 500ms;
+  -moz-transition-delay: 500ms;
+  -webkit-transition-delay: 500ms;
+  */
+
+}
+
+.nvd3.nv-stackedarea path.nv-area.hover {
+  fill-opacity: .9;
+  /*
+  stroke-opacity: .85;
+  */
+}
+/*
+.d3stackedarea .groups path {
+  stroke-opacity: 0;
+}
+  */
+
+
+
+.nvd3.nv-stackedarea .nv-groups .nv-point {
+  stroke-opacity: 0;
+  fill-opacity: 0;
+}
+
+/*
+.nvd3.nv-stackedarea .nv-groups .nv-point.hover {
+  stroke-width: 20px;
+  stroke-opacity: .75;
+  fill-opacity: 1;
+}*/
+
+
+
+/**********
+*  Line Plus Bar
+*/
+
+.nvd3.nv-linePlusBar .nv-bar rect {
+  fill-opacity: .75;
+}
+
+.nvd3.nv-linePlusBar .nv-bar rect:hover {
+  fill-opacity: 1;
+}
+
+
+/**********
+*  Bullet
+*/
+
+.nvd3.nv-bullet { font: 10px sans-serif; }
+.nvd3.nv-bullet .nv-measure { fill-opacity: .8; }
+.nvd3.nv-bullet .nv-measure:hover { fill-opacity: 1; }
+.nvd3.nv-bullet .nv-marker { stroke: #000; stroke-width: 2px; }
+.nvd3.nv-bullet .nv-markerTriangle { stroke: #000; fill: #fff; stroke-width: 1.5px; }
+.nvd3.nv-bullet .nv-tick line { stroke: #666; stroke-width: .5px; }
+.nvd3.nv-bullet .nv-range.nv-s0 { fill: #eee; }
+.nvd3.nv-bullet .nv-range.nv-s1 { fill: #ddd; }
+.nvd3.nv-bullet .nv-range.nv-s2 { fill: #ccc; }
+.nvd3.nv-bullet .nv-title { font-size: 14px; font-weight: bold; }
+.nvd3.nv-bullet .nv-subtitle { fill: #999; }
+
+
+.nvd3.nv-bullet .nv-range {
+  fill: #bababa;
+  fill-opacity: .4;
+}
+.nvd3.nv-bullet .nv-range:hover {
+  fill-opacity: .7;
+}
+
+
+
+/**********
+* Sparkline
+*/
+
+.nvd3.nv-sparkline path {
+  fill: none;
+}
+
+.nvd3.nv-sparklineplus g.nv-hoverValue {
+  pointer-events: none;
+}
+
+.nvd3.nv-sparklineplus .nv-hoverValue line {
+  stroke: #333;
+  stroke-width: 1.5px;
+ }
+
+.nvd3.nv-sparklineplus,
+.nvd3.nv-sparklineplus g {
+  pointer-events: all;
+}
+
+.nvd3 .nv-hoverArea {
+  fill-opacity: 0;
+  stroke-opacity: 0;
+}
+
+.nvd3.nv-sparklineplus .nv-xValue,
+.nvd3.nv-sparklineplus .nv-yValue {
+  /*
+  stroke: #666;
+  */
+  stroke-width: 0;
+  font-size: .9em;
+  font-weight: normal;
+}
+
+.nvd3.nv-sparklineplus .nv-yValue {
+  stroke: #f66;
+}
+
+.nvd3.nv-sparklineplus .nv-maxValue {
+  stroke: #2ca02c;
+  fill: #2ca02c;
+}
+
+.nvd3.nv-sparklineplus .nv-minValue {
+  stroke: #d62728;
+  fill: #d62728;
+}
+
+.nvd3.nv-sparklineplus .nv-currentValue {
+  /*
+  stroke: #444;
+  fill: #000;
+  */
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+/**********
+* historical stock
+*/
+
+.nvd3.nv-ohlcBar .nv-ticks .nv-tick {
+  stroke-width: 2px;
+}
+
+.nvd3.nv-ohlcBar .nv-ticks .nv-tick.hover {
+  stroke-width: 4px;
+}
+
+.nvd3.nv-ohlcBar .nv-ticks .nv-tick.positive {
+ stroke: #2ca02c;
+}
+
+.nvd3.nv-ohlcBar .nv-ticks .nv-tick.negative {
+ stroke: #d62728;
+}
+
+.nvd3.nv-historicalStockChart .nv-axis .nv-axislabel {
+  font-weight: bold;
+}
+
+.nvd3.nv-historicalStockChart .nv-dragTarget {
+  fill-opacity: 0;
+  stroke: none;
+  cursor: move;
+}
+
+.nvd3 .nv-brush .extent {
+  /*
+  cursor: ew-resize !important;
+  */
+  fill-opacity: 0 !important;
+}
+
+.nvd3 .nv-brushBackground rect {
+  stroke: #000;
+  stroke-width: .4;
+  fill: #fff;
+  fill-opacity: .7;
+}
+
+
+
+/**********
+* Indented Tree
+*/
+
+
+/**
+ * TODO: the following 3 selectors are based on classes used in the example.  I should either make them standard and leave them here, or move to a CSS file not included in the library
+ */
+.nvd3.nv-indentedtree .name {
+  margin-left: 5px;
+}
+
+.nvd3.nv-indentedtree .clickable {
+  color: #08C;
+  cursor: pointer;
+}
+
+.nvd3.nv-indentedtree span.clickable:hover {
+  color: #005580;
+  text-decoration: underline;
+}
+
+
+.nvd3.nv-indentedtree .nv-childrenCount {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.nvd3.nv-indentedtree .nv-treeicon {
+  cursor: pointer;
+  /*
+  cursor: n-resize;
+  */
+}
+
+.nvd3.nv-indentedtree .nv-treeicon.nv-folded {
+  cursor: pointer;
+  /*
+  cursor: s-resize;
+  */
+}
+
+/**********
+* Parallel Coordinates
+*/
+
+.nvd3 .background path {
+  fill: none;
+  stroke: #ccc;
+  stroke-opacity: .4;
+  shape-rendering: crispEdges;
+}
+
+.nvd3 .foreground path {
+  fill: none;
+  stroke: steelblue;
+  stroke-opacity: .7;
+}
+
+.nvd3 .brush .extent {
+  fill-opacity: .3;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+.nvd3 .axis line, .axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.nvd3 .axis text {
+  text-shadow: 0 1px 0 #fff;
+}
+
+/****
+Interactive Layer
+*/
+.nvd3 .nv-interactiveGuideLine {
+  pointer-events:none;
+}
+.nvd3 line.nv-guideline {
+  stroke: #ccc;
+}
