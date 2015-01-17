@@ -55,8 +55,6 @@ Ext.define('WordSeer.controller.WordTreeController', {
 			collection:word_tree_panel.collection,
 			metadata:formValues.metadata,
 			phrases: formValues.phrases,
-			user:getUsername(),
-			instance:getInstance(),
 		}, formValues.serialize()),
 		scope:word_tree_panel,
 		success:function(response){
@@ -73,7 +71,7 @@ Ext.define('WordSeer.controller.WordTreeController', {
 	then calls {@link #drawWordTree}. Uses the wordtree Javascript library in
 	lib/wordtree.js
 
-	@param {WordSeer.view.visualize.wordtree.WordTree} the WordTree view into
+	@param {WordSeer.view.visualize.wordtree.WordTree} panel the WordTree view into
 	which to render the tree.
 	@param {String} query The root query, the root of the tree.
 	@param {Object} concordance An object with 'left' and 'right' fields, which
@@ -758,24 +756,19 @@ Ext.define('WordSeer.controller.WordTreeController', {
 	drawn.
 	*/
 	getMetadataForSentenceNode: function(node, sentenceID, orientation, vis){
+		params = vis.panel.up().formValues.serialize();
+		params.sentence_id = sentenceID;
 	    Ext.Ajax.request({
-	        url:'../../src/php/strip-vis/getsentence.php',
+	    	url: (ws_project_path + project_id +  '/sentences/'),
 	        method:'GET',
 	        disableCaching: false,
-	        params:{
-	            id:sentenceID,
-	            wordtree:'true',
-	            instance:getInstance(),
-	            user:getUsername(),
-	        },
+	        params: params,
 	        scope:this,
 	        success:function(response){
 	            var data = Ext.decode(response.responseText);
-	            var sentence = {};
-	            sentence.words = data.words;
+	            var sentence = data;
 	            sentence.sentenceID = data.sentence_id;
 	            sentence.documentID = data.document_id;
-	            sentence.metadata = data.metadata;
 	            if (vis.number_popup) {
 		            vis.number_popup.remove();
 	            }
