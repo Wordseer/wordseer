@@ -114,18 +114,13 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 	requestWordFrequenciesData: function(formValues, word_frequencies_panel) {
 //		console.log("requested word frequencies data");
 		word_frequencies_panel.getEl().mask('loading');
-		var values = formValues.serialize();
+		params = formValues.serialize();
 		Ext.Ajax.request({
-		    url:'../../src/php/word-frequencies/bar-charts.php',
+		    url: ws_project_path + project_id +  '/metadata_frequencies/',
 		    method:'GET',
 		    disableCaching: false,
 		    timeout: 900000,
-		    params: Ext.apply({
-		        metadata:formValues.metadata,
-		        phrases: formValues.phrases,
-		        user:getUsername(),
-		        instance:getInstance(),
-		    }, values),
+		    params: params,
 		    scope:this,
 		    success:function(response){
 		        var data  = Ext.decode(response.responseText)

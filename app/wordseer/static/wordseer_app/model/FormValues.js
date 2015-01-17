@@ -19,6 +19,15 @@ Ext.define('WordSeer.model.FormValues', {
 	query_id: '',
 
 	/**
+	@property {Boolean} separate_sub_searches Whether or not each search in the
+	list of searches is to be assigned a separate query ID. Useful for
+	visualizations such as the WordFrequencies view that can be used to compare
+	the results of multiple searches. In this case, the main query_id will
+	represent the results that match ALL the searches.
+	*/
+	separate_sub_searches: false,
+
+	/**
 	@property {String|Integer} gov The gov part of the search query. Blank is
 	unspecified and will match all govs in a grammatical search. If the
 	query is not a grammatical search, and is just a keyword search,
@@ -123,6 +132,7 @@ Ext.define('WordSeer.model.FormValues', {
 		this.document_id = "";
 		this.sentence_id = "";
 		this.timing = 0;
+		this.separate_sub_searches = true;
 		Ext.apply(this, config);
 		this.callParent(arguments);
 	},
@@ -358,6 +368,7 @@ Ext.define('WordSeer.model.FormValues', {
 			search: JSON.stringify(this.search),
 			widget_xtype: this.widget_xtype,
 			query_id: this.query_id,
+			separate_sub_searches: this.separate_sub_searches
 		};
 		var phrases = [];
 		for (var i = 0; i < this.phrases.length; i++) {

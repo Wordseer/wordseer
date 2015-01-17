@@ -30,11 +30,9 @@ class QueryCacheView(MethodView):
         query = Query()
         query.save()
         sentence_query = project.sentences
+        final_result = project.sentences
+        sub_search_ids = []
         some_filtering_happened = False
-        if 'search' in keys:
-            sentence_query = self.apply_search_filters(params['search'][0],
-                                                       sentence_query)
-            some_filtering_happened = True
         if 'phrases' in keys:
             sentence_query = self.apply_phrase_filters(params['phrases'][0],
                                                        sentence_query)
@@ -43,24 +41,43 @@ class QueryCacheView(MethodView):
             sentence_query = self.apply_property_filters(params['metadata'][0],
                                                          sentence_query)
             some_filtering_happened = True
+        if 'search' in keys:
+            search_params = loads(params['search'][0])
+            final_result = self.apply_search_filters(search_params,
+                                                     sentence_query)
+            if params["separate_sub_searches"] and len(search_params) > 1:
+                for search in search_params:
+                    search_query = Query()
+                    search_query.sentences = self.apply_search_filter(
+                        search, sentence_query)
+                    search_query.save()
+                    sub_search_ids.append(search_query.id)
+            some_filtering_happened = True
         if some_filtering_happened:
-            query.sentences = sentence_query
+            query.sentences = final_result
             query.save()
-        return jsonify({ "ok": True, "query_id": query.id })
+        return jsonify({
+            "ok": True,
+            "query_id": query.id,
+            "sub_search_ids": sub_search_ids})
 
-    def apply_search_filters(self, search_string, filtered_sentences):
+    def apply_search_filter(self, search_query_dict, filtered_sentences):
+        if Query.is_grammatical_search_query(search_query_dict):
+            filtered = Dependency.\
+                apply_grammatical_search_filter(search_query_dict,
+                    filtered_sentences)
+        else:
+            filtered = Word.apply_non_grammatical_search_filter(
+                search_query_dict, filtered_sentences)
+        return filtered
+
+    def apply_search_filters(self, search_params, filtered_sentences):
         """ Add filters to the given query to restrict to just the sentences
         matched by the text and grammatical searches issued.
         """
-        json_parsed_search_params = loads(search_string)
-        for search_query_dict in json_parsed_search_params:
-            if Query.is_grammatical_search_query(search_query_dict):
-                filtered_sentences = Dependency.\
-                    apply_grammatical_search_filter(search_query_dict,
-                        filtered_sentences)
-            else:
-                filtered_sentences = Word.apply_non_grammatical_search_filter(
-                    search_query_dict, filtered_sentences)
+        for search_query_dict in search_params:
+            filtered_sentences = self.apply_search_filter(search_query_dict,
+                                                          filtered_sentences)
         return filtered_sentences
 
     def apply_phrase_filters(self, phrase_filters_string, filtered_sentences):

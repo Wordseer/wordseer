@@ -3,6 +3,7 @@ __all__ = [
     "cache_view",
     "documents_view",
     "ext_app",
+    "metadata_frequencies",
     "properties_view",
     "searchsuggestions",
     "sentences_view",

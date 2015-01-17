@@ -323,7 +323,7 @@ Ext.define('WordSeer.controller.SearchController', {
 		formValues.query_id = this.current_query_id;
 		panel.formValues = formValues;
 		var widget = panel.down('widget');
-		if (widget) widget.setFormValues(formValues);
+		widget.setFormValues(formValues);
 		if (APP.getSearchableWidgets().indexOf(formValues.widget_xtype) >= 0) {
 			if(formValues) {
 				var form = Ext.getCmp('universal-search-form');
@@ -366,7 +366,15 @@ Ext.define('WordSeer.controller.SearchController', {
 									var query_id = data.query_id;
 									this.current_query_id = query_id;
 									formValues.query_id = query_id;
+									for (var i = 0; i < data.sub_search_ids.length; i++) {
+										formValues.search[i].query_id = 
+											data.sub_search_ids[i];
+									}
 									panel.formValues.query_id = query_id;
+									for (var i = 0; i < data.sub_search_ids.length; i++) {
+										panel.formValues.search[i].query_id = 
+											data.sub_search_ids[i];
+									}
 									var widget = panel.down("widget");
 									// die here if user has already hit back/fwd
 									if (!widget) {return false;}
