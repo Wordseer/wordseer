@@ -29,8 +29,12 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						this.applySorter(view);
 					}
 
-				}
+				},
 			},
+			'frequent-words': {
+				datachanged: this.lollipop,
+				afterrender: this.lollipop,
+			}
 		});
 	},
 
@@ -111,36 +115,90 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 				button: button_el,
 				floatParent: panel,
 				itemId: 'frequent-words-overlay',
-				width: 1200,
-				height: 410,
+				title: "Frequent Words",
+				width: 380,
+				height: "75%",
+				layout: 'accordion',
+				draggable: true,
 				items: [
-					{
-						xtype: 'frequent-words',
-						flex:1,
-						pos: 'N',
-						store: panel.getLayoutPanelModel().NStore
-					},
-					{
-						xtype: 'frequent-words',
-						flex:1,
-						pos: 'V',
-						store: panel.getLayoutPanelModel().VStore
-					},
-					{
-						xtype: 'frequent-words',
-						flex:1,
-						pos: 'J',
-						store: panel.getLayoutPanelModel().JStore
-					},
-					{
-						xtype: 'phraseslist',
-						flex:1,
-						store: panel.getLayoutPanelModel().getPhrasesStore(),
-					}
-				]
+					Ext.create("Ext.panel.Panel", {
+						title: 'Nouns',
+						items: [
+							{
+								xtype: 'frequent-words',
+								pos: 'N',
+								store: panel.getLayoutPanelModel().NStore
+							}
+						]
+					}),
+					Ext.create("Ext.panel.Panel", {
+						title: 'Verbs',
+						items: [
+							{
+								xtype: 'frequent-words',
+								pos: 'V',
+								store: panel.getLayoutPanelModel().VStore
+							},
+						]
+					}),
+					Ext.create("Ext.panel.Panel", {
+						title: 'Adjectives',
+						items: [
+							{
+								xtype: 'frequent-words',
+								pos: 'J',
+								store: panel.getLayoutPanelModel().JStore
+							},
+						]
+					}),
+					Ext.create("Ext.panel.Panel", {
+						title: 'Phrases',
+						items: [
+							{
+								xtype: 'phraseslist',
+								store:
+									panel.getLayoutPanelModel().getPhrasesStore(),
+							}
+						]
+					}),
+				],
 			});
 			overlay.showBy(button_el);
 			panel.add(overlay);
 		}
+	},
+
+	lollipop: function(component){
+		var svg = d3.select(component.el.dom)
+			.selectAll('.distinct .lollipop')
+			.datum(function(){ return this.dataset; });
+
+		// console.log(svg[0]);
+		var maxscore = d3.max(svg.data(), function(d){
+			return +d.score;
+		});
+
+		var r = 4;
+		var scale = d3.scale.linear()
+			.domain([0, maxscore])
+			.range([r, 100-r]);
+
+		svg.append('circle')
+			.attr('cx', function(d){
+				return scale(d.score);
+			})
+			.attr('cy', 8)
+			.attr('r', r);
+
+		svg.append('line')
+			.attr('x1', scale(0))
+			.attr('x2', function(d){
+				// console.log("append line");
+				return scale(d.score); })
+			.attr('y1', 8)
+			.attr('y2', 8)
+			// .attr('stroke', '#000')
+			.attr('stroke-width', 1);
+		// debugger;
 	}
 });

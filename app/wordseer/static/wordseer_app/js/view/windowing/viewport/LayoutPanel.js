@@ -127,7 +127,8 @@ Ext.define('WordSeer.view.windowing.viewport.LayoutPanel',  {
                     itemCls: 'fitted',
                 },
                 items: cfg.items,
-                autoScroll: true,
+                overflowY: 'auto',
+				overflowX: 'hidden',
             }
         ];
         cfg.items = wrapped;

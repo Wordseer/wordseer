@@ -434,4 +434,3 @@ Ext.define('WordSeer.controller.WordMenuController',{
 			.playHistoryItemInNewPanel(history_item.get('id'));
 	}
 });
-

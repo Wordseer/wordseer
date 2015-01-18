@@ -46,11 +46,29 @@ Ext.define('WordSeer.controller.WindowingController', {
 				//TODO: add the move drag and drop behavior.
 				activate: this.layoutPanelActivated,
 				switchWidgets: this.switchWidgets,
+				initSearch: this.setLoadMask,
+			},
+			// 'widget': {
+			// 	render: function(widget){
+			// 		widget.ownerCt.setLoading(true);
+			// 	},
+			// },
+			'databox': {
+				datachanged: this.clearLoadMask,
+			},
+			'word-tree': {
+				draw: this.clearLoadMask,
+			},
+			'word-frequencies': {
+				rendered: this.clearLoadMask,
+			},
+			'document-viewer': {
+				draw: this.clearLoadMask,
 			},
 			'widgets-menu > button': {
 				click: this.launchWidgetFromWidgetsMenu
 			},
-			'sentence-list, document-grid': {
+			'sentence-list, sentence-table, document-grid': {
 				select: this.showResultMenu,
 				deselect: this.destroyResultMenu
 			}
@@ -90,7 +108,6 @@ Ext.define('WordSeer.controller.WindowingController', {
 		} else {
 			Ext.getCmp('windowing-viewport').down('layout').show();
 		}
-		$('.x-mask').remove();
 	},
 
 	/** Sets up the layouts that the application will use. By default, only
@@ -283,6 +300,8 @@ Ext.define('WordSeer.controller.WindowingController', {
 				var el = panel.getEl().down('option[value=word-frequencies-widget]');
 				if (el) el.set({disabled:'disabled'});
 				el = panel.getEl().down('option[value=sentence-list-widget]');
+				if (el) el.set({disabled:'disabled'});
+				el = panel.getEl().down('option[value=sentence-table-widget]');
 				if (el) el.set({disabled:'disabled'});
 			}
 			if (!has_grammatical_search || !has_search) {
@@ -522,10 +541,12 @@ Ext.define('WordSeer.controller.WindowingController', {
 			this.destroyResultMenu(view, record);
 			view.getEl().select('tr.hovered').removeCls('hovered');
 			var menu = Ext.create('WordSeer.view.menu.ResultListMenu', {
-				type: view.xtype == 'sentence-list'? 'sentence' : 'document',
-				sentenceId: view.xtype == 'sentence-list'? record.get('id'): false,
-				documentId: view.xtype == 'sentence-list'? record.get('document_id')
-				: record.get('id'),
+				type: view.xtype == 'sentence-list' || view.xtype == 'sentence-table'?
+				 	'sentence' : 'document',
+				sentenceId: view.xtype == 'sentence-list'|| view.xtype == 'sentence-table'?
+					record.get('id'): false,
+				documentId: view.xtype == 'sentence-list'|| view.xtype == 'sentence-table'?
+					record.get('document_id') : record.get('id'),
 			});
 			$(row_element).addClass('hovered');
 			menu.showBy(row_element, 'tl-bl?');
@@ -589,6 +610,20 @@ Ext.define('WordSeer.controller.WindowingController', {
 						panel_itemids[i]);
 				}
 			}
+		}
+	},
+
+	clearLoadMask: function(component){
+		var container = component.up('widget');
+		if (container){
+			container.ownerCt.setLoading(false);
+		}
+	},
+
+	setLoadMask: function(component){
+		var container = component.down('widget');
+		if (container){
+			container.ownerCt.setLoading(true);
 		}
 	},
 

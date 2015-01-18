@@ -117,7 +117,18 @@ Ext.define('WordSeer.controller.SearchController', {
 		formValues.widget_xtype = 'sentence-list-widget';
 		if (record instanceof WordSeer.model.PhraseModel ||
 			record instanceof WordSeer.model.WordModel) {
-			formValues.phrases.push(record);
+			// will be different property if single word or phrase
+			var gov = record.data.word ? record.data.word : record.data.sequence;
+
+			var values = {
+				"gov": gov,
+				"govtype": "word",
+				"dep": "",
+				"deptype": "word",
+				"relation": "",
+			};
+			Ext.apply(formValues, values);
+			formValues.search.push(values);
 		} else if (record instanceof WordSeer.model.MetadataModel ){
 			formValues.metadata.push(record);
 		}
@@ -149,10 +160,10 @@ Ext.define('WordSeer.controller.SearchController', {
 		});
 		// Add any autocompleted metadata values
 		var autosuggest = form.down('phrases-autosuggest');
-		var was_search_with_record = false;
+		var was_metadata_search = false;
 		if (autosuggest.record) {
 			if (autosuggest.record.get('class') == 'metadata') {
-				was_search_with_record = true;
+				was_metadata_search = true;
 				var record = Ext.create('WordSeer.model.MetadataModel', {
 				    text: autosuggest.record.get('value'),
 				    value: autosuggest.record.get('value'),
@@ -252,7 +263,16 @@ Ext.define('WordSeer.controller.SearchController', {
 		var values = Ext.create('WordSeer.model.FormValues');
 		values.widget_xtype = widget_info.widget_xtype;
 		var okToSearch = false;
-		if(item.getClass() == 'word'){
+		if (item.class == 'metadata'){
+			console.log('metadata searchwith')
+			values.metadata = item.metadata;
+
+			var history_item = this.getController('HistoryController')
+				.newHistoryItem(values);
+			history_item.set('widget_xtype', widget_info.widget_xtype);
+			this.getController('WindowingController')
+				.playHistoryItemInNewPanel(history_item.get('id'));
+		} else if(item.getClass() == 'word'){
 			values.gov = item.get('word');
 			okToSearch = true;
 		}
@@ -367,12 +387,12 @@ Ext.define('WordSeer.controller.SearchController', {
 									this.current_query_id = query_id;
 									formValues.query_id = query_id;
 									for (var i = 0; i < data.sub_search_ids.length; i++) {
-										formValues.search[i].query_id = 
+										formValues.search[i].query_id =
 											data.sub_search_ids[i];
 									}
 									panel.formValues.query_id = query_id;
 									for (var i = 0; i < data.sub_search_ids.length; i++) {
-										panel.formValues.search[i].query_id = 
+										panel.formValues.search[i].query_id =
 											data.sub_search_ids[i];
 									}
 									var widget = panel.down("widget");
@@ -462,7 +482,7 @@ Ext.define('WordSeer.controller.SearchController', {
 		if(!searchbox.getRecord() || searchbox.getRecord().get('class') === "phrase") {
 			searchbox.up('form').down('textfield[name="'+field+'"]')
 				.setValue('word');
-		} else if (searchbox.getRecord().get('class') === "phrase_set") {
+		} else if (searchbox.getRecord().get('class') === "phrase-set") {
 			searchbox.up('form').down('textfield[name="'+field+'"]')
 				.setValue('phrase-set');
 		}

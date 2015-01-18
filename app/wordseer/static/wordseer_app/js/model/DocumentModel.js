@@ -54,4 +54,3 @@ Ext.define('WordSeer.model.DocumentModel', {
 		{name:'document_set', type:'string', defaultValue: ''},
 	],
 });
-

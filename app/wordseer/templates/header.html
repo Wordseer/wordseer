@@ -7,11 +7,11 @@
         filename='extjs/resources/css/ext-all.css')}}">
 
 <link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
-    filename='style/new-ui.css')}}'>
+    filename='wordseer_app/css/new-ui.css')}}'>
 <link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
-    filename='style/main.css')}}'>
+    filename='wordseer_app/css/main.css')}}'>
 <link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
-    filename='style/d3.css')}}'>
+    filename='wordseer_app/css/d3.css')}}'>
 
 <!-- scripts -->
 <!-- libraries -->
@@ -46,14 +46,14 @@
 <!-- Ext -->
 <script charset="utf-8">
     // pass some variables from flask to JS
-    var ws_static_path = "{{ url_for('.static', filename='wordseer_app') }}";
+    var ws_static_path = "{{ url_for('.static', filename='wordseer_app/js') }}";
     var ws_project_path = "/projects/";
     var project_id = {{ project_id }};
     var ws_api_path = "";
 </script>
 <script type='text/javascript' src='{{ url_for('wordseer.static',
-    filename='wordseer_app/util.js')}}'></script>
+    filename='wordseer_app/js/util.js')}}'></script>
 <script type='text/javascript' src='{{ url_for('wordseer.static',
     filename='extjs/ext-all-debug.js')}}'></script>
 <script type='text/javascript' src='{{ url_for('wordseer.static',
-    filename='wordseer_app/new-ui.js')}}'></script>
+    filename='wordseer_app/js/new-ui.js')}}'></script>

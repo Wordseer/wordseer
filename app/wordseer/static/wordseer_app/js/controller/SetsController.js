@@ -22,6 +22,9 @@ Ext.define('WordSeer.controller.SetsController', {
 			'DocumentSetStore',
 	],
 	init: function() {
+		Ext.getStore('DocumentSetStore').load({params:{user:getUsername()}});
+		Ext.getStore('SentenceSetStore').load({params:{user:getUsername()}});
+//		console.log('SetsController initialized');
 		this.control({
 			'layout-panel': {
 				menuButtonClicked: function(panel, type, button) {
@@ -80,7 +83,7 @@ Ext.define('WordSeer.controller.SetsController', {
 			'widget': {
 				subsetTagClicked: this.subsetTagClicked,
 			},
-			'sentence-list, document-grid': {
+			'sentence-list, sentence-table, document-grid': {
 				optionEvent: function(view, event, option, option_el) {
 					if (event === 'click') {
 						this.showAddRemoveMenu(view, option, option_el);
@@ -241,7 +244,7 @@ Ext.define('WordSeer.controller.SetsController', {
 				selected_ids.push(id+"");
 			});
 			if (selected_ids.length > 0) {
-				var store = (view.xtype == 'sentence-list') ?
+				var store = (view.xtype == 'sentence-list' || view.xtype == 'sentence-table') ?
 					Ext.getStore('SentenceSetStore')
 					: Ext.getStore('DocumentSetStore');
 				var menu = Ext.create('WordSeer.view.menu.SetMenu', {

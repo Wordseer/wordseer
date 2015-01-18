@@ -468,6 +468,7 @@ Ext.define('WordSeer.view.table.Table', {
 		}
 		view.sorters = new_sorters;
 		view.getStore().sort(view.sorters);
-		view.populate();
+		// i don't think it needs to repopulate after sorting
+		// view.populate();
 	}
 });

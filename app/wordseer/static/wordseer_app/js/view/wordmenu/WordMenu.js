@@ -96,8 +96,10 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
                 menu: {
                     xtype: 'result-list-menu',
                     sentenceId: sentence_id,
+                    documentId: me.view.getStore().getById(sentence_id)
+                        .get('document_id'),
                     type: 'sentence',
-                    seeInContext: (me.view.xtype === 'sentence-list')
+                    seeInContext: (me.view.xtype === 'sentence-list' || me.view.xtype === 'sentence-table')
                 },
             });
             menuItems.push({

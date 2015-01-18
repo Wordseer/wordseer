@@ -6,7 +6,6 @@ Ext.define('WordSeer.view.widget.WordFrequenciesWidget', {
 	],
 	alias: 'widget.word-frequencies-widget',
 	items:[
-		{xtype:'word-frequencies', height: 800},
+		{xtype:'word-frequencies'},
 	]
 });
-

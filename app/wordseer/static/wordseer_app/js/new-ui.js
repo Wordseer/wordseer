@@ -37,6 +37,7 @@ Ext.application({
         'SentenceListController',
         'WindowingController',
         'WordMenuController',
+        'TagMenuController',
         'PhraseSetsController',
         'WordTreeController',
         'WordFrequenciesController',
@@ -55,6 +56,7 @@ Ext.application({
                 'word-frequencies-widget',
                 'bar-charts-widget',
                 'sentence-list-widget',
+                'sentence-table-widget',
                 'document-browser-widget',
                 'document-viewer-widget']
             },
@@ -74,7 +76,7 @@ Ext.application({
                                 },
                                 {
                                     widget_xtype: 'word-frequencies-widget',
-                                    text: 'Word Frequencies',
+                                    text: 'Metadata Profile',
                                 },
                                 {
                                     widget_xtype: 'search-widget',
@@ -82,11 +84,15 @@ Ext.application({
                                 },
                                 {
                                     widget_xtype: 'sentence-list-widget',
-                                    text: 'Sentences',
+                                    text: 'Sentence List',
                                 },
                                 {
                                     widget_xtype: 'document-browser-widget',
-                                    text: 'Documents',
+                                    text: 'Document Table',
+                                },
+                                {
+                                    widget_xtype: 'sentence-table-widget',
+                                    text: 'Sentence Table',
                                 }]
             },
             getWidgets: function() {
@@ -102,7 +108,7 @@ Ext.application({
                     },
                     {
                         widget_xtype: 'word-frequencies-widget',
-                        text: 'Word Frequencies',
+                        text: 'Metadata Profile',
                         inputClass: [
                             'word',
                             'phrase-set',
