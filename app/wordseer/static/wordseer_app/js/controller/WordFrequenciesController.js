@@ -20,46 +20,41 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 	/** Helper function to decode datetime format string returned by server
 	**/
-	formatDateTime: function(x, selected_date_detail){
+	aggregateDates: function(prop, selected_date_detail){
 		// retrieve format string from type
-		var format_string = x.type.slice(5);
+		var fstring = momentFormat(prop.type.slice(5));
 
-		var format = d3.time.format(format_string);
-		x.streams.forEach(function(stream){
-			// sort values first
-			stream.values.sort(function(a,b){
-				var aa = format.parse(String(a.x)),
-					bb = format.parse(String(b.x));
-				return aa - bb;
+		// convert dates to desired interval
+		var row_headers = _.zip(prop.columns)[0];
+		var rows = _.rest(_.zip(prop.columns));
+
+		var new_rows = d3.nest()
+			.key(function(d){
+				return moment(d[0], fstring)
+					.startOf(selected_date_detail)
+					.valueOf();
 			})
+			.sortKeys(d3.ascending)
+			.rollup(function(leaves){
+				var totals = []
+				for (var i = 1; i < leaves[0].length; i++) {
+					totals.push(d3.sum(leaves, function(d){
+						return d[i];
+					}));
+				}
+				return totals
+			})
+			.entries(rows)
+			;
 
-			// copy original for user transformations later
-			if (!('values_orig' in stream)) {
-				stream.values_orig = $.extend(true, [], stream.values);
-			}
-			var newvalues = [];
-			d3.nest()
-				.key(function(v){
-					var date = format.parse(String(v.x));
-					v.x = d3.time[selected_date_detail](date);
-					return v.x;
-				})
-				.rollup(function(leaves){
-					var point = {
-						'x': leaves[0].x,
-						'y': d3.sum(leaves, function(d){
-								return d.y;
-							})
-					};
-					newvalues.push(point);
-					return point;
-				})
-				.entries(stream.values)
-				;
-			stream.values = newvalues;
-		})
-		;
-		return format;
+		rows = _.map(new_rows, function(row){
+			return _.flatten([parseInt(row.key), row.values])
+		});
+
+		rows.unshift(row_headers);
+		var new_columns = _.zip(rows)
+
+		return {columns: new_columns};
 	},
 
 	/** Fetches WordFrequencies data from the server in response to a search request.
@@ -168,230 +163,460 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 	view in which the wordfrequencies is currently being drawn.
 	*/
 	draw: function(data, panel){
+		c3_charts = [];
 		var me = this;
 		// size params
-		var width = 380, height = 300,
-			padding = {"top": 5, "bottom": 5, "left": 5, "right": 5},
+		var width = 500, height = 350,
+			padding = {bottom: 25, right: 20},
 			margin = {"top": 0, "bottom": 0, "left": 0, "right": 15};
 
 		var canvas = d3.select(panel.getComponent('canvas').getEl().dom);
-		var chart;
 
-		data.forEach(function(x){
+		// create visibility toggles
+		var controls = d3.select('#' + panel.id + ' .panel-header .controls');
+		var toggles = controls.selectAll('span')
+			.data(data)
+			.enter()
+				.append('span')
+				.attr('class', 'viz-toggle')
+				;
+		toggles.append('input')
+			.attr('type', 'checkbox')
+			.property('checked', 'checked')
+			.attr('id', function(d){
+				return makeClassName(d.property)+'check'; // in util.js
+			})
+			.property('value', function(d){
+				return makeClassName(d.property); // in util.js
+			})
+			.on('change', function(d){
+				var check = this;
+				var target = canvas.select('.viz-container.' + check.value);
+				if (check.checked){
+					target.transition()
+						.style('margin-left', 0)
+							.transition()
+							.style('opacity', 1)
+							;
+				} else {
+					target.transition()
+						.style('opacity', 0)
+							.transition()
+							.style('margin-left', -9999)
+							;
+				}
+			})
+			;
+
+		toggles.append('label')
+			.text(function(d){
+				return d.displayName;
+			})
+			.attr('for', function(d){
+				return makeClassName(d.property)+'check'; // in util.js
+			})
+			;
+
+		// create normalize toggle
+		var display = d3.select('#' + panel.id + ' .panel-header .display');
+		var norm = display.selectAll('span')
+			.data([{'value': 'raw', 'label': 'Raw Counts'},
+				   {'value': 'norm', 'label': '% of Total'}
+			])
+			.enter()
+				.append('span')
+				.attr('class', 'viz-toggle')
+				;
+		norm.append('input')
+			.attr('type', 'radio')
+			.attr('value', function(d){
+				return d.value;
+			})
+			.attr('name', 'display_' + panel.id)
+			.attr('id', function(d){
+				return d.value + '_' + panel.id;
+			})
+			.property('checked', function(d){
+				return d.value == 'raw';
+			})
+			.on('change', function(d,i){
+				var total = data[i].total_count;
+				var svg = d3.selectAll('#'+panel.id+' .viz-container svg');
+				// reset all the sort controls
+				d3.selectAll('.sort-control')
+					.attr('class', 'sort-control fa fa-sort-alpha-asc')
+					.selectAll('.sort-menu i')
+						.classed('selected', function(d){
+							return d == 'fa-sort-alpha-asc';
+						});
+
+				if (d.value == "norm") {
+					// normalize data to total for profile
+					_.each(c3_charts, function(chart, index){
+						if (data[index].type == "string" || data[index].type == "number") {
+							var totals = _.cloneDeep(data[index].total_counts);
+							var remainders = _.cloneDeep(data[index].total_counts);
+							var cols = _.cloneDeep(data[index].columns);
+
+							_.each(cols[0], function(key,i){
+								if (i > 0){
+									_.each(_.rest(cols), function(c){
+										remainders[key] -= c[i]
+									})
+								}
+							})
+
+							remainders = _.reject(remainders, function(v){
+								return typeof v == 'string'
+							});
+							if (remainders.length > 0){
+								data[index]['c3_format_norm'] = true
+								var other = _.toArray(remainders);
+								other.unshift("(other)");
+								cols.push(other);
+
+								// normalize to 100%
+								_.each(cols[0], function(key,i){
+									if (i > 0){
+										_.each(_.rest(cols), function(c){
+											c[i] = c[i] / totals[key];
+										})
+									}
+								})
+								chart.load({
+									columns: cols
+								});
+
+								// formatting changes
+								chart.data.colors({'(other)': '#d4d4d4'})
+								var groups = _.pluck(chart.data(), 'id');
+								groups.push("(other)");
+								chart.groups([groups]);
+								chart.axis.max({y: 0.99})
+							}
+						}
+					})
+				} else if (d.value == "raw"){
+					// de-normalize the data
+					_.each(c3_charts, function(chart, index){
+						if (data[index].type == "string" || data[index].type == "number") {
+							var cols = _.clone(data[index].columns);
+							data[index]['c3_format_norm'] = false;
+							// unstack the bars
+							chart.groups([]);
+							// reset axis to max value
+							var all_vals = _.flatten(_.rest(cols));
+							chart.axis.max({y: _.max(all_vals)});
+							chart.load({
+								unload: ['(other)'],
+								columns: cols
+							})
+						}
+					})
+				}
+			})
+			;
+		norm.append('label')
+			.attr('for', function(d){
+				return d.value + '_' + panel.id;
+			})
+			.text(function(d){
+				return d.label;
+			})
+			;
+
+		data.forEach(function(prop, index){
 			var container = canvas.append('div')
-				.attr("class", "viz-container");
+				.classed("viz-container", true)
+				.classed(makeClassName(prop.property), true) // in util.js
+				;
 
 			var viztitle = container.append('div')
 				.attr('class', 'property')
-				.text(x.property);
+				.text(prop.displayName);
 
-			var svg = container.append('div')
+			var download_link = viztitle.append('a')
+				.attr('class', 'download')
+				.attr('download', function(){
+					return "sentence counts across " + prop.displayName + '.csv';
+				});
+
+			download_link.append('i')
+				.attr('class', 'fa fa-download');
+
+			var profile = container.append('div')
 					.attr("class", "wordfreq")
-						.append('svg')
-						.attr("class", x.property + " nvd3")
-						.datum(x.streams);
-
-			var chart;
-			nv.addGraph(function() {
-			    if (x.type == "string" || x.type == "number") {
-					chart = nv.models.multiBarChart()
-						.delay(0)
-						.groupSpacing(0.45)
-						.staggerLabels(false)
-						.showLegend(false)
-						.showControls(false)
-						.showXAxis(true)
-						.reduceXTicks(false)
-						.color(function(){ return '#1a1a1a'; })
 						;
 
-					chart.xAxis
-						.scale(d3.scale.ordinal());
-
-					// add a sorting control to the viz title
-					var sort_control = viztitle.append('span')
-						.attr('class', 'sort')
-							.append('i')
-							.attr('class', 'sort-control fa fa-sort-alpha-asc')
-							;
-
-					// default sorting
-					sort_control
-						// add a menu to change sorting
-						.append('div')
-						.attr('class', 'sort-menu')
-						.selectAll('i')
-							.data([
-								'fa-sort-alpha-asc',
-								'fa-sort-alpha-desc',
-								'fa-sort-amount-asc',
-								'fa-sort-amount-desc'
-							])
-							.enter()
-							.append('i')
-							.attr('class', function(d, i){
-								var classval = 'fa ' + d;
-								if (i == 0) { classval += ' selected'; }
-								return classval;
-							})
-							.on('click', function(d, i){
-								svg.datum(function(data){
-									switch (i) {
-										case 0:
-											// alpha asc
-											data[0].values.sort(function(a,b){
-												return d3.ascending(a.x, b.x);
-												});
-											break;
-										case 1:
-											// alpha desc
-											data[0].values.sort(function(a,b){
-												return d3.descending(a.x, b.x);
-												});
-											break;
-										case 2:
-											// value asc
-											data[0].values.sort(function(a,b){
-												return d3.ascending(a.y, b.y);
-												});
-											break;
-										case 3:
-											// value desc
-											data[0].values.sort(function(a,b){
-												return d3.descending(a.y, b.y);
-												});
-											break;
-										default:
-											// don't do nothin
-											break;
-									}
-									return data;
-								});
-
-								// update menu display and current sort icon
-								d3.select(this.parentElement)
-									.selectAll('i')
-									.classed('selected', false)
-									;
-
-								d3.select(this)
-									.classed('selected', true)
-									;
-
-								sort_control.attr('class', 'sort-control fa ' + d);
-								chart.update();
-
-							})
-							;
-
-
-
-				} else if (x.type.search(/^date_/) >= 0) {
-					// retrieve format string from type
-					var format_string = x.type.slice(5);
-
-					// determine date granularity options
-					date_detail = d3.map();
-					// start with compound string format codes
-					if (format_string.indexOf('%c') >= 0) {
-						date_detail.set('second', "%x %X");
-						date_detail.set('minute', '%x %H:%M');
-						date_detail.set('hour', '%x %H:00');
-						date_detail.set('day', '%x')
-						date_detail.set('month', '%m/%Y')
-						date_detail.set('year', '%Y')
-					} else {
-						// piece by piece
-						// time
-						if (format_string.indexOf('%X') >= 0 ||
-								format_string.indexOf('%S') >= 0) {
-							date_detail.set('second', "%x %X");
-							date_detail.set('minute', '%x %H:%M');
-							date_detail.set('hour', '%x %H:00');
-						} else if (format_string.indexOf('%M') >= 0){
-							date_detail.set('minute', '%x %H:%M');
-							date_detail.set('hour', '%x %H:00');
-						} else if (format_string.indexOf('%H') >= 0 ||
-									format_string.indexOf('%I') >= 0) {
-							date_detail.set('hour', '%x %H:00');
-						}
-						// date
-						if (format_string.indexOf('%x') >= 0 ||
-								format_string.indexOf('%j') >= 0 ||
-								format_string.indexOf('%d') >= 0 ||
-								format_string.indexOf('%e') >= 0) {
-							date_detail.set('day', '%x')
-							date_detail.set('month', '%m/%Y')
-							date_detail.set('year', '%Y')
-						} else if (format_string.indexOf('%m') >= 0 ||
-									format_string.indexOf('%b') >= 0 ||
-									format_string.indexOf('%B') >= 0) {
-							date_detail.set('month', '%m/%Y')
-							date_detail.set('year', '%Y')
-						} else if (format_string.indexOf('%y') >= 0 ||
-									format_string.indexOf('%Y') >= 0) {
-							date_detail.set('year', '%Y')
+			var chart_opts = {
+				bindto: profile,
+				size: {
+					width: width,
+					height: height
+				},
+				padding: padding,
+				data: {
+					x: 'x',
+					columns: prop.columns,
+					type: 'bar',
+					xSort: true,
+					colors: prop.color,
+				},
+				axis: {
+					x: {
+						type: 'category',
+						tick: {
+							culling: {
+								max: 9
+							},
+							fit: true,
+							multiline: true,
+							width: 45,
+						},
+					},
+					y: {
+						label: '# of sentences',
+						tick: {
+							format: function(tick) {
+								if (data[index].c3_format_norm) {
+									return d3.format('.1%')(tick)
+								} else {
+									return parseInt(tick);
+								}
+							}
 						}
 					}
-
-					// add dropdown selector for date granularity
-					var selector = container.append('div')
-						.attr('class', 'timeselect')
-						.append('select')
-							;
-
-					container.select('.timeselect')
-						.insert('span', ':first-child')
-						.text('detail level: ')
-
-					selector.selectAll('option')
-						.data(date_detail.keys()).enter()
-						.append('option')
-						.attr('value', function(d){ return d; })
-						.text(function(d){ return d; });
-
-					// default selection
-					if (date_detail.has('day')) {
-						selector.select('option[value=day]')
-							.property('selected', 'selected')
-					} else if (date_detail.has('month')) {
-						selector.select('option[value=month]')
-							.property('selected', 'selected')
-					} else if (date_detail.has('year')) {
-						selector.select('option[value=year]')
-							.property('selected', 'selected')
-					}
-
-					var selected_date_detail = selector.select(':checked')
-						.property('value');
-
-					var format = me.formatDateTime(x, selected_date_detail);
-
-					chart = nv.models.lineChart()
-						.showLegend(false)
-						.showYAxis(true)
-						.color(function(){ return '#1a1a1a'; })
-						.showXAxis(true)
-						.xScale(d3.time.scale())
-						.forceY(0)
-						;
-
-					chart
-						.xAxis
-							.tickFormat(function(v){
-								var format = d3.time.format(
-										date_detail.get(selected_date_detail)
-										)
-								return format(d3.time.scale().invert(v));
-								})
-						;
+				},
+				legend: {
+					position: 'bottom',
 				}
+			};
+
+			if (prop.type.search(/^date_/) >= 0) {
+				var dformat = prop.type.slice(5);
+				var dformat_moment = momentFormat(dformat); // in util.js
+
+				chart_opts.data.type = 'line';
+				chart_opts.axis.x.type = 'timeseries';
+				chart_opts.axis.x.tick.fit = false;
+				chart_opts.axis.x.tick.rotate = 45;
+				chart_opts.axis.x.tick.multiline = false;
+
+				// calculate intervals (requires moment.js)
+				// check the range,
+				// and also make sure the diffs aren't all exactly the next largest interval
+				var dmin = moment(prop.columns[0][1], dformat_moment),
+					dmax = moment(_.last(prop.columns[0]), dformat_moment)
+					;
+
+				prop.intervals = {
+					'year': dmax.diff(dmin, 'years') > 0,
+					'month': dmax.diff(dmin, 'months') > 0 && _.some(_.rest(prop.columns[0]),
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+									next = moment(a[i+1], dformat_moment)
+									;
+								return current.diff(next, 'years', true) != current.diff(next, 'years');
+							} else {
+								return false;
+							}
+						}
+					),
+					'day': dmax.diff(dmin, 'day') > 0 && _.some(_.rest(prop.columns[0]),
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+								next = moment(a[i+1], dformat_moment)
+								;
+								return current.diff(next, 'months', true) != current.diff(next, 'months');
+							} else {
+								return false;
+							}
+						}
+					),
+					'hour': dmax.diff(dmin, 'hours') > 0 && _.some(_.rest(prop.columns[0]),
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+								next = moment(a[i+1], dformat_moment)
+								;
+								return current.diff(next, 'days', true) != current.diff(next, 'days');
+							} else {
+								return false;
+							}
+						}
+					),
+					'minute': dmax.diff(dmin, 'minutes') > 0 && _.some(_.rest(prop.columns[0]),
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+								next = moment(a[i+1], dformat_moment)
+								;
+								return current.diff(next, 'hours', true) != current.diff(next, 'hours');
+							} else {
+								return false;
+							}
+						}
+					),
+					'second': dmax.diff(dmin, 'seconds') > 0 && _.some(_.rest(prop.columns[0]),
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+								next = moment(a[i+1], dformat_moment)
+								;
+								return current.diff(next, 'minutes', true) != current.diff(next, 'minutes');
+							} else {
+								return false;
+							}
+						}
+					)
+				}
+
+				var tickFormats = {
+					'second': "%x %X",
+					'minute': '%x %H:%M',
+					'hour': '%x %H:00',
+					'day': '%x',
+					'month': '%m/%Y',
+					'year': '%Y',
+				};
+
+				// add dropdown selector for date granularity
+				var selector = container.append('div')
+					.attr('class', 'timeselect')
+					.append('select')
+					;
+
+				container.select('.timeselect')
+					.insert('span', ':first-child')
+					.text('detail level: ')
+
+				var intervals_order = ['year', 'month', 'day', 'hour', 'minute', 'second'];
+
+				selector.selectAll('option')
+					.data(_.filter(intervals_order, function(k){
+							return prop.intervals[k];
+						})
+					)
+					.enter()
+					.append('option')
+					.attr('value', function(d){ return d; })
+					.text(function(d){ return d; })
+					.property('checked', function(d,i){ return i == 0; })
+					;
+
+				// aggregate dates into the largest meaningful interval
+				var selected_date_detail = selector.selectAll(':checked')
+					.property('value');
+
+				var agg = me.aggregateDates(prop, selected_date_detail);
+				chart_opts.data.columns = agg.columns;
+				chart_opts.axis.x.tick['format'] = tickFormats[selected_date_detail];
+			}
+
+
+
+			if (prop.type == "number") {
+				chart_opts.axis.x.type = "indexed";
+				chart_opts.axis.x.tick.fit = false;
+				chart_opts['bar'] = {
+					width: {
+						ratio: 7 / _.last(prop.columns[0])
+					}
+				}
+			}
+
+
+			var chart = c3.generate(chart_opts);
+			// store in global variable to access later
+			c3_charts.push(chart);
+
+			if (prop.type == "string") {
+				// add a sort control
+				var sort_control = viztitle.append('span')
+					.attr('class', 'sort')
+					.append('i')
+					.attr('class', 'sort-control fa fa-sort-alpha-asc')
+					;
+
+				// default sorting
+				sort_control
+					// add a menu to change sorting
+					.append('div')
+					.attr('class', 'sort-menu')
+					.selectAll('i')
+					.data([
+						'fa-sort-alpha-asc',
+						'fa-sort-alpha-desc',
+						'fa-sort-amount-asc',
+						'fa-sort-amount-desc'
+					])
+					.enter()
+					.append('i')
+						.attr('class', function(d, i){
+							var classval = 'fa ' + d;
+							if (i == 0) { classval += ' selected'; }
+							return classval;
+						})
+						.on('click', function(d){
+							// TODO: use chart.data, it's live
+							var cols_obj = _.pluck(chart.data(), 'values');
+							var cols = _.map(cols_obj, function(col){
+								return _.pluck(col, 'value');
+							})
+							var x_col = chart.categories();
+							cols.unshift(x_col);
+							var rows = _.zip(cols);
+							switch(d){
+								case 'fa-sort-alpha-asc':
+									rows = _.sortBy(rows, 0);
+									break;
+								case 'fa-sort-alpha-desc':
+									rows = _.sortBy(rows, 0).reverse();
+									break;
+								case 'fa-sort-amount-asc':
+									rows = _.sortBy(rows, 1);
+									break;
+								case 'fa-sort-amount-desc':
+									rows = _.sortBy(rows, 1).reverse();
+									break;
+							}
+							// append header on rows
+							var row_labels = _.pluck(chart.data(), 'id');
+							row_labels.unshift("x");
+							rows.unshift(row_labels);
+							// unzip the rows back into columns and reload
+							chart.load({
+								columns: _.zip(rows)
+							})
+
+							// update menu display and current sort icon
+							d3.select(this.parentElement)
+								.selectAll('i')
+								.classed('selected', false)
+								;
+
+							d3.select(this)
+								.classed('selected', true)
+								;
+
+							sort_control.attr('class', 'sort-control fa ' + d);
+
+						})
+						;
+
+			}
+
+			/*
+
 				chart.yAxis
 			        // .ticks
 					.tickFormat(d3.format(',d'))
 					.highlightZero(true)
-					.axisLabel('Number of Sentences')
-					.axisLabelDistance(40);
+					.axisLabel('Sentence count')
+					.rotateYLabel(false)
+					;
 
 				chart.xAxis
 					.rotateLabels(45)
@@ -485,8 +710,8 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 				nv.utils.windowResize(chart.update);
 
-				if (x.type.search(/^date_/) >= 0){
-					// fire change event for timeseries granularity
+				if (prop.type.search(/^date_/) >= 0){
+					// fire change event for timdebugger;eseries granularity
 					selector.on('change', function(){
 						var choice = d3.select(this)
 							.select(":checked")
@@ -496,9 +721,64 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 					});
 				}
+
+				// Make the export data.
+				var data_export = [];
+
+				// need to handle dates differently than other datatypes
+				if (prop.type == "string" || prop.type == "number") {
+					var keys = chart.xAxis.domain();
+					for (var i = 0; i < keys.length; i++){
+						var row = {};
+						row[prop.property] = keys[i];
+						// add each stream freq
+						prop.streams.forEach(function(stream){
+							var matching_value = stream.values.filter(function(v){
+								return v.x == keys[i];
+							});
+							row[stream.key] = matching_value[0].y;
+						});
+
+						data_export.push(row);
+					}
+				} else if (prop.type.search(/^date_/) >= 0) {
+					// make a set of all date values from all streams
+					var all_dates = d3.set();
+					prop.streams.forEach(function(stream){
+						stream.values_orig.forEach(function(v){
+							all_dates.add(v.x);
+						});
+					});
+
+					// find matching values for each stream, or 0 if none
+					all_dates.forEach(function(this_date){
+						var row = {};
+						row[prop.property] = this_date;
+						// add each stream freq
+						prop.streams.forEach(function(stream){
+							var matching_value = stream.values_orig.filter(function(v){
+								return v.x == this_date;
+							});
+							if (matching_value.length) {
+								row[stream.key] = matching_value[0].y;
+							} else {
+								row[stream.key] = 0;
+							}
+						});
+						data_export.push(row);
+					});
+
+				}
+
+				// attach to download button as data url
+				file_data = d3.csv.format(data_export); // requires d3 >= 3.1
+				var data_url = "data:application/octet-stream," +
+					escape(file_data);
+				download_link.attr("href", data_url);
+
 			    return chart;
 			});
-
+*/
 		});
 	},
 
@@ -542,11 +822,15 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		chart.update();
 	},
 
-	updateCharts: function(data){
+	updateCharts: function(data, panel_id){
 		var me = this;
-		var svg = d3.selectAll('.viz-container svg');
+		var svg = d3.selectAll('#' + panel_id + ' .viz-container svg');
 		svg.datum(function(d,i){
-			datum = data[i];
+			// var datum = data[i];
+
+			// Deep copy so we don't overwrite original data objects
+			var datum = $.extend(true, {}, data[i]);
+
 			if (datum.type.search(/^date_/) >= 0){
 				var selected_date_detail = d3.select(this.offsetParent)
 					.select('.timeselect')
@@ -561,6 +845,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			g.update();
 		})
 
-	},
+	}
 
 });
