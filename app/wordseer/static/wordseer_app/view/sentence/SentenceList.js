@@ -148,14 +148,18 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
         html = html.replace(/class='word'/g,
             function(match) {
                 cls = "word ";
-                if (sentence.gov_index.contains(i.toString())) {
-                    // cls += "gov-highlight ";
-                    cls += ' search-highlight';
-                }
-                if (sentence.dep_index == i) {
-                    // cls += "dep-highlight ";
-                    cls += ' search-highlight';
-                }
+                // *********************************
+                // TODO: this highlighting code doesn't work
+                // sentence.gov_index is undefined
+                // *********************************
+                // if (sentence.gov_index.contains(i.toString())) {
+                //     // cls += "gov-highlight ";
+                //     cls += ' search-highlight';
+                // }
+                // if (sentence.dep_index == i) {
+                //     // cls += "dep-highlight ";
+                //     cls += ' search-highlight';
+                // }
                 i += 1;
                 return (' onclick="Ext.getCmp(\'' +
                     me.id +'\').fireEvent(\'wordclicked\', this, ' +

@@ -421,17 +421,16 @@ Ext.define('WordSeer.controller.WordMenuController',{
 	searchForPhrase: function(menuitem) {
 		var parentMenuItem = menuitem.up().parentMenuItem;
 		var phrase = parentMenuItem.text;
-		var word_model_instance = Ext.create('WordSeer.model.WordModel', {
-			word: phrase,
-			class: 'grammatical',
-			gov: phrase,
-			govtype: 'word',
-			dep: '',
-			deptype: 'word',
-			relation: '',
+		var phrase_model = Ext.create('WordSeer.model.PhraseModel', {
+			sequence: phrase,
+			id: parentMenuItem.phraseId
 		});
-		this.getController('SearchController').searchWith(
-			{widget_xtype: 'sentence-list-widget'}, word_model_instance
-		);
+		var formValues = Ext.create('WordSeer.model.FormValues');
+		formValues.widget_xtype = 'sentence-list-widget';
+		formValues.phrases.push(phrase_model);
+		var history_item = this.getController('HistoryController')
+			.newHistoryItem(formValues);
+		this.getController('WindowingController')
+			.playHistoryItemInNewPanel(history_item.get('id'));
 	}
 });
