@@ -1,6 +1,12 @@
 <!-- stylesheets -->
 <link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
     filename='fonts/bitter/stylesheet.css')}}'>
+<link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
+    filename='fonts/open-sans/regular/stylesheet.css')}}'>
+<link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
+    filename='fonts/open-sans/light/stylesheet.css')}}'>
+<link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
+    filename='fonts/open-sans/bold/stylesheet.css')}}'>
 
 <link rel='stylesheet' type='text/css'
     href="{{ url_for('wordseer.static',
@@ -12,6 +18,8 @@
     filename='style/main.css')}}'>
 <link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
     filename='style/d3.css')}}'>
+<link rel='stylesheet' type='text/css' href='{{ url_for('wordseer.static',
+    filename='c3/c3.min.css')}}'>
 
 <!-- scripts -->
 <!-- libraries -->
@@ -24,24 +32,27 @@
     filename='jquery/jquery.scrollTo.js')}}'></script>
 <script type='text/javascript' src='{{ url_for('wordseer.static',
     filename='jquery/jquery.resizableColumns.js')}}'></script>
-
 <script type='text/javascript' src='{{ url_for('wordseer.static',
     filename='raphael.js')}}'></script>
-
 <script type='text/javascript' src='{{ url_for('wordseer.static',
     filename='wordtree.js')}}'></script>
-
-<script src="{{ url_for('wordseer.static',
-    filename='d3/d3.v3.min.js')}}" charset="utf-8"></script>
+<script src='{{ url_for('wordseer.static',
+    filename='d3/d3.min.js')}}' charset="utf-8"></script>
 <script type='text/javascript' src='{{ url_for('wordseer.static',
     filename='d3/crossfilter.v1.js')}}'></script>
-
+<script src='{{ url_for('wordseer.static',
+    filename='c3/c3.js')}}' charset="utf-8"></script>
+<script src='{{ url_for('wordseer.static',
+    filename='moment.js')}}' charset="utf-8"></script>
 <script type="text/javascript" src='{{ url_for('wordseer.static',
     filename='canvg/canvg.js')}}'></script>
 <script type="text/javascript" src='{{ url_for('wordseer.static',
     filename='canvg/rgbcolor.js')}}'></script>
+<script type='text/javascript' src='{{ url_for('wordseer.static',
+    filename='base64/base64.js')}}'></script>
+<script type='text/javascript' src='{{ url_for('wordseer.static',
+    filename='lodash.min.js')}}'></script>
 
-<script type='text/javascript' src='{{ url_for('wordseer.static', filename='base64/base64.js')}}'></script>
 
 <!-- Ext -->
 <script charset="utf-8">
