@@ -35,9 +35,9 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
 
     # Attributes
 
-    id = db.Column(db.Integer, primary_key=True, index=True)
-    lemma = db.Column(db.String, index=True)
-    surface = db.Column(db.String, index=True)
+    id = db.Column(db.Integer, primary_key=True)
+    lemma = db.Column(db.String)
+    surface = db.Column(db.String)
     part_of_speech = db.Column(db.String)
 
     # Scoped Pseudo-relationships
@@ -103,7 +103,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
                 query. Contains the keys:
                     - gov: The governor word in the case of grammatical search
                         or the string search query in the case of a
-                        non-grammatical search. 
+                        non-grammatical search.
                     - dep: The dependent word in the case of grammatical search
                         (ignored for a non-grammatical search)
                     - relation: The grammatical relationships. A space-separated
@@ -116,7 +116,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         if "gov" in search_query_dict:
             matching_word_ids = Word.get_matching_word_ids(
                 search_query_dict["gov"],
-                is_set_id = search_query_dict["govtype"] != "word")    
+                is_set_id = search_query_dict["govtype"] != "word")
             sentence_query = sentence_query.\
                 join(WordInSentence,
                     WordInSentence.sentence_id == Sentence.id).\
@@ -138,4 +138,3 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         """
 
         return "<Word: " + str(self.lemma) + ">"
-

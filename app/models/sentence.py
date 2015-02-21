@@ -41,7 +41,7 @@ class Sentence(db.Model, Base):
 
     unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
     document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
-    text = db.Column(db.Text, index=True)
+    text = db.Column(db.Text)
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     # Relationships
@@ -169,4 +169,3 @@ class Sentence(db.Model, Base):
         sequence_in_sentence.save(force=force)
 
         return sequence_in_sentence
-

@@ -28,7 +28,7 @@ class Document(Unit, NonPrimaryKeyEquivalenceMixin):
     # Attributes
     # We need to redefine ID here for polymorphic inheritance
     id = db.Column(db.Integer, db.ForeignKey("unit.id"), primary_key=True)
-    title = db.Column(db.String, index=True)
+    title = db.Column(db.String)
     sentence_count = db.Column(db.Integer)
     document_file_id = db.Column(db.Integer, db.ForeignKey("document_file.id"))
 
@@ -61,4 +61,3 @@ class Document(Unit, NonPrimaryKeyEquivalenceMixin):
 
     def __repr__(self):
         return "<Document: " + str(self.title) + ">"
-

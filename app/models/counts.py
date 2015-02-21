@@ -11,11 +11,11 @@ class Count(db.Model, Base):
 
     # Attributes
 
-    id = db.Column(db.Integer, primary_key=True, index=True)
+    id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(64))
-    sentence_count = db.Column(db.Integer, index=True, default=0)
-    document_count = db.Column(db.Integer, index=True, default=0)
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
+    sentence_count = db.Column(db.Integer, default=0)
+    document_count = db.Column(db.Integer, default=0)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     # Relationship
 
@@ -33,11 +33,10 @@ class WordCount(Count):
     """
 
     # We need to redefine ID here for polymorphic inheritance
-    id = db.Column(db.Integer, db.ForeignKey("count.id"), primary_key=True,
-        index=True)
+    id = db.Column(db.Integer, db.ForeignKey("count.id"), primary_key=True)
 
     # Belongs to a word
-    word_id = db.Column(db.Integer, db.ForeignKey("word.id"), index=True)
+    word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
     word = db.relationship("Word")
 
     __mapper_args__ = {
@@ -70,12 +69,14 @@ class SequenceCount(Count):
     id = db.Column(db.Integer, db.ForeignKey("count.id"), primary_key=True)
 
     # Belongs to a sequence
-    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"), index=True)
+    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
     sequence = db.relationship("Sequence")
 
     __mapper_args__ = {
         "polymorphic_identity": "sequence_count",
     }
+
+
 
     @classmethod
     def fast_find_or_initialize(cls, query, **kwargs):
@@ -105,7 +106,7 @@ class DependencyCount(Count):
     # Belongs to a dependency
     dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id"))
     dependency = db.relationship("Dependency")
-    
+
     __mapper_args__ = {
         "polymorphic_identity": "dependency_count",
     }
@@ -127,4 +128,3 @@ class DependencyCount(Count):
             new_record = cls(**kwargs)
             new_record.save(force=False)
             return new_record
-

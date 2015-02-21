@@ -39,9 +39,9 @@ class Set(db.Model, Base):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     name = db.Column(db.String)
     creation_date = db.Column(db.DateTime)
-    type = db.Column(db.String)
+    type = db.Column(db.String, index=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("set.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     # Relationships
     project = db.relationship("Project", backref=db.backref("sets"))
@@ -217,6 +217,4 @@ class DocumentSet(Set):
                 sentence.unit.properties.append(property)
                 sentence.save()
                 sentence.unit.save()
-        property.save() 
-
-
+        property.save()

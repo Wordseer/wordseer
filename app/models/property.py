@@ -25,8 +25,8 @@ class Property(db.Model, Base):
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
     property_metadata_id = db.Column(db.Integer, db.ForeignKey("property_metadata.id"))
 
-    name = db.Column(db.String, index=True)
-    value = db.Column(db.String, index=True)
+    name = db.Column(db.String)
+    value = db.Column(db.String)
     property_metadata = db.relationship("PropertyMetadata", backref="properties")
 
     def __repr__(self):
@@ -34,4 +34,3 @@ class Property(db.Model, Base):
         """
 
         return "<Property: " + str(self.name) + ">"
-

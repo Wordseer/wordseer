@@ -16,10 +16,10 @@ class WordInSentence(db.Model, Base):
         surface (str): The ``Word`` with exact capitalization.
     """
 
-    word_id = db.Column(db.Integer, db.ForeignKey("word.id"), index=True)
+    word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
-    position = db.Column(db.Integer, index=True)
+    position = db.Column(db.Integer)
     space_before = db.Column(db.String)
     surface = db.Column(db.String)
 
@@ -41,11 +41,11 @@ class SequenceInSentence(db.Model, Base):
             ``sentence``.
     """
 
-    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"), index=True)
+    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
     sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
     document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
-    position = db.Column(db.Integer, index=True)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    position = db.Column(db.Integer)
 
     sequence = db.relationship("Sequence",
         backref=db.backref(
@@ -178,5 +178,3 @@ class PropertyOfSentence(db.Model, Base):
     property = db.relationship("Property",
         backref=db.backref("sentences_with_property",
             cascade="all, delete-orphan"))
-
-
