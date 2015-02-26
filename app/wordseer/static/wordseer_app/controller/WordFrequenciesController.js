@@ -9,7 +9,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		'visualize.wordfrequencies.WordFrequencies',
 	],
 	init:function() {
-//		console.log('Word Frequencies Controller Initialized');
 		this.control({
 			'word-frequencies': {
 				'search': this.requestWordFrequenciesData,
@@ -22,11 +21,11 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 	**/
 	aggregateDates: function(prop, selected_date_detail){
 		// retrieve format string from type
-		var fstring = momentFormat(prop.type.slice(5));
+		var fstring = momentFormat(prop.date_format);
 
 		// convert dates to desired interval
-		var row_headers = _.zip(prop.columns)[0];
-		var rows = _.rest(_.zip(prop.columns));
+		var row_headers = prop.sentences[0];
+		var rows = _.rest(prop.sentences);
 
 		var new_rows = d3.nest()
 			.key(function(d){
@@ -52,9 +51,8 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		});
 
 		rows.unshift(row_headers);
-		var new_columns = _.zip(rows)
 
-		return {columns: new_columns};
+		return {rows: rows};
 	},
 
 	/** Fetches WordFrequencies data from the server in response to a search request.
@@ -67,7 +65,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 	rendered.
 	*/
 	requestWordFrequenciesData: function(formValues, word_frequencies_panel) {
-		word_frequencies_panel.getEl().mask('loading');
 		params = formValues.serialize();
 		Ext.Ajax.request({
 		    url: ws_project_path + project_id +  '/metadata_frequencies/',
@@ -88,21 +85,14 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				// 	this.updateCharts(data);
 				// }
 				//
-            	if (word_frequencies_panel.getEl()){
-        	    	word_frequencies_panel.getEl().unmask();
-        	    }
 				word_frequencies_panel.fireEvent('rendered', word_frequencies_panel);
 
 		    },
 		    reset:function(response) {
-		    	if (word_frequencies_panel.getEl()){
-			    	word_frequencies_panel.getEl().unmask();
-			    }
+
 		    },
 		    failure: function(response) {
-		    	if (word_frequencies_panel.getEl()) {
-			    	word_frequencies_panel.getEl().unmask();
-		    	}
+
 		    	console.log("request to bar-charts failed.");
 		    }
 		})
@@ -117,7 +107,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 	view in which the wordfrequencies is currently being drawn.
 	*/
 	draw: function(data, panel){
-		c3_charts = [];
+		c3_charts = {};
 		var me = this;
 		// size params
 		var width = 500, height = 350,
@@ -129,7 +119,11 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		// create visibility toggles
 		var controls = d3.select('#' + panel.id + ' .panel-header .controls');
 		var toggles = controls.selectAll('span')
-			.data(data)
+			.data(_.map(data, function(v,k){
+				// d3 wants an array, not an object
+				v.property = k;
+				return v;
+			}))
 			.enter()
 				.append('span')
 				.attr('class', 'viz-toggle')
@@ -164,7 +158,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 		toggles.append('label')
 			.text(function(d){
-				return d.displayName;
+				return d.property;
 			})
 			.attr('for', function(d){
 				return makeClassName(d.property)+'check'; // in util.js
@@ -194,7 +188,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				return d.value == 'raw';
 			})
 			.on('change', function(d,i){
-				var total = data[i].total_count;
 				var svg = d3.selectAll('#'+panel.id+' .viz-container svg');
 				// reset all the sort controls
 				d3.selectAll('.sort-control')
@@ -206,39 +199,48 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 				if (d.value == "norm") {
 					// normalize data to total for profile
-					_.each(c3_charts, function(chart, index){
-						if (data[index].type == "string" || data[index].type == "number") {
-							var totals = _.cloneDeep(data[index].total_counts);
-							var remainders = _.cloneDeep(data[index].total_counts);
-							var cols = _.cloneDeep(data[index].columns);
+					_.each(c3_charts, function(chart, key){
+						if (data[key].datatype == "string" || data[key].datatype == "number") {
+							var totals = _.cloneDeep(data[key].totals);
+							var remainders = _.cloneDeep(data[key].totals);
+							var rows = _.cloneDeep(data[key].sentences);
 
-							_.each(cols[0], function(key,i){
-								if (i > 0){
-									_.each(_.rest(cols), function(c){
-										remainders[key] -= c[i]
+							_.each(rows, function(row,row_i){
+								if (row_i > 0){ // skip the x row
+									_.each(_.rest(row), function(col, col_i){
+										// skip the label but adjust the index
+										var i = col_i + 1;
+										remainders[row_i][i] -= col;
 									})
 								}
 							})
 
-							remainders = _.reject(remainders, function(v){
-								return typeof v == 'string'
-							});
+							// remainders = _.reject(remainders, function(v){
+							// 	return typeof v == 'string'
+							// });
 							if (remainders.length > 0){
-								data[index]['c3_format_norm'] = true
-								var other = _.toArray(remainders);
-								other.unshift("(other)");
-								cols.push(other);
+								data[key]['c3_format_norm'] = true
+								_.each(remainders, function(v,i){
+									if (i == 0) {
+										v[1] = "(other)";
+									}
+									rows[i].push(v[1]);
+								})
 
 								// normalize to 100%
-								_.each(cols[0], function(key,i){
-									if (i > 0){
-										_.each(_.rest(cols), function(c){
-											c[i] = c[i] / totals[key];
+								_.each(rows, function(row,row_i){
+									if (row_i > 0){
+										console.log(row)
+										_.each(row, function(c,i,a){
+											if (i > 0) {
+												console.log(c, totals[row_i])
+												a[i] = c / totals[row_i][1];
+											}
 										})
 									}
 								})
 								chart.load({
-									columns: cols
+									rows: rows
 								});
 
 								// formatting changes
@@ -252,18 +254,18 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					})
 				} else if (d.value == "raw"){
 					// de-normalize the data
-					_.each(c3_charts, function(chart, index){
-						if (data[index].type == "string" || data[index].type == "number") {
-							var cols = _.clone(data[index].columns);
-							data[index]['c3_format_norm'] = false;
+					_.each(c3_charts, function(chart, key){
+						if (data[key].datatype == "string" || data[key].datatype == "number") {
+							var rows = _.clone(data[key].sentences);
+							data[key]['c3_format_norm'] = false;
 							// unstack the bars
 							chart.groups([]);
 							// reset axis to max value
-							var all_vals = _.flatten(_.rest(cols));
+							var all_vals = _.flatten(_.rest(rows));
 							chart.axis.max({y: _.max(all_vals)});
 							chart.load({
 								unload: ['(other)'],
-								columns: cols
+								rows: rows
 							})
 						}
 					})
@@ -302,6 +304,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					.attr("class", "wordfreq")
 						;
 
+			// debugger;
 			var chart_opts = {
 				bindto: profile,
 				size: {
@@ -314,7 +317,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					rows: val.sentences,
 					type: 'bar',
 					xSort: true,
-					// colors: prop.color,
+					colors: _.first(COLOR_SCALE, val.sentences[0].length - 1),
 				},
 				axis: {
 					x: {
@@ -346,393 +349,236 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				}
 			};
 
-			// if (prop.type.search(/^date_/) >= 0) {
-			// 	var dformat = prop.type.slice(5);
-			// 	var dformat_moment = momentFormat(dformat); // in util.js
-			//
-			// 	chart_opts.data.type = 'line';
-			// 	chart_opts.axis.x.type = 'timeseries';
-			// 	chart_opts.axis.x.tick.fit = false;
-			// 	chart_opts.axis.x.tick.rotate = 45;
-			// 	chart_opts.axis.x.tick.multiline = false;
-			//
-			// 	// calculate intervals (requires moment.js)
-			// 	// check the range,
-			// 	// and also make sure the diffs aren't all exactly the next largest interval
-			// 	var dmin = moment(prop.columns[0][1], dformat_moment),
-			// 		dmax = moment(_.last(prop.columns[0]), dformat_moment)
-			// 		;
-			//
-			// 	prop.intervals = {
-			// 		'year': dmax.diff(dmin, 'years') > 0,
-			// 		'month': dmax.diff(dmin, 'months') > 0 && _.some(_.rest(prop.columns[0]),
-			// 			function(v,i,a){
-			// 				if (a[i+1] != undefined){
-			// 					var current = moment(v, dformat_moment),
-			// 						next = moment(a[i+1], dformat_moment)
-			// 						;
-			// 					return current.diff(next, 'years', true) != current.diff(next, 'years');
-			// 				} else {
-			// 					return false;
-			// 				}
-			// 			}
-			// 		),
-			// 		'day': dmax.diff(dmin, 'day') > 0 && _.some(_.rest(prop.columns[0]),
-			// 			function(v,i,a){
-			// 				if (a[i+1] != undefined){
-			// 					var current = moment(v, dformat_moment),
-			// 					next = moment(a[i+1], dformat_moment)
-			// 					;
-			// 					return current.diff(next, 'months', true) != current.diff(next, 'months');
-			// 				} else {
-			// 					return false;
-			// 				}
-			// 			}
-			// 		),
-			// 		'hour': dmax.diff(dmin, 'hours') > 0 && _.some(_.rest(prop.columns[0]),
-			// 			function(v,i,a){
-			// 				if (a[i+1] != undefined){
-			// 					var current = moment(v, dformat_moment),
-			// 					next = moment(a[i+1], dformat_moment)
-			// 					;
-			// 					return current.diff(next, 'days', true) != current.diff(next, 'days');
-			// 				} else {
-			// 					return false;
-			// 				}
-			// 			}
-			// 		),
-			// 		'minute': dmax.diff(dmin, 'minutes') > 0 && _.some(_.rest(prop.columns[0]),
-			// 			function(v,i,a){
-			// 				if (a[i+1] != undefined){
-			// 					var current = moment(v, dformat_moment),
-			// 					next = moment(a[i+1], dformat_moment)
-			// 					;
-			// 					return current.diff(next, 'hours', true) != current.diff(next, 'hours');
-			// 				} else {
-			// 					return false;
-			// 				}
-			// 			}
-			// 		),
-			// 		'second': dmax.diff(dmin, 'seconds') > 0 && _.some(_.rest(prop.columns[0]),
-			// 			function(v,i,a){
-			// 				if (a[i+1] != undefined){
-			// 					var current = moment(v, dformat_moment),
-			// 					next = moment(a[i+1], dformat_moment)
-			// 					;
-			// 					return current.diff(next, 'minutes', true) != current.diff(next, 'minutes');
-			// 				} else {
-			// 					return false;
-			// 				}
-			// 			}
-			// 		)
-			// 	}
-			//
-			// 	var tickFormats = {
-			// 		'second': "%x %X",
-			// 		'minute': '%x %H:%M',
-			// 		'hour': '%x %H:00',
-			// 		'day': '%x',
-			// 		'month': '%m/%Y',
-			// 		'year': '%Y',
-			// 	};
-			//
-			// 	// add dropdown selector for date granularity
-			// 	var selector = container.append('div')
-			// 		.attr('class', 'timeselect')
-			// 		.append('select')
-			// 		;
-			//
-			// 	container.select('.timeselect')
-			// 		.insert('span', ':first-child')
-			// 		.text('detail level: ')
-			//
-			// 	var intervals_order = ['year', 'month', 'day', 'hour', 'minute', 'second'];
-			//
-			// 	selector.selectAll('option')
-			// 		.data(_.filter(intervals_order, function(k){
-			// 				return prop.intervals[k];
-			// 			})
-			// 		)
-			// 		.enter()
-			// 		.append('option')
-			// 		.attr('value', function(d){ return d; })
-			// 		.text(function(d){ return d; })
-			// 		.property('checked', function(d,i){ return i == 0; })
-			// 		;
-			//
-			// 	// aggregate dates into the largest meaningful interval
-			// 	var selected_date_detail = selector.selectAll(':checked')
-			// 		.property('value');
-			//
-			// 	var agg = me.aggregateDates(prop, selected_date_detail);
-			// 	chart_opts.data.columns = agg.columns;
-			// 	chart_opts.axis.x.tick['format'] = tickFormats[selected_date_detail];
-			// }
-			//
+			if (val.datatype == 'date') {
+				var dformat = val.date_format;
+				var dformat_moment = momentFormat(dformat); // in util.js
+
+				chart_opts.data.type = 'line';
+				chart_opts.axis.x.type = 'timeseries';
+				chart_opts.axis.x.tick.fit = false;
+				chart_opts.axis.x.tick.rotate = 45;
+				chart_opts.axis.x.tick.multiline = false;
+
+				// calculate intervals (requires moment.js)
+				// check the range,
+				// and also make sure the diffs aren't all exactly the next largest interval
+				var dates = _.pluck(_.rest(val.sentences), 0),
+					moments = _.map(dates, function(d){
+						return moment(d, dformat_moment);
+					}),
+					dmin = _.min(moments),
+					dmax = _.max(moments)
+					;
+
+				val.intervals = {
+					'year': dmax.diff(dmin, 'years') > 0,
+					'month': dmax.diff(dmin, 'months') > 0 && _.some(dates,
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+									next = moment(a[i+1], dformat_moment)
+									;
+								return current.diff(next, 'years', true) != current.diff(next, 'years');
+							} else {
+								return false;
+							}
+						}
+					),
+					'day': dmax.diff(dmin, 'day') > 0 && _.some(dates,
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+								next = moment(a[i+1], dformat_moment)
+								;
+								return current.diff(next, 'months', true) != current.diff(next, 'months');
+							} else {
+								return false;
+							}
+						}
+					),
+					'hour': dmax.diff(dmin, 'hours') > 0 && _.some(dates,
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+								next = moment(a[i+1], dformat_moment)
+								;
+								return current.diff(next, 'days', true) != current.diff(next, 'days');
+							} else {
+								return false;
+							}
+						}
+					),
+					'minute': dmax.diff(dmin, 'minutes') > 0 && _.some(dates,
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+								next = moment(a[i+1], dformat_moment)
+								;
+								return current.diff(next, 'hours', true) != current.diff(next, 'hours');
+							} else {
+								return false;
+							}
+						}
+					),
+					'second': dmax.diff(dmin, 'seconds') > 0 && _.some(dates,
+						function(v,i,a){
+							if (a[i+1] != undefined){
+								var current = moment(v, dformat_moment),
+								next = moment(a[i+1], dformat_moment)
+								;
+								return current.diff(next, 'minutes', true) != current.diff(next, 'minutes');
+							} else {
+								return false;
+							}
+						}
+					)
+				}
+
+				// TODO: a smarter way to deal with there being only one date value
+				if (_.all(val.intervals, function(v){ return v == false; })) {
+					val.intervals.day = true;
+				}
+
+				var tickFormats = {
+					'second': "%x %X",
+					'minute': '%x %H:%M',
+					'hour': '%x %H:00',
+					'day': '%x',
+					'month': '%m/%Y',
+					'year': '%Y',
+				};
+
+				// add dropdown selector for date granularity
+				var selector = container.append('div')
+					.attr('class', 'timeselect')
+					.append('select')
+					;
+
+				container.select('.timeselect')
+					.insert('span', ':first-child')
+					.text('detail level: ')
+
+				var intervals_order = ['year', 'month', 'day', 'hour', 'minute', 'second'];
+
+				selector.selectAll('option')
+					.data(_.filter(intervals_order, function(k){
+							return val.intervals[k];
+						})
+					)
+					.enter()
+					.append('option')
+					.attr('value', function(d){ return d; })
+					.text(function(d){ return d; })
+					.property('checked', function(d,i){ return i == 0; })
+					;
+
+				// aggregate dates into the largest meaningful interval
+				var selected_date_detail = selector.selectAll(':checked')
+					.property('value');
+
+				var agg = me.aggregateDates(val, selected_date_detail);
+				chart_opts.data.rows = agg.rows;
+				chart_opts.axis.x.tick['format'] = tickFormats[selected_date_detail];
+			}
 
 
-			// if (prop.type == "number") {
-			// 	chart_opts.axis.x.type = "indexed";
-			// 	chart_opts.axis.x.tick.fit = false;
-			// 	chart_opts['bar'] = {
-			// 		width: {
-			// 			ratio: 7 / _.last(prop.columns[0])
-			// 		}
-			// 	}
-			// }
+
+			if (val.datatype == "number") {
+				chart_opts.axis.x.type = "indexed";
+				chart_opts.axis.x.tick.fit = false;
+				chart_opts['bar'] = {
+					width: {
+						ratio: 7 / _.last(_.pluck(val.sentences, 0))
+					}
+				}
+				if (chart_opts.bar.width.ratio > .5) chart_opts.bar.width.ratio = .5;
+			}
 
 
 			var chart = c3.generate(chart_opts);
 			// store in global variable to access later
-			c3_charts.push(chart);
+			c3_charts[key] = chart;
 
-			// if (prop.type == "string") {
-			// 	// add a sort control
-			// 	var sort_control = viztitle.append('span')
-			// 		.attr('class', 'sort')
-			// 		.append('i')
-			// 		.attr('class', 'sort-control fa fa-sort-alpha-asc')
-			// 		;
-			//
-			// 	// default sorting
-			// 	sort_control
-			// 		// add a menu to change sorting
-			// 		.append('div')
-			// 		.attr('class', 'sort-menu')
-			// 		.selectAll('i')
-			// 		.data([
-			// 			'fa-sort-alpha-asc',
-			// 			'fa-sort-alpha-desc',
-			// 			'fa-sort-amount-asc',
-			// 			'fa-sort-amount-desc'
-			// 		])
-			// 		.enter()
-			// 		.append('i')
-			// 			.attr('class', function(d, i){
-			// 				var classval = 'fa ' + d;
-			// 				if (i == 0) { classval += ' selected'; }
-			// 				return classval;
-			// 			})
-			// 			.on('click', function(d){
-			// 				// TODO: use chart.data, it's live
-			// 				var cols_obj = _.pluck(chart.data(), 'values');
-			// 				var cols = _.map(cols_obj, function(col){
-			// 					return _.pluck(col, 'value');
-			// 				})
-			// 				var x_col = chart.categories();
-			// 				cols.unshift(x_col);
-			// 				var rows = _.zip(cols);
-			// 				switch(d){
-			// 					case 'fa-sort-alpha-asc':
-			// 						rows = _.sortBy(rows, 0);
-			// 						break;
-			// 					case 'fa-sort-alpha-desc':
-			// 						rows = _.sortBy(rows, 0).reverse();
-			// 						break;
-			// 					case 'fa-sort-amount-asc':
-			// 						rows = _.sortBy(rows, 1);
-			// 						break;
-			// 					case 'fa-sort-amount-desc':
-			// 						rows = _.sortBy(rows, 1).reverse();
-			// 						break;
-			// 				}
-			// 				// append header on rows
-			// 				var row_labels = _.pluck(chart.data(), 'id');
-			// 				row_labels.unshift("x");
-			// 				rows.unshift(row_labels);
-			// 				// unzip the rows back into columns and reload
-			// 				chart.load({
-			// 					columns: _.zip(rows)
-			// 				})
-			//
-			// 				// update menu display and current sort icon
-			// 				d3.select(this.parentElement)
-			// 					.selectAll('i')
-			// 					.classed('selected', false)
-			// 					;
-			//
-			// 				d3.select(this)
-			// 					.classed('selected', true)
-			// 					;
-			//
-			// 				sort_control.attr('class', 'sort-control fa ' + d);
-			//
-			// 			})
-			// 			;
-			//
-			// }
-
-			/*
-
-				chart.yAxis
-			        // .ticks
-					.tickFormat(d3.format(',d'))
-					.highlightZero(true)
-					.axisLabel('Sentence count')
-					.rotateYLabel(false)
+			if (val.datatype == "string") {
+				// add a sort control
+				var sort_control = viztitle.append('span')
+					.attr('class', 'sort')
+					.append('i')
+					.attr('class', 'sort-control fa fa-sort-alpha-asc')
 					;
 
-				chart.xAxis
-					.rotateLabels(45)
-					.tickValues(function(d){
-						var ticks = [];
-						if (d[0].values.length < 20) {
-							d[0].values.forEach(function(v){
-								ticks.push(v.x);
-							})
-						} else {
-							var interval = Math.ceil(d[0].values.length / 20);
-							d[0].values.forEach(function(v,i){
-								if (i % interval == 0) {
-									ticks.push(v.x);
-								} else {
-									ticks.push('');
-								}
-							})
-						}
-						return ticks;
-					})
-					;
-
-				chart.margin({left: 55, bottom: 100, right: 45});
-				chart.transitionDuration(500);
-				chart.tooltipContent(function(key, x, y, e, graph){
-					return '<table class="nv-pointer-events-none">' +
-						'<tr class="nv-pointer-events-none">'+
-							'<td class="key nv-pointer-events-none">' +
-							x +
-							'</td>'+
-							'<td class="value nv-pointer-events-none">' +
-							y +
-							'</td>'+
-						'</tr>'+
-					'</table>';
-				});
-
-				svg.call(chart);
-
-
-				// fade out overflowing labels
-				svg.append("linearGradient")
-			      .attr("id", "fadeToWhiteY")
-				  .attr("x1", 0).attr("y1", 0)
-			      .attr("x2", 0).attr("y2", 1)
-			    .selectAll("stop")
-			      .data([
-			        {offset: "0%", opacity: "0"},
-			        {offset: "100%", opacity: "1"}
-			      ])
-			    .enter().append("stop")
-			      .attr("offset", function(d) { return d.offset; })
-			      .attr("stop-color", "#FFFFFF")
-				  .attr("stop-opacity", function(d){ return d.opacity; })
-				;
-				svg.append("linearGradient")
-				.attr("id", "fadeToWhiteX")
-				.attr("x1", 0).attr("y1", 0)
-				.attr("x2", 1).attr("y2", 0)
-				.selectAll("stop")
-				.data([
-					{offset: "0%", opacity: "0"},
-					{offset: "100%", opacity: "1"}
-				])
-				.enter().append("stop")
-				.attr("offset", function(d) { return d.offset; })
-				.attr("stop-color", "#FFFFFF")
-				.attr("stop-opacity", function(d){ return d.opacity; })
-				;
-
-				var fadesize = 15;
-				// bottom edge
-				svg.append('rect')
-					.attr('width', '100%')
-					.attr('height', fadesize)
-					.attr('x', 0)
-					.attr('y', function(){
-						return this.parentElement.offsetHeight - fadesize;
-					})
-					.attr('fill', 'url(#fadeToWhiteY)');
-				// right edge
-				svg.append('rect')
-					.attr('height', '100%')
-					.attr('width', fadesize)
-					.attr('x', function(){
-						return this.parentElement.offsetWidth - fadesize;
-					})
-					.attr('y', 0)
-					.attr('fill', 'url(#fadeToWhiteX)');
-
-				nv.utils.windowResize(chart.update);
-
-				if (prop.type.search(/^date_/) >= 0){
-					// fire change event for timdebugger;eseries granularity
-					selector.on('change', function(){
-						var choice = d3.select(this)
-							.select(":checked")
-							.property('value');
-						panel.fireEvent('changeDateDetail', chart,
-										choice, date_detail, format);
-
-					});
-				}
-
-				// Make the export data.
-				var data_export = [];
-
-				// need to handle dates differently than other datatypes
-				if (prop.type == "string" || prop.type == "number") {
-					var keys = chart.xAxis.domain();
-					for (var i = 0; i < keys.length; i++){
-						var row = {};
-						row[prop.property] = keys[i];
-						// add each stream freq
-						prop.streams.forEach(function(stream){
-							var matching_value = stream.values.filter(function(v){
-								return v.x == keys[i];
+				// default sorting
+				sort_control
+					// add a menu to change sorting
+					.append('div')
+					.attr('class', 'sort-menu')
+					.selectAll('i')
+					.data([
+						'fa-sort-alpha-asc',
+						'fa-sort-alpha-desc',
+						'fa-sort-amount-asc',
+						'fa-sort-amount-desc'
+					])
+					.enter()
+					.append('i')
+						.attr('class', function(d, i){
+							var classval = 'fa ' + d;
+							if (i == 0) { classval += ' selected'; }
+							return classval;
+						})
+						.on('click', function(d){
+							// retrieve data from chart and configure in rows
+							var queries = _.pluck(chart.data(), 'values');
+							var x_labels = chart.categories();
+							var rows = _.map(x_labels, function(label, i){
+								var row = [label];
+								_.each(queries, function(q){
+									row.push(q[i].value);
+								})
+								return row;
 							});
-							row[stream.key] = matching_value[0].y;
-						});
 
-						data_export.push(row);
-					}
-				} else if (prop.type.search(/^date_/) >= 0) {
-					// make a set of all date values from all streams
-					var all_dates = d3.set();
-					prop.streams.forEach(function(stream){
-						stream.values_orig.forEach(function(v){
-							all_dates.add(v.x);
-						});
-					});
-
-					// find matching values for each stream, or 0 if none
-					all_dates.forEach(function(this_date){
-						var row = {};
-						row[prop.property] = this_date;
-						// add each stream freq
-						prop.streams.forEach(function(stream){
-							var matching_value = stream.values_orig.filter(function(v){
-								return v.x == this_date;
-							});
-							if (matching_value.length) {
-								row[stream.key] = matching_value[0].y;
-							} else {
-								row[stream.key] = 0;
+							switch(d){
+								case 'fa-sort-alpha-asc':
+									rows = _.sortBy(rows, 0);
+									break;
+								case 'fa-sort-alpha-desc':
+									rows = _.sortBy(rows, 0).reverse();
+									break;
+								case 'fa-sort-amount-asc':
+									rows = _.sortBy(rows, 1);
+									break;
+								case 'fa-sort-amount-desc':
+									rows = _.sortBy(rows, 1).reverse();
+									break;
 							}
-						});
-						data_export.push(row);
-					});
 
-				}
+							// add query labels back in after sorting values
+							var queries_row = _.map(queries, function(q){
+								return q[0].id;
+							});
+							queries_row.unshift('x');
+							rows.unshift(queries_row);
 
-				// attach to download button as data url
-				file_data = d3.csv.format(data_export); // requires d3 >= 3.1
-				var data_url = "data:application/octet-stream," +
-					escape(file_data);
-				download_link.attr("href", data_url);
+							chart.load({
+								rows: rows
+							})
 
-			    return chart;
-			});
-*/
+							// update menu display and current sort icon
+							d3.select(this.parentElement)
+								.selectAll('i')
+								.classed('selected', false)
+								;
+
+							d3.select(this)
+								.classed('selected', true)
+								;
+
+							sort_control.attr('class', 'sort-control fa ' + d);
+
+						})
+						;
+			}
 		});
 	},
 

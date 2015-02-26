@@ -15,7 +15,7 @@ class MetadataFrequenciesView(MethodView):
     results."""
 
     def get(self, **kwargs):
-        params = dict(kwargs, **request.args)        
+        params = dict(kwargs, **request.args)
         query = Query.query.get(params["query_id"])
         keys = params.keys()
         metadata_counts = {}
@@ -24,40 +24,61 @@ class MetadataFrequenciesView(MethodView):
             search_params = loads(params["search"][0])
             if len(search_params) > 1:
                 for i, search_param in enumerate(search_params):
+                    # TODO: get query text instead of this
                     header.append(str(i))
                     add_query_counts_to_results(
                         metadata_counts, len(search_params), i,
-                        search_param.query_id)
+                        search_param.query_id, params["project_id"])
 
             else:
                 header.append(0)
-                self.add_query_counts_to_results(metadata_counts, 1, 0, query.id)
+                self.add_query_counts_to_results(metadata_counts, 1, 0,
+                    query.id, params["project_id"])
 
         results = {}
         for property, counts in metadata_counts.iteritems():
+            prop_obj = Property.query.filter(Property.name == property,
+                Property.project_id == params["project_id"]).first()
+
             results[property] = {
-             "sentences": [header],
-             "totals": [["x", "total"]]
-             }
+                "sentences": [header],
+                "totals": [["x", "total"]],
+                "datatype": prop_obj.property_metadata.data_type
+            }
+
+            if results[property]['datatype'] == "date":
+                results[property]['date_format'] = prop_obj.property_metadata.date_format
+
             for value, query_counts in counts.iteritems():
                 results[property]["sentences"].append(query_counts[1:])
                 results[property]["totals"].append(
-                    [value, len(query_counts[0])])
+                    [value, query_counts[0]])
+
         return jsonify(results)
 
     def add_query_counts_to_results(
-        self, results, num_queries, query_index, query_id):
+        self, results, num_queries, query_index, query_id, project_id):
         query = Query.query.get(query_id)
         for sentence in query.sentences:
             for property in sentence.properties:
                 if property.name not in results:
                     results[property.name] = {}
                 if property.value not in results[property.name]:
-                    values = [set(), property.value]
+                    total = 0
+
+                    # need to aggregate any duplicate props
+                    # that are associated with different unit_ids
+                    for prop in Property.query.filter(
+                        Property.name == property.name,
+                        Property.value == property.value,
+                        Property.project_id == project_id
+                    ):
+                        total += len(prop.sentences_with_property)
+
+                    values = [total, property.value]
                     values.extend([0] * num_queries)
                     results[property.name][property.value] = values
                 results[property.name][property.value][2 + query_index] += 1
-                results[property.name][property.value][0].add(sentence.id)
 
     def post(self):
         pass
@@ -67,7 +88,6 @@ class MetadataFrequenciesView(MethodView):
 
     def put(self, id):
         pass
-        
 
 register_rest_view(
     MetadataFrequenciesView,
