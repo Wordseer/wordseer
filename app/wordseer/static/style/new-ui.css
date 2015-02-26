@@ -1278,13 +1278,14 @@ Visualizations - metadata profile
   margin-left: 10px;
   text-transform: uppercase;
   position: relative;
+  z-index: 10;
 }
-/* line 1061, new-ui.scss */
+/* line 1062, new-ui.scss */
 .viz-container div.property span.sort .sort-control {
   color: #64839f;
   padding-right: 15px;
 }
-/* line 1065, new-ui.scss */
+/* line 1066, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu {
   position: absolute;
   top: -9px;
@@ -1297,7 +1298,7 @@ Visualizations - metadata profile
   visibility: hidden;
   transition: visibility 0s ease 0.3s,opacity 0.3s ease;
 }
-/* line 1077, new-ui.scss */
+/* line 1078, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu i {
   padding: 5px;
   width: 100%;
@@ -1305,16 +1306,16 @@ Visualizations - metadata profile
   background-color: #eeeeee;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-/* line 1085, new-ui.scss */
+/* line 1086, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu i.selected {
   color: #64839f;
 }
-/* line 1089, new-ui.scss */
+/* line 1090, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu i:hover {
   background-color: #64839f;
   color: #eeeeee;
 }
-/* line 1097, new-ui.scss */
+/* line 1098, new-ui.scss */
 .viz-container div.property span.sort .sort-control:hover .sort-menu {
   opacity: 1;
   visibility: visible;
@@ -1322,7 +1323,7 @@ Visualizations - metadata profile
   z-index: 999;
 }
 
-/* line 1115, new-ui.scss */
+/* line 1116, new-ui.scss */
 .c3-axis-x .tick text tspan:nth-child(n+5) {
   display: none;
 }
