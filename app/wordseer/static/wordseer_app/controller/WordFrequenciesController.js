@@ -289,6 +289,11 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 				.attr('download', function(){
 					return "sentence counts across " + key + '.csv';
 				});
+			// attach to download button as data url
+			var file_data = d3.csv.format(val.sentences); // requires d3 >= 3.1
+			var data_url = "data:application/octet-stream," +
+				escape(file_data);
+			download_link.attr("href", data_url);
 
 			download_link.append('i')
 				.attr('class', 'fa fa-download');
@@ -573,6 +578,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						})
 						;
 			}
+
 		});
 	},
 
@@ -615,30 +621,5 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		;
 		chart.update();
 	},
-
-	updateCharts: function(data, panel_id){
-		var me = this;
-		var svg = d3.selectAll('#' + panel_id + ' .viz-container svg');
-		svg.datum(function(d,i){
-			// var datum = data[i];
-
-			// Deep copy so we don't overwrite original data objects
-			var datum = $.extend(true, {}, data[i]);
-
-			if (datum.type.search(/^date_/) >= 0){
-				var selected_date_detail = d3.select(this.offsetParent)
-					.select('.timeselect')
-						.select(':checked')
-						.property('value');
-
-				me.formatDateTime(datum, selected_date_detail);
-			}
-			return datum.streams;
-		})
-		nv.graphs.forEach(function(g){
-			g.update();
-		})
-
-	}
 
 });
