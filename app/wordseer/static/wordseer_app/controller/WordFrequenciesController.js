@@ -78,13 +78,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 		        word_frequencies_panel.data = data;
 
 				this.draw(data, word_frequencies_panel);
-				// // new or update
-				// if (word_frequencies_panel.down('#canvas').el.dom.childElementCount == 1){
-				// 	this.draw(data, word_frequencies_panel);
-				// } else {
-				// 	this.updateCharts(data);
-				// }
-				//
 				word_frequencies_panel.fireEvent('rendered', word_frequencies_panel);
 
 		    },
@@ -317,7 +310,8 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					rows: val.sentences,
 					type: 'bar',
 					xSort: true,
-					colors: _.first(COLOR_SCALE, val.sentences[0].length - 1),
+					// map query labels to colors
+					colors: _.object(_.rest(val.sentences[0]), COLOR_SCALE),
 				},
 				axis: {
 					x: {

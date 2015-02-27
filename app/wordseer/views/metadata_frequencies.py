@@ -11,7 +11,7 @@ from app.helpers.application_view import register_rest_view
 from app.wordseer.helpers import parse_phrase_strings
 
 class MetadataFrequenciesView(MethodView):
-    """Returns data that backs the Metadata Frequencies view for a set of
+    """Returns data that backs the Metadata Profile view for a set of
     results."""
 
     def get(self, **kwargs):
@@ -22,18 +22,15 @@ class MetadataFrequenciesView(MethodView):
         header = ["x"]
         if "search" in keys:
             search_params = loads(params["search"][0])
-            if len(search_params) > 1:
-                for i, search_param in enumerate(search_params):
-                    # TODO: get query text instead of this
-                    header.append(str(i))
-                    add_query_counts_to_results(
-                        metadata_counts, len(search_params), i,
-                        search_param.query_id, params["project_id"])
-
-            else:
-                header.append(0)
-                self.add_query_counts_to_results(metadata_counts, 1, 0,
-                    query.id, params["project_id"])
+            for i, search_param in enumerate(search_params):
+                query_text = search_param['gov']
+                if search_param['relation'] != "":
+                    query_text += ", %s (%s)" % (search_param['dep'],
+                        search_param['relation'])
+                header.append(query_text)
+                self.add_query_counts_to_results(
+                    metadata_counts, len(search_params), i,
+                    params['query_id'], params["project_id"])
 
         results = {}
         for property, counts in metadata_counts.iteritems():
