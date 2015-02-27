@@ -477,7 +477,13 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 				var agg = me.aggregateDates(val, selected_date_detail);
 				chart_opts.data.rows = agg.rows;
-				chart_opts.axis.x.tick['format'] = tickFormats[selected_date_detail];
+				chart_opts.axis.x.tick.format = function(time){
+					var choice = selector
+						.select(":checked")
+						.property('value')
+						;
+					return d3.time.format(tickFormats[choice])(time);
+				}
 			}
 
 
@@ -579,47 +585,18 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						;
 			}
 
+			if (val.datatype == "date") {
+				selector.on('change', function(){
+					var choice = d3.select(this)
+						.select(":checked")
+						.property('value');
+
+					// reload data at new aggregation level
+					var new_data = me.aggregateDates(val, choice);
+					chart.load(new_data);
+				});
+			}
+
 		});
-	},
-
-	changeDateDetail: function(chart, choice, date_detail, format) {
-		var data = d3.select(chart.container).datum();
-		data.forEach(function(stream){
-			var newvalues = [];
-			d3.nest()
-				.key(function(d){
-					var date = format.parse(String(d.x));
-					return d3.time[choice](date);
-				})
-				.rollup(function(leaves){
-					var date = format.parse(String(leaves[0].x));
-					var point = {
-						'x': d3.time[choice](date),
-						'y': d3.sum(leaves, function(d){
-								return d.y;
-							})
-					};
-					newvalues.push(point);
-					return point;
-				})
-				.entries(stream.values_orig)
-				;
-
-			stream.values = newvalues;
-		})
-		;
-		// bind new data
-		d3.select(chart.container).datum(data);
-		// update x axis ticks
-		chart.xAxis
-			.tickFormat(function(v){
-				var format = d3.time.format(
-					date_detail.get(choice)
-				);
-				return format(d3.time.scale().invert(v));
-			})
-		;
-		chart.update();
-	},
-
+	}
 });
