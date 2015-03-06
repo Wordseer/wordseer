@@ -510,7 +510,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 						ratio: 7 / _.last(_.pluck(val.sentences, 0))
 					}
 				}
-				if (chart_opts.bar.width.ratio > .5) chart_opts.bar.width.ratio = .5;
+				if (chart_opts.bar.width.ratio > .25) chart_opts.bar.width.ratio = .25;
 			}
 
 
