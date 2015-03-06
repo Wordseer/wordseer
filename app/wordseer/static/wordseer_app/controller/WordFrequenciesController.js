@@ -337,8 +337,22 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 								if (data[key].c3_format_norm) {
 									return d3.format('.1%')(tick)
 								} else {
-									return parseInt(tick);
+									if (tick % 1 === 0) {
+										return parseInt(tick);
+									}
 								}
+							},
+							values: function(range){
+								var max = Math.floor(range[1]);
+								var values = [];
+								var skip = 1;
+								if (max > 10) {
+									var skip = Math.ceil(max / 10);
+								}
+								for (var i=0; i<=max; i += skip ) {
+									values.push(i);
+								}
+								return values;
 							}
 						}
 					}
