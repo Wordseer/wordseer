@@ -30,7 +30,7 @@ class AutoSuggest(MethodView):
         either side of the string; so the ``query`` could be anywhere
         in the suggestions.
 
-        The returned list has a maximum of three types of suggestions: 
+        The returned list has a maximum of three types of suggestions:
         ``Set``\s, ``Property``\s, and ``Sequence``\s. The response is formed
         like so::
 
@@ -80,6 +80,7 @@ class AutoSuggest(MethodView):
         ``Set``\s are filtered on the following criteria:
 
         * Have the same ``user`` as the one given in the request
+        * Have the same ``project`` as the one given in the request
         * Contain the ``query`` from the url, if applicable
 
         ``Property``\s are filtered by the following criteria:
@@ -123,6 +124,7 @@ class AutoSuggest(MethodView):
 
         ``Property``\s are filtered by the following criteria:
 
+        * Has the same ``project`` as the one given in the request
         * ``value`` contains the user's ``query``, if any
         * ``Property.name`` is equal to ``PropertyMetadata.property_name``
         * The ``Property`` is a category (``is_category`` is true for these
@@ -151,6 +153,7 @@ class AutoSuggest(MethodView):
             PropertyMetadata.display_name.label("display_name"),
             Property.value.label("value"),
             func.count(PropertyOfSentence.sentence_id.distinct()).label("sentence_count")).\
+                filter(Property.project == self.project).\
                 filter(self.property_value_filter).\
                 filter(PropertyOfSentence.property_id == Property.id).\
                 filter(Property.property_metadata_id == PropertyMetadata.id).\
@@ -181,6 +184,7 @@ class AutoSuggest(MethodView):
 
         ``Sequence``\s are filtered by the following criteria:
 
+        * Has the same ``project`` as the one given in the request
         * ``Sequence.sequence`` starts with ``query``
 
         Returns:
@@ -207,6 +211,7 @@ class AutoSuggest(MethodView):
             literal_column("'phrase'").label("class"),
             func.count(SequenceInSentence.sentence_id).\
                 label("sentence_count")).\
+        filter(Sequence.project == self.project).\
         filter(SequenceInSentence.sequence_id == Sequence.id).\
         filter(self.sequence_filter).\
         group_by(Sequence.sequence).\
@@ -217,7 +222,7 @@ class AutoSuggest(MethodView):
         sequence_list = {}
         for sequence in sequences:
             text = sequence.text.lower()
-            print text
+            # print text
             if text not in sequence_list and text is not None:
                 sequence_list[text] = 1
                 suggested_sequences.append(sequence._asdict())
