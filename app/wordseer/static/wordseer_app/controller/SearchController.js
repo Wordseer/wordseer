@@ -161,6 +161,7 @@ Ext.define('WordSeer.controller.SearchController', {
 		// Add any autocompleted metadata values
 		var autosuggest = form.down('phrases-autosuggest');
 		var was_metadata_search = false;
+		was_search_with_record = false;
 		if (autosuggest.record) {
 			if (autosuggest.record.get('class') == 'metadata') {
 				was_metadata_search = true;
