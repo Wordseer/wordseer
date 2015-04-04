@@ -61,6 +61,7 @@ Ext.define('WordSeer.view.document.DocumentGrid',{
 
     ],
     initComponent: function() {
+        var me = this;
         this.store = Ext.create('WordSeer.store.DocumentStore');
         this.selModel = new Ext.selection.CheckboxModel({
             checkOnly: true,
@@ -108,19 +109,29 @@ Ext.define('WordSeer.view.document.DocumentGrid',{
                 }
             }
         ];
-        var model = this.getStore().model;
-        var base_field_names = model.getBaseFieldNames();
-        var all_fields = model.getFields();
-        for (var i = 0; i < all_fields.length; i++) {
-            var field = all_fields[i];
-            if (!base_field_names.contains(field.name)) {
-                this.columns.push({
-                    headerTitle: field.text,
-                    field: field.name,
-                    flex: 1,
-                });
+
+        this.store.on('load', function(store, records, successful){
+            // choose columns to display based on property fields returned
+            if (successful) {
+                var model = me.store.model;
+                var base_field_names = model.getBaseFieldNames();
+                var returned_fields = Object.keys(records[0].raw);
+
+                for (var i = 0; i < returned_fields.length; i++) {
+                    var field = returned_fields[i];
+                    if (!base_field_names.contains(field)) {
+                        var column_def = {
+                            'headerTitle': field,
+                            'field': field,
+                            'flex': 1,
+                        };
+                        var c = Ext.create('WordSeer.model.ColumnDefinition', column_def)
+                        me.columns.push(c);
+                    }
+                }
             }
-        }
+        });
+        
         this.callParent(arguments);
     },
 
