@@ -429,7 +429,7 @@ Ext.define('WordSeer.controller.WordTreeController', {
 	    }
 	    d.hidden_children = [];
 	    var controller = this;
-	    d.children.forEach(function(d){
+	    _.forEach(d.children, function(d){
 	    	controller.calculateDepths(d, vis, sign)
 	    });
 	},
@@ -442,7 +442,7 @@ Ext.define('WordSeer.controller.WordTreeController', {
 	adjustHeight: function(d){
 	    if(!d.isRoot){
 	        var minX = d.x;
-	        d.children.forEach(function(node){
+	        _.forEach(d.children, function(node){
 	            if(!minX){
 	                minX = node.x
 	            }
@@ -575,7 +575,7 @@ Ext.define('WordSeer.controller.WordTreeController', {
 	@param {Object} d The node whose children should be hidden.
 	*/
 	toggle: function(d) {
-	  if (d.children.length > 0) {
+	  if (d.children != undefined && d.children.length > 0) {
 	      this.hideChildren(d);
 	  } else {
 	      this.showChildren(d);
