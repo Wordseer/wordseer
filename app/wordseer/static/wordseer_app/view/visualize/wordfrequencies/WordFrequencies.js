@@ -5,7 +5,7 @@ Ext.define('WordSeer.view.visualize.wordfrequencies.WordFrequencies', {
 	extend:'Ext.Container',
 	layout: 'fit',
 	alias:'widget.word-frequencies',
-	autoScroll: true,
+	autoScroll: false,
 	items: [
 		{
 			xtype: 'component',
