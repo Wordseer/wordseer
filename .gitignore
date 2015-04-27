@@ -25,3 +25,5 @@ stanford-corenlp
 # logs
 *.log
 
+/start_windows.bat
+preferences.json
