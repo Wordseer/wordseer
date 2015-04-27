@@ -30,7 +30,7 @@ class MetadataFrequenciesView(MethodView):
                 header.append(query_text)
                 self.add_query_counts_to_results(
                     metadata_counts, len(search_params), i,
-                    params['query_id'], params["project_id"])
+                    search_param['query_id'], params["project_id"])
 
         results = {}
         for property, counts in metadata_counts.iteritems():
