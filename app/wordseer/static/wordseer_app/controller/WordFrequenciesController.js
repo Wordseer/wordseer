@@ -108,6 +108,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 			margin = {"top": 0, "bottom": 0, "left": 0, "right": 15};
 
 		var canvas = d3.select(panel.getComponent('canvas').getEl().dom);
+		canvas.selectAll('.viz-container').remove();
 
 		// create visibility toggles
 		var controls = d3.select('#' + panel.id + ' .panel-header .controls');

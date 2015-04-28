@@ -28,9 +28,15 @@ class MetadataFrequenciesView(MethodView):
                     query_text += ", %s (%s)" % (search_param['dep'],
                         search_param['relation'])
                 header.append(query_text)
+                
+                if 'query_id' in search_param:
+                    query_id = search_param['query_id']
+                else:
+                    query_id = params['query_id']
+
                 self.add_query_counts_to_results(
                     metadata_counts, len(search_params), i,
-                    search_param['query_id'], params["project_id"])
+                    query_id, params["project_id"])
 
         results = {}
         for property, counts in metadata_counts.iteritems():
