@@ -19,9 +19,9 @@ Ext.define('WordSeer.model.LayoutPanelModel', {
 		this.callParent(arguments);
 		this.phrasesStore = Ext.create('WordSeer.store.PhrasesStore');
 		this.metadataTreeStore = Ext.create('WordSeer.store.MetadataTreeStore');
-		this.JStore = Ext.create('WordSeer.store.FrequentWordsStore', {pos:'J'});
-		this.VStore = Ext.create('WordSeer.store.FrequentWordsStore', {pos:'V'});
-		this.NStore = Ext.create('WordSeer.store.FrequentWordsStore', {pos:'N'});
+		this.JStore = Ext.create('WordSeer.store.AssociatedWordsStore', {pos:'Adjectives'});
+		this.VStore = Ext.create('WordSeer.store.AssociatedWordsStore', {pos:'Verbs'});
+		this.NStore = Ext.create('WordSeer.store.AssociatedWordsStore', {pos:'Nouns'});
 		this.metadataListStore = Ext.create('WordSeer.store.MetadataListStore');
 		this.breadcrumbs = [];
 	},

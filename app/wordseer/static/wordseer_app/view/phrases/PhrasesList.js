@@ -79,7 +79,7 @@ Ext.define('WordSeer.view.phrases.PhrasesList', {
 			headerTitle: 'Distinctiveness',
 			renderer: function(record, field) {
 				var count = record.get(field);
-				var svg = '<svg class="lollipop" data-score="'+ count
+				var svg = '<svg class="lollipop" data-score_sentences="'+ count
 					+'"></svg>';
 				return {tag: 'td', cls:'frequent-word-count distinct', html:svg};
 			},

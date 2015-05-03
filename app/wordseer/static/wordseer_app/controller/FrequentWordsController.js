@@ -59,9 +59,9 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 				Ext.apply(params, formValues.search[0]);
 			}
 			var model = panel.getLayoutPanelModel();
-			model.NStore.load({params:Ext.apply( params, {pos:'N'})});
-			model.VStore.load({params:Ext.apply( params, {pos:'V'})});
-			model.JStore.load({params:Ext.apply( params, {pos:'J'})});
+			model.NStore.load({params:params});
+			model.VStore.load({params:params});
+			model.JStore.load({params:params});
 		}
 	},
 
@@ -126,7 +126,6 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						items: [
 							{
 								xtype: 'frequent-words',
-								pos: 'N',
 								store: panel.getLayoutPanelModel().NStore
 							}
 						]
@@ -136,7 +135,6 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						items: [
 							{
 								xtype: 'frequent-words',
-								pos: 'V',
 								store: panel.getLayoutPanelModel().VStore
 							},
 						]
@@ -146,7 +144,6 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						items: [
 							{
 								xtype: 'frequent-words',
-								pos: 'J',
 								store: panel.getLayoutPanelModel().JStore
 							},
 						]
@@ -156,8 +153,7 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						items: [
 							{
 								xtype: 'phraseslist',
-								store:
-									panel.getLayoutPanelModel().getPhrasesStore(),
+								store: panel.getLayoutPanelModel().getPhrasesStore()
 							}
 						]
 					}),
@@ -173,11 +169,9 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 			.selectAll('.distinct .lollipop')
 			.datum(function(){ return this.dataset; });
 
-		// console.log(svg[0]);
 		var maxscore = d3.max(svg.data(), function(d){
-			return +d.score;
+			return +d.score_sentences;
 		});
-
 		var r = 4;
 		var scale = d3.scale.linear()
 			.domain([0, maxscore])
@@ -185,7 +179,7 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 
 		svg.append('circle')
 			.attr('cx', function(d){
-				return scale(d.score);
+				return scale(+d.score_sentences);
 			})
 			.attr('cy', 8)
 			.attr('r', r);
@@ -193,8 +187,8 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 		svg.append('line')
 			.attr('x1', scale(0))
 			.attr('x2', function(d){
-				// console.log("append line");
-				return scale(d.score); })
+				return scale(+d.score_sentences); 
+			})
 			.attr('y1', 8)
 			.attr('y2', 8)
 			// .attr('stroke', '#000')

@@ -7,26 +7,14 @@ Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
 	extend: 'WordSeer.view.table.Table',
 	alias: 'widget.frequent-words',
 	requires: [
-		'WordSeer.store.FrequentWordsStore'
+		'WordSeer.store.AssociatedWordsStore'
 	],
 	config: {
-		/**
-		@cfg {String} pos The part of speech of the words in this list.
-
-		*/
-		pos: 'N',
-
 		/**
 		@cfg {Boolean} groupedByStem Whether or not the words in this list are
 		grouped by stem.
 		*/
 		groupedByStem: true,
-
-		/**
-		@cfg {Boolean} orderedByDiffProp Whether or not the words in this list are
-		ordered by difference of proportion (i.e. distinctiveness)
-		*/
-		orderedByDiffProp: true
 	},
 	selectable: false,
 	width: "100%",
@@ -53,14 +41,14 @@ Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
 			renderer: function(record, field){
 				var word = record.get(field);
 				html = "<span class='word'>"+word+"</span> ";
-				var sets = record.get('phrase_set');
-				if (sets.trim().length  > 0) {
-					var ids = sets.trim().split(" ");
-					for (var j = 0; j < ids.length; j++) {
-						html += WordSeer.model.
-							SubsetModel.makeSubsetTag(ids[j]);
-					}
-				}
+				// var sets = record.get('phrase_set');
+				// if (sets && sets.trim().length  > 0) {
+				// 	var ids = sets.trim().split(" ");
+				// 	for (var j = 0; j < ids.length; j++) {
+				// 		html += WordSeer.model.
+				// 			SubsetModel.makeSubsetTag(ids[j]);
+				// 	}
+				// }
 				return {tag: 'td', cls:'frequent-word-word', html: html};
 			}
 		},
@@ -74,7 +62,7 @@ Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
 			}
 		},
 		{
-			field: 'document_count',
+			field: 'doc_count',
 			headerCls: 'frequent-word-count',
 			headerTitle: 'Docs',
 			renderer: function(record, field) {
@@ -88,7 +76,7 @@ Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
 			headerTitle: 'Distinctiveness',
 			renderer: function(record, field) {
 				var count = record.get(field);
-				var svg = '<svg class="lollipop" data-score="'+ count
+				var svg = '<svg class="lollipop" data-score_sentences="'+ count
 					+'"></svg>';
 				return {tag: 'td', cls:'frequent-word-count distinct', html:svg};
 			},
@@ -97,13 +85,6 @@ Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
 	],
 	// title: 'Frequent Words',
 	constructor: function(cfg) {
-		if (cfg.pos == 'N') {
-			// cfg.title = 'Nouns';
-		} else if (cfg.pos == 'V') {
-			// cfg.title = 'Verbs';
-		} else if (cfg.pos == 'J') {
-			// cfg.title = 'Adjectives';
-		}
 		this.callParent(arguments);
 		this.autoEl.cls += ' frequent-words-list';
 	},

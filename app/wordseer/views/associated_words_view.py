@@ -1,3 +1,6 @@
+from __future__ import division
+import math 
+
 from flask.views import MethodView
 from flask.json import jsonify, dumps, loads
 from flask import request
@@ -30,9 +33,10 @@ class AssociatedWordsView(MethodView):
         if project is None:
             return # 500 error
 
-        sequence_ids = Word.get_matching_sequence_ids(
-            params.get("word")[0],
-            is_set_id = params.get("class")[0] == "phrase-set")
+        
+
+        search_param = loads(params["search"][0])[0]
+        sequence_ids = Word.get_matching_sequence_ids(search_param['gov'])
         sentences = SequenceInSentence.query.filter(
             SequenceInSentence.sequence_id.in_(sequence_ids)).subquery()
 
@@ -40,42 +44,37 @@ class AssociatedWordsView(MethodView):
             Word.id.label("id"),
             Word.part_of_speech.label("pos"),
             Word.surface.label("word"),
-            func.count(WordInSentence.sentence_id).label("score")).\
+            func.count(WordInSentence.sentence_id.distinct()).label("count"),
+            func.count(Sentence.document_id.distinct()).label("doc_count")
+            ).\
         filter(WordInSentence.word_id == Word.id).\
+        filter(Sentence.id == WordInSentence.sentence_id).\
         join(sentences, WordInSentence.sentence_id ==
                         sentences.c.sentence_id).\
-        group_by(Word.id).\
-        order_by(desc("score"))
-
-        for word in associated_words:
-            print word.pos
-
-        associated_sequences = db.session.query(
-            Sequence.id.label("sequence_id"),
-            Sequence.sequence.label("word"),
-            func.count(SequenceInSentence.sentence_id.distinct()).label("score")).\
-        filter(SequenceInSentence.sequence_id == Sequence.id).\
-        join(sentences, SequenceInSentence.sentence_id ==
-                        sentences.c.sentence_id).\
-        filter(Sequence.length > 1).\
-        filter(Sequence.lemmatized == False).\
-        filter(Sequence.all_function_words == False).\
-        group_by(Sequence.id).\
-        order_by(desc("score"))
-        
-        response = {"Phrases":[], "Synsets": []}
+        group_by(Word.id)
+    
+        response = {"Synsets": []}
         for word in associated_words:
             category = self.get_category(word.pos)
             if category is None:
                 continue
             if category not in response:
                 response[category] = []
-            response[category].append(word._asdict())
 
-        for sequence in associated_sequences:
-            if sequence.word is None:
-                break
-            response["Phrases"].append(sequence._asdict())
+            row = word._asdict()
+
+            # calculate tf*idf
+            tf = word.count
+            df = db.session.query(WordCount.document_count).filter(WordCount.word_id == word.id)[0][0]
+            alldocs = len(project.get_documents())
+            idf = alldocs / df
+            row["score_sentences"] = tf * math.log(idf)
+            response[category].append(row)
+
+        # sort by tf*idf
+        for category in response: 
+            response[category] = sorted(response[category], key=lambda k: k['score_sentences'], reverse=True)
+
         return jsonify(response)
 
 
