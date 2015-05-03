@@ -34,9 +34,9 @@ Ext.define('WordSeer.view.windowing.viewport.LandingPage',  {
         }
         this.layoutPanelModel.getPhrasesStore().load({params:{length:2,
             has_function_words:0}});
-        this.layoutPanelModel.getNStore().load({params:{pos:'N'}});
-        this.layoutPanelModel.getVStore().load({params:{pos:'V'}});
-        this.layoutPanelModel.getJStore().load({params:{pos:'J'}});
+        this.layoutPanelModel.getTopN().load({params:{pos:'N'}});
+        this.layoutPanelModel.getTopV().load({params:{pos:'V'}});
+        this.layoutPanelModel.getTopJ().load({params:{pos:'J'}});
 
         cfg.autoEl = {
             tag: 'div',

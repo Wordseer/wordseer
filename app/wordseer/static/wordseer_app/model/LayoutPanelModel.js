@@ -22,6 +22,9 @@ Ext.define('WordSeer.model.LayoutPanelModel', {
 		this.JStore = Ext.create('WordSeer.store.AssociatedWordsStore', {pos:'Adjectives'});
 		this.VStore = Ext.create('WordSeer.store.AssociatedWordsStore', {pos:'Verbs'});
 		this.NStore = Ext.create('WordSeer.store.AssociatedWordsStore', {pos:'Nouns'});
+		this.topJ = Ext.create("WordSeer.store.FrequentWordsStore", {pos: "J"});
+		this.topN = Ext.create("WordSeer.store.FrequentWordsStore", {pos: "N"});
+		this.topV = Ext.create("WordSeer.store.FrequentWordsStore", {pos: "V"});
 		this.metadataListStore = Ext.create('WordSeer.store.MetadataListStore');
 		this.breadcrumbs = [];
 	},
@@ -42,6 +45,10 @@ Ext.define('WordSeer.model.LayoutPanelModel', {
 		JStore: false,
 		VStore: false,
 		NStore: false,
+
+		topJ: false,
+		topN: false,
+		topV: false,
 
 		/**
 		@cfg {WordSeer.store.MetadataListStore} metadataListStore The metadata

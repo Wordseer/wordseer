@@ -34,7 +34,6 @@ class AssociatedWordsView(MethodView):
             return # 500 error
 
         
-
         search_param = loads(params["search"][0])[0]
         sequence_ids = Word.get_matching_sequence_ids(search_param['gov'])
         sentences = SequenceInSentence.query.filter(

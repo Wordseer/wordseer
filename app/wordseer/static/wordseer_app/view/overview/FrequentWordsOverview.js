@@ -23,21 +23,21 @@ Ext.define('WordSeer.view.overview.FrequentWordsOverview', {
 				title: 'Nouns',
 				tagField: 'word',
 				numberFields: ['count'],
-				store: this.getModel().getNStore(),
+				store: this.getModel().getTopN(),
 			},
 			{
 				xtype: 'tag-list',
 				title: 'Verbs',
 				tagField: 'word',
 				numberFields: ['count'],
-				store: this.getModel().getVStore(),
+				store: this.getModel().getTopV(),
 			},
 			{
 				xtype: 'tag-list',
 				title: 'Adjectives',
 				tagField: 'word',
 				numberFields: ['count'],
-				store: this.getModel().getJStore(),
+				store: this.getModel().getTopJ(),
 			},
 		]
 		this.callParent(arguments);
