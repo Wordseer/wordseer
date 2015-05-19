@@ -55,13 +55,28 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 				user: getUsername(),
 			};
 			Ext.apply(params, formValues.serialize());
-			if (formValues.search && formValues.search.length > 0) {
-				Ext.apply(params, formValues.search[0]);
-			}
+			// if (formValues.search && formValues.search.length > 0) {
+			// 	Ext.apply(params, formValues.search[0]);
+			// }
 			var model = panel.getLayoutPanelModel();
-			model.NStore.load({params:params});
-			model.VStore.load({params:params});
-			model.JStore.load({params:params});
+
+			// make one AJAX request then filter and populate the stores
+			Ext.Ajax.request({
+                    method: 'GET',
+                    disableCaching: false,
+                    url: ws_api_path + ws_project_path + project_id +
+                    '/associated_words',
+                    params: params,
+                    scope: this,
+                    callback: function(opts, success, response){
+                    	if (!success) return console.log('panel: co-ocurring words request failed');
+                    	// populate the stores
+				        var related_words = Ext.decode(response.responseText).Words;
+				        model.NStore.add(_.where(related_words, {category: 'Nouns'}));
+				        model.JStore.add(_.where(related_words, {category: 'Adjectives'}));
+				        model.VStore.add(_.where(related_words, {category: 'Verbs'}));  
+                    },
+                });
 		}
 	},
 
@@ -126,7 +141,8 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						items: [
 							{
 								xtype: 'frequent-words',
-								store: panel.getLayoutPanelModel().NStore
+								store: panel.getLayoutPanelModel().NStore,
+								pos: "Nouns"
 							}
 						]
 					}),
@@ -135,7 +151,8 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						items: [
 							{
 								xtype: 'frequent-words',
-								store: panel.getLayoutPanelModel().VStore
+								store: panel.getLayoutPanelModel().VStore,
+								pos: "Verbs"
 							},
 						]
 					}),
@@ -144,19 +161,20 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 						items: [
 							{
 								xtype: 'frequent-words',
-								store: panel.getLayoutPanelModel().JStore
+								store: panel.getLayoutPanelModel().JStore,
+								pos: "Adjectives"
 							},
 						]
 					}),
-					Ext.create("Ext.panel.Panel", {
-						title: 'Phrases',
-						items: [
-							{
-								xtype: 'phraseslist',
-								store: panel.getLayoutPanelModel().getPhrasesStore()
-							}
-						]
-					}),
+					// Ext.create("Ext.panel.Panel", {
+					// 	title: 'Phrases',
+					// 	items: [
+					// 		{
+					// 			xtype: 'phraseslist',
+					// 			store: panel.getLayoutPanelModel().getPhrasesStore()
+					// 		}
+					// 	]
+					// }),
 				],
 			});
 			overlay.showBy(button_el);
@@ -193,6 +211,5 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 			.attr('y2', 8)
 			// .attr('stroke', '#000')
 			.attr('stroke-width', 1);
-		// debugger;
 	}
 });

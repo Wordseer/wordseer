@@ -90,6 +90,7 @@ Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
 		// filter the store by POS
 		// suspent events to avoid triggering a premature 'datachanged' action
 		this.store.suspendEvents(); 
+		debugger;
 		this.store.filter("category", cfg.pos);
 		this.store.resumeEvents();
 	},
