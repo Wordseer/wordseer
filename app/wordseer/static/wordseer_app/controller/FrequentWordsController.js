@@ -50,16 +50,9 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 			panel.formValues = formValues;
 		}
 		if (!panel.getLayoutPanelModel().isSameSlice()) {
-			var params = {
-				instance: getInstance(),
-				user: getUsername(),
-			};
+			var params = {};
 			Ext.apply(params, formValues.serialize());
-			// if (formValues.search && formValues.search.length > 0) {
-			// 	Ext.apply(params, formValues.search[0]);
-			// }
 			var model = panel.getLayoutPanelModel();
-
 			// make one AJAX request then filter and populate the stores
 			Ext.Ajax.request({
                     method: 'GET',
@@ -166,15 +159,15 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 							},
 						]
 					}),
-					// Ext.create("Ext.panel.Panel", {
-					// 	title: 'Phrases',
-					// 	items: [
-					// 		{
-					// 			xtype: 'phraseslist',
-					// 			store: panel.getLayoutPanelModel().getPhrasesStore()
-					// 		}
-					// 	]
-					// }),
+					Ext.create("Ext.panel.Panel", {
+						title: 'Phrases',
+						items: [
+							{
+								xtype: 'phraseslist',
+								store: panel.getLayoutPanelModel().getPhrasesStore()
+							}
+						]
+					}),
 				],
 			});
 			overlay.showBy(button_el);

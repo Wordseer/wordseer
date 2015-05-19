@@ -14,7 +14,6 @@ Ext.define('WordSeer.store.PhrasesStore', {
 			root: 'results'
 		},
 		extraParams: {
-			instance: getInstance(),
 			length: 2,
 			has_function_words: 0
 		},

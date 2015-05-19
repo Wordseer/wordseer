@@ -223,6 +223,7 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
                     scope: me,
                     callback: me.addRelatedWordsOption,
                 });
+            // me.phrasesStore.load({params: params});
 
             /**
             // Similar words. We don't compute these in the back end right

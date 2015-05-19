@@ -42,7 +42,6 @@ Ext.define('WordSeer.model.LayoutPanelModel', {
 		*/
 		metadataTreeStore: false,
 
-		CoocurringWordsStore: false,
 		JStore: false,
 		VStore: false,
 		NStore: false,

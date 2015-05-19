@@ -393,12 +393,13 @@ Ext.define('WordSeer.controller.WordMenuController',{
 							},
 						]
 					}),
+					// TODO: without sending a query ID, the API can't filter these results
 					// Ext.create("Ext.panel.Panel", {
 					// 	title: 'Phrases',
 					// 	items: [
 					// 		{
 					// 			xtype: 'phraseslist',
-					// 			store: panel.getLayoutPanelModel().getPhrasesStore()
+					// 			store: menu.phrasesStore
 					// 		}
 					// 	]
 					// }),

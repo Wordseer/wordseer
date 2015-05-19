@@ -87,12 +87,13 @@ Ext.define('WordSeer.view.frequentwords.FrequentWordsList', {
 	constructor: function(cfg) {
 		this.callParent(arguments);
 		this.autoEl.cls += ' frequent-words-list';
-		// filter the store by POS
-		// suspent events to avoid triggering a premature 'datachanged' action
-		this.store.suspendEvents(); 
-		debugger;
-		this.store.filter("category", cfg.pos);
-		this.store.resumeEvents();
+		// filter the store by POS, if not phrases
+		if (cfg.pos != undefined) {
+			// suspend events to avoid triggering a premature 'datachanged' action
+			this.store.suspendEvents(); 
+			this.store.filter("category", cfg.pos);
+			this.store.resumeEvents();
+		}
 	},
 	initComponent: function() {
 		this.addEvents('search');
