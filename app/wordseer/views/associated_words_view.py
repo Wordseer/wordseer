@@ -52,27 +52,28 @@ class AssociatedWordsView(MethodView):
                         sentences.c.sentence_id).\
         group_by(Word.id)
     
-        response = {"Synsets": []}
+        response = {"Synsets": [], "Words": []}
+
+        alldocs = len(project.get_documents())
+
+        
         for word in associated_words:
             category = self.get_category(word.pos)
             if category is None:
                 continue
-            if category not in response:
-                response[category] = []
-
+            
             row = word._asdict()
+            row['category'] = category
 
             # calculate tf*idf
             tf = word.count
             df = db.session.query(WordCount.document_count).filter(WordCount.word_id == word.id)[0][0]
-            alldocs = len(project.get_documents())
             idf = alldocs / df
             row["score_sentences"] = tf * math.log(idf)
-            response[category].append(row)
+            response["Words"].append(row)
 
         # sort by tf*idf
-        for category in response: 
-            response[category] = sorted(response[category], key=lambda k: k['score_sentences'], reverse=True)
+        response["Words"] = sorted(response["Words"], key=lambda k: k['score_sentences'], reverse=True)
 
         return jsonify(response)
 

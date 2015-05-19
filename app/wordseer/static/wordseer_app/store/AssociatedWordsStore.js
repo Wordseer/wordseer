@@ -28,7 +28,7 @@ Ext.define('WordSeer.store.AssociatedWordsStore', {
 			url: ws_api_path + ws_project_path + project_id + '/associated_words',
 			reader: {
 				type: 'json',
-				root: pos
+				root: 'Words'
 			}
 		})
 	}

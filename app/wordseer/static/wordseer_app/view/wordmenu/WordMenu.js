@@ -189,16 +189,31 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
 
         }
         if (cls == "word" || cls == "phrase-set") {
+            // query for co-occurring words
+            
+            // initialize the stores
+            me.phrasesStore = Ext.create('WordSeer.store.PhrasesStore');
+            me.JStore = Ext.create('WordSeer.store.AssociatedWordsStore', {pos:'Adjectives'});
+            me.VStore = Ext.create('WordSeer.store.AssociatedWordsStore', {pos:'Verbs'});
+            me.NStore = Ext.create('WordSeer.store.AssociatedWordsStore', {pos:'Nouns'});
+
             menuItems.push({
                 text: "<span class='wordmenu-label'>Loading co-occurring</span> words...",
                 itemId: "related-words-placeholder",
             });
             var params = {};
-            params.instance = getInstance();
-            params.user = getUsername();
-            params.word = (cls == 'word') ? me.current.get('word'):
-                me.curent.get('id');
-            params.class = cls;
+            var search = {};
+
+            // load each store
+            if (cls == "word") {
+                search.gov = me.current.get('word');
+            } else {
+                search.gov = me.current.get('id');
+            }
+            search.govtype = cls;
+
+            params.search = [Ext.JSON.encode([search])];
+
             Ext.Ajax.request({
                     method: 'GET',
                     disableCaching: false,
@@ -208,6 +223,7 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
                     scope: me,
                     callback: me.addRelatedWordsOption,
                 });
+
             /**
             // Similar words. We don't compute these in the back end right
             // now.
@@ -245,18 +261,26 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
     in which  that word appears with the menu word.
     */
     addRelatedWordsOption: function(opts, success, response) {
-        var related_words = Ext.decode(response.responseText);
+        if (!success) return console.log('word menu: related words query failed');
+
+        // populate the stores
+        var related_words = Ext.decode(response.responseText).Words;
+        this.NStore.add(_.where(related_words, {category: 'Nouns'}));
+        this.JStore.add(_.where(related_words, {category: 'Adjectives'}));
+        this.VStore.add(_.where(related_words, {category: 'Verbs'}));
+        // debugger;
+
         var itemId = "related-words-placeholder";
         var placeholder = this.getComponent(itemId);
         if (placeholder) {
             this.remove(placeholder);
         }
+        
         this.add([{
             text: "<span class='wordmenu-label'>See</span> co-occurring words",
-            action: 'nearbywords',
-            data: related_words,
-            items:[],
+            action: 'nearbywords'
         }]);
+
         /**
         itemId = "similar-words-placeholder";
         placeholder = this.getComponent(itemId);

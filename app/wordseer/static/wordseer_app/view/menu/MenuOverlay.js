@@ -39,7 +39,6 @@ Ext.define('WordSeer.view.menu.MenuOverlay',  {
             cls: 'overlay-render-target',
             children: [],
         });
-        this.pinned = false;
     },
 
     initComponent: function() {
@@ -64,15 +63,20 @@ Ext.define('WordSeer.view.menu.MenuOverlay',  {
                 }
             });
         }
+
     },
 
     populate: function() {
         var me = this;
-        me.getEl().down('.nav-button-close')
-        .removeCls('nav-button-close')
-        .addCls('nav-button-pinned')
-        .addCls('disabled');
-        me.getEl().down('.nav-button-pinned').on('click', function(event, el) {
+
+        if (!me.pinned) {
+            me.getEl().down('.nav-button-close')
+            .removeCls('nav-button-close')
+            .addCls('nav-button-pinned')
+            .addCls('disabled');    
+        }
+        
+        me.getEl().down('.nav-button-pinned, .nav-button-close').on('click', function(event, el) {
             me.pinned = !me.pinned;
             if (me.pinned) {
                 this.removeCls('nav-button-pinned');

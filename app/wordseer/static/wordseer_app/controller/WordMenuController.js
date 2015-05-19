@@ -344,14 +344,68 @@ Ext.define('WordSeer.controller.WordMenuController',{
 	@param {Ext.menu.Item} menuitem The word menu item that was clicked.
 	*/
 	showNearbyWords: function(menuitem) {
-		var data = menuitem.data;
 		var position = menuitem.getPosition();
-		var popup = Ext.create('WordSeer.view.relatedwords.RelatedWordsPopup', {
-			data: data,
-			current: menuitem.up('wordmenu').getCurrent(),
-			formValues: menuitem.up('wordmenu').getFormValues()
-		});
-		popup.showAt(position[0], position[1]);
+		var menu = menuitem.up();
+		var word;
+		var cls = menu.current.get('class');
+
+		if (cls == 'word') {
+			word = menu.current.get('word');
+		}
+
+		var overlay = Ext.create('WordSeer.view.menu.MenuOverlay', {
+				destroyOnClose: true,
+				itemId: 'frequent-words-overlay',
+				title: "Words found near '" + word + "' ",
+				width: 380,
+				height: "75%",
+				layout: 'accordion',
+				draggable: true,
+				pinned: true,
+				items: [
+					Ext.create("Ext.panel.Panel", {
+						title: 'Nouns',
+						items: [
+							{
+								xtype: 'frequent-words',
+								store: menu.NStore,
+								pos: 'Nouns'
+							}
+						]
+					}),
+					Ext.create("Ext.panel.Panel", {
+						title: 'Verbs',
+						items: [
+							{
+								xtype: 'frequent-words',
+								store: menu.VStore,
+								pos: 'Verbs'
+							},
+						]
+					}),
+					Ext.create("Ext.panel.Panel", {
+						title: 'Adjectives',
+						items: [
+							{
+								xtype: 'frequent-words',
+								store: menu.JStore,
+								pos: 'Adjectives'
+							},
+						]
+					}),
+					// Ext.create("Ext.panel.Panel", {
+					// 	title: 'Phrases',
+					// 	items: [
+					// 		{
+					// 			xtype: 'phraseslist',
+					// 			store: panel.getLayoutPanelModel().getPhrasesStore()
+					// 		}
+					// 	]
+					// }),
+				],
+			});
+
+		overlay.showAt(position[0], 100);
 	},
 
 	/** Shows a popup displaying the words that occur in similar contexts
