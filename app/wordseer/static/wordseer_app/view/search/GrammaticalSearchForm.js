@@ -36,11 +36,12 @@ Ext.define('WordSeer.view.search.GrammaticalSearchForm',{
         },
         {
             name: 'all_word_forms',
-            fieldLabel: 'with stemming',
+            fieldLabel: 'search lemmas',
             labelAlign: 'right',
             labelWidth: 85,
             xtype: 'checkbox',
-            value: 'off',
+            value: 'on',
+            checked: true
         },
         //dealing with word sets
         {

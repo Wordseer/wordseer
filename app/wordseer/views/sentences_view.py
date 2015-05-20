@@ -16,7 +16,6 @@ class SentencesView(MethodView):
     def get(self, **kwargs):
         params = dict(kwargs, **request.args)        
         query = Query.query.get(params["query_id"])
-
         # Determine the words, phrases or phrase sets that match the query in
         # order to send back information about which terms should be highlighted
         # in the UI.
@@ -46,15 +45,16 @@ class SentencesView(MethodView):
 
     def get_matching_words(self, params):
         matching_words = []
-        if "gov" in params and "govtype" in params:
+        if "gov" in params and "govtype" in params and params["gov"][0]:
             is_set_id = params["govtype"][0] != "word"
+            search_lemmas = "all_word_forms" in params and params["all_word_forms"][0] == 'on'
             matching_words.extend(Word.get_matching_word_ids(params["gov"][0],
-                is_set_id))
-        if "dep" in params and "deptype" in params:
+                is_set_id, search_lemmas))
+        if "dep" in params and "deptype" in params and params["dep"][0]:
             is_set_id = params["deptype"][0] != "word"
+            search_lemmas = "all_word_forms" in params and params["all_word_forms"][0] == 'on'
             matching_words.extend(Word.get_matching_word_ids(params["dep"][0],
-                is_set_id))
-        print matching_words
+                is_set_id, search_lemmas))
         return matching_words
 
     def make_single_sentence_view(self, sentence, matching_words):
@@ -89,7 +89,7 @@ class SentencesView(MethodView):
         """ Constructs an HTML string to display to the user, in which each
         word is enclosed by a <span class='word' word-id=<word_id>
         sentence-id=<sentence_id>></span> and the whole
-        sentence is enclosed by a <span class='sentence'>. We sould send the
+        sentence is enclosed by a <span class='sentence'>. We could send the
         raw data, and have the javascript create and render the HTML, but
         creating the HTML server side turns out to be much faster in practice.
         """
