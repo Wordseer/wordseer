@@ -55,12 +55,16 @@ class AutoSuggest(MethodView):
 
         if "query" in params and len(params["query"]) > 0:
             query_string = params["query"][0]
+            # convert the JS boolean to Python
+            search_lemmas = params["search_lemmas"][0] == 'true'
+
             if len(query_string) == 0:
                 return "[]"
             like_query = "%" + query_string + "%"
             self.set_name_filter = Set.name.like(like_query)
             self.property_value_filter = Property.value.like(like_query)
             self.sequence_filter = Sequence.sequence.like(query_string + "%")
+            self.search_lemmas = search_lemmas
 
             suggestions = self.get_suggested_sets()
             suggestions.extend(self.get_suggested_properties())
@@ -205,14 +209,20 @@ class AutoSuggest(MethodView):
         """
         #TODO: document_count
         suggested_sequences = []
+        lemmatized_vals = [False]
+        if self.search_lemmas:
+            lemmatized_vals.append(True)
         sequences = db.session.query(Sequence.id,
             Sequence.sequence.label("text"),
             Sequence.length,
+            Sequence.lemmatized,
             literal_column("'phrase'").label("class"),
             func.count(SequenceInSentence.sentence_id).\
-                label("sentence_count")).\
+                label("sentence_count")
+        ).\
         filter(Sequence.project == self.project).\
         filter(SequenceInSentence.sequence_id == Sequence.id).\
+        filter(Sequence.lemmatized.in_(lemmatized_vals)).\
         filter(self.sequence_filter).\
         group_by(Sequence.sequence).\
         order_by(desc("sentence_count")).\
@@ -221,6 +231,12 @@ class AutoSuggest(MethodView):
 
         sequence_list = {}
         for sequence in sequences:
+            print "=" * 30
+            print "search lemmas:", self.search_lemmas
+            print "sequence lemmatized:", sequence.lemmatized
+            print "sequence:", sequence.text
+            print "=" * 30
+
             text = sequence.text.lower()
             # print text
             if text not in sequence_list and text is not None:

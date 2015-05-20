@@ -30,8 +30,9 @@ Ext.define('WordSeer.view.autosuggest.AutoSuggestTextField', {
 	valueChanged: function(view, newValue, oldValue) {
 		if (view.hasFocus) {
 			if (newValue != oldValue) {
+				var search_lemmas = view.up().down("checkbox[name=all_word_forms]").value;
 				view.menu.hide();
-				view.menu.refresh(newValue);
+				view.menu.refresh(newValue, search_lemmas);
 			}
 		}
 	},

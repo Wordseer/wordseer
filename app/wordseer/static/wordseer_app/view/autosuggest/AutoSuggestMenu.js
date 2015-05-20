@@ -55,14 +55,16 @@ Ext.define('WordSeer.view.autosuggest.AutoSuggestMenu', {
 		this.callParent(arguments);
 	},
 
-	refresh: function(query) {
+	refresh: function(query, search_lemmas) {
 		var me = this;
+		console.log(search_lemmas, typeof search_lemmas)
 		me.removeAll();
 		me.getStore().load({
 			scope: me,
 			params: {
 				user: getUsername(),
-				query: query
+				query: query,
+				search_lemmas: search_lemmas
 			},
 			callback: function(records, operation, success) {
 					var items = [];
