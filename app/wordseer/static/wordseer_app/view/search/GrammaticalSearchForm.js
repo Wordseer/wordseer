@@ -21,6 +21,7 @@ Ext.define('WordSeer.view.search.GrammaticalSearchForm',{
             flex:1,
             //xtype:'PhraseSetcombobox',
             xtype: 'phrases-autosuggest',
+            emptyText: 'wildcard: *'
         },
         {
             name:'relation',

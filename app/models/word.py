@@ -73,6 +73,9 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
                     for word in sequence.words:
                         word_ids.append(word.id)
         if query_string is not None:
+            # wildcard search
+            query_string = query_string.replace('*', '%')
+
             if search_lemmas:
                 w = Word.query.filter(
                     (Word.surface.like(query_string.lower())) | 
@@ -80,7 +83,7 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
                 )
             else:
                 w = Word.query.filter(
-                    Word.surface == query_string.lower()
+                    Word.surface.like(query_string.lower())
                 )
             for word in w:
                 word_ids.append(word.id)
