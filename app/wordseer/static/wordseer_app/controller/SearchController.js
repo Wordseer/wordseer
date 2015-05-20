@@ -126,6 +126,7 @@ Ext.define('WordSeer.controller.SearchController', {
 				"dep": "",
 				"deptype": "word",
 				"relation": "",
+				"all_word_forms": "on"
 			};
 			Ext.apply(formValues, values);
 			formValues.search.push(values);
