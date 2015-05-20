@@ -231,12 +231,6 @@ class AutoSuggest(MethodView):
 
         sequence_list = {}
         for sequence in sequences:
-            print "=" * 30
-            print "search lemmas:", self.search_lemmas
-            print "sequence lemmatized:", sequence.lemmatized
-            print "sequence:", sequence.text
-            print "=" * 30
-
             text = sequence.text.lower()
             # print text
             if text not in sequence_list and text is not None:
