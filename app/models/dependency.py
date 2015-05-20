@@ -89,12 +89,15 @@ class Dependency(db.Model, Base):
             A list of Sentence objects that contain the dependencies specified
             by the query parameters.
         """
+        
+        search_lemmas = "all_word_forms" in search_query_dict and search_query_dict["all_word_forms"] == 'on'
+        
         gov_ids = Word.get_matching_word_ids(
                 search_query_dict["gov"],
-                is_set_id = search_query_dict["govtype"] != "word")
+                is_set_id = search_query_dict["govtype"] != "word", search_lemmas=search_lemmas)
         dep_ids = Word.get_matching_word_ids(
                 search_query_dict["dep"],
-                is_set_id = search_query_dict["deptype"] != "word")
+                is_set_id = search_query_dict["deptype"] != "word", search_lemmas=search_lemmas)
         relationship = GrammaticalRelationship.query.filter(
             GrammaticalRelationship.name == search_query_dict["relation"]).first()
 

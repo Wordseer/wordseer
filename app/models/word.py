@@ -64,7 +64,6 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     @staticmethod
     def get_matching_word_ids(query_string=None, is_set_id=False, search_lemmas=True):
         """Returns a list of Word ids that match the given query"""
-        # TODO: implement stemming if query includes all_word_forms=True
         word_ids = []
         if is_set_id:
             sequences = SequenceSet.query.get(query_string).sequences
@@ -126,9 +125,9 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         """
         if "gov" in search_query_dict:
             is_set_id = search_query_dict["govtype"] != "word"
-            stemming = "all_word_forms" in search_query_dict and search_query_dict["all_word_forms"] == 'on'
+            search_lemmas = "all_word_forms" in search_query_dict and search_query_dict["all_word_forms"] == 'on'
             matching_word_ids = Word.get_matching_word_ids(
-                search_query_dict["gov"], is_set_id, stemming)
+                search_query_dict["gov"], is_set_id, search_lemmas)
             sentence_query = sentence_query.\
                 join(WordInSentence,
                     WordInSentence.sentence_id == Sentence.id).\
