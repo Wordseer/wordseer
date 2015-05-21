@@ -4,6 +4,7 @@ from .dependency import Dependency
 from .document import Document
 from .documentfile import DocumentFile
 from .flask_security import User, Role
+from .frequent_words import *
 from .grammaticalrelationship import GrammaticalRelationship
 from .log import *
 from .project import Project

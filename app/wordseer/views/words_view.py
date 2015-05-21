@@ -51,36 +51,29 @@ class WordsView(MethodView):
         else:
             # There's no query id, we just want the most frequent words in
             # the whole collection.
-            sentence_count_expr = WordCount.sentence_count
-            document_count_expr = WordCount.document_count
-            if is_lemmatized:
-                sentence_count_expr = func.sum(WordCount.sentence_count)
-                document_count_expr = func.sum(WordCount.document_count)
+            is_lemmatized = False
+            count_docs = False
 
-            words_query = db.session.query(
-                Word.id,
-                Word.lemma.label("lemma"),
-                Word.surface.label("word"),
-                sentence_count_expr.label("sentence_count"),
-                document_count_expr.label("document_count")).\
-            filter(WordCount.project_id == project.id).\
-            filter(WordCount.word_id == Word.id).\
-            filter(Word.part_of_speech.like(like_query))
-
-            if is_lemmatized:
-                words_query = words_query.group_by(Word.lemma)
+            words_query = FrequentWord.query.\
+                filter(FrequentWord.project_id == project.id).\
+                filter(FrequentWord.pos.like(like_query))
         
         words_query = words_query.order_by(desc("sentence_count"))
 
         results = []
         for word in words_query:
-            results.append({
-                "id": "." + str(word.id) if is_lemmatized else str(word.id),
+            result = {
                 "word": word.lemma if is_lemmatized else word.word,
                 "is_lemmatized": 1 if is_lemmatized else 0,
                 "count": word.sentence_count,
-                "document_count": word.document_count
-            })
+            }
+            if "query_id" in params: 
+                result["id"] = "." + str(word.id) if is_lemmatized else str(word.id)
+                result["document_count"] = word.document_count
+            else: 
+                result["id"] = str(word.word_id)
+
+            results.append(result)
         return results
 
     def post(self):

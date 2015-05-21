@@ -115,6 +115,7 @@ Ext.define('WordSeer.controller.SearchController', {
 
 		var formValues = Ext.create('WordSeer.model.FormValues');
 		formValues.widget_xtype = 'sentence-list-widget';
+		console.log(record)
 		if (record instanceof WordSeer.model.PhraseModel ||
 			record instanceof WordSeer.model.WordModel) {
 			// will be different property if single word or phrase
@@ -126,7 +127,7 @@ Ext.define('WordSeer.controller.SearchController', {
 				"dep": "",
 				"deptype": "word",
 				"relation": "",
-				"all_word_forms": "on"
+				"all_word_forms": false
 			};
 			Ext.apply(formValues, values);
 			formValues.search.push(values);

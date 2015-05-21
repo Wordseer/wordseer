@@ -15,7 +15,6 @@ Ext.define('WordSeer.store.FrequentWordsStore', {
 		pos: 'N'
 	},
 	model: 'WordSeer.model.WordModel',
-	filters: [{property:'is_lemmatized', value:1}],
 	proxy: {
 		type: 'ajax',
 		noCache: false,

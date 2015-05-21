@@ -29,6 +29,7 @@ class StructureExtractor(object):
         self.project = str_proc.project
         self.structure_file = open(structure_file, "r")
         self.document_structure = json.load(self.structure_file)
+        print self.document_structure
         self.logger = logging.getLogger(__name__)
         self.project_logger = logger.ProjectLogger(self.logger,
                 str_proc.project)
@@ -49,10 +50,12 @@ class StructureExtractor(object):
 
         try:
             doc = etree.parse(infile)
-        except(etree.XMLSyntaxError) as e:
-            self.project_logger.error("XML Error: %s; skipping file", str(e))
-            self.project_logger.info(infile)
-            return documents
+        # except(etree.XMLSyntaxError) as e:
+        except etree.Error as e:
+            print str(e)
+            # self.project_logger.error("XML Error: %s; skipping file", str(e))
+            # self.project_logger.info(infile)
+            # return documents
 
         extracted_units = self.extract_unit_information(self.document_structure,
             doc)
@@ -370,7 +373,7 @@ def _get_title(properties):
         if prop.name == "title":
             return prop.value
 
-    # If there's no title property, return empty string
+    # If there's no title property, return ` string
     return ""
 
 def assign_sentences(document):
