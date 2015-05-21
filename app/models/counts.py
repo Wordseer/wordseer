@@ -128,3 +128,37 @@ class DependencyCount(Count):
             new_record = cls(**kwargs)
             new_record.save(force=False)
             return new_record
+
+class PropertyCount(Count):
+    """Model to store counts for properties.
+    """
+
+    # We need to redefine ID here for polymorphic inheritance
+    id = db.Column(db.Integer, db.ForeignKey("count.id"), primary_key=True)
+
+    # Belongs to a property_metadata
+    property_meta_id = db.Column(db.Integer, db.ForeignKey("property_metadata.id"))
+    property_metadata = db.relationship("PropertyMetadata")
+    property_value = db.Column(db.String)
+
+    __mapper_args__ = {
+        "polymorphic_identity": "property_count",
+    }
+
+    @classmethod
+    def fast_find_or_initialize(cls, query, **kwargs):
+        """Use a query to see if a row exists.
+        """
+        tablename = cls.__tablename__
+        query_base = ("FROM count JOIN %s ON count.id = property_count.id "
+            "WHERE %s LIMIT 1") % (tablename, query)
+        query = "SELECT EXISTS (SELECT 1 %s)" % query_base
+        match = db.session.execute(query).fetchone()
+        if match == (1,):
+            return db.session.execute(("SELECT document_count, "
+                " sentence_count %s") % query_base).fetchone()
+        else:
+            new_record = cls(**kwargs)
+            new_record.save(force=False)
+            return new_record
+

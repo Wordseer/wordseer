@@ -2,6 +2,7 @@ from flask.views import MethodView
 from flask.json import jsonify, dumps
 from flask import request
 from sqlalchemy import func, not_
+from sqlalchemy.sql.expression import desc
 
 from app import app
 from app.wordseer import wordseer
@@ -65,16 +66,29 @@ class PropertiesView(MethodView):
         return values
 
     def get_metadata_counts(self, params, project, property):
-        values = db.session.query(
-            Property.value.label("value"),
-            func.count(Property.unit_id.distinct()).label("unit_count")).\
-        filter(Property.project_id == project.id).\
-        filter(not_(Property.name.contains("_set"))).\
-        filter(Property.name == property.property_name).\
-        group_by(Property.value)
-
         if "query_id" in params:
-           values = self.restrict_query_to_cached_sentences(values, params)
+            values = db.session.query(
+                Property.value.label("value"),
+                func.count(Property.unit_id.distinct()).label("unit_count")
+            )
+            values = self.restrict_query_to_cached_sentences(values, params)
+
+            # filter(Property.project_id == project.id).\
+            values.filter(not_(Property.name.contains("_set"))).\
+            filter(Property.name == property.property_name).\
+            group_by(Property.value)
+        else:
+            values = db.session.query(
+                Property.value.label('value'),
+                PropertyCount.sentence_count.label("unit_count")
+            ).filter(Property.project_id == project.id).\
+            filter(not_(Property.name.contains("_set"))).\
+            filter(Property.name == property.property_name).\
+            filter(PropertyCount.property_value == Property.value).\
+            order_by(desc("unit_count")).\
+            group_by(Property.value).\
+            limit(20)
+
         return values.all()
 
     def get_metadata_counts_for_sets(self, params, project, property):
@@ -106,6 +120,7 @@ class PropertiesView(MethodView):
         if project is None:
             # TODO: real error response
             print("Project not found")
+            return #500 error
 
         view_type = params.get("view")[0]
 
@@ -142,9 +157,10 @@ class PropertiesView(MethodView):
             for value in values:
                 as_dict = value._asdict()
                 text = value.value
-                if "_set" in property.property_name:
-                    set = Set.query.get(value.value)
-                    text = set.name
+                # if "_set" in property.property_name:
+                #     print "\n", "=" * 30, "\n Set value:", value.value
+                #     set = Set.query.get(value.value)
+                #     text = set.name
                 document_count = value.unit_count
                 if "document_count" in as_dict:
                     document_count = value.document_count

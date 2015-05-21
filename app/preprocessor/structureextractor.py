@@ -29,7 +29,6 @@ class StructureExtractor(object):
         self.project = str_proc.project
         self.structure_file = open(structure_file, "r")
         self.document_structure = json.load(self.structure_file)
-        print self.document_structure
         self.logger = logging.getLogger(__name__)
         self.project_logger = logger.ProjectLogger(self.logger,
                 str_proc.project)

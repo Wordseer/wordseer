@@ -4,11 +4,11 @@ models.
 
 import logging
 from sqlalchemy import func
+from sqlalchemy.sql.expression import desc
 
 from app import db
 from app.models import *
 from .logger import ProjectLogger
-from app.models import Document, Dependency, Sequence, Word
 
 def count_all(project, commit_interval=500):
     """Run counts for documents, dependencies, sequences, and words.
@@ -21,6 +21,7 @@ def count_all(project, commit_interval=500):
     count_dependencies(project, commit_interval)
     count_sequences(project, commit_interval)
     count_words(project, commit_interval)
+    count_sentences_by_property(project, commit_interval)
 
 def count_documents(project, commit_interval):
     """Calculate counts for documents.
@@ -176,3 +177,58 @@ def count_words(project, commit_interval):
     db.session.commit()
     project_logger.info('Counted %s words.', count)
 
+def count_sentences_by_property(project, commit_interval):
+    """Calculate counts for sentences matching properties.
+
+    Arguments:
+        project (Project): The ``Project`` to run counts for.
+        commit_interval (int): This method will commit the counts every this
+            many times.
+    """
+    count = 0
+    logger = logging.getLogger(__name__)
+    project_logger = ProjectLogger(logger, project)
+
+    # get master list of properties
+    properties = db.session.query(
+        PropertyMetadata.property_name.label("name"),
+        PropertyMetadata.data_type.label("data_type"),
+        PropertyMetadata.date_format.label("date_format"),
+        PropertyMetadata.id.label("id")
+    ).\
+    join(Property, Property.property_metadata_id == PropertyMetadata.id).\
+    filter(Property.project_id == project.id).\
+    filter(~PropertyMetadata.property_name.contains('_set')).\
+    filter(PropertyMetadata.is_category == True).\
+    group_by(PropertyMetadata.property_name)
+
+    count = 0
+    for property in properties: 
+        values = db.session.query(
+            Property.value.label('value'),
+            func.count(PropertyOfSentence.sentence_id).label("sentence_count")
+        ).filter(Property.project_id == project.id).\
+        filter(Property.name == property.name).\
+        filter(PropertyOfSentence.property_id == Property.id).\
+        order_by(desc("sentence_count")).\
+        group_by(Property.value).\
+        limit(20)
+
+        property_obj = PropertyMetadata.query.get(property.id)
+
+        for value in values:
+            count += 1
+            property_count = PropertyCount(
+                project=project,
+                property_metadata=property_obj,
+                property_value=value.value,
+                sentence_count=value.sentence_count
+            )
+            property_count.save(False)
+            property_obj.save(False)
+            if count % commit_interval == 0:
+                db.session.commit()
+                project_logger.info("Calculating sentence count for property/value pair %s", count)
+
+    db.session.commit()
+    project_logger.info('Counted %s property/value pairs.', count)
