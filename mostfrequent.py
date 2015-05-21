@@ -4,7 +4,7 @@ from sqlalchemy import func
 from sqlalchemy.sql.expression import desc
 
 from app import app, db
-from app.models import FrequentWord, Project, Sequence, SequenceCount, Word, WordCount
+from app.models import FrequentSequence, FrequentWord, Project, Sequence, SequenceCount, Word, WordCount
 
 STOPWORDS = app.config["STOPWORDS"]
 
@@ -47,37 +47,30 @@ def get_frequent_sequences_for_project(proj_id, length):
 	    filter(Sequence.lemmatized == False).\
 	    filter(Sequence.has_function_words == False).\
 	    order_by(desc("sentence_count")).\
-	    limit(20)
+	    limit(30)
 
-	results = []
 	for seq in sequence_query:
-	    results.append({
-	        "text": seq.text,
-	        "sequence_id": seq.id,
-	        "sentence_count": seq.sentence_count,
-	        "project_id": proj_id,
-	    })
-	return results
+	    freqseq = FrequentSequence(sequence=seq.text, sequence_id=seq.id, 
+	    	sentence_count=seq.sentence_count, project_id=proj_id)
+	    freqseq.save()
 
 def main():
+	
+	#frequent words
 	parts_of_speech = ('NN', 'VB', 'JJ')
-
-	# delete previous results for this project, if any
 	db.session.query(FrequentWord).\
 		filter(FrequentWord.project_id == 3).\
 		delete()
-
 	for pos in parts_of_speech:
-		results = get_frequent_words_for_project(3, pos)
+		get_frequent_words_for_project(3, pos)
+	print "frequent word results:", FrequentWord.query.count()
 
-	print FrequentWord.query.count()
-
-	seqs = get_frequent_sequences_for_project(3, 2)
-
-	print '\n', "="*30
-	print 'SEQUENCES'
-	for seq in seqs:
-		print seq['text'], seq['sentence_count']
+	#frequent sequences
+	db.session.query(FrequentSequence).\
+		filter(FrequentSequence.project_id == 3).\
+		delete()
+	get_frequent_sequences_for_project(3, 2)
+	print "frequent sequence results:", FrequentSequence.query.count()
 
 if __name__ == '__main__':
 	main()

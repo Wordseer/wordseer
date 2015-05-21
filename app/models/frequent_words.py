@@ -24,9 +24,13 @@ class FrequentSequence(db.Model, Base):
 	"""Index of the most frequent Sequences in a project
 
 	Attributes:
-		text
+		sequence
 		sequence_id
 		sentence_count
 		project_id
 	"""
-	pass
+	# fields
+	sequence = db.Column(db.String)
+	sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
+	sentence_count = db.Column(db.Integer)
+	project_id = db.Column(db.Integer, db.ForeignKey("project.id"))

@@ -46,30 +46,31 @@ class SequencesView(MethodView):
         else:
             # There's no query id, we just want the most frequent sequences in
             # the whole collection.
-            sequence_query = db.session.query(
-                Sequence.id,
-                Sequence.lemmatized.label("lemmatized"),
-                Sequence.has_function_words.label("has_function_words"),
-                Sequence.sequence.label("sequence"),
-                SequenceCount.sentence_count.label("sentence_count"),
-                SequenceCount.document_count.label("document_count")).\
-            filter(SequenceCount.project_id == project.id).\
-            filter(SequenceCount.sequence_id == Sequence.id).\
-            filter(Sequence.length == length)
+            sequence_query = FrequentSequence.query.\
+                filter(FrequentSequence.project_id == project.id)
 
         sequence_query = sequence_query.order_by(desc("sentence_count"))
         results = []
         for sequence in sequence_query:
-            results.append({
-                "id": sequence.id,
+            result = {
                 "count": sequence.sentence_count,
-                "document_count": sequence.document_count,
                 "sentence_count": sequence.sentence_count,
-                "has_function_words": 1 if sequence.has_function_words else 0,
-                "lemmatized": 1 if sequence.lemmatized else 0,
                 "sequence": sequence.sequence,
-                "length": length
-            })
+                
+            }
+            if "query_id" in params:
+                result["id"] = sequence.id
+                result["has_function_words"] = 1 if sequence.has_function_words else 0
+                result["lemmatized"] = 1 if sequence.lemmatized else 0
+                result["length"] = length
+                result["document_count"] = sequence.document_count
+            else:
+                result["id"] = sequence.sequence_id
+
+                
+                
+
+            results.append(result)
 
         return jsonify(results = results)
 

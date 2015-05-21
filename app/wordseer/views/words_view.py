@@ -31,7 +31,7 @@ class WordsView(MethodView):
     def get_frequent_words(
         self, params, project, part_of_speech, is_lemmatized):
         words_query = None
-        like_query = "%" + part_of_speech + "%"
+        like_query = part_of_speech + "%"
         if "query_id" in params:
             query = Query.query.get(params["query_id"])
             words_query = db.session.query(
