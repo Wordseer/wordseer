@@ -121,6 +121,10 @@ class PropertiesView(MethodView):
         results = []
         for property in properties:
             type = property.data_type
+            # if type is missing for some reason, fall back to String
+            if type == None:
+                type = "string"
+
             if type == "date":
                 type += "_" + property.date_format
 
