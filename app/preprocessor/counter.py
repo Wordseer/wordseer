@@ -22,6 +22,7 @@ def count_all(project, commit_interval=500):
     count_sequences(project, commit_interval)
     count_words(project, commit_interval)
     count_sentences_by_property(project, commit_interval)
+    count_most_frequent(project, commit_interval)
 
 def count_documents(project, commit_interval):
     """Calculate counts for documents.
@@ -232,3 +233,75 @@ def count_sentences_by_property(project, commit_interval):
 
     db.session.commit()
     project_logger.info('Counted %s property/value pairs.', count)
+
+def count_most_frequent(project, commit_interval):
+    """Calculate the overall most frequent words and phrases for a given project.
+
+    Arguments:
+        project (Project): The ``Project`` to run counts for.
+        commit_interval (int): This method will commit the counts every this
+            many times.
+    """
+    logger = logging.getLogger(__name__)
+    project_logger = ProjectLogger(logger, project)
+    STOPWORDS = app.config["STOPWORDS"]
+
+    #words
+    parts_of_speech = ('NN', 'VB', 'JJ')
+    for pos in parts_of_speech:
+        count = 0
+        like_query = pos + "%"
+
+        words_query = db.session.query(
+            Word.id,
+            Word.surface.label("word"),
+            WordCount.sentence_count.label("sentence_count")
+        ).\
+            filter(WordCount.project_id == project.id).\
+            filter(WordCount.word_id == Word.id).\
+            filter(Word.part_of_speech.like(like_query)).\
+            filter(~Word.lemma.in_(STOPWORDS)).\
+            filter(~Word.surface.in_(STOPWORDS)).\
+            order_by(desc("sentence_count")).\
+            limit(20)
+
+        for word in words_query:
+            count += 1
+            freqword = FrequentWord(word=word.word, word_id=word.id, pos=pos, 
+                sentence_count=word.sentence_count, project_id=project.id)
+            freqword.save(False)
+            if count % commit_interval == 0:
+                db.session.commit()
+                project_logger.info("Calculating frequent %s %s", pos, count)
+
+        db.session.commit()
+        project_logger.info('Counted %s frequent %s\'s.', count, pos)
+
+    #sequences
+    count = 0
+    sequence_length = 2
+    sequence_query = db.session.query(
+        Sequence.id,
+        Sequence.has_function_words.label("has_function_words"),
+        Sequence.sequence.label("text"),
+        SequenceCount.sentence_count.label("sentence_count"),
+    ).\
+        filter(SequenceCount.project_id == project.id).\
+        filter(SequenceCount.sequence_id == Sequence.id).\
+        filter(Sequence.length == sequence_length).\
+        filter(Sequence.lemmatized == False).\
+        filter(Sequence.has_function_words == False).\
+        order_by(desc("sentence_count")).\
+        limit(30)
+
+    for seq in sequence_query:
+        count += 1
+        freqseq = FrequentSequence(sequence=seq.text, sequence_id=seq.id, 
+            sentence_count=seq.sentence_count, project_id=project.id)
+        freqseq.save(False)
+        if count % commit_interval == 0:
+            db.session.commit()
+            project_logger.info("Calculating frequent sequence %s", count)
+
+    db.session.commit()
+    project_logger.info('Counted %s most frequent sequences.', count)

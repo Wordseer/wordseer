@@ -264,9 +264,9 @@ def split_sentences(text):
         approx_sentence_length = len(sentence_text.split(" "))
 
         if approx_sentence_length > max_length:
-            project_logger.warning("Sentence appears to be too long, max "
-                "length is %s: %s", str(max_length),
-                sentence_text[:truncate_length] + "...")
+            # project_logger.warning("Sentence appears to be too long, max "
+            #     "length is %s: %s", str(max_length),
+            #     sentence_text[:truncate_length] + "...")
 
             # Attempt to split on a suitable punctuation mark
             # Order (tentative): semicolon, double-dash, colon, comma
@@ -283,8 +283,8 @@ def split_sentences(text):
                 if all([len(subsentence.split(" ")) <= max_length
                     for subsentence in subsentences]):
 
-                    project_logger.info("Splitting sentence around %s to fit "
-                        "length limit.", character)
+                    # project_logger.info("Splitting sentence around %s to fit "
+                    #     "length limit.", character)
                     break
 
                 # Otherwise, reset subsentences and try again
@@ -293,8 +293,8 @@ def split_sentences(text):
 
             # If none of the split characters worked, force split on max_length
             if not subsentences:
-                project_logger.warning("No suitable punctuation for " +
-                    "splitting; forcing split on max_length number of words")
+                # project_logger.warning("No suitable punctuation for " +
+                #     "splitting; forcing split on max_length number of words")
                 subsentences = []
                 split_sentence = sentence_text.split(" ")
 
