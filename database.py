@@ -155,6 +155,7 @@ def index():
         # compound indices
         Index('ix_count_projid_id', models.Count.project_id, models.Count.id),
         Index('ix_property_name_value', models.Property.name, models.Property.value),
+        Index('ix_property_id_name_value', models.Property.id, models.Property.name, models.Property.value),
         Index("ix_property_projid_name_value", models.Property.project_id, models.Property.name, models.Property.value),
         Index('ix_property_projid_propmetaid', models.Property.project_id, models.Property.property_metadata_id),
         Index('ix_property_projid_name_value', models.Property.project_id, models.Property.name, models.Property.value),
@@ -173,6 +174,7 @@ def index():
         Index('ix_set_projid_parentid_type', models.Set.project_id, models.Set.parent_id, models.Set.type),
         Index('ix_set_projid_type', models.Set.project_id, models.Set.type),
         Index("ix_word_pos_id", models.Word.part_of_speech, models.Word.id),
+        Index("ix_word_surface_lemma", models.Word.surface, models.Word.lemma),
         Index('ix_wordcount_wordid_id', models.WordCount.word_id, models.WordCount.id),
         Index('ix_wordinsent_wordid_sentid', models.WordInSentence.word_id, models.WordInSentence.sentence_id),
         # TODO: it can't find this column in the table for some reason
