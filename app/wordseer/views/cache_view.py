@@ -138,7 +138,6 @@ class QueryCacheView(MethodView):
                 for value_expression in value_list:
                     (text, value) = value_expression.split("__")
                     values.append(value)
-                    print value
                 matching_sentences = db.session.query(
                     PropertyOfSentence.sentence_id.label("sentence_id")).\
                 join(Property, PropertyOfSentence.property_id == Property.id).\

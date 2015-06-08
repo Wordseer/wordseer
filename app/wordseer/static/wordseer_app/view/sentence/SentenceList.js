@@ -90,9 +90,7 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
 
     populate: function() {
         var title = 'Search Results';
-        if (this.getStore().getCount() > 0) {
-            title +=  " (" + this.getStore().getCount() +")";
-        }
+        title +=  " (" + this.getStore().getTotalCount() +")";
         this.resetTitle(title);
         this.callParent(arguments);
     },

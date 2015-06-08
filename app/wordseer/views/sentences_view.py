@@ -31,7 +31,12 @@ class SentencesView(MethodView):
             # If not, then return the data for all the sentences that match the
             # query.
             results = []
-            for sentence in query.sentences:
+            total = len(query.sentences)
+            start = int(params["start"][0])
+
+            end = int(params["limit"][0]) + start
+
+            for sentence in query.sentences[start:end]:
                 result = {
                     "sentence": self.make_sentence_dict(sentence,
                                                         matching_words),
@@ -41,7 +46,7 @@ class SentencesView(MethodView):
                 }
                 self.add_metadata_properties(sentence, result)
                 results.append(result)
-            return jsonify(results = results, total = len(results))
+            return jsonify(results = results, total = total)
 
     def get_matching_words(self, params):
         matching_words = []
@@ -119,8 +124,7 @@ class SentencesView(MethodView):
 
     def make_sentence_dict(self, sentence, matching_words):
         sentence_dict = {}
-        sentence_dict["words"] = self.make_sentence_html(sentence,
-                                                         matching_words)
+        sentence_dict["words"] = self.make_sentence_html(sentence, matching_words)
         return sentence_dict
 
     def post(self):

@@ -25,7 +25,17 @@ Ext.define('WordSeer.controller.SentenceListController', {
 				list in which to display the new search results.
 				*/
 				search: function(formValues, grid) {
-					grid.getStore().load({params:formValues.serialize()});
+					var params = formValues.serialize();
+					grid.getStore().loadPage(1,{params:params, callback: function(records, operation, success) {
+					        var pages = Math.ceil(this.totalCount / this.pageSize),
+					        	i = 2;
+					        while (i <= pages) {
+					        	this.loadPage(i, {params: params, addRecords: true});
+					        	i++;
+					        }
+					        
+					    }});
+
 				},
 				datachanged: function(widget) {
 					// highlight all the words

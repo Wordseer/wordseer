@@ -8,9 +8,6 @@ Ext.define('WordSeer.store.SentenceSearchResultStore', {
         noCache: false,
         timeout: 9000000,
         url: ws_api_path + ws_project_path + project_id + '/sentences',
-        extraParams: {
-          user: getUsername(),
-        },
         reader: {
             type: 'json',
             root: 'results',
@@ -19,6 +16,5 @@ Ext.define('WordSeer.store.SentenceSearchResultStore', {
     },
     constructor: function(config) {
         this.callParent(arguments);
-        this.getProxy().setExtraParam('user', getUsername());
     }
 });
