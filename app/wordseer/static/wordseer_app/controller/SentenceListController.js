@@ -26,11 +26,27 @@ Ext.define('WordSeer.controller.SentenceListController', {
 				*/
 				search: function(formValues, grid) {
 					var params = formValues.serialize();
-					grid.getStore().loadPage(1,{params:params, callback: function(records, operation, success) {
-					        var pages = Math.ceil(this.totalCount / this.pageSize),
-					        	i = 2;
+					grid.getStore().on('load', function(store){
+						if (store.data.length == store.totalCount) {
+							// all data is loaded from server:
+							// hide the "rows loading" placeholder
+							// debugger;
+							this.el.down('.rowsloading').addCls('hidden')
+						}
+						
+					}, grid);
+
+					grid.getStore().loadPage(1,{params:params, scope: grid, callback: function(records, operation, success) {
+					        var store = grid.getStore();
+					        
+					        grid.el.down('.rowsloading').removeCls('hidden');
+
+					        var start = store.pageSize;
+					        store.pageSize = 100;
+					        var pages = Math.ceil(store.totalCount / store.pageSize),
+					        	i = 1;
 					        while (i <= pages) {
-					        	this.loadPage(i, {params: params, addRecords: true});
+					        	store.loadPage(i, {params: params, addRecords: true});
 					        	i++;
 					        }
 					        

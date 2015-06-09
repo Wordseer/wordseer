@@ -995,6 +995,18 @@ div.metatag {
     }
 }
 
+div.rowsloading {
+	text-align: center;
+	padding: $space_5;
+	font-family: $slab-serif;
+	font-size: $large-font-size;
+	background-color: lighten($pink, 5%);
+
+	&.hidden {
+		display: none;
+	}
+}
+
 
 /*******************************************************************************
 Visualizations - metadata profile

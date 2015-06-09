@@ -84,6 +84,13 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
         this.base_field_names = this.model.getBaseFieldNames();
         this.all_fields = this.model.getFields();
 
+        // add a "rows loading" placeholder 
+        this.autoEl.children.push({
+            tag: 'div', 
+            cls: 'rowsloading hidden',
+            html: '<i class="fa fa-circle-o-notch fa-spin"></i> Loading more sentences ...'
+        });
+
         this.callParent(arguments);
 
     },

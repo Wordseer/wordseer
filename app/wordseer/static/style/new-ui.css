@@ -1220,59 +1220,72 @@ div.metatag.sorting.lev2 {
   background-color: #fff2fe;
 }
 
+/* line 998, new-ui.scss */
+div.rowsloading {
+  text-align: center;
+  padding: 31.45728px;
+  font-family: "Bitter";
+  font-size: 18px;
+  background-color: #fff2fe;
+}
+/* line 1005, new-ui.scss */
+div.rowsloading.hidden {
+  display: none;
+}
+
 /*******************************************************************************
 Visualizations - metadata profile
 *******************************************************************************/
-/* line 1004, new-ui.scss */
+/* line 1016, new-ui.scss */
 .panel-header .controls, .panel-header .display {
   font-family: "Bitter";
   font-size: 12px;
   color: #64839f;
 }
-/* line 1009, new-ui.scss */
+/* line 1021, new-ui.scss */
 .panel-header .controls .viz-toggle, .panel-header .display .viz-toggle {
   display: inline-block;
   margin-left: 12.288px;
 }
 
-/* line 1017, new-ui.scss */
+/* line 1029, new-ui.scss */
 .viz-container {
   float: left;
   position: relative;
   margin-top: 31.45728px;
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
-/* line 1021, new-ui.scss */
+/* line 1033, new-ui.scss */
 .viz-container .timeselect {
   position: absolute;
   top: 7px;
   right: 5px;
 }
-/* line 1027, new-ui.scss */
+/* line 1039, new-ui.scss */
 .viz-container .wordfreq {
   width: 500px;
   height: 400px;
 }
-/* line 1031, new-ui.scss */
+/* line 1043, new-ui.scss */
 .viz-container .wordfreq .nvtooltip {
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
-/* line 1036, new-ui.scss */
+/* line 1048, new-ui.scss */
 .viz-container .wordfreq svg text {
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
-/* line 1045, new-ui.scss */
+/* line 1057, new-ui.scss */
 .viz-container div.property {
   font-size: 18px;
   font-weight: 700;
   margin-left: 50px;
 }
-/* line 1050, new-ui.scss */
+/* line 1062, new-ui.scss */
 .viz-container div.property a.download {
   padding-left: 10px;
   color: #64839f;
 }
-/* line 1055, new-ui.scss */
+/* line 1067, new-ui.scss */
 .viz-container div.property span.sort {
   display: inline-block;
   margin-left: 10px;
@@ -1280,12 +1293,12 @@ Visualizations - metadata profile
   position: relative;
   z-index: 10;
 }
-/* line 1062, new-ui.scss */
+/* line 1074, new-ui.scss */
 .viz-container div.property span.sort .sort-control {
   color: #64839f;
   padding-right: 15px;
 }
-/* line 1066, new-ui.scss */
+/* line 1078, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu {
   position: absolute;
   top: -9px;
@@ -1298,7 +1311,7 @@ Visualizations - metadata profile
   visibility: hidden;
   transition: visibility 0s ease 0.3s,opacity 0.3s ease;
 }
-/* line 1078, new-ui.scss */
+/* line 1090, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu i {
   padding: 5px;
   width: 100%;
@@ -1306,16 +1319,16 @@ Visualizations - metadata profile
   background-color: #eeeeee;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-/* line 1086, new-ui.scss */
+/* line 1098, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu i.selected {
   color: #64839f;
 }
-/* line 1090, new-ui.scss */
+/* line 1102, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu i:hover {
   background-color: #64839f;
   color: #eeeeee;
 }
-/* line 1098, new-ui.scss */
+/* line 1110, new-ui.scss */
 .viz-container div.property span.sort .sort-control:hover .sort-menu {
   opacity: 1;
   visibility: visible;
@@ -1323,7 +1336,7 @@ Visualizations - metadata profile
   z-index: 999;
 }
 
-/* line 1116, new-ui.scss */
+/* line 1128, new-ui.scss */
 .c3-axis-x .tick text tspan:nth-child(n+5) {
   display: none;
 }
