@@ -483,7 +483,7 @@ def document_map(project_id, document_file_id):
         return app.login_manager.unauthorized()
 
     filename = os.path.split(document.path)[1]
-    project = Project.query.get(project_id) 
+    project = Project.query.get(project_id)
     map_document = forms.MapDocumentForm()
     return render_template("document_map.html",
         document=document,

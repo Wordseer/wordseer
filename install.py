@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 """Installtion script for WordSeer.
 """
+import platform
 import argparse
 import shutil
 import os
@@ -10,7 +11,6 @@ import urllib2
 import zipfile
 import gzip
 import glob
-import pdb
 import json
 # Config
 # Location of CoreNLP
@@ -28,6 +28,7 @@ CORENLP_LOCAL_NAME = "stanford-corenlp"
 PREFERENCES_PATH = "./preferences.json"
 FULL_INSTALL_TYPE = "full"
 PARTIAL_INSTALL_TYPE = "partial"
+VENV_DIR = sys.prefix
 
 CORENLP_LOCAL_PATH = os.path.join(CORENLP_LOCAL_DIR, CORENLP_LOCAL_NAME)
 CORENLP_ZIP_DIRECTORY = os.path.splitext(os.path.basename(CORENLP))[0]
@@ -68,10 +69,29 @@ def install_prerequisites(sudo):
     Arguments:
         sudo (boolean): If ``True``, use sudo.
     """
-    #TODO: this is unix-specific
     system = sys.platform
+    success = 0
 
-    if "linux" in system and sudo:
+    if "win32" in system:
+        print "Checking windows prerequisites"
+        arch, operating_system = platform.architecture()
+        if '32' in arch:
+            if not check_package_exists("pywin"):
+                print "installing pywin32 (32bit)"
+                subprocess.call("easy_install-2.7 bin\\win32\\pywin32-219.win32-py2.7.exe", shell=True)
+            if not check_package_exists("lxml"):
+                print "installing lxml (32bit)"
+                success = subprocess.call("easy_install-2.7 bin\\win32\\lxml-3.3.6.win32-py2.7.exe", shell=True)
+
+        elif '64' in arch:
+            if not check_package_exists("pywin"):
+                print "installing pywin32 (64bit)"
+                subprocess.call("easy_install-2.7 bin\\win64\\pywin32-219.win-amd64-py2.7.exe", shell=True)
+            if not check_package_exists("lxml"):
+                print "installing lxml (64bit)"
+                success = subprocess.call("easy_install-2.7 bin\\win64\\lxml-3.3.6.win-amd64-py2.7.exe", shell=True)
+
+    elif "linux" in system and sudo:
         print "Attempting to install prerequisites for linux."
         uname = subprocess.call(["uname -a"], shell=True)
         if "ARCH" in system:
@@ -83,11 +103,18 @@ def install_prerequisites(sudo):
                 shell=True)
 
     elif "darwin" in system:
-        print "Mac detected. Compiling requirements for lxml."
-        subprocess.call(["STATIC_DEPS=true pip2.7 install lxml"], shell=True)
+        print "Mac detected. Installing lxml from binary."
+        subprocess.call("pip install --upgrade pip", shell=True)
+        success = subprocess.call("pip install bin/macosx/lxml-3.3.6-cp27-none-macosx_10_9_intel.whl", shell=True)
 
     else:
         print "Not installing prerequisites."
+    
+    if success != 0:
+        print "Could not install prerequisites. Quitting."
+        sys.exit(1)
+
+    print "Finished installing prerequisites."
 
 def install_interactively():
     """Install while prompting the user.
@@ -125,7 +152,7 @@ def install_interactively():
         set_install_type(PARTIAL_INSTALL_TYPE)
 
     setup_database()
-
+    write_startup_scripts()
     sys.exit(0)
 
 def make_virtualenv(sudo_install=False):
@@ -136,22 +163,50 @@ def make_virtualenv(sudo_install=False):
             virtualenv via pip if it isn't installed already.
     """
     print "Setting up virtualenv."
+    
     venv_name = "venv"
-    packages = subprocess.check_output(["pip2.7", "freeze"])
-    if not "virtualenv" in packages:
+    if not check_package_exists("virtualenv"):
         if sudo_install:
+            system = sys.platform
             print "Installing virtualenv."
-            subprocess.call(["sudo", "pip2.7", "install", "virtualenv"])
+            if "win32" in system:
+                subprocess.call("pip install virtualenv", shell=True)
+            else:
+                subprocess.call("sudo pip2.7 install virtualenv", shell=True)
         else:
             print "Virtualenv not found, not installing."
-            return
+            sys.exit(1)
     else:
         print "Virtualenv already installed."
-    subprocess.call(["virtualenv", "--python=python2.7", venv_name])
-    venv_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
-    #TODO: this is unix-specific
-    os.environ["PATH"] = (os.path.join(ROOT_DIRECTORY, venv_name, "bin") + ":" +
-        os.environ["PATH"])
+        try:
+            subprocess.call("virtualenv")
+        except OSError:
+            print "Virtualenv still not located, trying to find."
+            #TODO: this is not multiplatform
+            pip_output = subprocess.check_output("pip install virtualenv", shell=True)
+            path = pip_output.split("\n")[0].split()[-1]
+            os.environ["PATH"] += ":" + os.path.join(path, "../../../bin")
+        try:
+            subprocess.call("virtualenv")
+        except OSError:
+            print "Virtualenv could not be located. Exiting."
+            sys.exit(1)
+
+    #Initiate VENV
+    subprocess_output = subprocess.call("virtualenv --clear --python=python2.7 " + venv_name, shell=True)
+    if int(subprocess_output) != 0:    
+        subprocess_output =  subprocess.call("virtualenv " + venv_name, shell=True)
+    
+    global VENV_DIR
+    VENV_DIR= os.path.join(os.path.dirname(os.path.realpath(__file__)), venv_name)
+    
+    #clone python.exe to venv root (required by winpexpect)
+    if "win32" in sys.platform:
+        add_to_path(os.path.join(VENV_DIR, "Scripts"))
+        shutil.copyfile(os.path.join(VENV_DIR,'Scripts', 'python.exe '), os.path.join(VENV_DIR, 'python.exe '))
+    
+    else:
+        add_to_path(os.path.join(VENV_DIR, "bin"))
 
 def install_python_packages(reqs=REQUIREMENTS_FULL, full=True):
     """Install the required python modules.
@@ -160,14 +215,18 @@ def install_python_packages(reqs=REQUIREMENTS_FULL, full=True):
         reqs (str): The requirements file to install from.
         full (boolean): ``True`` if a full installation, ``False`` otherwise.
     """
-    print "Installing python dependencies from " + reqs
-    system = subprocess.check_output(["uname", "-a"])
 
-    subprocess.call(["pip2.7 install -r " + reqs],
+    print "Installing python dependencies from " + reqs
+    
+    success = subprocess.call("pip2.7 install -r " + reqs,
         shell=True)
 
+    if success != 0:
+        print "Could not install python packages. Quitting."
+        sys.exit(0)
+
     if full:
-        subprocess.call(["python -m nltk.downloader punkt"], shell=True)
+        subprocess.call("python -m nltk.downloader punkt", shell=True)
 
 def setup_stanford_corenlp(force=False):
     """Download and move Stanford CoreNLP to the expected place.
@@ -184,11 +243,8 @@ def setup_stanford_corenlp(force=False):
 
     if force:
         print "Installing CoreNLP"
-        source_file = urllib2.urlopen(CORENLP)
-
-        with open(temp_corenlp_name, "w") as local_file:
-            print "Downloading..."
-            local_file.write(source_file.read())
+        print "Downloading..."
+        download_file(CORENLP, temp_corenlp_name)
 
         with zipfile.ZipFile(temp_corenlp_name, "r") as local_zip:
             print "Extracting..."
@@ -206,7 +262,9 @@ def setup_database():
     """Set up the database.
     """
     print "Setting up database..."
-    subprocess.call(["python2.7 database.py reset"], shell=True)
+    #TODO: Should we always call python2.7?
+    subprocess.call("python database.py create", shell=True)
+    subprocess.call("python database.py migrate", shell=True)
 
 def pip_is_installed():
     """Check if the correct version of pip is installed.
@@ -216,8 +274,13 @@ def pip_is_installed():
             version, ``True`` otherwise.
     """
     try:
-        pip_version = subprocess.check_output(["pip2.7", "-V"])
+        pip_version = subprocess.check_output("pip -V", shell=True)
+        print pip_version
     except OSError:
+        print OSError
+        return False
+    except subprocess.CalledProcessError:
+        print subprocess.CalledProcessError
         return False
 
     return True
@@ -236,7 +299,13 @@ def set_install_type(install_type):
          preferences_file.write("\n")
 
 def install_pip(sudo):
-    """Install pip.
+    """Install pip if it's not installed.
+
+    This function first checks if pip is installed, exiting if it is.
+    If it isn't, it downloads and installs using get-pip.py. If pip
+    still doesn't seem to be installed, it looks for pip in a few
+    places to try to find the executable, and adds it to the PATH
+    if found.
 
     Arguments:
         sudo (boolean): If ``True``, install pip. Otherwise, the script will
@@ -244,8 +313,10 @@ def install_pip(sudo):
     """
     pip_name = "get-pip.py"
     #TODO: windows-specific
-    possible_paths = [os.path.join(sys.prefix + "/bin"),
-        "/usr/local/bin"]
+    
+    possible_paths = [os.path.join(sys.prefix, 'bin'),
+        "/usr/local/bin",
+        os.path.join(sys.prefix, 'Scripts')]
 
     # Stop if it's installed
     if pip_is_installed():
@@ -253,10 +324,11 @@ def install_pip(sudo):
         return
 
     # If it's not installed, see if we can install it
-    if sudo:
+    if sudo and not 'win32' in sys.platform:
         print "Attempting to install pip."
         download_file(PIP, pip_name)
         subprocess.call("sudo python2.7 get-pip.py", shell=True)
+    
     else:
         print "Pip not installed or not accessible, not set to install."
 
@@ -264,15 +336,48 @@ def install_pip(sudo):
     if not pip_is_installed():
         print "Pip not in PATH, attempting to find."
         for possible_path in possible_paths:
-            if "pip" in os.listdir(possible_path):
-                print "Found pip in " + possible_path + ", adding to PATH."
-                os.environ["PATH"] = possible_path + ":" + os.environ["PATH"]
-
+            print "Looking for pip in %s" % possible_path
+            try:
+                if "pip" in os.listdir(possible_path):
+                    print "Found pip in " + possible_path + ", adding to PATH."
+                    add_to_path(possible_path)
+            except OSError:
+                continue
+    
     if pip_is_installed():
         print "Pip installed successfully."
+    
     else:
         print "Pip install failed. Quitting."
         sys.exit(1)
+
+def add_to_path(new_path):
+    """Add a directory to the beginning of the system path.
+    
+    This function separates the path correctly based on the OS.
+
+    Arguments:
+        new_path (str): The path to add.
+    """
+    path_sep = ':'
+    if 'win32' in sys.platform:
+        path_sep = ';'
+    os.environ["PATH"] = new_path + path_sep + os.environ["PATH"]
+
+def write_startup_scripts():
+    """Write a quick start script.
+    """
+    if "win32" in sys.platform:
+        print "Writing windows startup file"
+        f = open('wordseer.bat', 'w')
+        
+        if VENV_DIR != sys.prefix:
+            python_path = os.path.join(VENV_DIR, "Scripts", "python.exe")
+        else:
+            python_path = os.path.join(VENV_DIR, "python.exe")
+        
+        f.write(python_path + ' wordseer.py\n')
+        f.close()
 
 def main():
     """Perform the installation process.
@@ -293,11 +398,19 @@ def main():
         help="Install only enough to run the wordseer tool.", default=False)
 
     args = parser.parse_args()
+    
+    new_path_dirs = []
+    path_dirs = os.environ["PATH"].split(":")
+    for path_dir in path_dirs:
+        if "conda" not in path_dir:
+            new_path_dirs.append(path_dir)
+
+    os.environ["PATH"] = ":".join(new_path_dirs)
 
     if args.interactive:
         install_interactively()
 
-    if pip_is_installed():
+    if not pip_is_installed():
         install_pip(args.sudo)
 
     if args.virtualenv:
@@ -311,8 +424,16 @@ def main():
     else:
         install_python_packages(REQUIREMENTS_MIN, False)
         set_install_type(PARTIAL_INSTALL_TYPE)
-
+    
     setup_database()
+    write_startup_scripts()
+
+def check_package_exists(package):
+    packages = subprocess.check_output("pip2.7 freeze", shell=True)
+    if not package in packages:
+        return False
+    else:
+        return True
 
 if __name__ == "__main__":
     main()

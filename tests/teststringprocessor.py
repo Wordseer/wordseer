@@ -8,7 +8,7 @@ from app.models.dependency import Dependency
 from app.models.project import Project
 from app.preprocessor import stringprocessor
 import database
-
+import pdb
 t = stringprocessor.StringProcessor(Project())
 
 class CommonTests(object):
