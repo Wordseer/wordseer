@@ -37,8 +37,9 @@ Ext.define('WordSeer.controller.SentenceListController', {
 					}, grid);
 
 					grid.getStore().loadPage(1,{params:params, scope: grid, callback: function(records, operation, success) {
+							if (records.length == 0) return;
+
 					        var store = grid.getStore();
-					        
 					        grid.el.down('.rowsloading').removeCls('hidden');
 
 					        var start = store.pageSize;
