@@ -150,7 +150,7 @@ class PostTests(CommonTests, unittest.TestCase):
     def test_get_metadata(self):
         """Tests for get_metadata
         """
-        results = get_metadata(self.json, self.xml.getroot())
+        results = get_metadata(self.json, self.xml.getroot(), "sentence", None)
         self.failUnless(compare_metadata(self.meta, results))
 
     def test_get_xpath_attribute(self):

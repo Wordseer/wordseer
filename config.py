@@ -40,6 +40,7 @@ class BaseConfig(object):
     UPLOAD_ROUTE = "/uploads/"
     MAP_ROUTE = "/map/"
     SAVE_MAP = "/save/"
+    ANALYZE_ROUTE = "/analyze/"
 
     #Login settings
     SECURITY_REGISTERABLE = True
@@ -174,4 +175,3 @@ class Testing(BaseConfig):
     SQLALCHEMY_ECHO = False
 
     PAGE_SIZE = 10
-

@@ -16,22 +16,50 @@ class Project(db.Model, Base):
         user (User): The owner of this project.
         documents (list of Documents): ``Document``\s present in this project.
     """
+    STATUS_UNPROCESSED = 0
+    STATUS_PREPROCESSING = 1
+    STATUS_DONE = 2
+
+    STATUS_NAMES = {
+        STATUS_UNPROCESSED: "Not yet procesed.",
+        STATUS_PREPROCESSING: "Preprocessing.",
+        STATUS_DONE: "Preprocessed."
+    }
 
     # Attributes
     name = db.Column(db.String)
     path = db.Column(db.String)
+    status = db.Column(db.Integer, default=STATUS_UNPROCESSED)
 
     # Active project indicator
     active_project = None
 
     # Relationships
+    sentences = db.relationship("Sentence", backref="project", lazy="dynamic")
     document_files = db.relationship("DocumentFile",
-        secondary="document_files_in_projects", backref="projects"
-    )
+        secondary="document_files_in_projects", backref="projects")
     structure_files = db.relationship("StructureFile", backref="project")
     logs = db.relationship("Log", backref="project")
+    word_in_sentence = db.relationship("WordInSentence",
+        backref="project", lazy="dynamic")
+    sequence_in_sentence = db.relationship("SequenceInSentence",
+        backref="project", lazy="dynamic")
+    word_in_sequence = db.relationship("WordInSequence",
+        backref="project", lazy="dynamic")
+    dependency_in_sentence = db.relationship("DependencyInSentence",
+        backref="project", lazy="dynamic")
+    properties = db.relationship("Property",
+        backref="project", lazy="dynamic")
     users = association_proxy("project_users", "user",
         creator=lambda user: ProjectsUsers(user=user))
+
+    def is_processable(self):
+        """Check if this project can be processed.
+        """
+        if (self.status == self.STATUS_UNPROCESSED and len(self.document_files) > 0 and
+                len(self.structure_files) > 0):
+            return True
+        return False
 
     def get_documents(self):
         """A method to get all the ``Document``\s that are in this project.
@@ -46,6 +74,7 @@ class Project(db.Model, Base):
             documents.extend(document_file.documents)
 
         return documents
+
 
     def get_errors(self):
         """Return all ``ErrorLogs`` attached to this project.
@@ -64,4 +93,3 @@ class Project(db.Model, Base):
         """
         return Log.query.filter(Log.project == self).\
             filter(Log.type == "info").all()
-

@@ -98,36 +98,42 @@ class TestSentenceModel(unittest.TestCase):
         db.session.add_all([sequence1, sequence2])
         db.session.commit()
 
+        #Test with Project
+        project = Project()
+        sentence.project = project
+        db.session.add_all([project])
+        db.session.commit()
+
+
     def test_add_word(self):
         """Test the ``add_word()`` method of ``Sentence``.
         """
 
-        sentence = Sentence(text="foo")
-        word = Word(lemma="foo")
         project = Project()
+        sentence = Sentence(text="foo", project=project)
+        word = Word(lemma="foo")
 
         project.save()
         sentence.save()
         word.save()
 
         rel = sentence.add_word(word, position=4, space_before=" ",
-            part_of_speech="ADF", project=project)
+            project=project)
 
         assert rel.word == word
         assert rel.sentence == sentence
         assert rel.position == 4
         assert rel.space_before == " "
-        assert rel.part_of_speech == "ADF"
         assert rel.project == project
 
     def test_add_dependency(self):
         """Test the ``add_dependency()`` method of ``Sentence``.
         """
 
-        sentence = Sentence(text="foo")
+        project = Project()
+        sentence = Sentence(text="foo", project=project)
         word = Word(lemma="foo")
         dependency = Dependency(governor=word)
-        project = Project()
 
         project.save()
         sentence.save()
@@ -147,9 +153,9 @@ class TestSentenceModel(unittest.TestCase):
         """Test the ``add_sequence()`` method of ``Sentence``.
         """
 
-        sentence = Sentence(text="foo")
-        sequence = Sequence(lemmatized=False)
         project = Project()
+        sentence = Sentence(text="foo", project=project)
+        sequence = Sequence(lemmatized=False)
 
         project.save()
         sentence.save()

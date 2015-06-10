@@ -9,6 +9,7 @@ from .sentence import Sentence
 from .sequence import Sequence
 from .association_objects import WordInSentence
 from .association_objects import WordInSequence
+from .sets import SequenceSet
 from .counts import WordCount
 from .mixins import NonPrimaryKeyEquivalenceMixin
 
@@ -34,8 +35,10 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
 
     # Attributes
 
-    id = db.Column(db.Integer, primary_key=True, index=True)
-    lemma = db.Column(db.String, index=True)
+    id = db.Column(db.Integer, primary_key=True)
+    lemma = db.Column(db.String)
+    surface = db.Column(db.String)
+    part_of_speech = db.Column(db.String)
 
     # Scoped Pseudo-relationships
 
@@ -44,7 +47,6 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         """Retrieves sentences that contain this word within the scope of the
         current active project.
         """
-
         return Sentence.query.join(WordInSentence).join(Word).\
             filter(WordInSentence.project==Project.active_project).\
             filter(WordInSentence.word==self).all()
@@ -58,6 +60,80 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         return Sequence.query.join(WordInSequence).join(Word).\
             filter(WordInSequence.project==Project.active_project).\
             filter(WordInSequence.word==self).all()
+
+    @staticmethod
+    def get_matching_word_ids(query_string=None, is_set_id=False, search_lemmas=True):
+        """Returns a list of Word ids that match the given query"""
+        word_ids = []
+        if is_set_id:
+            sequences = SequenceSet.query.get(query_string).sequences
+            for sequence in sequences:
+                if sequence.length == 1:
+                    for word in sequence.words:
+                        word_ids.append(word.id)
+        if query_string is not None:
+            # wildcard search
+            query_string = query_string.replace('*', '%')
+
+            if search_lemmas:
+                w = Word.query.filter(
+                    (Word.surface.like(query_string.lower())) | 
+                    (Word.lemma.like(query_string.lower()))
+                )
+            else:
+                w = Word.query.filter(
+                    Word.surface.like(query_string.lower())
+                )
+            for word in w:
+                word_ids.append(word.id)
+        return word_ids
+
+    @staticmethod
+    def get_matching_sequence_ids(query_string=None, is_set_id=False):
+        """Returns a list of Sequence ids that match the given query"""
+        ids = []
+        if is_set_id:
+            sequences = SequenceSet.query.get(query_string).sequences
+            for sequence in sequences:
+                ids.append(sequence.id)
+        if query_string is not None:
+            s = Sequence.query.filter(
+                Sequence.sequence.like(query_string.lower()))
+            for sequence in s:
+                ids.append(sequence.id)
+        return ids
+
+    @staticmethod
+    def apply_non_grammatical_search_filter(search_query_dict, sentence_query):
+        """ Gets the sentences that contain the query specified by the given
+        parameters.
+
+        Arguments:
+            search_query_dict (dict): A dictionary representation of a search
+                query. Contains the keys:
+                    - gov: The governor word in the case of grammatical search
+                        or the string search query in the case of a
+                        non-grammatical search.
+                    - dep: The dependent word in the case of grammatical search
+                        (ignored for a non-grammatical search)
+                    - relation: The grammatical relationships. A space-separated
+                        list of grammatical relationship identifiers. If this
+                        is "" or not present, the search is assumed to be
+                        non-grammatical.
+        Returns:
+            A query object with sentences that match the given query parameters.
+        """
+        if "gov" in search_query_dict:
+            is_set_id = search_query_dict["govtype"] != "word"
+            search_lemmas = "all_word_forms" in search_query_dict and search_query_dict["all_word_forms"] == 'on'
+            matching_word_ids = Word.get_matching_word_ids(
+                search_query_dict["gov"], is_set_id, search_lemmas)
+            sentence_query = sentence_query.\
+                join(WordInSentence,
+                    WordInSentence.sentence_id == Sentence.id).\
+                filter(WordInSentence.word_id.in_(matching_word_ids))
+            return sentence_query
+        return sentence_query
 
     def get_counts(self, project=None):
 
@@ -73,4 +149,3 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
         """
 
         return "<Word: " + str(self.lemma) + ">"
-

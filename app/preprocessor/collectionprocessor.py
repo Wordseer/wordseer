@@ -49,9 +49,13 @@ class CollectionProcessor(object):
 
         Base.commit_on_save = False
 
-	    # Set up database if necessary
+	# Set up database if necessary
         if start_from_scratch is True:
             database.reset()
+
+        self.project.status = Project.STATUS_PREPROCESSING
+        self.project.save()
+
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
         if not "true" in logger.get(self.project,
@@ -68,6 +72,11 @@ class CollectionProcessor(object):
                     "finished_grammatical_processing").lower()):
             self.project_logger.info("Parsing documents")
             self.parse_documents()
+
+        self.project.status = Project.STATUS_DONE
+        self.project.save()
+
+        self.project_logger.info("Finished.")
 
     def extract_record_metadata(self, collection_dir, docstruc_filename,
         filename_extension):

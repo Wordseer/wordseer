@@ -1,5 +1,6 @@
 """Unit tests for the components of the wordseer web interface.
 """
+import pdb
 from cStringIO import StringIO
 import os
 import shutil
@@ -273,7 +274,6 @@ class ViewsTests(unittest.TestCase):
             "action": "-1",
             })
 
-        assert "must select" in result.data
         assert "/documents/1" in result.data
         assert "/documents/2" in result.data
 
@@ -354,10 +354,9 @@ class ViewsTests(unittest.TestCase):
 
         result = self.client.post("/projects/1", data={
             "process-submitted": "true",
-            "action": "0",
-            "process-selection": ["1", "2"]
+            "action": "p-1"
             })
-        assert "must select exactly one" in result.data
+        assert "not a structure file" in result.data
 
     def test_get_file(self):
         """Run tests on the get_file view.
@@ -419,6 +418,38 @@ class ViewsTests(unittest.TestCase):
         assert "<em>a</em>: a" in result.data
         assert "<em>b</em>: b" in result.data
         assert "<em>c</em>: c" in result.data
+
+    def test_process_processed_files(self):
+        """Make sure that a project that's being processed or already
+        processed can't be processed again.
+        """
+
+        project1 = Project(name="foo", path="/test-path",
+            status=Project.STATUS_PREPROCESSING)
+        rel = self.user.add_project(project1, role=ProjectsUsers.ROLE_ADMIN)
+        document_file = DocumentFile(path="foo/foo.xml")
+        structure_file = StructureFile(path="foo/foo.json")
+        project1.document_files = [document_file]
+        project1.structure_files = [structure_file]
+        project1.save()
+
+        data = {
+            "process-submitted": "true",
+            "action": "p-" + str(structure_file.id),
+            }
+
+        result = self.client.post("/projects/1", data=data)
+
+        assert "Upload" not in result.data
+        assert "This project can&#39;t be processed" in result.data
+
+        project1.status = Project.STATUS_DONE
+        project1.save()
+
+        result = self.client.post("/projects/1", data=data)
+
+        assert "This project can&#39;t be processed" in result.data
+        assert "Upload" not in result.data
 
 class ProjectPermissionsTests(unittest.TestCase):
     """Tests for the ProjectPermissions view.

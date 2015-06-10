@@ -5,6 +5,7 @@ from .sentence import Sentence
 from .association_objects import WordInSequence, SequenceInSentence
 from .counts import SequenceCount
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.schema import Index
 
 class Sequence(db.Model, Base):
     """A sequence of at most 4 consecutive words in a sentence.
@@ -31,13 +32,13 @@ class Sequence(db.Model, Base):
 
     # Attributes
 
-    sequence = db.Column(db.String, index=True)
-    lemmatized = db.Column(db.Boolean, index=True)
-    has_function_words = db.Column(db.Boolean, index=True)
-    all_function_words = db.Column(db.Boolean, index=True)
-    length = db.Column(db.Integer, index=True)
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), index=True)
-    
+    sequence = db.Column(db.String)
+    lemmatized = db.Column(db.Boolean)
+    has_function_words = db.Column(db.Boolean)
+    all_function_words = db.Column(db.Boolean)
+    length = db.Column(db.Integer)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+
     # Relationships
 
     project = db.relationship("Project")
@@ -66,6 +67,7 @@ class Sequence(db.Model, Base):
             "sequence_id = %s and project_id = %s" % (self.id, project.id),
             sequence_id = self.id, project_id = project.id)
 
+
     def add_word(self, word, project=None, force=True):
         """Add a word to this sequence within the scope of the project
         """
@@ -84,4 +86,3 @@ class Sequence(db.Model, Base):
 
     def __repr__(self):
         return "<Sequence {0}>".format(self.sequence)
-

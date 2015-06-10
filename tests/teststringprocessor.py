@@ -38,7 +38,7 @@ class CommonTests(object):
         """
         # Make sure the words are tagged.
         for sentence in self.result:
-            for word in sentence.word_in_sentence:
+            for word in sentence.words:
                 self.failIf(word.part_of_speech == "")
 
 class TokenizeParagraphTests(CommonTests, unittest.TestCase):

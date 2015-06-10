@@ -99,7 +99,6 @@ class StringProcessor(object):
                     else:
 
                         try:
-                            #FIXME: project specific
                             relationship = GrammaticalRelationship.query.\
                                 filter_by(name=grammatical_relationship,
                                 project=self.project).\
@@ -116,11 +115,15 @@ class StringProcessor(object):
 
                     # Read the data for the governor, and find the
                     # corresponding word
-                    governor = Word.query.filter_by(lemma = governor_lemma).\
+                    governor = Word.query.filter_by(lemma=governor_lemma,
+                            surface=governor.lower(),
+                            part_of_speech=governor_pos).\
                         first()
 
                     # Same as above for the dependent in the relationship
-                    dependent = Word.query.filter_by(lemma = dependent_lemma).\
+                    dependent = Word.query.filter_by(lemma = dependent_lemma,
+                            surface=dependent.lower(),
+                            part_of_speech=dependent_pos).\
                         first()
 
                     try:
@@ -262,9 +265,9 @@ def split_sentences(text):
         approx_sentence_length = len(sentence_text.split(" "))
 
         if approx_sentence_length > max_length:
-            project_logger.warning("Sentence appears to be too long, max "
-                "length is %s: %s", str(max_length),
-                sentence_text[:truncate_length] + "...")
+            # project_logger.warning("Sentence appears to be too long, max "
+            #     "length is %s: %s", str(max_length),
+            #     sentence_text[:truncate_length] + "...")
 
             # Attempt to split on a suitable punctuation mark
             # Order (tentative): semicolon, double-dash, colon, comma
@@ -281,8 +284,8 @@ def split_sentences(text):
                 if all([len(subsentence.split(" ")) <= max_length
                     for subsentence in subsentences]):
 
-                    project_logger.info("Splitting sentence around %s to fit "
-                        "length limit.", character)
+                    # project_logger.info("Splitting sentence around %s to fit "
+                    #     "length limit.", character)
                     break
 
                 # Otherwise, reset subsentences and try again
@@ -291,8 +294,8 @@ def split_sentences(text):
 
             # If none of the split characters worked, force split on max_length
             if not subsentences:
-                project_logger.warning("No suitable punctuation for " +
-                    "splitting; forcing split on max_length number of words")
+                # project_logger.warning("No suitable punctuation for " +
+                #     "splitting; forcing split on max_length number of words")
                 subsentences = []
                 split_sentence = sentence_text.split(" ")
 
@@ -333,7 +336,8 @@ def tokenize_from_raw(parsed_text, txt, project):
     sentence_count = len(parsed_text["sentences"])
 
     for sentence_data in parsed_text["sentences"]:
-        sentence = Sentence(text = sentence_data["text"])
+        sentence = Sentence(text = sentence_data["text"],
+                            project = project)
         position = 0
 
         for word_data in sentence_data["words"]:
@@ -348,26 +352,30 @@ def tokenize_from_raw(parsed_text, txt, project):
             except IndexError:
                 pass
 
-            if lemma in words:
-                word = words[lemma]
+            key = (surface.lower(), part_of_speech, lemma)
+
+            if key in words:
+                word = words[key]
 
             else:
                 try:
-                    word = Word.query.filter_by(lemma=lemma).one()
+                    word = Word.query.filter_by(lemma=lemma,
+                        surface=surface.lower(),
+                        part_of_speech=part_of_speech).one()
                 except(MultipleResultsFound):
                     project_logger.warning("Duplicate records found for: %s",
                         str(key))
                 except(NoResultFound):
-                    word = Word(lemma=lemma)
-                    # print("New word " + str(word))
+                    word = Word(lemma=lemma,
+                        surface=surface.lower(),
+                        part_of_speech=part_of_speech)
 
-                words[lemma] = word
+                words[key] = word
 
             sentence.add_word(
                 word = word,
                 position = position,
-                space_before = space_before, # word["space_before"],
-                part_of_speech = part_of_speech,
+                space_before = space_before,
                 surface=surface,
                 project = project,
                 force=False

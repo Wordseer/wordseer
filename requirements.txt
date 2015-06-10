@@ -10,4 +10,4 @@ sqlalchemy-migrate==0.9.1
 stanford-corenlp-python
 nose
 nltk
-inflect
+inflect==0.2.4
