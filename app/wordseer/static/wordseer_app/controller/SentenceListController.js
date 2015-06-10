@@ -33,7 +33,6 @@ Ext.define('WordSeer.controller.SentenceListController', {
 							// debugger;
 							this.el.down('.rowsloading').addCls('hidden')
 						}
-						
 					}, grid);
 
 					grid.getStore().loadPage(1,{params:params, scope: grid, callback: function(records, operation, success) {

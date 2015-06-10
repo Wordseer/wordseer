@@ -17,7 +17,7 @@ Ext.define('WordSeer.view.sentence.SentenceTable',{
             option: {
                 tag: 'span',
                 cls: 'button disabled',
-                html: 'Add to group',
+                html: 'Add selected to Set',
                 action: 'add',
             },
             listeners: [
@@ -32,7 +32,7 @@ Ext.define('WordSeer.view.sentence.SentenceTable',{
         {
             option: {
                 tag: 'span',
-                html: 'Remove from group',
+                html: 'Remove selected from Set',
                 cls: 'button disabled',
                 action: 'remove',
             },
@@ -47,6 +47,7 @@ Ext.define('WordSeer.view.sentence.SentenceTable',{
         },
 
     ],
+
     initComponent: function(){
         var me = this;
         var myargs = arguments;
@@ -82,9 +83,12 @@ Ext.define('WordSeer.view.sentence.SentenceTable',{
             }
         ];
 
+        this.columnsLoaded = false;
+
         this.store.on('load', function(store, records, successful){
             // choose columns to display based on property fields returned
-            if (successful) {
+            if (successful && me.columnsLoaded == false) {
+                me.columnsLoaded = true;
                 var model = me.store.model;
                 var base_field_names = model.getBaseFieldNames();
                 var returned_fields = Object.keys(records[0].raw);
@@ -104,14 +108,14 @@ Ext.define('WordSeer.view.sentence.SentenceTable',{
             }
         });
 
+        this.loadIndicator();
+
         this.callParent(arguments);
     },
 
     populate: function() {
         var title = 'Search Results';
-        if (this.getStore().getCount() > 0) {
-            title +=  " (" + this.getStore().getCount() +")";
-        }
+        title +=  " (" + this.getStore().getTotalCount() +")";
         this.resetTitle(title);
         this.callParent(arguments);
     },
@@ -148,21 +152,13 @@ Ext.define('WordSeer.view.sentence.SentenceTable',{
             return null;
         }
     },
-    // listeners: {
-    //     afterrender: function( eOpts ) {
-    //         view = this.getView();
-    //         view.tip = Ext.create('Ext.tip.ToolTip', {
-    //             target: view.el,
-    //             delegate: view.itemSelector,
-    //             trackMouse: true,
-    //             renderTo: Ext.getBody(),
-    //             listeners: {
-    //                 beforeshow: function updateTipBody(tip) {
-    //                     tip.update(
-    //                         "Double click to see this sentence in context.");
-    //                 }
-    //             }
-    //         });
-    //     }
-    // }
+
+    loadIndicator: function(){
+        // add a "rows loading" placeholder 
+        this.autoEl.children.push({
+            tag: 'div', 
+            cls: 'rowsloading hidden',
+            html: '<i class="fa fa-circle-o-notch fa-spin"></i> Loading more sentences ...'
+        });
+    }
 });

@@ -120,7 +120,8 @@ class SentencesView(MethodView):
         """Adds the properties of each sentence to the dictionary being sent to
         the client."""
         for property in sentence.properties:
-            result[property.name] = property.value
+            if property.property_metadata.is_category:
+                result[property.name] = property.value
 
     def make_sentence_dict(self, sentence, matching_words):
         sentence_dict = {}

@@ -52,7 +52,6 @@ Ext.define('WordSeer.controller.SearchController', {
 			method:'GET',
 			disableCaching: false,
 			params:{
-				instance:getInstance(),
 				unit: 'sentence'
 			},
 			scope:this,
