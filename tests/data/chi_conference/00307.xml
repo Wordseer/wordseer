@@ -1,0 +1,12 @@
+<article>
+<year>2010</year>
+<title>Using text animated transitions to support navigation in document histories</title>
+<author>Chevalier, Fanny</author>
+<author>Dragicevic, Pierre</author>
+<author>Bezerianos, Anastasia</author>
+<author>Fekete, Jean-Daniel</author>
+<keyword>animated transitions</keyword>
+<keyword>revision control</keyword>
+<keyword>text editing</keyword>
+<abstract>This article examines the benefits of using text animated transitions for navigating in the revision history of textual documents. We propose an animation technique for smoothly transitioning between different text revisions, then present the Diffamation system. Diffamation supports rapid exploration of revision histories by combining text animated transitions with simple navigation and visualization tools. We finally describe a user study showing that smooth text animation allows users to track changes in the evolution of textual documents more effectively than flipping pages.</abstract>
+<article>

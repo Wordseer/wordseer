@@ -1,0 +1,17 @@
+<article>
+<year>2002</year>
+<title>Polyarchy visualization: visualizing multiple intersecting hierarchies</title>
+<author>Robertson, George</author>
+<author>Cameron, Kim</author>
+<author>Czerwinski, Mary</author>
+<author>Robbins, Daniel</author>
+<keyword>3D</keyword>
+<keyword>animation</keyword>
+<keyword>hierarchy</keyword>
+<keyword>information visualization</keyword>
+<keyword>metadirectory</keyword>
+<keyword>polyarchy</keyword>
+<keyword>query language</keyword>
+<keyword>user studies</keyword>
+<abstract>We describe a new information structure composed of multiple intersecting hierarchies, which we call Polyarchies. Visualizing polyarchies enables use of novel views for discovery of relationships which are very difficult using existing hierarchy visualization tools. This paper will describe the visualization design and system architecture challenges as well as our current solutions. A Mid-Tier Cache architecture is used as a "polyarchy server" which supports a novel web-based polyarchy visualization technique, called Visual Pivot. A series of five user studies guided iterative design of Visual Pivot</abstract>
+<article>

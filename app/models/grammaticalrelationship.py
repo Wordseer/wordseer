@@ -21,11 +21,12 @@ class GrammaticalRelationship(db.Model, Base):
 
     # Attributes
 
-    name = db.Column(db.String, index=True)
+    name = db.Column(db.String)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    project = db.relationship("Project")
 
     def __repr__(self):
         """Return a string representation of this ``GrammaticalRelationship``.
         """
 
         return str(self.name)
-

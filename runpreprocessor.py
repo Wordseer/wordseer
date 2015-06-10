@@ -3,9 +3,15 @@ from app.models.documentfile import DocumentFile
 from app.preprocessor.collectionprocessor import cp_run
 
 import os
+import sys
 import database
 
-collection_dir = os.path.join("tests", "data", "personals")
+collection_name = "articles"
+
+if len(sys.argv) > 1 and sys.argv[1]:
+    collection_name = sys.argv[1]
+
+collection_dir = os.path.join("tests", "data", collection_name)
 extension = ".xml"
 structure_file = os.path.join(collection_dir, "structure.json")
 

@@ -4,53 +4,35 @@
 from flask import abort
 from flask import request
 from flask.json import jsonify
-from flask.views import View
+from flask.views import MethodView
 from sqlalchemy import not_
 from sqlalchemy import func
-from sqlalchemy.sql.expression import asc
+from sqlalchemy.sql.expression import asc, desc
 from sqlalchemy.sql.expression import literal_column
 
-from .. import wordseer
-from ...models import PropertyMetadata, Property, Sequence, SequenceInSentence
+from app.wordseer import wordseer
 from app import db
+from app.models import *
+from app.helpers.application_view import register_rest_view
 
-class AutoSuggest(View):
+
+# TODO: update existing code, refactor
+
+class AutoSuggest(MethodView):
     """Retrieve a list of suggested ``Set``\s, ``Sequence``\s, and
     ``Property``\s.
     """
-    def __init__(self):
-        """Get necessary query variables and set filters.
+    def get(self, **kwargs):
+        """Return a JSON list of suggestions of phrases, sets, and metadata
+        property values that match the query.
 
         The ``query`` will be queried using a ``LIKE`` clause with ``%`` on
         either side of the string; so the ``query`` could be anywhere
         in the suggestions.
 
-        If ``user`` is not supplied, a 400 error will be raised.
-
-        Keyword Arguments:
-            user (str): The name of the user performing the query.
-            query (str): (optional) The word that the user has entered into the
-                search bar so far.
-
-        """
-        self.query = request.args.get("query")
-        #TODO: can we use userid instead?
-        self.user = request.args.get("user")
-
-        self.workingset_name_filter = True
-        self.property_value_filter = True
-
-        if self.query:
-            like_query = "%" + query + "%"
-            self.workingset_name_filter = WorkingSet.name.like(like_query)
-            self.property_value_filter = Property.value.like(like_query)
-
-
-    def dispatch_request(self):
-        """Return a JSON list of suggestions.
-
-        The list has a maximum of three types of suggestions: ``Set``\s,
-        ``Property``\s, and ``Sequence``\s. The response is formed like so::
+        The returned list has a maximum of three types of suggestions:
+        ``Set``\s, ``Property``\s, and ``Sequence``\s. The response is formed
+        like so::
 
             {
                 "results": [
@@ -65,23 +47,33 @@ class AutoSuggest(View):
         ``get_suggested_properties``, and ``get_suggested_sequences``. Each
         function returns a list, all the lists are joined together into one.
 
-        Note that ``get_suggested_sequences`` is only run if the length of the
-        ``query`` is >= 2.
-
         Returns:
             A JSON response, or a 400 error if ``user`` is not supplied.
         """
+        params = dict(kwargs, **request.args)
+        self.project = Project.query.get(params["project_id"])
 
-        if not self.user:
-            abort(400)
+        if "query" in params and len(params["query"]) > 0:
+            query_string = params["query"][0]
+            # convert the JS boolean to Python
+            search_lemmas = params["search_lemmas"][0] == 'true'
 
-        suggestions = get_suggested_sets()
-        suggestions.extend(get_suggested_properties())
+            if len(query_string) == 0:
+                return "[]"
+            like_query = "%" + query_string + "%"
+            self.set_name_filter = Set.name.like(like_query)
+            self.property_value_filter = Property.value.like(like_query)
+            self.sequence_filter = Sequence.sequence.like(query_string + "%")
+            self.search_lemmas = search_lemmas
 
-        if len(query) >= 2:
-            suggestions.extend(get_suggested_sequences())
+            suggestions = self.get_suggested_sets()
+            suggestions.extend(self.get_suggested_properties())
+            suggestions.extend(self.get_suggested_sequences())
 
-        return jsonify(results=suggestions)
+            return jsonify(results= sorted(suggestions,
+                key=lambda s: -1*s["sentence_count"]))
+        else:
+            return "[]"
 
     def get_suggested_sets(self):
         """Return a list of dicts of suggestions of ``Set``\s that may
@@ -92,6 +84,7 @@ class AutoSuggest(View):
         ``Set``\s are filtered on the following criteria:
 
         * Have the same ``user`` as the one given in the request
+        * Have the same ``project`` as the one given in the request
         * Contain the ``query`` from the url, if applicable
 
         ``Property``\s are filtered by the following criteria:
@@ -114,18 +107,15 @@ class AutoSuggest(View):
                     ...etc...
                 ]
         """
-        #TODO: Mystery clause
-        #TODO: document_count
-        sets = db.session.query(WorkingSet.id,
-            Property.name.label("text"),
-            literal_column("'phrase-set'").label("class"),
-            func.count(Property.unit_id.distinct()).label("unit_count")).\
-                filter(Property.unit_name == "sentence").\
-                filter(Property.value == WorkingSet.id).\
-                filter(WorkingSet.username == user).\
-                filter(Property.name == "phrase_set").\
-                filter(self.workingset_name_filter).\
-                group_by(WorkingSet.name).\
+        sets = db.session.query(SequenceSet.id,
+            Set.name.label("text"),
+            Property.name.label("class"),
+            func.count(Property.unit_id).label("sentence_count")).\
+                filter(Property.value == Set.id).\
+                filter(Set.project == self.project).\
+                filter(Property.name.like("%_set")).\
+                filter(self.set_name_filter).\
+                group_by(Set.name).\
                 all()
 
         return [set._asdict() for set in sets]
@@ -138,6 +128,7 @@ class AutoSuggest(View):
 
         ``Property``\s are filtered by the following criteria:
 
+        * Has the same ``project`` as the one given in the request
         * ``value`` contains the user's ``query``, if any
         * ``Property.name`` is equal to ``PropertyMetadata.property_name``
         * The ``Property`` is a category (``is_category`` is true for these
@@ -161,36 +152,43 @@ class AutoSuggest(View):
         """
         suggested_metadata = []
         #TODO: document_count, sentence_count
-        metadata = db.session.query(PropertyMetadata.display_name,
-            Property.name,
-            Property.value,
-            literal_column("'metadata'").label("class"),
-            func.count(Property.unit_id.distinct()).label("unit_count")).\
+        metadata = db.session.query(
+            PropertyMetadata.property_name.label("name"),
+            PropertyMetadata.display_name.label("display_name"),
+            Property.value.label("value"),
+            func.count(PropertyOfSentence.sentence_id.distinct()).label("sentence_count")).\
+                filter(Property.project == self.project).\
                 filter(self.property_value_filter).\
-                filter(Property.name == PropertyMetadata.property_name).\
+                filter(PropertyOfSentence.property_id == Property.id).\
+                filter(Property.property_metadata_id == PropertyMetadata.id).\
                 filter(PropertyMetadata.is_category == True).\
-                filter(not_(Property.name.like("%_set"))).\
+                filter(not_(Property.name.like("phrase_set"))).\
                 group_by(Property.value).\
                 limit(50).\
                 all()
 
-        for metadatum in metadata:
-            property_name = metadata.name
-            if metadatum.display_name:
-                property_name = metadatum.display_name
-
-            suggestion = metadatum._asdict()
-            suggestion["text"] = {property_name.lower(): metadatum.value}
+        for datum in metadata:
+            name = datum.name
+            if datum.display_name is not None:
+                name = datum.display_name
+            suggestion = {
+                "class": "metadata",
+                "sentence_count": datum.sentence_count,
+                "property_name": name,
+                "text": "%s: %s" % (name, str(datum.value)),
+                "value": datum.value
+            }
             suggested_metadata.append(suggestion)
 
         return suggested_metadata
 
-    def get_suggested_sequences():
+    def get_suggested_sequences(self):
         """Return a list of dicts of suggestions of ``Sequence``\s that
         match the query.
 
         ``Sequence``\s are filtered by the following criteria:
 
+        * Has the same ``project`` as the one given in the request
         * ``Sequence.sequence`` starts with ``query``
 
         Returns:
@@ -211,28 +209,40 @@ class AutoSuggest(View):
         """
         #TODO: document_count
         suggested_sequences = []
+        lemmatized_vals = [False]
+        if self.search_lemmas:
+            lemmatized_vals.append(True)
         sequences = db.session.query(Sequence.id,
             Sequence.sequence.label("text"),
             Sequence.length,
-            literal_column("'sequence'").label("class"),
+            Sequence.lemmatized,
+            literal_column("'phrase'").label("class"),
             func.count(SequenceInSentence.sentence_id).\
-                label("sentence_count")).\
-                    join(SequenceInSentence).\
-                    filter(Sequence.sequence.like(query + "%")).\
-                    order_by("sentence_count").\
-                    order_by(asc(Sequence.length)).\
-                    limit(50).\
-                    all()
+                label("sentence_count")
+        ).\
+        filter(Sequence.project == self.project).\
+        filter(SequenceInSentence.sequence_id == Sequence.id).\
+        filter(Sequence.lemmatized.in_(lemmatized_vals)).\
+        filter(self.sequence_filter).\
+        group_by(Sequence.sequence).\
+        order_by(desc("sentence_count")).\
+        order_by(asc(Sequence.length)).\
+        limit(50)
 
+        sequence_list = {}
         for sequence in sequences:
             text = sequence.text.lower()
-
-            if text in sequence_list and text is not None:
+            # print text
+            if text not in sequence_list and text is not None:
                 sequence_list[text] = 1
                 suggested_sequences.append(sequence._asdict())
 
         return suggested_sequences
 
-wordseer.add_url_rule("/search-suggestions/autosuggest",
-    view_func=AutoSuggest.as_view("autosuggest"))
-
+register_rest_view(
+    AutoSuggest,
+    wordseer,
+    'searchsuggestions',
+    'searchsuggestion',
+    parents=["project"]
+)

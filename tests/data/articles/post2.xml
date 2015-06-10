@@ -3,7 +3,7 @@
 <title>Post 2</title>
 <author>amy</author>
 <tags>
- <tag>Tag 1</tag>
+ <tag>Tag 2</tag>
  <tag>Tag 3</tag>
 </tags>
 <number>2</number>
@@ -12,4 +12,3 @@
 <foobar>yes</foobar>
 <text>Debugging is the best.</text>
 </article>
-

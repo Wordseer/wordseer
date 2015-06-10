@@ -1,0 +1,14 @@
+<article>
+<year>2011</year>
+<title>The haptic laser: multi-sensation tactile feedback for at-a-distance physical space perception and interaction</title>
+<author>Iannacci, Francis</author>
+<author>Turnquist, Erik</author>
+<author>Avrahami, Daniel</author>
+<author>Patel, Shwetak N.</author>
+<keyword>at-a-distance interaction</keyword>
+<keyword>computer vision</keyword>
+<keyword>haptic feedback</keyword>
+<keyword>motor control</keyword>
+<keyword>ubiquitous computing</keyword>
+<abstract>We present the Haptic Laser, a system for providing a range of tactile sensations to represent a physical environment at-a-distance. The Haptic Laser is a handheld device that simulates interaction with physical surfaces as a user targets objects of interest (e.g., a light switch, TV, etc). Using simple computer vision techniques for scene analysis and laser range finding for calculating distance, the Haptic Laser extracts information about the physical environment and conveys it haptically through a collection of hardware actuators. Pointing the Haptic Laser around a room, for example, presents the user with information about the presence of objects, transitions, and edges through touch rather than, or in addition to, vision. The Haptic Laser extends current work on haptic touch screens and pens, and is designed to allow for haptic feedback from a distance using multiple feedback channels.</abstract>
+<article>

@@ -1,0 +1,16 @@
+<article>
+<year>2010</year>
+<title>Social gravity: a virtual elastic tether for casual, privacy-preserving pedestrian rendezvous</title>
+<author>Williamson, John</author>
+<author>Robinson, Simon</author>
+<author>Stewart, Craig</author>
+<author>Murray-Smith, Roderick</author>
+<author>Jones, Matt</author>
+<author>Brewster, Stephen</author>
+<keyword>geosocial interaction</keyword>
+<keyword>gps</keyword>
+<keyword>mobile</keyword>
+<keyword>navigation</keyword>
+<keyword>vibrotactile</keyword>
+<abstract>We describe a virtual "tether" for mobile devices that allows groups to have quick, simple and privacy-preserving meetups. Our design provides cues which allow dynamic coordination of rendezvous without revealing users' positions. Using accelerometers and magnetometers, combined with GPS positioning and non-visual feedback, users can probe and sense a dynamic virtual object representing the nearest meeting point. The Social Gravity system makes social bonds tangible in a virtual world which is geographically grounded, using haptic feedback to help users rendezvous. We show dynamic navigation using this physical model-based system to be efficient and robust in significant field trials, even in the presence of low-quality positioning. The use of simulators to build models of mobile geolocated systems for pre-validation purposes is discussed, and results compared with those from our trials. Our results show interesting behaviours in the social coordination task, which lead to guidelines for geosocial interaction design. The Social Gravity system proved to be very successful in allowing groups to rendezvous efficiently and simply and can be implemented using only commercially available hardware.</abstract>
+<article>

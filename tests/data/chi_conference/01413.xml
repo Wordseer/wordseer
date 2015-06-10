@@ -1,0 +1,15 @@
+<article>
+<year>2001</year>
+<title>Using information scent to model user information needs and actions and the Web</title>
+<author>Chi, Ed H.</author>
+<author>Pirolli, Peter</author>
+<author>Chen, Kim</author>
+<author>Pitkow, James</author>
+<keyword>World Wide Web</keyword>
+<keyword>data mining</keyword>
+<keyword>information foraging</keyword>
+<keyword>information retrieval</keyword>
+<keyword>information scent</keyword>
+<keyword>usability</keyword>
+<abstract>On the Web, users typically forage for information by navigating from page to page along Web links. Their surfing patterns or actions are guided by their information needs. Researchers need tools to explore the complex interactions between user needs, user actions, and the structures and contents of the Web. In this paper, we describe two computational methods for understanding the relationship between user needs and user actions. First, for a particular pattern of surfing, we seek to infer the associated information need. Second, given an information need, and some pages as starting pints, we attempt to predict the expected surfing patterns. The algorithms use a concept called ``information scent", which is the subjective sense of value and cost of accessing a page based on perceptual cues. We present an empirical evaluation of these two algorithms, and show their effectiveness.</abstract>
+<article>
