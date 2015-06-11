@@ -264,7 +264,7 @@ def get_metadata(structure, node, unit_type, project):
         extracted = [] # A list of strings
 
         for xpath in xpaths:
-            if attribute is not None:
+            if attribute not in [None, ""]:
                 extracted = get_xpath_attribute(xpath,
                     attribute, node)
             else:
