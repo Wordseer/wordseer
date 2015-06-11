@@ -328,7 +328,7 @@ def get_xpath_text(xpath_pattern, node):
         for node in nodes:
 
             # Adding temporary unicode check for now, could do something else later
-            value = get_xml_text(node.getparent())
+            value = get_xml_text(node)
 
             # If parse failed, skip
             if value == None:
