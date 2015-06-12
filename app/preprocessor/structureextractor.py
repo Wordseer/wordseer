@@ -264,7 +264,7 @@ def get_metadata(structure, node, unit_type, project):
         extracted = [] # A list of strings
 
         for xpath in xpaths:
-            if attribute is not None:
+            if attribute not in [None, ""]:
                 extracted = get_xpath_attribute(xpath,
                     attribute, node)
             else:
@@ -328,7 +328,7 @@ def get_xpath_text(xpath_pattern, node):
         for node in nodes:
 
             # Adding temporary unicode check for now, could do something else later
-            value = get_xml_text(node.getparent())
+            value = get_xml_text(node)
 
             # If parse failed, skip
             if value == None:
