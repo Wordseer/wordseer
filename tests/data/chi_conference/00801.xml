@@ -1,0 +1,16 @@
+<article>
+<year>2011</year>
+<title>Does MoodyBoard make internet use more secure?: evaluating an ambient security visualization tool</title>
+<author>De Luca, Alexander</author>
+<author>Frauendienst, Bernhard</author>
+<author>Maurer, Max-Emanuel</author>
+<author>Seifert, Julian</author>
+<author>Hausen, Doris</author>
+<author>Kammerer, Niels</author>
+<author>Hussmann, Heinrich</author>
+<keyword>MoodyBoard</keyword>
+<keyword>ambient visualization</keyword>
+<keyword>awareness</keyword>
+<keyword>security</keyword>
+<abstract>Internet users are targets for ever-advancing phishing- and other attacks. The risks are, for example, to disclose credit card information or passwords to unauthorized instances. One approach to help users with insecure situations is provided by MoodyBoard, which uses ambient information to highlight potential risks. In this paper, we present findings from an evaluation of this system. Two user studies were conducted in order to find out whether an ambient security tool can protect users during sensitive tasks. We designed a pilot study to find out whether users understand the warnings and a security study to see if it helps to protect users from phishing attacks. Results show that MoodyBoard users behaved significantly more secure.</abstract>
+<article>

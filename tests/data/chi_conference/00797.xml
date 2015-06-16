@@ -1,0 +1,15 @@
+<article>
+<year>2011</year>
+<title>On the costs of multiple trajectory pointing methods</title>
+<author>Quinn, Philip</author>
+<author>Cockburn, Andy</author>
+<author>R\"{a}ih\"{a}, Kari-Jouko</author>
+<author>Delamarche, J{\'e}r\^{o}me</author>
+<keyword>fitt's law</keyword>
+<keyword>multiple trajectories</keyword>
+<keyword>ninja cursors</keyword>
+<keyword>pointing</keyword>
+<keyword>search/decision</keyword>
+<keyword>wrapping cursors</keyword>
+<abstract>Several enhanced pointing techniques aim to reduce the Fitts' law targeting distance by providing multiple target trajectories in the hope that a shorter path is available. However, these techniques introduce a search or decision component to pointing users must examine the alternatives available and decide upon the trajectory to use. We analyse these difficulties, present a methodology for examining them as well as other behaviour issues, and report empirical results of performance with pointer wrapping and Ninja cursors. Results show that offering multiple trajectories incurs a significant search or decision cost, and that users are therefore poor at capitalising on the theoretical benefits of reduced target distance.</abstract>
+<article>

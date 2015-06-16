@@ -1,0 +1,13 @@
+<article>
+<year>2010</year>
+<title>API usability peer reviews: a method for evaluating the usability of application programming interfaces</title>
+<author>Farooq, Umer</author>
+<author>Welicki, Leon</author>
+<author>Zirkler, Dieter</author>
+<keyword>api usability</keyword>
+<keyword>software bugs</keyword>
+<keyword>usability breakdowns</keyword>
+<keyword>usability evaluation method (uem)</keyword>
+<keyword>usability inspection</keyword>
+<abstract>We describe a usability inspection method to evaluate Application Programming Interfaces (APIs). We found the method useful as it identified usability defects in Microsoft's .NET Framework, of which 59\% were new and 21\% were fixed. Based on a comparison of usability defects identified between API usability peer reviews and API usability tests, API usability tests were found to expose design issues related to actually using an API whereas API usability peer reviews were found to expose the design rationale of an API. We reflect on the efficiency and productivity of each method: each API usability test is equivalent to 16 API usability peer reviews with the former having a 2.5x productivity advantage. We discuss how API usability peer reviews can be used in conjunction with API usability tests to increase usability coverage on APIs.</abstract>
+<article>

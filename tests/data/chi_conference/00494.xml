@@ -1,0 +1,12 @@
+<article>
+<year>2010</year>
+<title>High accuracy position and orientation detection in two-dimensional communication network</title>
+<author>Nakatsuma, Kei</author>
+<author>Shinoda, Hiroyuki</author>
+<keyword>capacitance sensing</keyword>
+<keyword>device localization</keyword>
+<keyword>surface-like device</keyword>
+<keyword>two-dimensional communication (2dc)</keyword>
+<keyword>ubiquitous computing</keyword>
+<abstract>In this paper we describe a method of high accuracy device position and orientation detection for HCI environments. Our position and orientation detection is an additional function to the Two-Dimensional Communication technology, which enables devices placed on a thin sheet to achieve two key functions for ubiquitous computing, to communicate one another and to receive electricity through the sheet wirelessly. This paper discusses the method developed to specify the positions and orientation of devices placed on the sheet. It evaluates the accuracy of obtained position and orientation through an experiment using a prototype of our positioning sensor.</abstract>
+<article>

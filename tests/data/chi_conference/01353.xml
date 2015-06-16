@@ -1,0 +1,26 @@
+<article>
+<year>2001</year>
+<title>Listen reader: an electronically augmented paper-based book</title>
+<author>Back, Maribeth</author>
+<author>Cohen, Jonathan</author>
+<author>Gold, Rich</author>
+<author>Harrison, Steve</author>
+<author>Minneman, Scott</author>
+<keyword>RFID tags</keyword>
+<keyword>audio books</keyword>
+<keyword>augmented books</keyword>
+<keyword>augmented reality</keyword>
+<keyword>electronic books</keyword>
+<keyword>embedded tags</keyword>
+<keyword>exhibits</keyword>
+<keyword>gestural input</keyword>
+<keyword>interactive audio</keyword>
+<keyword>interactive books</keyword>
+<keyword>interactive museum</keyword>
+<keyword>multimodal i/o</keyword>
+<keyword>new genres</keyword>
+<keyword>page detection</keyword>
+<keyword>smart documents</keyword>
+<keyword>sound design</keyword>
+<abstract>While predictions abound that electronic books will supplant traditional paper-based books, many people bemoan the coming loss of the book as cultural artifact. In this project we deliberately keep the affordances of paper books while adding electronic augmentation. The Listen Reader combines the look and feel of a real book - a beautiful binding, paper pages and printed images and text - with the rich, evocative quality of a movie soundtrack. The book's multi-layered interactive soundtrack consists of music and sound effects. Electric field sensors located in the book binding sense the proximity of the reader's hands and control audio parameters, while RFID tags embedded in each page allow fast, robust page identification.Three different Listen Readers were built as part of a six-month museum exhibit, with more than 350,000 visitors. This paper discusses design, implementation, and lessons learned through the iterative design process, observation, and visitor interviews.</abstract>
+<article>

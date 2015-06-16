@@ -1,0 +1,15 @@
+<article>
+<year>2011</year>
+<title>Mid-air pan-and-zoom on wall-sized displays</title>
+<author>Nancel, Mathieu</author>
+<author>Wagner, Julie</author>
+<author>Pietriga, Emmanuel</author>
+<author>Chapuis, Olivier</author>
+<author>Mackay, Wendy</author>
+<keyword>mid-air interaction techniques</keyword>
+<keyword>multi-scale interfaces</keyword>
+<keyword>navigation</keyword>
+<keyword>pan \&\#38; zoom</keyword>
+<keyword>wall-sized displays</keyword>
+<abstract>Very-high-resolution wall-sized displays offer new opportunities for interacting with large data sets. While pointing on this type of display has been studied extensively, higher-level, more complex tasks such as pan-zoom navigation have received little attention. It thus remains unclear which techniques are best suited to perform multiscale navigation in these environments. Building upon empirical data gathered from studies of pan-and-zoom on desktop computers and studies of remote pointing, we identified three key factors for the design of mid-air pan-and-zoom techniques: uni- vs. bimanual interaction, linear vs. circular movements, and level of guidance to accomplish the gestures in mid-air. After an extensive phase of iterative design and pilot testing, we ran a controlled experiment aimed at better understanding the influence of these factors on task performance. Significant effects were obtained for all three factors: bimanual interaction, linear gestures and a high level of guidance resulted in significantly improved performance. Moreover, the interaction effects among some of the dimensions suggest possible combinations for more complex, real-world tasks.</abstract>
+<article>

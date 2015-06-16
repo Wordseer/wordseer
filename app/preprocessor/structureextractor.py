@@ -8,12 +8,7 @@ from lxml import etree
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 
-from app.models.project import Project
-from app.models.document import Document
-from app.models.documentfile import DocumentFile
-from app.models.sentence import Sentence
-from app.models.unit import Unit
-from app.models.property import Property
+from app.models import *
 from app import db
 from . import logger
 
@@ -31,6 +26,7 @@ class StructureExtractor(object):
         :return StructureExtractor: a StructureExtractor instance
         """
         self.str_proc = str_proc
+        self.project = str_proc.project
         self.structure_file = open(structure_file, "r")
         self.document_structure = json.load(self.structure_file)
         self.logger = logging.getLogger(__name__)
@@ -53,10 +49,12 @@ class StructureExtractor(object):
 
         try:
             doc = etree.parse(infile)
-        except(etree.XMLSyntaxError) as e:
-            self.project_logger.error("XML Error: %s; skipping file", str(e))
-            self.project_logger.info(infile)
-            return documents
+        # except(etree.XMLSyntaxError) as e:
+        except etree.Error as e:
+            print str(e)
+            # self.project_logger.error("XML Error: %s; skipping file", str(e))
+            # self.project_logger.info(infile)
+            # return documents
 
         extracted_units = self.extract_unit_information(self.document_structure,
             doc)
@@ -78,6 +76,7 @@ class StructureExtractor(object):
 
         for extracted_unit in extracted_units:
             document = Document()
+            document.name = "document"
             document.properties = extracted_unit.properties
             document.sentences = extracted_unit.sentences
             document.title = _get_title(document.properties)
@@ -110,8 +109,9 @@ class StructureExtractor(object):
             nodes = get_nodes_from_xpath(xpath, parent_node)
             for node in nodes:
                 current_unit = Unit(name=structure["structureName"])
-                # Get the metadata
-                current_unit.properties = get_metadata(structure, node)
+                # Get the metadataget
+                current_unit.properties = get_metadata(
+                    structure, node, current_unit.name, self.project)
                 # If there are child units, retrieve them and put them in a
                 # list, otherwise get the sentences
                 children = []
@@ -141,7 +141,8 @@ class StructureExtractor(object):
                 True)
 
             for sentence in new_sentences:
-                sentence.properties = get_metadata(structure, combined_nodes[0])
+                sentence.properties = get_metadata(
+                    structure, combined_nodes[0], "sentence", self.project)
                 units[-1].sentences.append(sentence)
 
             combined_sentence = ""
@@ -199,7 +200,7 @@ class StructureExtractor(object):
                 if node_text != None:
                     sentence_text += node_text.strip() + "\n"
                     sentence_metadata.extend(get_metadata(structure,
-                        sentence_node))
+                        sentence_node, "sentence", self.project))
 
 #        if tokenize:
 #            sents = self.str_proc.tokenize(sentence_text)
@@ -219,7 +220,7 @@ class StructureExtractor(object):
 
         return result_sentences
 
-def get_metadata(structure, node):
+def get_metadata(structure, node, unit_type, project):
     """Return a list of Property objects of the metadata of the Tags in
     node according to the rules in metadata_structure.
 
@@ -246,21 +247,35 @@ def get_metadata(structure, node):
         attribute = spec.get("attr")
         data_type = spec.get("dataType")
         date_format = spec.get("dateFormat")
+        property_name = spec.get("propertyName")
+        metadata = PropertyMetadata.query.filter(
+            PropertyMetadata.property_name == property_name).first()
+        if metadata is None:
+            metadata = PropertyMetadata(
+                property_name = property_name,
+                data_type=data_type,
+                date_format=date_format,
+                is_category=spec.get("isCategory"),
+                display_name=spec.get("displayName"),
+                display=spec.get("valueIsDisplayed"),
+                unit_type=unit_type)
+            metadata.save()
 
         extracted = [] # A list of strings
 
         for xpath in xpaths:
-            if attribute is not None:
+            if attribute not in [None, ""]:
                 extracted = get_xpath_attribute(xpath,
                     attribute, node)
             else:
                 extracted = get_xpath_text(xpath, node)
             for val in extracted:
-                metadata_list.append(Property(
+                property = Property(
+                    project=project,
                     value=val,
-                    name=spec["propertyName"],
-                    data_type=data_type,
-                    date_format=date_format))
+                    name=property_name,
+                    property_metadata = metadata)
+                metadata_list.append(property)
 
     return metadata_list
 
@@ -313,7 +328,7 @@ def get_xpath_text(xpath_pattern, node):
         for node in nodes:
 
             # Adding temporary unicode check for now, could do something else later
-            value = get_xml_text(node.getparent())
+            value = get_xml_text(node)
 
             # If parse failed, skip
             if value == None:
@@ -357,7 +372,7 @@ def _get_title(properties):
         if prop.name == "title":
             return prop.value
 
-    # If there's no title property, return empty string
+    # If there's no title property, return ` string
     return ""
 
 def assign_sentences(document):
@@ -366,23 +381,25 @@ def assign_sentences(document):
     :param Document document: The document to use
     """
 
-    document.all_sentences = _get_sentences(document)
+    document.all_sentences = _assign_sentence_metadata(document, [])
 
-def _get_sentences(unit):
+def _assign_sentence_metadata(unit, all_parent_properties):
     """Recursively traverse the unit tree for sentences.
 
     :param Unit unit: The unt to use
     :return list: A nested list of sentences
     """
-
-    if not unit.children:
-        return unit.sentences
-
-    else:
-        sentences = list(unit.sentences)
-
-        for child in unit.children:
-            sentences.extend(_get_sentences(child))
-
-        return sentences
+    properties = all_parent_properties[:]
+    properties.extend(unit.properties)
+    sentences = list(unit.sentences)
+    for sentence in sentences:
+        for property in properties:
+            property_of_sentence = PropertyOfSentence(
+                property=property,
+                sentence=sentence)
+            property_of_sentence.save()
+            
+    for child in unit.children:
+        sentences.extend(_assign_sentence_metadata(child, properties))
+    return sentences
 

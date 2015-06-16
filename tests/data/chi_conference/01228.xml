@@ -1,0 +1,12 @@
+<article>
+<year>2003</year>
+<title>Using pixel rewrites for shape-rich interaction</title>
+<author>Furnas, George W.</author>
+<author>Qu, Yan</author>
+<keyword>graphical interaction</keyword>
+<keyword>graphical rewrites</keyword>
+<keyword>pixel rewrites</keyword>
+<keyword>shape analysis</keyword>
+<keyword>shape manipulation</keyword>
+<abstract>This paper introduces new interactive ways to create, manipulate and analyze shapes, even when those shapes do not have simple algebraic generators. This is made possible by using pixel-pattern rewrites to compute directly with bitmap representations. Such rewrites also permit the definition of functionality maps, bitmaps that specify the spatial scope of application functionality, and organic-widgets, implemented right in the pixels to have arbitrary form, integrated with the shape needs of the applications. Together these features should increase our capabilities for working with rich spatial domains.</abstract>
+<article>

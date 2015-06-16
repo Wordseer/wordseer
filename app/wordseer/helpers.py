@@ -359,3 +359,18 @@ def get_model_from_tablename(tablename):
 
     return None
 
+def parse_phrase_strings(phrase_strings):
+    """Parse a phrase string passed from the JS application and return the
+    corresponding sequence texts.
+    """
+
+    sequence_texts = list()
+
+    for phrase_string in phrase_strings:
+
+        # Split on underscore to remove the unnecessary components, then
+        # restore any actual underscores in the phrase 
+        text = "_".join(phrase_string.split("_")[2:])
+        sequence_texts.append(text)
+
+    return sequence_texts

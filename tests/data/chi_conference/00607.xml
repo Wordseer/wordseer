@@ -1,0 +1,13 @@
+<article>
+<year>2006</year>
+<title>Visualization of large hierarchical data by circle packing</title>
+<author>Wang, Weixin</author>
+<author>Wang, Hui</author>
+<author>Dai, Guozhong</author>
+<author>Wang, Hongan</author>
+<keyword>circle packing</keyword>
+<keyword>file system</keyword>
+<keyword>nested circles</keyword>
+<keyword>tree visualization</keyword>
+<abstract>In this paper a novel approach is described for tree visualization using nested circles. The brother nodes at the same level are represented by externally tangent circles; the tree nodes at different levels are displayed by using 2D nested circles or 3D nested cylinders. A new layout algorithm for tree structure is described. It provides a good overview for large data sets. It is easy to see all the branches and leaves of the tree. The new method has been applied to the visualization of file systems.</abstract>
+<article>

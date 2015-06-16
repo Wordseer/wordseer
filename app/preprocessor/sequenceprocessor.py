@@ -14,6 +14,7 @@ from app import app
 from app.models.sequence import Sequence
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
+import pdb
 
 from .logger import ProjectLogger
 
@@ -36,13 +37,13 @@ class SequenceProcessor(object):
     def remove_stops(self, words):
         """Remove every sort of stop from the sentences.
 
-        :param list words: A list of TaggedWord objects.
+        :param list words: A list of WordInSentence objects.
         :return list: The list without stops.
         """
 
         without_stops = []
         for word in words:
-            if word.word.lower() not in app.config["STOPWORDS"]:
+            if word.word.lemma not in app.config["STOPWORDS"]:
                 without_stops.append(word)
 
         return without_stops
@@ -71,7 +72,6 @@ class SequenceProcessor(object):
         # Write the sequences to the database using duplication check
 
         if isinstance(sequence_dict, dict):
-
             for sequence in sequences:
                 sequence_text = sequence["sequence"]
                 lemmatized = sequence["is_lemmatized"]
@@ -79,17 +79,17 @@ class SequenceProcessor(object):
                 all_function_words = sequence["all_function_words"]
                 length = len(sequence["words"])
                 position = sequence["start_position"]
+                words = sequence["words"]
 
                 key = sequence_text
-
                 if key in sequence_dict.keys():
                     sequence = sequence_dict[key]
                 else:
 
                     try:
-                        sequence = Sequence.query.filter_by(
-                            sequence = sequence_text
-                        ).one()
+                        sequence = Sequence.query.\
+                            filter_by(sequence = sequence_text,
+                            project=self.project).one()
                     except(MultipleResultsFound):
                         self.project_logger.error("Duplicate records found "
                             "for: %s", str(key))
@@ -99,8 +99,11 @@ class SequenceProcessor(object):
                             lemmatized = lemmatized,
                             has_function_words = has_function_words,
                             all_function_words = all_function_words,
-                            length = length
+                            length = length,
+                            project=self.project,
+                            words = words
                         )
+                        sequence.save(False)
 
                     sequence_dict[key] = sequence
 
@@ -124,24 +127,27 @@ class SequenceProcessor(object):
 
         sequences = []
 
-        wordlist = sentence.words[i:j] # all the words
-        lemmatized_phrase = join_tws(wordlist, " ", "lemma") # only lemmas
-        surface_phrase = join_tws(wordlist, " ", "word") # only words
+        rel_list = sentence.word_in_sentence[i:j] # all the words
+        word_list = [rel.word for rel in rel_list]
+
+        surface_phrase = join_words(rel_list, WORD)
 
         if surface_phrase in self.previously_indexed:
             #If we've already seen this sentence, don't bother
             return sequences
 
-        wordlist_nostops = self.remove_stops(wordlist)
-        lemmatized_phrase_nostops = join_tws(wordlist_nostops, " ", LEMMA)
-        surface_phrase_nostops = join_tws(wordlist_nostops, " ", WORD)
+        lemmatized_phrase = join_words(rel_list, LEMMA)
+        rel_list_nostops = self.remove_stops(rel_list)
+        word_list_nostops = [rel.word for rel in rel_list_nostops]
+        lemmatized_phrase_nostops = join_words(rel_list_nostops, LEMMA)
+        surface_phrase_nostops = join_words(rel_list_nostops, WORD)
 
         # TOOO: Aditi says it's possible to remove these checks, should
         # see if that's doable after the unit test is written
-        has_stops = len(wordlist_nostops) < len(wordlist)
+        has_stops = len(rel_list_nostops) < len(rel_list)
         lemmatized_has_stops = (len(lemmatized_phrase_nostops) <
             len(lemmatized_phrase))
-        all_stop_words = len(wordlist_nostops) == 0
+        all_stop_words = len(rel_list_nostops) == 0
         lemmatized_all_stop_words = len(lemmatized_phrase_nostops) == 0
 
         # Definitely make a Sequence of the surface_phrase
@@ -152,14 +158,14 @@ class SequenceProcessor(object):
             "is_lemmatized": False,
             "has_function_words": has_stops,
             "all_function_words": all_stop_words,
-            "words": wordlist})
+            "words": word_list})
         self.previously_indexed.append(surface_phrase)
 
         # If it's not just stops, has stops, and the first word isn't a stop,
         # and it hasn't been indexed, then make a Sequence from the nostop SP
         if (has_stops and not # Should have stops to avoid duplicate
             all_stop_words and
-            wordlist_nostops[0] == wordlist[0] and not
+            rel_list_nostops[0] == rel_list[0] and not
             surface_phrase_nostops in self.previously_indexed):
             sequences.append({"start_position": i,
                 "sentence_id": sentence.id,
@@ -168,7 +174,7 @@ class SequenceProcessor(object):
                 "is_lemmatized": False,
                 "has_function_words": False,
                 "all_function_words": False,
-                "words": wordlist_nostops})
+                "words": word_list_nostops})
             self.previously_indexed.append(surface_phrase_nostops)
 
         # Definitely make a Sequence of the lemmatized_phrase
@@ -179,13 +185,13 @@ class SequenceProcessor(object):
             "is_lemmatized": True,
             "has_function_words": lemmatized_has_stops,
             "all_function_words": lemmatized_all_stop_words,
-            "words": wordlist})
+            "words": word_list})
         self.previously_indexed.append(lemmatized_phrase)
 
         # Maybe make a sequence of the lemmatized_phrase_nostop
         if (lemmatized_has_stops and not
             lemmatized_all_stop_words and
-            wordlist_nostops[0] == wordlist[0] and not
+            rel_list_nostops[0] == rel_list[0] and not
             lemmatized_phrase_nostops in self.previously_indexed):
             # We don't add this to previously_indexed
             #print "Lemmatized nostop"
@@ -197,15 +203,15 @@ class SequenceProcessor(object):
                 "is_lemmatized": True,
                 "has_function_words": False,
                 "all_function_words": False,
-                "words": wordlist_nostops})
+                "words": word_list_nostops})
 
         return sequences
 
-def join_tws(words, delimiter, attr):
-    """Join either the lemmas or text of words with the delimiter.
+def join_words(words, attr):
+    """Join either lemmas or surface words from a list of `WordInSentence`
+    objects.
 
-    :param list words: A list of TaggedWord objects.
-    :param str delimiter: A delimiter to put between the words/lemmas.
+    :param list words: A list of WordInSentence objects.
     :param str attr: Either sequenceprocessor.LEMMA to combine lemmas or
         sequenceprocessor.WORD to combine words.
     :return str: The combined sentence.
@@ -213,11 +219,11 @@ def join_tws(words, delimiter, attr):
 
     result = []
 
-    for word in words:
-        if attr == LEMMA:
-            result.extend([word.lemma, delimiter])
-        elif attr == WORD:
-            result.extend([word.word, delimiter])
-
-    return "".join(result[:-1])
+    if attr == LEMMA:
+        for word in words:
+            result.append(word.word.lemma)
+    elif attr == WORD:
+        for word in words:
+            result.append(word.surface)
+    return " ".join(result)
 
