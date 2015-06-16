@@ -181,7 +181,10 @@ class CLPDView(View):
 def home():
     """Display the home page.
     """
-    return render_template("home.html")
+    if current_user.is_authenticated():
+        return redirect(app.config["PROJECT_ROUTE"])
+    else:
+        return render_template("home.html")
 
 class ProjectsCLPD(CLPDView):
     """A CLPD view for the list of a user's projects.
