@@ -96,7 +96,14 @@ def project_show(project_id):
         rel = ProjectsUsers.query.filter_by(user=current_user,
             project=project).one()
 
-        return render_template("document_list.html", project=project, user_role=rel.role)
+        # retrieve log info
+        project_errors = project.get_errors()
+        project_warnings = project.get_warnings()
+        project_infos = project.get_infos()
+
+        return render_template("document_list.html", project=project, user_role=rel.role, 
+            project_errors=project_errors, project_warnings=project_warnings, 
+            project_infos=project_infos)
     else:
         return redirect("/")
 
