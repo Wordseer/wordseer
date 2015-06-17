@@ -35,7 +35,7 @@
                 </thead>
                 <tbody>
                     {% for project in projects %}
-                        <tr>
+                        <tr id="proj-{{project.id}}">
                             <td class="fitted">
                                 {% if project.status == 0 %}
                                     <a href="{{ url_for("uploader.project_show",
@@ -69,13 +69,14 @@
                                 
                             </td>
                             <td class="fitted">
-                                <a href="{{ url_for("uploader.project_show",
-                                    project_id=project.id) }}", class="btn btn-danger">
+                                {% if project.admin %}
+                                <a data-projid="{{project.id}}" class="btn btn-danger delete">
                                     <span class="glyphicon glyphicon-remove"></span>
                                     Delete
                                 </a>
+                                {% endif %}
                             </td>
-                        </tr>
+
                     {% endfor %}
                 </tbody>
             </table>
@@ -103,7 +104,44 @@
                 console.log("Project creation failed", data);
                 // TODO: real error handling
             });
-        })
+        });
+
+        $("a.btn.delete").click(function(e){
+            e.preventDefault();
+
+            // confirmation dialog
+            $("#confirmDelete .modal-title").text('Delete this project permanently?')
+            $("#confirmDelete").modal("show");
+
+            // clear old click handler, replace with new one
+            $("#confirmDelete #confirm")
+                .off("click")
+                .on("click", function(){
+                    $(this).removeClass('btn-danger')
+                        .addClass('btn-default')
+                        .text("Deleting...");
+
+                    var project_id = e.currentTarget.dataset.projid,
+                        csrf_token = $("#csrf_token").val(),
+                        request = $.post("{{ url_for("uploader.delete_obj")}}", {
+                            project_id: project_id,
+                            obj_type: "project",
+                            obj_id: project_id,
+                            csrf_token: csrf_token
+                        });
+                    request.done(function(resp){
+                        var data = $.parseJSON(resp),
+                            rowToDelete = $("tr#proj-" + data.obj_id);
+
+                        $("#confirmDelete").modal("hide");
+                        rowToDelete.remove();
+
+                    }).fail(function(resp){
+                        console.log("deletion failed")
+                        // TODO: real error handling
+                    });
+                });
+        });
     })
     </script>
 {% endblock %}

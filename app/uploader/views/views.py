@@ -72,10 +72,13 @@ def project_list():
     if current_user.is_authenticated():
         projects = []
         for project in current_user.projects:
+            rel = ProjectsUsers.query.filter_by(user=current_user,
+            project=project).one()
             projects.append({
                 "name": project.name,
                 "id": project.id,
-                "status": project.status
+                "status": project.status,
+                "admin": rel.role == ProjectsUsers.ROLE_ADMIN
             })
         return render_template("project_list.html", projects=projects, create_form=forms.ProjectCreateForm())
     else:
@@ -126,6 +129,56 @@ def project_permissions():
 @uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/document/")
 def document_show():
     pass
+
+@uploader.route(app.config["DELETE_ROUTE"], methods=["POST"])
+def delete_obj():
+    """Given a Unit or Project object, delete their files and database records.
+    """
+    if current_user.is_authenticated():
+
+        # retrieve relevant variables from request params
+        project_id = request.form["project_id"]
+        obj_type = request.form["obj_type"]
+        obj_id = request.form["obj_id"]
+        
+        # does user have access to project?
+        project = helpers.get_object_or_exception(Project,
+            Project.id == project_id,
+            exceptions.ProjectNotFoundException)
+        if project not in current_user.projects:
+            return #500 error
+
+        # does user have admin permissions?
+        rel = ProjectsUsers.query.filter_by(user=current_user,
+            project=project).one()
+        if rel.role != ProjectsUsers.ROLE_ADMIN:
+            return #500 error
+
+        # figure out what they want to delete, and delete it
+        if obj_type == "project":
+            obj = Project.query.get(obj_id)
+
+        if os.path.isdir(obj.path):
+            shutil.rmtree(obj.path)
+            for document_file in obj.document_files:
+                #TODO: can't we cascade this?
+                document_file.delete()
+            db.session.commit()
+        else:
+            os.remove(obj.path)
+
+        # if isinstance(obj, StructureFile):
+        #     self.process_form.structure_file.delete_choice(obj.id, data)
+
+        # else:
+        #     self.process_form.selection.delete_choice(obj.id, data)
+
+        obj.delete()
+
+        return render_template("delete_obj.json", obj_type=obj_type, obj_id=obj_id)
+
+    else:
+        return #500 error
 
 # class CLPDView(View):
 #     """This is a pluggable view to handle CLPD (Create, List, Process, Delete)
