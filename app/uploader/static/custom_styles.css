@@ -78,3 +78,7 @@ form + div.alert, input+div.alert, div.form-group+div.alert {
     font-style: italic;
     font-weight: bolder;
 }
+
+.tab-content {
+    padding-top: 1em;
+}
