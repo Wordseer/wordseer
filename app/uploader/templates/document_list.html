@@ -1,12 +1,5 @@
 {% import "macros.html" as macros %}
 {% extends "item_list_sidebar.html" %}
-{% block scripts %}
-{{ super() }}
-<script src="{{ url_for('uploader.static',
-        filename='upload-input-group.js') }}"></script>
-<script src="{{ url_for('uploader.static',
-        filename='tooltips.js') }}"></script>
-{% endblock %}
 {% block title %}Document List{% endblock %}
 {% block page_header %}
 {{ macros.breadcrumbs([
@@ -15,24 +8,7 @@
         ])}}
 {% endblock %}
 
-{% block creation_header %}Upload new document{% endblock %}
 {% block creation_form %}
-{#
-{% if project.status == 0 and user_role > 0 %}
-<form method="POST" enctype="multipart/form-data"
-      class="form-inline clearfix" role="form">
-    {{ create_form.hidden_tag() }}
-    {{ macros.render_field(create_form.uploaded_file,
-                multiple="multiple",
-                accept=allowed_extensions|join(", "),
-                button=create_form.upload_button(
-                    class="btn btn-primary left-margin",
-                    icon="glyphicon-cloud-upload"),
-                help=("Allowed extensions: " + allowed_extensions|join(", ") +
-                    ".")) }}
-</form>
-{% endif %}
-#}
 
 {% set tooltip_args = {"data-toggle": "tooltip", "data-placement": "top"} %}
     {% set process_button_class = "" %}
@@ -97,7 +73,7 @@
         title="{{ mapper_button_tooltip }}">
         <a class="btn btn-info {{mapper_button_class}}">
             <i class="glyphicon glyphicon-list" id='structure-button'></i>
-            Map structure
+            Map document structure
         </a> 
     </span>&nbsp;
 
@@ -105,7 +81,7 @@
     <span data-toggle="tooltip" data-placement="top" class="has-tooltip" 
         title="{{ permissions_button_tooltip }}">
     <a href="{{ url_for("uploader.project_permissions", project_id=project.id) }}",
-       class="btn btn-default"><i class="glyphicon glyphicon-user"></i> User permissions</a>
+       class="btn btn-default"><i class="glyphicon glyphicon-user"></i> Users</a>
     </span>
     {% endif %}
 
@@ -116,18 +92,33 @@
 
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="{% if project.status == 0 %}active{% endif %}"><a href="#docs" aria-controls="docs" role="tab" data-toggle="tab">Documents</a></li>
-        <li role="presentation"><a href="#struc" aria-controls="struc" role="tab" data-toggle="tab">Structure Maps</a></li>
+        <li role="presentation" class="{% if project.status == 0 and not struc_active %}active{% endif %}"><a href="#docs" aria-controls="docs" role="tab" data-toggle="tab">Documents</a></li>
+        <li role="presentation" class="{% if struc_active %}active{% endif %}"><a href="#struc" aria-controls="struc" role="tab" data-toggle="tab">Structure Maps</a></li>
         <li role="presentation" class="{% if project.status > 0 %}active{% endif %}"><a href="#log" aria-controls="log" role="tab" data-toggle="tab">Processing Log</a></li>
         
     </ul>
 
     <!-- Tab panes -->
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane {% if project.status == 0 %}active {% endif %}panel panel-default" id="docs">
+        <div role="tabpanel" class="tab-pane {% if project.status == 0 and not struc_active %}active {% endif %}panel panel-default" id="docs">
+            {% if project.status == 0 and user_role > 0 %}
+            <div class="panel-body">
+                <form method="POST" enctype="multipart/form-data"
+                      class="form-inline clearfix upload" role="form" >
+                    {{ doc_form.hidden_tag() }}
+                    {{ macros.render_field(doc_form.uploaded_file,
+                        multiple="multiple",
+                        accept=allowed_extensions_doc|join(", "),
+                        button=doc_form.upload_button(
+                            class="btn btn-primary left-margin",
+                            icon="glyphicon-cloud-upload"),
+                        help=("Allowed extensions: " + allowed_extensions_doc|join(", ") +
+                            ".")) }}
+                </form>
+            </div>
+            {% endif %}
             
             {% if project.document_files %}
-                {#{{ macros.render_errors(process_form.selection.errors) }}#}
                 <ul class="list-group">
                     {% for document in project.document_files %}
                     <li class="list-group-item">
@@ -146,13 +137,31 @@
                     {% endfor %}    
                 </ul>
             {% else %}
-            <div class="panel-body">
+            <div class="panel-footer">
                 <p>There are no Documents in this project.</p>
-                <p>Upload documents (in XML format) with the form above.</p>
+                <p>Use the form above to upload the documents you want to analyze.</p>
             </div>
             {% endif %}
+
         </div>
-        <div role="tabpanel" class="tab-pane panel panel-default" id="struc">
+        <div role="tabpanel" class="tab-pane panel panel-default {% if struc_active %}active{% endif %}" id="struc">
+            {% if project.status == 0 and user_role > 0 %}
+            <div class="panel-body">
+                <form method="POST" enctype="multipart/form-data"
+                      class="form-inline clearfix upload" role="form">
+                    {{ struc_form.hidden_tag() }}
+                    {{ macros.render_field(struc_form.uploaded_file,
+                        multiple="multiple",
+                        accept=allowed_extensions_struc|join(", "),
+                        button=struc_form.upload_button(
+                            class="btn btn-primary left-margin",
+                            icon="glyphicon-cloud-upload"),
+                        help=("Allowed extensions: " + allowed_extensions_struc|join(", ") +
+                            ".")) }}
+                </form>
+            </div>
+            {% endif %}
+
             {% if project.structure_files %}
                 <ul class="list-group">
                     {% for file in project.structure_files %}
@@ -174,7 +183,7 @@
                     {% endfor %}    
                 </ul>
             {% else %}
-            <div class="panel-body">
+            <div class="panel-footer">
                 <p>There are no Structure Maps in this project.</p>
                 <p>Click the "Map Structure" button to create a structure map that tells Wordseer what content and metadata to extract from your XML documents.</p>
                 <p>If you already have a Structure Map (in JSON format), you can just upload it with the form above.</p>
@@ -233,3 +242,35 @@
     </ol>
 </div>
 {% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('uploader.static',
+        filename='upload-input-group.js') }}"></script>
+<script src="{{ url_for('uploader.static',
+        filename='tooltips.js') }}"></script>
+
+<script type="text/javascript">
+    // $(document).ready(function(){
+        
+    //     // handle upload forms via ajax
+    //     $("form.upload").submit(function(e){
+    //         e.preventDefault();
+    //         var data = new FormData(),
+    //             files = this[2].files;
+    //         $.extend(data, $(this).serializeArray());
+    //         data["project_id"] = {{project.id}};
+
+    //         $.each(files, function(i, file){
+    //             data.append('files[]', file, file.name);
+    //         });
+    //         debugger;
+
+
+
+
+    //     });
+    // });
+</script>
+{% endblock %}
+{#{{ macros.render_errors(process_form.selection.errors) }}#}

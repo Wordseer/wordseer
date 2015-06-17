@@ -84,9 +84,10 @@ def project_list():
     else:
         return redirect("/")
 
-@uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>")
+@uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>", methods=["GET", "POST"])
 def project_show(project_id):
     """A view to list documents and log messages for a single project."""
+
     if current_user.is_authenticated():
         # does user have access to the project?
         project = helpers.get_object_or_exception(Project,
@@ -99,6 +100,62 @@ def project_show(project_id):
         rel = ProjectsUsers.query.filter_by(user=current_user,
             project=project).one()
 
+        # initialize some form objects
+        doc_form=forms.DocumentUploadForm()
+        struc_form = forms.StructureUploadForm()
+
+        # should the structure tab be active because the struc form was submitted?
+        struc_active = False
+
+        if request.method == "POST":
+            # handle file upload
+            
+            if rel.role != ProjectsUsers.ROLE_ADMIN:
+                return #500 error
+
+            # For every file, check if it exists and if not then upload it to
+            # the project directory and create a database record with its filename and
+            # path.
+
+            uploaded_files = request.files.getlist("uploaded_file")
+            for uploaded_file in uploaded_files:
+                filename = secure_filename(uploaded_file.filename)
+                dest_path = os.path.join(app.config["UPLOAD_DIR"],
+                    str(project.id), filename)
+                ext = os.path.splitext(dest_path)[1][1:]
+                
+                # make sure file doesn't already exist
+                if not os.path.isfile(dest_path):
+                    # Tell whether the uploaded file is a document file or a structure
+                    # file, and create a Document or StructureFile instance accordingly.
+
+                    if ext == app.config["STRUCTURE_EXTENSION"]:
+                        if struc_form.validate():
+                            uploaded_file.save(dest_path)
+                            file_model = StructureFile(path=dest_path, project=project)
+                            file_model.save()
+                            struc_active = True
+
+                    else:
+                        if doc_form.validate():
+                            uploaded_file.save(dest_path)
+                            file_model = DocumentFile(path=dest_path, projects=[project])
+                            file_model.save()
+                    
+                else:
+                    # create_form.uploaded_file.errors.append("A file with "
+#                     "name " + os.path.split(dest_path)[1] + " already exists")
+                    if ext == app.config["STRUCTURE_EXTENSION"]:
+                        struc_form.validate()
+                        struc_form.uploaded_file.errors.append("A file with "
+                            "name " + os.path.split(dest_path)[1] + " already exists")
+                        struc_active = True
+
+                    else:
+                        doc_form.validate()
+                        doc_form.uploaded_file.errors.append("A file with "
+                            "name " + os.path.split(dest_path)[1] + " already exists")
+
         # retrieve log info
         project_errors = project.get_errors()
         project_warnings = project.get_warnings()
@@ -106,7 +163,9 @@ def project_show(project_id):
 
         return render_template("document_list.html", project=project, user_role=rel.role, 
             project_errors=project_errors, project_warnings=project_warnings, 
-            project_infos=project_infos)
+            project_infos=project_infos, doc_form=doc_form,
+            struc_form=struc_form, allowed_extensions_doc=["xml"], 
+            allowed_extensions_struc=["json"], struc_active=struc_active)
     else:
         return redirect("/")
 

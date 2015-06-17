@@ -105,7 +105,19 @@ class DocumentUploadForm(Form, HiddenSubmitted):
 
     uploaded_file = FileField("File", validators=[
         FileRequired("You must select a file"),
-        FileAllowed(app.config["ALLOWED_EXTENSIONS"], "Invalid file type")
+        FileAllowed([app.config["DOCUMENT_EXTENSION"]], "Invalid file type")
+        ])
+
+class StructureUploadForm(Form, HiddenSubmitted):
+    """This is a form to upload files to the server. It handles both XML
+    and JSON files, and is used by the document_upload view.
+    """
+
+    upload_button = ButtonField(text="Upload", name="action")
+
+    uploaded_file = FileField("File", validators=[
+        FileRequired("You must select a file"),
+        FileAllowed([app.config["STRUCTURE_EXTENSION"]], "Invalid file type")
         ])
 
 class DocumentProcessForm(ProcessForm):
