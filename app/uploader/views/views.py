@@ -85,8 +85,18 @@ def project_list():
 def project_show(project_id):
     """A view to list documents and log messages for a single project."""
     if current_user.is_authenticated():
-        # TODO: check project ownership
-        return render_template("document_list.html")
+        # does user have access to the project?
+        project = helpers.get_object_or_exception(Project,
+            Project.id == project_id,
+            exceptions.ProjectNotFoundException)
+        if project not in current_user.projects:
+            return #500 error
+
+        # what is user's permission level?
+        rel = ProjectsUsers.query.filter_by(user=current_user,
+            project=project).one()
+
+        return render_template("document_list.html", project=project, user_role=rel.role)
     else:
         return redirect("/")
 
@@ -101,6 +111,14 @@ def project_create():
         project.save()
         os.mkdir(project.path)
         return render_template("create_project.json", project_id=project.id, errors=errors)
+
+@uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/permissions")
+def project_permissions():
+    pass
+
+@uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/document/")
+def document_show():
+    pass
 
 # class CLPDView(View):
 #     """This is a pluggable view to handle CLPD (Create, List, Process, Delete)
