@@ -71,8 +71,8 @@
 
     <span data-toggle="tooltip" data-placement="top" class="has-tooltip" 
         title="{{ mapper_button_tooltip }}">
-        <a class="btn btn-info {{mapper_button_class}}">
-            <i class="glyphicon glyphicon-list" id='structure-button'></i>
+        <a class="btn btn-info {{mapper_button_class}}" id='structure-button'>
+            <i class="glyphicon glyphicon-list"></i>
             Map document structure
         </a> 
     </span>&nbsp;
@@ -123,15 +123,6 @@
                     {% for document in project.document_files %}
                     <li class="list-group-item">
                         {{ document.path.split('/')[-1] }}
-                        <span data-toggle="tooltip" data-placement="top" class="has-tooltip" title="{{ mapper_button_tooltip }}">
-                            <!-- <a class="btn btn-info {{mapper_button_class}}">
-                                <i class="glyphicon glyphicon-list" id='structure-button'></i>
-                                Map structure
-                            </a> -->
-                            
-                        </span>
-
-                        
                     </li>
                     
                     {% endfor %}    
@@ -223,6 +214,31 @@
         </div>
     </div>
 
+    <div class="modal fade" id="mapperSelect" role="dialog" aria-labelledby="mapperSelectLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Choose the XML file you want to map</h4>
+                </div>
+                <div class="modal-body">
+                    <p>To continue to the Structure Mapper, select one file from this list to serve as an example of how your documents are structured.</p>
+                    <p class="small">The Structure Map is a set of instructions that Wordseer will use to extract content and metadata from your documents. Wordseer assumes that all files in a project follow the same schema, so you only need to map one file. (If your files don't all follow the same schema, you should remove or replace any non-conforming XML files before processing or the processor will fail or produce unreliable results.)</p>
+
+                    <div class="list-group">
+                        {% for document in project.document_files %}
+                        <a class="list-group-item" href="#" data-fileid="{{document.id}}">
+                            {{ document.path.split('/')[-1] }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 {% block sidebar %}
 <h2>Directions</h2>
@@ -251,26 +267,22 @@
         filename='tooltips.js') }}"></script>
 
 <script type="text/javascript">
-    // $(document).ready(function(){
-        
-    //     // handle upload forms via ajax
-    //     $("form.upload").submit(function(e){
-    //         e.preventDefault();
-    //         var data = new FormData(),
-    //             files = this[2].files;
-    //         $.extend(data, $(this).serializeArray());
-    //         data["project_id"] = {{project.id}};
+    $(document).ready(function(){
+        // selection dialog for xml structure mapper
+        $("#structure-button:not(.disabled)").click(function(e){
+            e.preventDefault();
 
-    //         $.each(files, function(i, file){
-    //             data.append('files[]', file, file.name);
-    //         });
-    //         debugger;
+            $("#mapperSelect").modal("show");
 
-
-
-
-    //     });
-    // });
+            $("#mapperSelect a.list-group-item").click(function(e){
+                e.preventDefault();
+                var fileid = e.currentTarget.dataset.fileid;
+                map_url = "{{ url_for("uploader.document_map", project_id=project.id, document_file_id=0) }}";
+                map_url = map_url.slice(0,-1) + fileid
+                window.location =  map_url;
+            });
+        });
+    });
 </script>
 {% endblock %}
-{#{{ macros.render_errors(process_form.selection.errors) }}#}
+{#href="{{ url_for("document_map", project_id=project.id) }}"#}

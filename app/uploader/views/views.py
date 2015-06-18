@@ -239,6 +239,38 @@ def delete_obj():
     else:
         return #500 error
 
+@csrf.exempt
+@uploader.route(app.config["PROJECT_ROUTE"]+"<int:project_id>"+
+    app.config["MAP_ROUTE"] + '<int:document_file_id>')
+@login_required
+def document_map(project_id, document_file_id):
+    """
+    The map xml action, which is used create a structure map file for document.
+
+    :param int doc_id: The document to retrieve details for.
+    """
+    try:
+        document = DocumentFile.query.get(document_file_id)
+    except TypeError:
+        return app.login_manager.unauthorized()
+
+    access_granted = current_user.has_document_file(
+        DocumentFile.query.get(document_file_id))
+
+    # Test if this user can see it
+    if not access_granted:
+        return app.login_manager.unauthorized()
+
+    filename = os.path.split(document.path)[1]
+    project = Project.query.get(project_id)
+    map_document = forms.MapDocumentForm()
+    return render_template("document_map.html",
+        document=document,
+        project=project,
+        filename=filename,
+        map_document = map_document,
+        document_url="%s%s"%(app.config["UPLOAD_ROUTE"],document.id))
+
 # class CLPDView(View):
 #     """This is a pluggable view to handle CLPD (Create, List, Process, Delete)
 #     views.
