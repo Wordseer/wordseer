@@ -23,7 +23,7 @@
 {% block body %}
 <h1>
     {{ breadcrumbs([
-            (url_for('uploader.projects'), "Projects"),
+            (url_for('uploader.project_list'), "Projects"),
             (url_for('uploader.project_show', project_id=project.id),
                 project.name),
             ("", filename)
