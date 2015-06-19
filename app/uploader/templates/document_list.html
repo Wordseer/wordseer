@@ -122,7 +122,7 @@
                 <ul class="list-group">
                     {% for document in project.document_files %}
                     <li class="list-group-item">
-                        {{ document.path.split('/')[-1] }}
+                        <a href="{{ url_for("uploader.get_file", filetype="doc", file_id=document.id) }}">{{ document.path.split('/')[-1] }}</a>
                     </li>
                     
                     {% endfor %}    
@@ -157,18 +157,12 @@
                 <ul class="list-group">
                     {% for file in project.structure_files %}
                     <li class="list-group-item">
-                        {{ file.path.split('/')[-1] }}
-                        <span data-toggle="tooltip" data-placement="top" class="has-tooltip" title="{{ mapper_button_tooltip }}">
-                            
-                        </span>
+                        <a href="{{ url_for("uploader.get_file", filetype="struc", file_id=file.id) }}">{{ file.path.split('/')[-1] }}</a>
+                        
                         <span data-toggle="tooltip" data-placement="top" class="has-tooltip" title="{{ delete_button_tooltip }}">
-    
-        </span>
-        {#{{ process_form.delete_button(class="btn btn-danger" + delete_button_class,
-                    icon="glyphicon-remove") }}#}
-
-                        {#{{ process_form.hidden_tag() }}#}
-
+                            {#{{ process_form.delete_button(class="btn btn-danger" + delete_button_class,
+                                icon="glyphicon-remove") }}#}
+                        </span>
                     </li>
                     
                     {% endfor %}    
