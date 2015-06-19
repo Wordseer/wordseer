@@ -169,6 +169,44 @@ def project_show(project_id):
     else:
         return redirect("/")
 
+@csrf.exempt
+@uploader.route(app.config["PROJECT_ROUTE"]+"<int:project_id>"+
+    app.config["MAP_ROUTE"] + '<int:document_id>'+app.config["SAVE_MAP"], methods=['POST'])
+@login_required
+def upload_structure_file(project_id, document_id):
+    """
+    Retireve the JSON object from te request, write it to a json file and
+    save it back to the project.
+    """
+    json_data = request.json
+    dest_path = ''
+    filename=''
+    counter = 0
+    while os.path.isfile(dest_path) or counter==0:
+        suffix = ''
+        if counter >0:
+            suffix='_%s'%counter
+        filename = json_data['filename']+"_structure"+suffix+".json"
+        filename = secure_filename(filename)
+        dest_path = os.path.join(app.config["UPLOAD_DIR"],
+            str(project_id), filename)
+        counter+=1
+
+    # TODO: this checks if the file exists, but can we do this
+    # inside the form?
+    if not os.path.isfile(dest_path):
+        f = open(dest_path, 'w');
+        f.write(json.dumps(json_data))
+        f.close();
+        project = Project.query.get(project_id)
+        structure_file = StructureFile(path=dest_path, project=project)
+        structure_file.save()
+
+    else:
+        return "A file with name " + os.path.split(dest_path)[1] + " already exists"
+
+    return 'ok'
+
 @uploader.route(app.config["PROJECT_ROUTE"] + "new", methods=["POST"])
 def project_create():
     """View for an AJAX endpoint that creates a new project"""
@@ -183,10 +221,6 @@ def project_create():
 
 @uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/permissions")
 def project_permissions():
-    pass
-
-@uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/document/")
-def document_show():
     pass
 
 @uploader.route(app.config["DELETE_ROUTE"], methods=["POST"])
@@ -268,8 +302,8 @@ def document_map(project_id, document_file_id):
         document=document,
         project=project,
         filename=filename,
-        map_document = map_document,
-        document_url="%s%s"%(app.config["UPLOAD_ROUTE"],document.id))
+        map_document = map_document
+        )
 
 
 @csrf.exempt
@@ -744,42 +778,4 @@ def get_file(filetype, file_id):
 #         project.id)
 #     preprocessing_process = threading.Thread(target=cp_run, args=args)
 #     preprocessing_process.start()
-
-# @csrf.exempt
-# @uploader.route(app.config["PROJECT_ROUTE"]+"<int:project_id>"+
-#     app.config["MAP_ROUTE"] + '<int:document_id>'+app.config["SAVE_MAP"], methods=['POST'])
-# @login_required
-# def upload_structure_file( project_id, document_id):
-#     """
-#     Retireve the JSON object from te request, write it to a json file and
-#     save it back to the project.
-#     """
-#     json_data = request.json
-#     dest_path = ''
-#     filename=''
-#     counter = 0
-#     while os.path.isfile(dest_path) or counter==0:
-#         suffix = ''
-#         if counter >0:
-#             suffix='_%s'%counter
-#         filename = json_data['filename']+"_structure"+suffix+".json"
-#         filename = secure_filename(filename)
-#         dest_path = os.path.join(app.config["UPLOAD_DIR"],
-#             str(project_id), filename)
-#         counter+=1
-
-#     # TODO: this checks if the file exists, but can we do this
-#     # inside the form?
-#     if not os.path.isfile(dest_path):
-#         f = open(dest_path, 'w');
-#         f.write(json.dumps(json_data))
-#         f.close();
-#         project = Project.query.get(project_id)
-#         structure_file = StructureFile(path=dest_path, project=project)
-#         structure_file.save()
-
-#     else:
-#         return "A file with name " + os.path.split(dest_path)[1] + " already exists"
-
-#     return 'ok'
 
