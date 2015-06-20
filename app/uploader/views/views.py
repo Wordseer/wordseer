@@ -19,6 +19,7 @@ from flask import session
 from flask_security.core import current_user
 from flask_security.decorators import login_required
 from flask.views import View
+from lxml import etree
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug import secure_filename
 
@@ -138,9 +139,15 @@ def project_show(project_id):
 
                     else:
                         if doc_form.validate():
-                            uploaded_file.save(dest_path)
-                            file_model = DocumentFile(path=dest_path, projects=[project])
-                            file_model.save()
+                            try:
+                                # XML validation 
+                                etree.parse(uploaded_file)
+                                
+                                uploaded_file.save(dest_path)
+                                file_model = DocumentFile(path=dest_path, projects=[project])
+                                file_model.save()
+                            except etree.XMLSyntaxError:
+                                doc_form.uploaded_file.errors.append("The file %s is not well-formed XML." % uploaded_file.filename)
                     
                 else:
                     # create_form.uploaded_file.errors.append("A file with "
