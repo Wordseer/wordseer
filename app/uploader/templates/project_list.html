@@ -117,7 +117,8 @@
             $("#confirmDelete #confirm")
                 .off("click")
                 .on("click", function(){
-                    $(this).removeClass('btn-danger')
+                    var me = this;
+                    $(me).removeClass('btn-danger')
                         .addClass('btn-default')
                         .text("Deleting...");
 
@@ -135,6 +136,11 @@
 
                         $("#confirmDelete").modal("hide");
                         rowToDelete.remove();
+                        
+                        // reset the delete button
+                        $(me).addClass('btn-danger')
+                            .removeClass('btn-default')
+                            .text("Delete");
 
                     }).fail(function(resp){
                         console.log("deletion failed")
