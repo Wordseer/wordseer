@@ -272,9 +272,55 @@ def project_create():
         os.mkdir(project.path)
         return render_template("create_project.json", project_id=project.id, errors=errors)
 
-@uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/permissions")
-def project_permissions():
-    pass
+@uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>" + "/permissions", methods=["GET", "POST"])
+@login_required
+def project_permissions(project_id):
+    """View and modify a project's permissions.
+    """
+    # does user have access to the project?
+    project = helpers.get_object_or_exception(Project,
+        Project.id == project_id,
+        exceptions.ProjectNotFoundException)
+    if project not in current_user.projects:
+        return app.login_manager.unauthorized()
+
+    form = forms.ProjectPermissionsForm(prefix="permissions")
+
+    ownerships = ProjectsUsers.query.filter_by(project = project).all()
+
+    form.selection.choices = []
+    for ownership in ownerships:
+        form.selection.add_choice(ownership.id, ownership)
+
+    if request.method == "POST":
+        selected_rels = request.form.getlist("permissions-selection")
+        ownerships = [ProjectsUsers.query.get(id) for id in selected_rels]
+        
+        if request.form["action"] == form.DELETE:
+            for ownership in ownerships:
+                form.selection.delete_choice(ownership.id, ownership)
+                ownership.delete()
+
+        if request.form["action"] == form.UPDATE:
+            role = int(request.form["permissions-update_permissions"])
+            for ownership in ownerships:
+                ownership.role = role
+                ownership.save(False)
+            db.session.commit()
+
+        if request.form["action"] == form.CREATE:
+            email = request.form["permissions-new_collaborator"]
+            role = int(request.form["permissions-create_permissions"])
+            try:
+                user = User.query.filter(User.email == email).one()
+                rel = user.add_project(project=project, role=role)
+                form.selection.add_choice(rel.id, rel)
+            except NoResultFound as error:
+                form.selection.errors = list(form.selection.errors)
+                form.selection.errors.append("User %s does not exist. (Users must register for an account before you can add them as collaborators.)" % email)
+
+    return render_template("project_permissions.html", project=project,form=form)
+
 
 @csrf.exempt
 @uploader.route(app.config["DELETE_ROUTE"], methods=["POST"])
@@ -317,7 +363,7 @@ def delete_obj():
             db.session.commit()
         else:
             os.remove(obj.path)
-            
+
         obj.delete()
 
         return render_template("delete_obj.json", obj_type=obj_type, obj_id=obj_id)
