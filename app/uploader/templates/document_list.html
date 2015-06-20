@@ -8,50 +8,50 @@
         ])}}
 {% endblock %}
 
-{% block creation_form %}
-
 {% set tooltip_args = {"data-toggle": "tooltip", "data-placement": "top"} %}
-    {% set process_button_class = "" %}
-    {% set mapper_button_class = "" %}
-    {% set delete_button_class = "" %}
-    {% set analyze_button_class = "" %}
-    
-    {% if not project.is_processable() %}
-        {% set process_button_class = " disabled" %}
-        {% set process_button_tooltip = "This project cannot be processed" %}
-    {% endif %}
+{% set process_button_class = "" %}
+{% set mapper_button_class = "" %}
+{% set delete_button_class = "" %}
+{% set analyze_button_class = "" %}
 
-    {% if not project.document_files %}
-        {% set mapper_button_class = "disabled" %}
-        {% set mapper_button_tooltip = "You need to upload at least one document first." %}
-        {% set process_button_tooltip = "You need to upload at least one document first." %}
-    {% endif %}
+{% if not project.is_processable() %}
+    {% set process_button_class = " disabled" %}
+    {% set process_button_tooltip = "This project cannot be processed" %}
+{% endif %}
 
-    {% if not project.structure_files %}
-        {% set process_button_tooltip = "You need to upload or create a structure map first." %}
-    {% endif %}
+{% if not project.document_files %}
+    {% set mapper_button_class = "disabled" %}
+    {% set mapper_button_tooltip = "You need to upload at least one document first." %}
+    {% set process_button_tooltip = "You need to upload at least one document first." %}
+{% endif %}
 
-    {% if project.status > 0 %}
-        {% set mapper_button_tooltip = "You can only do this before processing" %}
-        {% set delete_button_tooltip = "You can only do this before processing" %}
-        {% set mapper_button_class = " disabled" %}
-        {% set delete_button_class = " disabled" %}    
-    {% endif %} 
-    {% if project.status < 2 %}
-        {% set analyze_button_tooltip = "You can only do this after processing" %}
-        {% set analyze_button_class = " disabled" %}
-    {% endif %}
-    {% if user_role == 0 %}
-        {% set mapper_button_class = " disabled" %}
-        {% set delete_button_class = " disabled" %}    
-        {% set process_button_class = " disabled" %}
-        {% set process_button_tooltip = "You don't have permission to do this" %}
-        {% set delete_button_tooltip = "You don't have permission to do this" %}
-        {% set mapper_button_tooltip = "You don't have permission to do this" %}
-        {% set permissions_button_tooltip = "You don't have permission to do this" %}
-    {% endif %}
+{% if not project.structure_files %}
+    {% set process_button_tooltip = "You need to upload or create a structure map first." %}
+{% endif %}
 
+{% if project.status > 0 %}
+    {% set mapper_button_tooltip = "You can only do this before processing" %}
+    {% set delete_button_tooltip = "You can only do this before processing" %}
+    {% set mapper_button_class = " disabled" %}
+    {% set delete_button_class = "disabled" %}    
+{% endif %} 
 
+{% if project.status < 2 %}
+    {% set analyze_button_tooltip = "You can only do this after processing" %}
+    {% set analyze_button_class = " disabled" %}
+{% endif %}
+
+{% if user_role == 0 %}
+    {% set mapper_button_class = " disabled" %}
+    {% set delete_button_class = " disabled" %}    
+    {% set process_button_class = " disabled" %}
+    {% set process_button_tooltip = "You don't have permission to do this" %}
+    {% set delete_button_tooltip = "You don't have permission to do this" %}
+    {% set mapper_button_tooltip = "You don't have permission to do this" %}
+    {% set permissions_button_tooltip = "You don't have permission to do this" %}
+{% endif %}
+
+{% block creation_form %}
 <!-- buttons -->
     <span data-toggle="tooltip" data-placement="top" class="has-tooltip" 
         title="{{ analyze_button_tooltip }}">
@@ -121,8 +121,13 @@
             {% if project.document_files %}
                 <ul class="list-group">
                     {% for document in project.document_files %}
-                    <li class="list-group-item">
+                    <li class="list-group-item" id="doc-{{ document.id }}">
                         <a href="{{ url_for("uploader.get_file", filetype="doc", file_id=document.id) }}">{{ document.path.split('/')[-1] }}</a>
+                        <span data-toggle="tooltip" data-placement="top" class="has-tooltip pull-right" title="{{ delete_button_tooltip }}">
+                            <a class="delete btn btn-danger btn-xs {{mapper_button_class}}" data-prefix="doc" data-fileid="{{ document.id }}">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </a>
+                        </span>
                     </li>
                     
                     {% endfor %}    
@@ -156,12 +161,13 @@
             {% if project.structure_files %}
                 <ul class="list-group">
                     {% for file in project.structure_files %}
-                    <li class="list-group-item">
+                    <li class="list-group-item" id="struc-{{ file.id }}">
                         <a href="{{ url_for("uploader.get_file", filetype="struc", file_id=file.id) }}">{{ file.path.split('/')[-1] }}</a>
                         
-                        <span data-toggle="tooltip" data-placement="top" class="has-tooltip" title="{{ delete_button_tooltip }}">
-                            {#{{ process_form.delete_button(class="btn btn-danger" + delete_button_class,
-                                icon="glyphicon-remove") }}#}
+                        <span data-toggle="tooltip" data-placement="top" class="has-tooltip pull-right" title="{{ delete_button_tooltip }}">
+                            <a class="delete btn btn-danger btn-xs {{delete_button_class}}" data-prefix="struc" data-fileid="{{ file.id }}">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </a>
                         </span>
                     </li>
                     
@@ -207,7 +213,27 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block sidebar %}
+<h2>Directions</h2>
+<ol>
+    <li>Prepare a directory to upload with the files that you want to process.</li>
+    <li>Use the form below to upload the directory.</li>
+    <li>Use the checkbox to select one of the uploaded files, then press
+        "Map Structure". This will send you to the structure mapper. Follow
+        the on screen directions to create a description of the structure of
+        your collection's xml files. It will generate a structure file that will
+        be displayed below.</li>
+    <li>You may generate several structure files, but you must use one when
+        processing. To process, select the structure file you'd like to use then
+        click "Process".</li>
+    <li>Once processing is finished, you will see a button to view the resulting
+        data.</li>
+    </ol>
+</div>
+{% endblock %}
 
+{% block toplevel %}
     {% if project.status == 0 and user_role > 0 %}
     <div class="modal fade" id="mapperSelect" role="dialog" aria-labelledby="mapperSelectLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -266,27 +292,12 @@
             </div>
         </div>
     </div>
-    {% endif %}
 
+    {{ macros.modal_confirmation() }}
+
+    {% endif %}
 {% endblock %}
-{% block sidebar %}
-<h2>Directions</h2>
-<ol>
-    <li>Prepare a directory to upload with the files that you want to process.</li>
-    <li>Use the form below to upload the directory.</li>
-    <li>Use the checkbox to select one of the uploaded files, then press
-        "Map Structure". This will send you to the structure mapper. Follow
-        the on screen directions to create a description of the structure of
-        your collection's xml files. It will generate a structure file that will
-        be displayed below.</li>
-    <li>You may generate several structure files, but you must use one when
-        processing. To process, select the structure file you'd like to use then
-        click "Process".</li>
-    <li>Once processing is finished, you will see a button to view the resulting
-        data.</li>
-    </ol>
-</div>
-{% endblock %}
+
 
 {% block scripts %}
 {{ super() }}
@@ -348,6 +359,48 @@
                     });
             });
 
+        });
+
+        $("a.btn.delete").click(function(e){
+            e.preventDefault();
+
+            // confirmation dialog
+            $("#confirmDelete .modal-title").text('Delete this file permanently?')
+            $("#confirmDelete").modal("show");
+
+            // clear old click handler, replace with new one
+            $("#confirmDelete #confirm")
+                .off("click")
+                .on("click", function(){
+                    var me = this;
+                    $(me).removeClass('btn-danger')
+                        .addClass('btn-default')
+                        .text("Deleting...");
+
+                    var file_id = e.currentTarget.dataset.fileid,
+                        request = $.post("{{ url_for("uploader.delete_obj")}}", {
+                            project_id: {{ project.id }},
+                            obj_type: e.currentTarget.dataset.prefix,
+                            obj_id: file_id,
+                        });
+                    request.done(function(resp){
+                        $("#confirmDelete").modal("hide");
+
+                        var data = $.parseJSON(resp),
+                            rowToDelete = $("#" + e.currentTarget.dataset.prefix + "-" + data.obj_id);
+
+                        rowToDelete.remove();
+                        
+                        // reset the delete button
+                        $(me).addClass('btn-danger')
+                            .removeClass('btn-default')
+                            .text("Delete");
+
+                    }).fail(function(resp){
+                        console.log("deletion failed")
+                        // TODO: real error handling
+                    });
+                });
         });
     
         {% if project.status == 1 %}

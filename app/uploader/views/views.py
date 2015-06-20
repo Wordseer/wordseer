@@ -276,6 +276,7 @@ def project_create():
 def project_permissions():
     pass
 
+@csrf.exempt
 @uploader.route(app.config["DELETE_ROUTE"], methods=["POST"])
 def delete_obj():
     """Given a Unit or Project object, delete their files and database records.
@@ -303,6 +304,10 @@ def delete_obj():
         # figure out what they want to delete, and delete it
         if obj_type == "project":
             obj = Project.query.get(obj_id)
+        elif obj_type == "doc":
+            obj = DocumentFile.query.get(obj_id)
+        elif obj_type == "struc":
+            obj = StructureFile.query.get(obj_id)
 
         if os.path.isdir(obj.path):
             shutil.rmtree(obj.path)
@@ -312,13 +317,7 @@ def delete_obj():
             db.session.commit()
         else:
             os.remove(obj.path)
-
-        # if isinstance(obj, StructureFile):
-        #     self.process_form.structure_file.delete_choice(obj.id, data)
-
-        # else:
-        #     self.process_form.selection.delete_choice(obj.id, data)
-
+            
         obj.delete()
 
         return render_template("delete_obj.json", obj_type=obj_type, obj_id=obj_id)
