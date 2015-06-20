@@ -42,6 +42,8 @@ class BaseConfig(object):
     SAVE_MAP = "/save/"
     ANALYZE_ROUTE = "/analyze/"
     DELETE_ROUTE = "/delete/"
+    PROCESS_ROUTE = "/process/"
+    LOG_ROUTE = "/logs/"
 
     #Login settings
     SECURITY_REGISTERABLE = True

@@ -76,20 +76,26 @@ class Project(db.Model, Base):
         return documents
 
 
-    def get_errors(self):
+    def get_errors(self, start=0):
         """Return all ``ErrorLogs`` attached to this project.
         """
         return Log.query.filter(Log.project == self).\
-            filter(Log.type == "error").all()
+            filter(Log.type == "error")\
+            .filter(Log.id > int(start))\
+            .all()
 
-    def get_warnings(self):
+    def get_warnings(self, start=0):
         """Return all ``WarningLogs`` attached to this project.
         """
         return Log.query.filter(Log.project == self).\
-            filter(Log.type == "warning").all()
+            filter(Log.type == "warning")\
+            .filter(Log.id > int(start))\
+            .all()
 
-    def get_infos(self):
+    def get_infos(self, start=0):
         """Return all ``InfoLogs`` attached to this project.
         """
-        return Log.query.filter(Log.project == self).\
-            filter(Log.type == "info").all()
+        return Log.query.filter(Log.project == self)\
+            .filter(Log.type == "info")\
+            .filter(Log.id > int(start))\
+            .all()
