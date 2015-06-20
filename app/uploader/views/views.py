@@ -94,7 +94,7 @@ def project_show(project_id):
             Project.id == project_id,
             exceptions.ProjectNotFoundException)
         if project not in current_user.projects:
-            return #500 error
+            return app.login_manager.unauthorized()
 
         # what is user's permission level?
         rel = ProjectsUsers.query.filter_by(user=current_user,
@@ -161,13 +161,66 @@ def project_show(project_id):
         project_warnings = project.get_warnings()
         project_infos = project.get_infos()
 
+        #highest log id
+        log_start = max([log.id for log in project_errors] + [log.id for log in project_warnings] + [log.id for log in project_infos] + [0])
+
         return render_template("document_list.html", project=project, user_role=rel.role, 
             project_errors=project_errors, project_warnings=project_warnings, 
             project_infos=project_infos, doc_form=doc_form,
-            struc_form=struc_form, allowed_extensions_doc=["xml"], 
-            allowed_extensions_struc=["json"], struc_active=struc_active)
+            struc_form=struc_form, allowed_extensions_doc=[".xml"], 
+            allowed_extensions_struc=[".json"], struc_active=struc_active, log_start=log_start)
     else:
         return redirect("/")
+
+@uploader.route(app.config["LOG_ROUTE"] + "<int:project_id>")
+@login_required
+def project_log(project_id):
+    # does user have access to the project?
+    project = helpers.get_object_or_exception(Project,
+        Project.id == project_id,
+        exceptions.ProjectNotFoundException)
+    if project not in current_user.projects:
+        return app.login_manager.unauthorized()
+
+    start = request.args.get('start', 0)
+
+    # retrieve log info
+    project_errors = project.get_errors(start)
+    project_warnings = project.get_warnings(start)
+    project_infos = project.get_infos(start)
+
+    #highest log id
+    log_start = max([log.id for log in project_errors] + [log.id for log in project_warnings] + [log.id for log in project_infos] + [0])
+
+    return render_template("processing_log.json", infos=project_infos, warnings=project_warnings, errors=project_errors, max=log_start, status=project.status)
+
+@csrf.exempt
+@uploader.route(app.config["PROCESS_ROUTE"] + "<int:project_id>", methods=["POST"])
+@login_required
+def project_process(project_id):
+    """ An AJAX endpoint to initiate the preprocessor for the project.
+    """
+    # does user have access to the project?
+    project = helpers.get_object_or_exception(Project,
+        Project.id == project_id,
+        exceptions.ProjectNotFoundException)
+    if project not in current_user.projects:
+        return app.login_manager.unauthorized()
+
+    # does user have admin permissions?
+    rel = ProjectsUsers.query.filter_by(user=current_user,
+        project=project).one()
+    if rel.role != ProjectsUsers.ROLE_ADMIN:
+        return app.login_manager.unauthorized()
+
+    # retrieve the structure file and start processing
+    structure_file = StructureFile.query.get(request.form["struc_id"])
+    if structure_file.project != project:
+        return app.login_manager.unauthorized()
+
+    process_files(project.path, structure_file.path, project)
+    return render_template("process_project.json", project_id=project.id)
+
 
 @csrf.exempt
 @uploader.route(app.config["PROJECT_ROUTE"]+"<int:project_id>"+
@@ -239,13 +292,13 @@ def delete_obj():
             Project.id == project_id,
             exceptions.ProjectNotFoundException)
         if project not in current_user.projects:
-            return #500 error
+            return app.login_manager.unauthorized()
 
         # does user have admin permissions?
         rel = ProjectsUsers.query.filter_by(user=current_user,
             project=project).one()
         if rel.role != ProjectsUsers.ROLE_ADMIN:
-            return #500 error
+            return app.login_manager.unauthorized()
 
         # figure out what they want to delete, and delete it
         if obj_type == "project":
@@ -335,6 +388,21 @@ def get_file(filetype, file_id):
 
     return send_from_directory(directory, filename)
 
+
+def process_files(collection_dir, structure_file, project):
+    """Process a list of files using the preprocessor. This must be a valid list
+    of files or bad things will happen - exactly one structure file, several
+    document files.
+    """
+    logger = logging.getLogger()
+    if app.config["INSTALL_TYPE"] == "partial":
+        logger.info("Not processing as per config.")
+        return
+    project.status = Project.STATUS_PREPROCESSING
+    args = (collection_dir, structure_file, app.config["DOCUMENT_EXTENSION"],
+        project.id)
+    preprocessing_process = threading.Thread(target=cp_run, args=args)
+    preprocessing_process.start()
 
 
 # class CLPDView(View):
@@ -763,19 +831,4 @@ def get_file(filetype, file_id):
 #         document_file=document_file,
 #         filename=filename)
 
-
-# def process_files(collection_dir, structure_file, project):
-#     """Process a list of files using the preprocessor. This must be a valid list
-#     of files or bad things will happen - exactly one structure file, several
-#     document files.
-#     """
-#     project.status = Project.STATUS_PREPROCESSING
-#     logger = logging.getLogger()
-#     if app.config["INSTALL_TYPE"] == "partial":
-#         logger.info("Not processing as per config.")
-#         return
-#     args = (collection_dir, structure_file, app.config["DOCUMENT_EXTENSION"],
-#         project.id)
-#     preprocessing_process = threading.Thread(target=cp_run, args=args)
-#     preprocessing_process.start()
 
