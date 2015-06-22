@@ -30,6 +30,7 @@ class Unit(db.Model, Base):
     number = db.Column(db.Integer)
     parent_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
     name = db.Column(db.String)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     # Relationships
     children = db.relationship("Unit", backref=db.backref("parent",

@@ -44,7 +44,6 @@ class Set(db.Model, Base):
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     # Relationships
-    project = db.relationship("Project", backref=db.backref("sets"))
     children = db.relationship("Set", backref=db.backref("parent",
         remote_side=[id]))
 

@@ -326,7 +326,7 @@ def project_permissions(project_id):
                 form.selection.errors = list(form.selection.errors)
                 form.selection.errors.append("User %s does not exist. (Users must register for an account before you can add them as collaborators.)" % email)
 
-    return render_template("project_permissions.html", project=project,form=form)
+    return render_template("project_permissions.html", project=project, form=form)
 
 
 @csrf.exempt
@@ -364,10 +364,6 @@ def delete_obj():
 
         if os.path.isdir(obj.path):
             shutil.rmtree(obj.path)
-            for document_file in obj.document_files:
-                #TODO: can't we cascade this?
-                document_file.delete()
-            db.session.commit()
         else:
             os.remove(obj.path)
 
