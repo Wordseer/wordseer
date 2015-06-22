@@ -109,6 +109,7 @@ class StructureExtractor(object):
             nodes = get_nodes_from_xpath(xpath, parent_node)
             for node in nodes:
                 current_unit = Unit(name=structure["structureName"])
+                current_unit.project = self.project
                 # Get the metadataget
                 current_unit.properties = get_metadata(
                     structure, node, current_unit.name, self.project)

@@ -40,8 +40,6 @@ class Sequence(db.Model, Base):
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     # Relationships
-
-    project = db.relationship("Project")
     words = association_proxy("word_in_sequence", "word",
         creator=lambda word: WordInSequence(word=word))
 

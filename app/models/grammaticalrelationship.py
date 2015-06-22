@@ -2,7 +2,7 @@
 """
 
 from app import db
-from base import Base
+from .base import Base
 
 class GrammaticalRelationship(db.Model, Base):
     """A grammatical relationship between two words.
@@ -23,7 +23,11 @@ class GrammaticalRelationship(db.Model, Base):
 
     name = db.Column(db.String)
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
-    project = db.relationship("Project")
+
+    # Relationships
+
+    dependencies = db.relationship('Dependency', backref="grammatical_relationship", 
+                                   cascade="all, delete-orphan")
 
     def __repr__(self):
         """Return a string representation of this ``GrammaticalRelationship``.
