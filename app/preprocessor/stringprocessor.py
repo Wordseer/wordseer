@@ -1,7 +1,7 @@
 """Methods to handle string parsing, tokenization, tagging, etc.
 """
 from nltk.tokenize import sent_tokenize
-from corenlp import StanfordCoreNLP, ProcessError, TimeoutError
+from app.corenlp import StanfordCoreNLP, ProcessError, TimeoutError
 import logging
 
 from app import app
@@ -23,7 +23,7 @@ class StringProcessor(object):
         """Instantiate and ready the parser. Note that readying the parser takes
         some time.
         """
-        self.parser = StanfordCoreNLP(app.config["CORE_NLP_DIR"])
+        self.parser = StanfordCoreNLP()
         self.project = project
 
         logger = logging.getLogger(__name__)

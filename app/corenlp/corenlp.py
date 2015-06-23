@@ -33,6 +33,8 @@ from unidecode import unidecode
 from subprocess import call
 import glob
 
+from app import app
+
 use_winpexpect = True
 
 try:
@@ -45,7 +47,7 @@ STATE_START, STATE_TEXT, STATE_WORDS, STATE_TREE, STATE_DEPENDENCY, STATE_COREFE
 WORD_PATTERN = re.compile('\[([^\]]+)\]')
 CR_PATTERN = re.compile(r"\((\d*),(\d)*,\[(\d*),(\d*)\)\) -> \((\d*),(\d)*,\[(\d*),(\d*)\)\), that is: \"(.*)\" -> \"(.*)\"")
 
-DIRECTORY = "stanford-corenlp-full-2013-06-20"
+DIRECTORY = app.config["CORE_NLP_DIR"]
 
 
 class bc:
@@ -153,7 +155,8 @@ def parse_parser_results(text):
     """
     results = {"sentences": []}
     state = STATE_START
-    for line in unidecode(text.decode('utf-8')).split("\n"):
+    lines = unidecode(text.decode('utf-8')).split("\n")
+    for index, line in enumerate(lines):
         line = line.strip()
 
         if line.startswith("Sentence #"):
@@ -170,15 +173,11 @@ def parse_parser_results(text):
                 raise ParserError('Parse error. Could not find "[Text=" in: %s' % line)
             for s in WORD_PATTERN.findall(line):
                 sentence['words'].append(parse_bracketed(s))
-            state = STATE_TREE
-
-        elif state == STATE_TREE:
-            if len(line) == 0:
+            if not lines[index + 1].startswith("[Text="):
                 state = STATE_DEPENDENCY
-                sentence['parsetree'] = " ".join(sentence['parsetree'])
-            else:
-                sentence['parsetree'].append(remove_escapes(line))
+                # skipping TREE because the new depparse annotator doesn't make a parse tree
 
+        
         elif state == STATE_DEPENDENCY:
             if len(line) == 0:
                 state = STATE_COREFERENCE
@@ -320,16 +319,18 @@ class StanfordCoreNLP:
         # show progress bar while loading the models
         if VERBOSE:
             widgets = ['Loading Models: ', Fraction()]
-            pbar = ProgressBar(widgets=widgets, maxval=5, force_update=True).start()
+            pbar = ProgressBar(widgets=widgets, maxval=2, force_update=True).start()
             # Model timeouts:
             # pos tagger model (~5sec)
             # NER-all classifier (~33sec)
             # NER-muc classifier (~60sec)
             # CoNLL classifier (~50sec)
             # PCFG (~3sec)
-            timeouts = [20, 200, 600, 600, 20]
-            for i in xrange(5):
-                self.corenlp.expect("done.", timeout=timeouts[i])  # Load model
+            # timeouts = [20, 200, 600, 600, 20]
+            timeouts = [20, 200]
+
+            for i in xrange(2):
+                self.corenlp.expect("done", timeout=timeouts[i])  # Load model
                 pbar.update(i + 1)
             self.corenlp.expect("Entering interactive shell.")
             pbar.finish()
