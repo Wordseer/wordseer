@@ -13,8 +13,8 @@ import gzip
 import glob
 import json
 # Config
-# Location of CoreNLP
-CORENLP = "http://nlp.stanford.edu/software/stanford-corenlp-full-2013-06-20.zip"
+# Location of CoreNLP 3.5.2
+CORENLP = "http://nlp.stanford.edu/software/stanford-corenlp-full-2015-04-20.zip"
 # Location of pip
 PIP = "https://bootstrap.pypa.io/get-pip.py"
 # Path to requirements file
