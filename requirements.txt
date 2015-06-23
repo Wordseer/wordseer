@@ -7,7 +7,8 @@ lxml==3.3.6
 mock==1.0.1
 sphinxcontrib-napoleon==0.2.8
 sqlalchemy-migrate==0.9.1
-stanford-corenlp-python
 nose
 nltk
 inflect==0.2.4
+unidecode >= 0.04.12
+xmltodict >= 0.4.6
