@@ -228,6 +228,24 @@ def install_python_packages(reqs=REQUIREMENTS_FULL, full=True):
     if full:
         subprocess.call("python -m nltk.downloader punkt", shell=True)
 
+        # install pexpect - differs by platform
+        pexpect = "requirements-pexpect.txt"
+        with open(pexpect, 'w') as reqfile:
+            PEXPECT = "pexpect >= 2.4"
+            WINPEXPECT = "winpexpect >= 1.5"
+            reqfile.truncate()
+
+            if "win32" in sys.platform or "cygwin" in sys.platform:
+                reqfile.write(WINPEXPECT)    
+            else:
+                reqfile.write(PEXPECT)
+
+        success = subprocess.call("pip2.7 install -r " + pexpect, shell=True)
+        if success != 0:
+            print "Could not install pexpect. Quitting."
+            sys.exit(0)
+
+
 def setup_stanford_corenlp(force=False):
     """Download and move Stanford CoreNLP to the expected place.
 

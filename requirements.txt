@@ -10,3 +10,5 @@ sqlalchemy-migrate==0.9.1
 nose
 nltk
 inflect==0.2.4
+unidecode >= 0.04.12
+xmltodict >= 0.4.6
