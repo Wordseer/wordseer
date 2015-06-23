@@ -29,12 +29,7 @@ app/wordseer/static/wordseer_app/css/config.rb
 
 app/wordseer/static/wordseer_app/css/.sass-cache/
 
-
 *.ipynb
-
-*.xml
-
-*.json
 
 *.scssc
 
