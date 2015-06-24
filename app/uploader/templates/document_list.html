@@ -139,8 +139,7 @@
             </div>
             {% endif %}
 
-        </div>
-        <div role="tabpanel" class="tab-pane panel panel-default {% if project.status == 0 and struc_active %}active{% endif %}" id="struc">
+         <div role="tabpanel" class="tab-pane panel panel-default {% if project.status == 0 and struc_active %}active{% endif %}" id="struc">
             {% if project.status == 0 and user_role > 0 %}
             <div class="panel-body">
                 <form method="POST" enctype="multipart/form-data"
@@ -404,13 +403,7 @@
                         $(me).addClass('btn-danger')
                             .removeClass('btn-default')
                             .text("Delete");
-                    });
-                });
-        });
-    
-        {% if project.status == 1 %}
-        // poll for log updates
-        logPoll();
+                    
         {% endif %}
     });
 
@@ -445,8 +438,7 @@ var getLogs = function(){
 
     }).fail(function(resp){
         failAlert($('.tab-pane#log .panel-body'), "request for logs failed: " +  resp.statusText);
-    })
-
+    
 };
 
 var logPoll = function(){

@@ -290,7 +290,6 @@ def project_permissions(project_id):
         return app.login_manager.unauthorized()
 
     form = forms.ProjectPermissionsForm(prefix="permissions")
-
     ownerships = ProjectsUsers.query.filter_by(project = project).all()
 
     form.selection.choices = []
@@ -402,7 +401,6 @@ def document_map(project_id, document_file_id):
         filename=filename,
         map_document=map_document
     )
-
 
 @csrf.exempt
 @uploader.route(app.config["UPLOAD_ROUTE"] + "<filetype>/<int:file_id>")
