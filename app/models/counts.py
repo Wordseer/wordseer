@@ -17,10 +17,6 @@ class Count(db.Model, Base):
     document_count = db.Column(db.Integer, default=0)
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
-    # Relationship
-
-    project = db.relationship("Project")
-
     # Inheritence
 
     __mapper_args__ = {

@@ -79,6 +79,20 @@ class User(db.Model, Base, UserMixin):
         return any([project in self.projects for project in
             document_file.projects])
 
+    def has_structure_file(self, structure_file):
+        """Check if this user owns this `StructureFile`.
+
+        Arguments:
+            structure_file (StructureFile): A ``StructureFile`` to check ownership
+                of.
+
+        Returns:
+            ``True`` if the given ``StructureFile`` is present in at least one of
+            the projects that this user owns. ``False`` otherwise.
+        """
+        return structure_file.project in self.projects
+
+
     def has_document(self, document):
         """Check if this user owns this ``Document``.
 

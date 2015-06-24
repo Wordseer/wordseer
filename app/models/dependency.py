@@ -40,8 +40,8 @@ class Dependency(db.Model, Base):
 
     # Relationships
 
-    grammatical_relationship = db.relationship(
-        "GrammaticalRelationship", backref="dependencies")
+    # grammatical_relationship = db.relationship(
+    #     "GrammaticalRelationship", backref="dependencies")
 
     governor = db.relationship("Word", foreign_keys=[governor_id])
 
