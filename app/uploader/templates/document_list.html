@@ -139,6 +139,7 @@
             </div>
             {% endif %}
 
+         </div>
          <div role="tabpanel" class="tab-pane panel panel-default {% if project.status == 0 and struc_active %}active{% endif %}" id="struc">
             {% if project.status == 0 and user_role > 0 %}
             <div class="panel-body">
@@ -213,6 +214,7 @@
         </div>
     </div>
 {% endblock %}
+
 {% block sidebar %}
 <h2>Directions</h2>
 <ol>
@@ -403,8 +405,14 @@
                         $(me).addClass('btn-danger')
                             .removeClass('btn-default')
                             .text("Delete");
-                    
-        {% endif %}
+                    });
+                });
+        });
+    
+        {% if project.status == 1 %}
+        // poll for log updates
+        logPoll();   
+        {% endif %}                         
     });
 
 var log_start = {{ log_start }},
@@ -438,7 +446,7 @@ var getLogs = function(){
 
     }).fail(function(resp){
         failAlert($('.tab-pane#log .panel-body'), "request for logs failed: " +  resp.statusText);
-    
+    })
 };
 
 var logPoll = function(){
@@ -458,22 +466,21 @@ var logPoll = function(){
 
 var failAlert = function(target, text){
 
-        var alertEl = $('<div></div>')
-            .addClass('alert alert-danger alert-dismissable')
-            .attr('role', 'alert')
-            .css("margin-top", "10px");
+    var alertEl = $('<div></div>')
+        .addClass('alert alert-danger alert-dismissable')
+        .attr('role', 'alert')
+        .css("margin-top", "10px");
 
-        alertEl.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+    alertEl.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
 
-        alertEl.append("<span>" + text + "</span>");
-        
-        alertEl.prependTo(target);
+    alertEl.append("<span>" + text + "</span>");
+    
+    alertEl.prependTo(target);
 
-        // initialize the js plugin
-        alertEl.alert();
-    }
-    </script>
+    // initialize the js plugin
+    alertEl.alert();
+}
+
 </script>
 {% endif %}
 {% endblock %}
-{#href="{{ url_for("document_map", project_id=project.id) }}"#}
