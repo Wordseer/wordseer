@@ -100,7 +100,7 @@
 
     <!-- Tab panes -->
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane {% if project.status == 0 and not struc_active %}active {% endif %}panel panel-default" id="docs">
+        <div role="tabpanel" class="tab-pane {% if project.status == 0 and not struc_active %}active {% endif %}panel panel-default" id="doc">
             {% if project.status == 0 and user_role > 0 %}
             <div class="panel-body">
                 <form method="POST" enctype="multipart/form-data"
@@ -350,8 +350,9 @@
 
                     })
                     .fail(function(resp){
-                        console.log("processor failed")
-                        // TODO: better error handling
+                        failAlert($('.tab-pane#log .panel-body'), "processor failed: " +  resp.statusText);
+                        $('.nav-tabs li').last().find('a').click();
+                        $("#processConfirm").modal("hide");
                     });
             });
 
@@ -379,6 +380,7 @@
                             obj_type: e.currentTarget.dataset.prefix,
                             obj_id: file_id,
                         });
+
                     request.done(function(resp){
                         $("#confirmDelete").modal("hide");
 
@@ -393,8 +395,15 @@
                             .text("Delete");
 
                     }).fail(function(resp){
-                        console.log("deletion failed")
-                        // TODO: real error handling
+
+                        $("#confirmDelete").modal("hide");
+
+                        failAlert($('.tab-pane#' + e.currentTarget.dataset.prefix + " .panel-body"), "Deletion failed: " +  resp.statusText);
+
+                        // reset the delete button
+                        $(me).addClass('btn-danger')
+                            .removeClass('btn-default')
+                            .text("Delete");
                     });
                 });
         });
@@ -435,8 +444,7 @@ var getLogs = function(){
 
 
     }).fail(function(resp){
-        console.log("request for logs failed");
-        // TODO: better error handling
+        failAlert($('.tab-pane#log .panel-body'), "request for logs failed: " +  resp.statusText);
     })
 
 };
@@ -455,6 +463,24 @@ var logPoll = function(){
         logPoll();
     }, 5000);
 }
+
+var failAlert = function(target, text){
+
+        var alertEl = $('<div></div>')
+            .addClass('alert alert-danger alert-dismissable')
+            .attr('role', 'alert')
+            .css("margin-top", "10px");
+
+        alertEl.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+
+        alertEl.append("<span>" + text + "</span>");
+        
+        alertEl.prependTo(target);
+
+        // initialize the js plugin
+        alertEl.alert();
+    }
+    </script>
 </script>
 {% endif %}
 {% endblock %}

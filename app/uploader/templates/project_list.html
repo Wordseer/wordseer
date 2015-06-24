@@ -101,8 +101,7 @@
                 var data = $.parseJSON(resp);
                 window.location = "{{ url_for("uploader.project_list") }}" + data.project_id;
             }).fail(function(data){
-                console.log("Project creation failed", data);
-                // TODO: real error handling
+                failAlert($('#createProject'), "Project creation failed: " +  data.statusText);
             });
         });
 
@@ -142,12 +141,35 @@
                             .removeClass('btn-default')
                             .text("Delete");
 
-                    }).fail(function(resp){
-                        console.log("deletion failed")
-                        // TODO: real error handling
+                    }).fail(function(data){
+                        $("#confirmDelete").modal("hide");
+                        
+                        failAlert($('#createProject'), "Project deletion failed: " +  data.statusText);
+
+                        // reset the delete button
+                        $(me).addClass('btn-danger')
+                            .removeClass('btn-default')
+                            .text("Delete");
                     });
                 });
         });
     })
+
+    var failAlert = function(target, text){
+
+        var alertEl = $('<div></div>')
+            .addClass('alert alert-danger alert-dismissable')
+            .attr('role', 'alert')
+            .css("margin-top", "10px");
+
+        alertEl.appendTo(target);
+
+        alertEl.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+
+        alertEl.append("<span>" + text + "</span>");
+        
+        // initialize the js plugin
+        alertEl.alert();
+    }
     </script>
 {% endblock %}
