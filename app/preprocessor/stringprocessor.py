@@ -1,10 +1,11 @@
 """Methods to handle string parsing, tokenization, tagging, etc.
 """
-from nltk.tokenize import sent_tokenize
-from app.corenlp import StanfordCoreNLP, ProcessError, TimeoutError
+import json
 import logging
+from nltk.tokenize import sent_tokenize
 
 from app import app
+from app.corenlp import StanfordCoreNLP, ProcessError, TimeoutError
 from app.models.sentence import Sentence
 from app.models.word import Word
 from app.models.dependency import Dependency
@@ -30,23 +31,6 @@ class StringProcessor(object):
         global project_logger
         project_logger = ProjectLogger(logger, project)
 
-    def tokenize(self, txt):
-        """Turn a string of one or more ``Sentence``\s into a list of
-        ``Sentence`` objects. This method will also tokenize each word in txt,
-        find its PoS, lemma, and space_before.
-
-        :param str txt: One or more sentences, in a string format.
-        :return list: A list of document.Sentence objects.
-        """
-        sentences = []
-
-        for sentence_text in split_sentences(txt):
-            sentence = self.parse_with_error_handling(sentence_text)
-            sentences.extend(tokenize_from_raw(sentence, sentence_text,
-                self.project))
-
-        return sentences
-
     def parse(self, sentence, relationships=None, dependencies=None,
             max_length=30):
         """Parse a ``Sentence`` and extract dependencies, parse trees, etc.
@@ -69,113 +53,16 @@ class StringProcessor(object):
         parsed_sentence = parsed["sentences"][0]
 
         if len(parsed["sentences"]) > 1:
-            project_logger.warning("More than one sentence passed in to"
-                " StringProcessor.parse().")
+            # TODO: handle this better so we don't lose data from additional sentences
+            project_logger.warning(
+                "More than one sentence passed in to StringProcessor.parse(): " +
+                json.dumps(sentence.text).replace('"', "'") +
+                " Some data may have been lost.") 
             parsed_sentence["text"] += parsed["sentences"][1]["text"]
 
-        for dependency in parsed_sentence["dependencies"]:
-            # We don't want to make a dependency involving ROOT
-            if int(dependency[2]) > 0 and int(dependency[4]) > 0:
-                governor = dependency[1]
-                dependent = dependency[3]
-                governor_index = int(dependency[2]) - 1
-                dependent_index = int(dependency[4]) - 1
-                governor_pos = parsed_sentence["words"][governor_index][1]\
-                    ["PartOfSpeech"]
-                governor_lemma = parsed_sentence["words"][governor_index][1]\
-                    ["Lemma"].lower()
-                dependent_pos = parsed_sentence["words"][dependent_index][1]\
-                    ["PartOfSpeech"]
-                dependent_lemma = parsed_sentence["words"][dependent_index][1]\
-                    ["Lemma"].lower()
-                grammatical_relationship = dependency[0]
-
-                # If dictionaries are present, run with duplication handling
-                if relationships != None and dependencies != None:
-                    key = grammatical_relationship
-
-                    if key in relationships.keys():
-                        relationship = relationships[key]
-                    else:
-
-                        try:
-                            relationship = GrammaticalRelationship.query.\
-                                filter_by(name=grammatical_relationship,
-                                project=self.project).\
-                                one()
-                        except(MultipleResultsFound):
-                            project_logger.error("duplicate records found "
-                                "for: %s", str(key))
-                        except(NoResultFound):
-                            relationship = GrammaticalRelationship(
-                                name = grammatical_relationship,
-                                project=self.project)
-
-                        relationships[key] = relationship
-
-                    # Read the data for the governor, and find the
-                    # corresponding word
-                    governor = Word.query.filter_by(lemma=governor_lemma,
-                            surface=governor.lower(),
-                            part_of_speech=governor_pos).\
-                        first()
-
-                    # Same as above for the dependent in the relationship
-                    dependent = Word.query.filter_by(lemma = dependent_lemma,
-                            surface=dependent.lower(),
-                            part_of_speech=dependent_pos).\
-                        first()
-
-                    try:
-                        governor.id
-                        dependent.id
-                    except:
-                        project_logger.error("Governor or dependent not "
-                            "found; giving up on parse. This likely indicates"
-                            " an error in the preprocessing; rerunning the "
-                            "preprocessor is recommended.")
-                        project_logger.info(sentence)
-                        return sentence
-
-                    key = (relationship.name, governor.id, dependent.id)
-
-                    if key in dependencies.keys():
-                        dependency = dependencies[key]
-                    else:
-
-                        try:
-                            dependency = Dependency.query.filter_by(
-                                grammatical_relationship = relationship,
-                                governor = governor,
-                                dependent = dependent
-                            ).one()
-                        except(MultipleResultsFound):
-                            self.logg_error(("duplicate records found for: %s",
-                                str(key)))
-                        except(NoResultFound):
-                            dependency = Dependency(
-                                grammatical_relationship = relationship,
-                                governor = governor,
-                                dependent = dependent
-                            )
-
-                        dependencies[key] = dependency
-
-                    # Add the dependency to the sentence
-                    sentence.add_dependency(
-                        dependency = dependency,
-                        governor_index = governor_index,
-                        dependent_index = dependent_index,
-                        project = self.project,
-                        force = False
-                    )
-
-                    dependency.save(False)
-
-                else:
-                    # TODO: fill
-                    pass
-
+        self.add_words(sentence, parsed_sentence)
+        self.add_grammatical_relations(sentence, parsed_sentence, relationships, dependencies)
+        
         return sentence
 
     def parse_with_error_handling(self, text):
@@ -191,8 +78,7 @@ class StringProcessor(object):
 
         # Check for non-string
         if not isinstance(text, str) and not isinstance(text, unicode):
-            project_logger.warning("Parser got a non-string argument: %s",
-                text)
+            project_logger.warning("Parser got a non-string argument: %s", text)
             return None
 
         # Check for non-unicode
@@ -243,111 +129,23 @@ class StringProcessor(object):
         # Parse successful, return parsed text
         return parsed_text
 
-def split_sentences(text):
-    """Split the string into sentences.
+    def add_words(self, sentence, parsed_sentence):
+        """Given a Sentence and its parsed text, and find the PoS, lemmas, 
+        and space_befores of each word in the sentence, and add them to the
+        Sentence object.
+        """
 
-    Also runs a length check and splits sentences that are too long on
-    reasonable punctuation marks.
-
-    :param str text: The text to split
-    """
-
-    sentences = []
-
-    # Split sentences using NLTK
-    sentence_texts = sent_tokenize(text)
-
-    for sentence_text in sentence_texts:
-
-        # Check length of sentence
-        max_length = app.config["SENTENCE_MAX_LENGTH"]
-        truncate_length = app.config["LOG_SENTENCE_TRUNCATE_LENGTH"]
-        approx_sentence_length = len(sentence_text.split(" "))
-
-        if approx_sentence_length > max_length:
-            # project_logger.warning("Sentence appears to be too long, max "
-            #     "length is %s: %s", str(max_length),
-            #     sentence_text[:truncate_length] + "...")
-
-            # Attempt to split on a suitable punctuation mark
-            # Order (tentative): semicolon, double-dash, colon, comma
-
-            # Mini helper function to get indices of punctuation marks
-
-            split_characters = app.config["SPLIT_CHARACTERS"]
-            subsentences = None
-
-            for character in split_characters:
-                subsentences = sentence_text.split(character)
-
-                # If all subsentences fit the length limit, exit the loop
-                if all([len(subsentence.split(" ")) <= max_length
-                    for subsentence in subsentences]):
-
-                    # project_logger.info("Splitting sentence around %s to fit "
-                    #     "length limit.", character)
-                    break
-
-                # Otherwise, reset subsentences and try again
-                else:
-                    subsentences = None
-
-            # If none of the split characters worked, force split on max_length
-            if not subsentences:
-                # project_logger.warning("No suitable punctuation for " +
-                #     "splitting; forcing split on max_length number of words")
-                subsentences = []
-                split_sentence = sentence_text.split(" ")
-
-                index = 0
-                # Join every max_length number of words
-                while index < approx_sentence_length:
-                    subsentences.append(" ".join(
-                        split_sentence[index:index+max_length]))
-                    index += max_length
-
-            sentences.extend(subsentences)
-
-        else:
-            sentences.append(sentence_text)
-
-    return sentences
-
-def tokenize_from_raw(parsed_text, txt, project):
-    """Given the output of a call to raw_parse, produce a list of Sentences
-    and find the PoS, lemmas, and space_befores of each word in each sentence.
-
-    This method does the same thing as tokenize(), but it accepts already parsed
-    data.
-
-    :param dict parsed_text: The return value of a call to raw_parse
-    :param str txt: The original text.
-    :return list: A list of document.Sentence objects.
-    """
-
-    # If parsed_text is the result of a failed parse, return with an empty list
-    if not parsed_text:
-        return []
-
-    paragraph = [] # a list of Sentences
-    words = dict()
-
-    count = 0
-    sentence_count = len(parsed_text["sentences"])
-
-    for sentence_data in parsed_text["sentences"]:
-        sentence = Sentence(text = sentence_data["text"],
-                            project = project)
+        words = dict()
         position = 0
 
-        for word_data in sentence_data["words"]:
+        for word_data in parsed_sentence["words"]:
             surface = word_data[0]
             part_of_speech = word_data[1]["PartOfSpeech"]
             lemma = word_data[1]["Lemma"].lower()
             space_before = " "
 
             try:
-                if txt[int(word_data[1]["CharacterOffsetBegin"]) - 1] != " ":
+                if sentence.text[int(word_data[1]["CharacterOffsetBegin"]) - 1] != " ":
                     space_before = ""
             except IndexError:
                 pass
@@ -359,41 +157,134 @@ def tokenize_from_raw(parsed_text, txt, project):
 
             else:
                 try:
-                    word = Word.query.filter_by(lemma=lemma,
-                        surface=surface.lower(),
-                        part_of_speech=part_of_speech).one()
-                except(MultipleResultsFound):
+                    word = Word.query.filter_by(lemma=lemma, surface=surface.lower(),
+                                                part_of_speech=part_of_speech).one()
+                except MultipleResultsFound:
                     project_logger.warning("Duplicate records found for: %s",
-                        str(key))
-                except(NoResultFound):
-                    word = Word(lemma=lemma,
-                        surface=surface.lower(),
-                        part_of_speech=part_of_speech)
+                                           str(key))
+                except NoResultFound:
+                    word = Word(lemma=lemma, surface=surface.lower(), part_of_speech=part_of_speech)
+                    word.save(False)
 
                 words[key] = word
 
             sentence.add_word(
-                word = word,
-                position = position,
-                space_before = space_before,
+                word=word,
+                position=position,
+                space_before=space_before,
                 surface=surface,
-                project = project,
+                project=self.project,
                 force=False
             )
 
             position += 1
 
-        paragraph.append(sentence)
+        db.session.commit()
 
-        count += 1
+    def add_grammatical_relations(self, sentence, parsed_sentence, relationships, dependencies):
+        
+        for dependency in parsed_sentence["dependencies"]:
+            # We don't want to make a dependency involving ROOT
+            if int(dependency[2]) > 0 and int(dependency[4]) > 0:
+                governor = dependency[1]
+                dependent = dependency[3]
+                governor_index = int(dependency[2]) - 1
+                dependent_index = int(dependency[4]) - 1
+                governor_pos = parsed_sentence["words"][governor_index][1]\
+                    ["PartOfSpeech"]
+                governor_lemma = parsed_sentence["words"][governor_index][1]\
+                    ["Lemma"].lower()
+                dependent_pos = parsed_sentence["words"][dependent_index][1]\
+                    ["PartOfSpeech"]
+                dependent_lemma = parsed_sentence["words"][dependent_index][1]\
+                    ["Lemma"].lower()
+                grammatical_relationship = dependency[0]
 
-        # NOTE: it seems the word dictionary can overload memory sometimes, so
-        # this is in place to prevent it.
-        # TODO: make the 50 here and in documentparser a config
-        if count % 50 == 0 or count == sentence_count:
-            db.session.commit()
-            words = dict()
+                # If dictionaries are present, run with duplication handling
+                if relationships != None and dependencies != None:
+                    key = grammatical_relationship
 
-    db.session.commit()
-    return paragraph
+                    if key in relationships.keys():
+                        relationship = relationships[key]
+                    else:
 
+                        try:
+                            relationship = GrammaticalRelationship.query.\
+                                filter_by(name=grammatical_relationship,
+                                          project=self.project).one()
+                        except MultipleResultsFound:
+                            project_logger.error("duplicate records found "
+                                                 "for: %s", str(key))
+                        except NoResultFound:
+                            relationship = GrammaticalRelationship(
+                                name=grammatical_relationship,
+                                project=self.project)
+
+                        relationships[key] = relationship
+
+                    # Read the data for the governor, and find the
+                    # corresponding word
+                    governor = Word.query.filter_by(
+                        lemma=governor_lemma,
+                        surface=governor.lower(),
+                        part_of_speech=governor_pos).first()
+
+                    # Same as above for the dependent in the relationship
+                    dependent = Word.query.filter_by(
+                        lemma=dependent_lemma,
+                        surface=dependent.lower(),
+                        part_of_speech=dependent_pos).first()
+
+                    try:
+                        governor.id
+                        dependent.id
+                    except:
+                        project_logger.error(
+                            "Governor or dependent not "
+                            "found; giving up on parse. This likely indicates "
+                            "an error in the preprocessing; rerunning the "
+                            "preprocessor is recommended.")
+                        project_logger.info(sentence)
+                        
+                        return #die
+
+                    key = (relationship.name, governor.id, dependent.id)
+
+                    if key in dependencies.keys():
+                        dependency = dependencies[key]
+                    else:
+
+                        try:
+                            dependency = Dependency.query.filter_by(
+                                grammatical_relationship=relationship,
+                                governor=governor,
+                                dependent=dependent
+                            ).one()
+                        except MultipleResultsFound:
+                            project_logger.error("duplicate records found for: %s",
+                                                 str(key))
+                        except NoResultFound:
+                            dependency = Dependency(
+                                grammatical_relationship=relationship,
+                                governor=governor,
+                                dependent=dependent
+                            )
+
+                        dependencies[key] = dependency
+
+                    # Add the dependency to the sentence
+                    sentence.add_dependency(
+                        dependency=dependency,
+                        governor_index=governor_index,
+                        dependent_index=dependent_index,
+                        project=self.project,
+                        force=False
+                    )
+
+                    dependency.save(False)
+
+                else:
+                    # TODO: fill
+                    pass
+                    
+        db.session.commit() 

@@ -5,6 +5,7 @@ import json
 import logging
 
 from lxml import etree
+from nltk.tokenize import sent_tokenize
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 
@@ -12,26 +13,26 @@ from app.models import *
 from app import db
 from . import logger
 
+
+
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
     JSON file. It generates document classes (Sentences, Documents, Propertys,
     etc.) from the input file.
     """
-    def __init__(self, str_proc, structure_file):
+    def __init__(self, project, structure_file):
         """Create a new StructureExtractor.
 
-        :param StringProcessor str_proc: A StringProcessor object
+        :param Project project: A Project object
         :param str structure_file: Path to a JSON file that specifies the
             document structure.
         :return StructureExtractor: a StructureExtractor instance
         """
-        self.str_proc = str_proc
-        self.project = str_proc.project
+        self.project = project
         self.structure_file = open(structure_file, "r")
         self.document_structure = json.load(self.structure_file)
         self.logger = logging.getLogger(__name__)
-        self.project_logger = logger.ProjectLogger(self.logger,
-                str_proc.project)
+        self.project_logger = logger.ProjectLogger(self.logger, self.project)
 
     def extract(self, infile):
         """Extract ``Document``\s from a ``DocumentFile``. This method uses the
@@ -42,7 +43,6 @@ class StructureExtractor(object):
         :return list of DocumentFiles: The DocumentFile that contains the
             extracted documents.
         """
-        documents = []
 
         # Check for unescaped special characters (tentative)
         doc = None
@@ -50,15 +50,10 @@ class StructureExtractor(object):
         try:
             doc = etree.parse(infile)
         # except(etree.XMLSyntaxError) as e:
-        except etree.Error as e:
-            print str(e)
-            # self.project_logger.error("XML Error: %s; skipping file", str(e))
-            # self.project_logger.info(infile)
-            # return documents
+        except etree.Error as err:
+            self.project_logger.error("XML Error: %s; skipping file", str(err))
 
-        extracted_units = self.extract_unit_information(self.document_structure,
-            doc)
-        #TODO: this doc_num isn't very helpful
+        extracted_units = self.extract_unit_information(self.document_structure, doc)
         doc_num = 0
 
         try:
@@ -67,11 +62,11 @@ class StructureExtractor(object):
             ).one()
         except NoResultFound:
             self.project_logger.warning("Could not find file with path %s, making "
-                "new one", infile)
+                                        "new one", infile)
             document_file = DocumentFile()
         except MultipleResultsFound:
             self.project_logger.error("Found multiple files with path %s, "
-                "skipping.", infile)
+                                      "skipping.", infile)
             return DocumentFile()
 
         for extracted_unit in extracted_units:
@@ -110,7 +105,7 @@ class StructureExtractor(object):
             for node in nodes:
                 current_unit = Unit(name=structure["structureName"])
                 current_unit.project = self.project
-                # Get the metadataget
+                # Get the metadata
                 current_unit.properties = get_metadata(
                     structure, node, current_unit.name, self.project)
                 # If there are child units, retrieve them and put them in a
@@ -129,17 +124,18 @@ class StructureExtractor(object):
                         combined_sentence += str(node) + " "
                         combined_nodes.append(node)
                     else:
-                        current_unit.sentences = self.get_sentences(structure,
-                            node, True)
+                        current_unit.sentences = self.get_sentences_from_node(structure,
+                                                                              node)
 
                 if not structure.get("combine") or len(combined_nodes) == 1:
+                    # end of extraction for uncombined text nodes
+                    # runs only once for combined text nodes
                     current_unit.children = children
                     current_unit.save(False)
                     units.append(current_unit)
 
-            # TODO: refactor, this code is similar in get_sentences
-            new_sentences = self.get_sentences_from_text(combined_sentence,
-                True)
+            # this code only runs for combined text nodes
+            new_sentences = self.get_sentences_from_text(combined_sentence)
 
             for sentence in new_sentences:
                 sentence.properties = get_metadata(
@@ -151,28 +147,25 @@ class StructureExtractor(object):
 
         return units
 
-    def get_sentences_from_text(self, text, tokenize):
-        """Given a string of text, either tokenize the sentences and return
-        the result or return the given string.
+    def get_sentences_from_text(self, text):
+        """Given a string of text, split into sentences and return Sentence objects.
 
         Arguments:
             text (str): The text to get sentences from, at least one sentence.
-            tokenize (boolean): Whether or not to tokenize the sentence.
 
         Returns:
-            If ``tokenize`` is ``True`` a list of ``Sentence`` objects with
-            ``Sentence.text`` set to the text of the sentence.
-
-            Otherwise, return a list of one ``Sentence`` object with
-            ``Sentence.text`` set to ``text``.
+            A list of ``Sentence`` objects with ``Sentence.text`` set to the text 
+            of the sentence, and reference to the Project.
         """
-        if not tokenize:
-            return [Sentence(text=text)]
+        sentences = []
 
-        else:
-            return self.str_proc.tokenize(text)
+        for sentence in split_sentences(text):
+            sentences.append(Sentence(text=sentence, project=self.project))
 
-    def get_sentences(self, structure, parent_node, tokenize):
+        return sentences
+
+
+    def get_sentences_from_node(self, structure, parent_node):
         """Return the sentences present in the parent_node and its children.
 
         :param dict structure: A JSON description of the structure
@@ -181,7 +174,6 @@ class StructureExtractor(object):
         :param boolean tokenize: if True, then the sentences will be tokenized
         :return list: A list of Sentences.
         """
-        #TODO: do we really need the tokenize argument?
 
         result_sentences = [] # a list of sentences
         sentence_text = ""
@@ -200,23 +192,13 @@ class StructureExtractor(object):
 
                 if node_text != None:
                     sentence_text += node_text.strip() + "\n"
-                    sentence_metadata.extend(get_metadata(structure,
-                        sentence_node, "sentence", self.project))
+                    sentence_metadata.extend(
+                        get_metadata(structure, sentence_node, "sentence", self.project))
 
-#        if tokenize:
-#            sents = self.str_proc.tokenize(sentence_text)
-#            for sent in sents:
-#                sent.properties = sentence_metadata
-#                result_sentences.append(sent)
-#
-#        else:
-#            result_sentences.append(Sentence(text=sentence_text,
-#                metadata=sentence_metadata))
-        sentences = self.get_sentences_from_text(sentence_text, tokenize)
+        sentences = self.get_sentences_from_text(sentence_text)
 
         for sentence in sentences:
-            # TODO: figure out sentence properties
-            # sentence.properties = sentence_metadata
+            sentence.properties = sentence_metadata
             result_sentences.append(sentence)
 
         return result_sentences
@@ -253,7 +235,7 @@ def get_metadata(structure, node, unit_type, project):
             PropertyMetadata.property_name == property_name).first()
         if metadata is None:
             metadata = PropertyMetadata(
-                property_name = property_name,
+                property_name=property_name,
                 data_type=data_type,
                 date_format=date_format,
                 is_category=spec.get("isCategory"),
@@ -266,17 +248,16 @@ def get_metadata(structure, node, unit_type, project):
 
         for xpath in xpaths:
             if attribute not in [None, ""]:
-                extracted = get_xpath_attribute(xpath,
-                    attribute, node)
+                extracted = get_xpath_attribute(xpath, attribute, node)
             else:
                 extracted = get_xpath_text(xpath, node)
             for val in extracted:
-                property = Property(
+                prop = Property(
                     project=project,
                     value=val,
                     name=property_name,
-                    property_metadata = metadata)
-                metadata_list.append(property)
+                    property_metadata=metadata)
+                metadata_list.append(prop)
 
     return metadata_list
 
@@ -394,9 +375,9 @@ def _assign_sentence_metadata(unit, all_parent_properties):
     properties.extend(unit.properties)
     sentences = list(unit.sentences)
     for sentence in sentences:
-        for property in properties:
+        for prop in properties:
             property_of_sentence = PropertyOfSentence(
-                property=property,
+                property=prop,
                 sentence=sentence)
             property_of_sentence.save()
             
@@ -404,3 +385,72 @@ def _assign_sentence_metadata(unit, all_parent_properties):
         sentences.extend(_assign_sentence_metadata(child, properties))
     return sentences
 
+def split_sentences(text):
+    """Split the string into sentences.
+
+    Also runs a length check and splits sentences that are too long on
+    reasonable punctuation marks.
+
+    :param str text: The text to split
+    """
+
+    sentences = []
+
+    # Split sentences using NLTK
+    sentence_texts = sent_tokenize(text)
+
+    for sentence_text in sentence_texts:
+
+        # Check length of sentence
+        max_length = app.config["SENTENCE_MAX_LENGTH"]
+        truncate_length = app.config["LOG_SENTENCE_TRUNCATE_LENGTH"]
+        approx_sentence_length = len(sentence_text.split(" "))
+
+        if approx_sentence_length > max_length:
+            project_logger.warning("Sentence appears to be too long, max "
+                "length is %s: %s", str(max_length),
+                sentence_text[:truncate_length] + "...")
+
+            # Attempt to split on a suitable punctuation mark
+            # Order (tentative): semicolon, double-dash, colon, comma
+
+            # Mini helper function to get indices of punctuation marks
+
+            split_characters = app.config["SPLIT_CHARACTERS"]
+            subsentences = None
+
+            for character in split_characters:
+                subsentences = sentence_text.split(character)
+
+                # If all subsentences fit the length limit, exit the loop
+                if all([len(subsentence.split(" ")) <= max_length
+                    for subsentence in subsentences]):
+
+                    project_logger.info("Splitting sentence around %s to fit "
+                        "length limit.", character)
+                    break
+
+                # Otherwise, reset subsentences and try again
+                else:
+                    subsentences = None
+
+            # If none of the split characters worked, force split on max_length
+            if not subsentences:
+                project_logger.warning("No suitable punctuation for " +
+                    "splitting; forcing split on max_length number of words")
+                subsentences = []
+                split_sentence = sentence_text.split(" ")
+
+                index = 0
+                # Join every max_length number of words
+                while index < approx_sentence_length:
+                    subsentences.append(" ".join(
+                        split_sentence[index:index+max_length]))
+                    index += max_length
+
+            sentences.extend(subsentences)
+
+        else:
+            sentences.append(sentence_text)
+
+    return sentences
