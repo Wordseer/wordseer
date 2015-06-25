@@ -205,19 +205,21 @@ def cp_run(collection_dir, structure_file, extension, project_id):
         extension (str): Extension of the document files.
         project_id (int): Which project to use for this processing.
     """
+    start_time = datetime.now()
     if extension[0] != ".":
         extension = "." + extension
 
     project = Project.query.get(project_id)
     collection_processor = CollectionProcessor(project)
+    project_logger = logger.ProjectLogger(logging.getLogger(__name__),
+            project)
     
-    collection_processor.process(collection_dir, structure_file, extension,
+    try:
+        collection_processor.process(collection_dir, structure_file, extension,
            False)
-    # try:
-    #     collection_processor.process(collection_dir, structure_file, extension,
-    #        False)
-    # except Exception as e:
-    #     project_logger = logger.ProjectLogger(logging.getLogger(__name__),
-    #         project)
-    #     project_logger.error("Fatal error: " + str(e))
+    except Exception as e:
+        project_logger.error("Fatal error: " + str(e))
+
+    total_time = (datetime.now() - start_time).total_seconds() / 60
+    project_logger.info("Total processing time: %.1f minutes", total_time)
 
