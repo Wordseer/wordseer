@@ -165,6 +165,7 @@ def project_show(project_id):
                         "A file with name " + os.path.split(dest_path)[1] + " already exists")
 
         if upload_errors:
+            doc_form.validate()
             doc_form.uploaded_file.errors.extend(upload_errors)
 
     # retrieve log info
