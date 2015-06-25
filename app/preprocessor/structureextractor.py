@@ -12,8 +12,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound
 from app.models import *
 from app import db
 from . import logger
-
-
+from .helpers import json_escape
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
@@ -51,7 +50,7 @@ class StructureExtractor(object):
             doc = etree.parse(infile)
         # except(etree.XMLSyntaxError) as e:
         except etree.Error as err:
-            self.project_logger.error("XML Error: %s; skipping file", str(err))
+            self.project_logger.error("XML Error: %s; skipping file", json_escape(str(err)))
 
         extracted_units = self.extract_unit_information(self.document_structure, doc)
         doc_num = 0
@@ -62,11 +61,11 @@ class StructureExtractor(object):
             ).one()
         except NoResultFound:
             self.project_logger.warning("Could not find file with path %s, making "
-                                        "new one", infile)
+                                        "new one", json_escape(infile))
             document_file = DocumentFile()
         except MultipleResultsFound:
             self.project_logger.error("Found multiple files with path %s, "
-                                      "skipping.", infile)
+                                      "skipping.", json_escape(infile))
             return DocumentFile()
 
         for extracted_unit in extracted_units:
@@ -159,7 +158,7 @@ class StructureExtractor(object):
         """
         sentences = []
 
-        for sentence in split_sentences(text):
+        for sentence in self.split_sentences(text):
             sentences.append(Sentence(text=sentence, project=self.project))
 
         return sentences
@@ -202,6 +201,77 @@ class StructureExtractor(object):
             result_sentences.append(sentence)
 
         return result_sentences
+
+    def split_sentences(self, text):
+        """Split the string into sentences.
+
+        Also runs a length check and splits sentences that are too long on
+        reasonable punctuation marks.
+
+        :param str text: The text to split
+        """
+
+        sentences = []
+
+        # Split sentences using NLTK
+        sentence_texts = sent_tokenize(text)
+
+        for sentence_text in sentence_texts:
+
+            # Check length of sentence
+            max_length = app.config["SENTENCE_MAX_LENGTH"]
+            truncate_length = app.config["LOG_SENTENCE_TRUNCATE_LENGTH"]
+            approx_sentence_length = len(sentence_text.split(" "))
+
+            if approx_sentence_length > max_length:
+                self.project_logger.warning(
+                    "Sentence appears to be too long, max " +
+                    "length is %s: %s", str(max_length),
+                    json_escape(sentence_text[:truncate_length]) + "...")
+
+                # Attempt to split on a suitable punctuation mark
+                # Order (tentative): semicolon, double-dash, colon, comma
+
+                # Mini helper function to get indices of punctuation marks
+
+                split_characters = app.config["SPLIT_CHARACTERS"]
+                subsentences = None
+
+                for character in split_characters:
+                    subsentences = sentence_text.split(character)
+
+                    # If all subsentences fit the length limit, exit the loop
+                    if all([len(subsentence.split(" ")) <= max_length
+                        for subsentence in subsentences]):
+
+                        self.project_logger.info("Splitting sentence around %s to fit "
+                            "length limit.", character)
+                        break
+
+                    # Otherwise, reset subsentences and try again
+                    else:
+                        subsentences = None
+
+                # If none of the split characters worked, force split on max_length
+                if not subsentences:
+                    self.project_logger.warning("No suitable punctuation for " +
+                        "splitting; forcing split on max_length number of words")
+                    subsentences = []
+                    split_sentence = sentence_text.split(" ")
+
+                    index = 0
+                    # Join every max_length number of words
+                    while index < approx_sentence_length:
+                        subsentences.append(" ".join(
+                            split_sentence[index:index+max_length]))
+                        index += max_length
+
+                sentences.extend(subsentences)
+
+            else:
+                sentences.append(sentence_text)
+
+        return sentences
 
 def get_metadata(structure, node, unit_type, project):
     """Return a list of Property objects of the metadata of the Tags in
@@ -385,72 +455,3 @@ def _assign_sentence_metadata(unit, all_parent_properties):
         sentences.extend(_assign_sentence_metadata(child, properties))
     return sentences
 
-def split_sentences(text):
-    """Split the string into sentences.
-
-    Also runs a length check and splits sentences that are too long on
-    reasonable punctuation marks.
-
-    :param str text: The text to split
-    """
-
-    sentences = []
-
-    # Split sentences using NLTK
-    sentence_texts = sent_tokenize(text)
-
-    for sentence_text in sentence_texts:
-
-        # Check length of sentence
-        max_length = app.config["SENTENCE_MAX_LENGTH"]
-        truncate_length = app.config["LOG_SENTENCE_TRUNCATE_LENGTH"]
-        approx_sentence_length = len(sentence_text.split(" "))
-
-        if approx_sentence_length > max_length:
-            project_logger.warning("Sentence appears to be too long, max "
-                "length is %s: %s", str(max_length),
-                sentence_text[:truncate_length] + "...")
-
-            # Attempt to split on a suitable punctuation mark
-            # Order (tentative): semicolon, double-dash, colon, comma
-
-            # Mini helper function to get indices of punctuation marks
-
-            split_characters = app.config["SPLIT_CHARACTERS"]
-            subsentences = None
-
-            for character in split_characters:
-                subsentences = sentence_text.split(character)
-
-                # If all subsentences fit the length limit, exit the loop
-                if all([len(subsentence.split(" ")) <= max_length
-                    for subsentence in subsentences]):
-
-                    project_logger.info("Splitting sentence around %s to fit "
-                        "length limit.", character)
-                    break
-
-                # Otherwise, reset subsentences and try again
-                else:
-                    subsentences = None
-
-            # If none of the split characters worked, force split on max_length
-            if not subsentences:
-                project_logger.warning("No suitable punctuation for " +
-                    "splitting; forcing split on max_length number of words")
-                subsentences = []
-                split_sentence = sentence_text.split(" ")
-
-                index = 0
-                # Join every max_length number of words
-                while index < approx_sentence_length:
-                    subsentences.append(" ".join(
-                        split_sentence[index:index+max_length]))
-                    index += max_length
-
-            sentences.extend(subsentences)
-
-        else:
-            sentences.append(sentence_text)
-
-    return sentences

@@ -3,20 +3,17 @@ between the input and the pipeline.
 """
 
 from datetime import datetime
-import json
 import logging
 import os
 import traceback
 
 from app import app
-from app.models import Project
+from app.models import Project, Base
 import database
-from . import logger
+from . import counter, logger, structureextractor
 from .documentparser import DocumentParser
-from . import structureextractor
+from .helpers import json_escape
 from .stringprocessor import StringProcessor
-from . import counter
-from app.models import Base
 
 class CollectionProcessor(object):
     """Process a collection of files.
@@ -137,7 +134,7 @@ class CollectionProcessor(object):
 
                 self.project_logger.info(
                     "Finished extracting and recording "
-                    "metadata for %s. Time: %ss (%s/%s).", filename,
+                    "metadata for %s. Time: %ss (%s/%s).", json_escape(filename),
                     seconds_elapsed, str(num_files_done), str(len(contents)))
 
                 logger.log(self.project, "text_and_metadata_recorded",
@@ -217,10 +214,11 @@ def cp_run(collection_dir, structure_file, extension, project_id):
             project)
     
     try:
-        collection_processor.process(collection_dir, structure_file, extension,
-           False)
-    except Exception as e:
-        project_logger.error("Fatal error: " + json.dumps(traceback.format_exc()).replace('"', ""))
+        collection_processor.process(collection_dir, structure_file, extension, False)
+    except Exception:
+        project_logger.error(
+            "Fatal error: " + 
+            json_escape(traceback.format_exc()))
 
     total_time = (datetime.now() - start_time).total_seconds() / 60
     project_logger.info("Total processing time: %.1f minutes", total_time)
