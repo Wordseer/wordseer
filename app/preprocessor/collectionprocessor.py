@@ -3,8 +3,10 @@ between the input and the pipeline.
 """
 
 from datetime import datetime
+import json
 import logging
 import os
+import traceback
 
 from app import app
 from app.models import Project
@@ -218,7 +220,7 @@ def cp_run(collection_dir, structure_file, extension, project_id):
         collection_processor.process(collection_dir, structure_file, extension,
            False)
     except Exception as e:
-        project_logger.error("Fatal error: " + str(e))
+        project_logger.error("Fatal error: " + json.dumps(traceback.format_exc()).replace('"', ""))
 
     total_time = (datetime.now() - start_time).total_seconds() / 60
     project_logger.info("Total processing time: %.1f minutes", total_time)
