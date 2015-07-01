@@ -1,5 +1,6 @@
 """Methods to handle string parsing, tokenization, tagging, etc.
 """
+from datetime import datetime
 import json
 import logging
 from nltk.tokenize import sent_tokenize
@@ -17,7 +18,7 @@ from .logger import ProjectLogger
 
 
 class StringProcessor(object):
-    """Tokenize or parse a string.
+    """Tokenize and parse a string.
     """
 
     def __init__(self, project):
@@ -26,44 +27,54 @@ class StringProcessor(object):
         """
         self.parser = StanfordCoreNLP()
         self.project = project
+        self.parsetime = 0
 
         logger = logging.getLogger(__name__)
         global project_logger
         project_logger = ProjectLogger(logger, project)
 
-    def parse(self, sentence, relationships=None, dependencies=None,
-            max_length=30):
-        """Parse a ``Sentence`` and extract dependencies, parse trees, etc.
-
-        Note that for max_length, a "word" is defined as something with a space
-        on at least one side. This is not the typical definition of "word".
-        This is done so that length can be checked before resources are
-        committed to processing a very long sentence.
+    def parse(self, text, relationships=None, dependencies=None):
+        """Tokenize and parse some text to create ``Sentence`` objects and extract 
+        dependencies, parse trees, etc.
 
         :param Sentence sentence: The ``Sentence`` object.
-        :param int max_length: The most amount of words to process.
+
         """
 
-        parsed = self.parse_with_error_handling(sentence.text)
+        start_time = datetime.now()
+        parsed = self.parse_with_error_handling(text)
+        end_time = datetime.now()
 
         # If the parse was unsuccessful, exit
         if parsed == None:
-            return
-
-        parsed_sentence = parsed["sentences"][0]
-
-        if len(parsed["sentences"]) > 1:
-            # TODO: handle this better so we don't lose data from additional sentences
-            project_logger.warning(
-                "More than one sentence passed in to StringProcessor.parse(): " +
-                json.dumps(sentence.text).replace('"', "'") +
-                " Some data may have been lost.") 
-            parsed_sentence["text"] += parsed["sentences"][1]["text"]
-
-        self.add_words(sentence, parsed_sentence)
-        self.add_grammatical_relations(sentence, parsed_sentence, relationships, dependencies)
+            return []
+        # timing report
+        parsetime = end_time - start_time
+        self.parsetime += parsetime.total_seconds()
         
-        return sentence
+        sentences = []
+
+        # parsed_sentence = parsed["sentences"][0]
+        # if len(parsed["sentences"]) > 1:
+        #     # TODO: handle this better so we don't lose data from additional sentences
+        #     project_logger.warning(
+        #         "More than one sentence passed in to StringProcessor.parse(): " +
+        #         json.dumps(sentence.text).replace('"', "'") +
+        #         " Some data may have been lost.") 
+        #     parsed_sentence["text"] += parsed["sentences"][1]["text"]
+
+        for parsed_sentence in parsed['sentences']:
+            sentence = Sentence(text = parsed_sentence['text'], project=self.project)
+            sentence.save(False)
+
+            self.add_words(sentence, parsed_sentence)
+            self.add_grammatical_relations(sentence, parsed_sentence, relationships, dependencies)
+
+            sentence.save(False)
+
+            sentences.append(sentence)
+        
+        return sentences
 
     def parse_with_error_handling(self, text):
         """Run the parser and handle errors properly.

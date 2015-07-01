@@ -112,7 +112,7 @@ class CollectionProcessor(object):
         :param str filename_extension: The extension of the files that contain
             documents.
         """
-        extractor = structureextractor.StructureExtractor(self.project, docstruc_filename)
+        extractor = structureextractor.StructureExtractor(self.project, docstruc_filename, self.str_proc)
 
         # Extract and record metadata, text for documents in the collection
         num_files_done = 1

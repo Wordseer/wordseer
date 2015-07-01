@@ -19,7 +19,7 @@ class StructureExtractor(object):
     JSON file. It generates document classes (Sentences, Documents, Propertys,
     etc.) from the input file.
     """
-    def __init__(self, project, structure_file):
+    def __init__(self, project, structure_file, string_processor):
         """Create a new StructureExtractor.
 
         :param Project project: A Project object
@@ -32,6 +32,7 @@ class StructureExtractor(object):
         self.document_structure = json.load(self.structure_file)
         self.logger = logging.getLogger(__name__)
         self.project_logger = logger.ProjectLogger(self.logger, self.project)
+        self.string_processor = string_processor
 
     def extract(self, infile):
         """Extract ``Document``\s from a ``DocumentFile``. This method uses the
@@ -83,6 +84,10 @@ class StructureExtractor(object):
 
         db.session.commit()
 
+        parsetime = self.string_processor.parsetime / len(document.all_sentences)
+        self.project_logger.info("CoreNLP speed: %.3fs per sentence", parsetime)
+        self.string_processor.parsetime = 0
+
         return document_file
 
     def extract_unit_information(self, structure, parent_node):
@@ -112,14 +117,18 @@ class StructureExtractor(object):
                 children = []
 
                 if "units" in structure.keys():
+                    # if current_unit has children
                     for child_struc in structure["units"]:
                         children.extend(self.extract_unit_information(
                             child_struc,
                             node))
                 else:
+                    # unit has no children so it should be text
                     if structure.get("combine") == True:
                         # This element contains text which must be combined
                         # with the next sibling element of this type.
+                        # NOTE: this isn't checking for siblings in the etree, 
+                        # it's going to the next highest property node in the Structure File
                         combined_sentence += str(node) + " "
                         combined_nodes.append(node)
                     else:
@@ -129,10 +138,15 @@ class StructureExtractor(object):
                 if not structure.get("combine") or len(combined_nodes) == 1:
                     # end of extraction for uncombined text nodes
                     # runs only once for combined text nodes
+                    # runs once for ALL nodes
                     current_unit.children = children
                     current_unit.save(False)
                     units.append(current_unit)
 
+            # self.project_logger.info("combined_sentence: %s", combined_sentence)
+            # self.project_logger.info("chars: %s", len(combined_sentence))
+            # self.project_logger.info("words (appx): %s", len(combined_sentence.split(' ')))
+            
             # this code only runs for combined text nodes
             new_sentences = self.get_sentences_from_text(combined_sentence)
 
@@ -156,13 +170,13 @@ class StructureExtractor(object):
             A list of ``Sentence`` objects with ``Sentence.text`` set to the text 
             of the sentence, and reference to the Project.
         """
+        
         sentences = []
 
-        for sentence in self.split_sentences(text):
-            sentences.append(Sentence(text=sentence, project=self.project))
-
+        # 1000 characters seems to be the choke point for CoreNLP 3.5.2
+        for subtext in split_paragraph(text, 1000):
+            sentences.extend(self.string_processor.parse(subtext, {}, {}))
         return sentences
-
 
     def get_sentences_from_node(self, structure, parent_node):
         """Return the sentences present in the parent_node and its children.
@@ -202,76 +216,6 @@ class StructureExtractor(object):
 
         return result_sentences
 
-    def split_sentences(self, text):
-        """Split the string into sentences.
-
-        Also runs a length check and splits sentences that are too long on
-        reasonable punctuation marks.
-
-        :param str text: The text to split
-        """
-
-        sentences = []
-
-        # Split sentences using NLTK
-        sentence_texts = sent_tokenize(text)
-
-        for sentence_text in sentence_texts:
-
-            # Check length of sentence
-            max_length = app.config["SENTENCE_MAX_LENGTH"]
-            truncate_length = app.config["LOG_SENTENCE_TRUNCATE_LENGTH"]
-            approx_sentence_length = len(sentence_text.split(" "))
-
-            if approx_sentence_length > max_length:
-                self.project_logger.warning(
-                    "Sentence appears to be too long, max " +
-                    "length is %s: %s", str(max_length),
-                    json_escape(sentence_text[:truncate_length]) + "...")
-
-                # Attempt to split on a suitable punctuation mark
-                # Order (tentative): semicolon, double-dash, colon, comma
-
-                # Mini helper function to get indices of punctuation marks
-
-                split_characters = app.config["SPLIT_CHARACTERS"]
-                subsentences = None
-
-                for character in split_characters:
-                    subsentences = sentence_text.split(character)
-
-                    # If all subsentences fit the length limit, exit the loop
-                    if all([len(subsentence.split(" ")) <= max_length
-                        for subsentence in subsentences]):
-
-                        self.project_logger.info("Splitting sentence around %s to fit "
-                            "length limit.", character)
-                        break
-
-                    # Otherwise, reset subsentences and try again
-                    else:
-                        subsentences = None
-
-                # If none of the split characters worked, force split on max_length
-                if not subsentences:
-                    self.project_logger.warning("No suitable punctuation for " +
-                        "splitting; forcing split on max_length number of words")
-                    subsentences = []
-                    split_sentence = sentence_text.split(" ")
-
-                    index = 0
-                    # Join every max_length number of words
-                    while index < approx_sentence_length:
-                        subsentences.append(" ".join(
-                            split_sentence[index:index+max_length]))
-                        index += max_length
-
-                sentences.extend(subsentences)
-
-            else:
-                sentences.append(sentence_text)
-
-        return sentences
 
 def get_metadata(structure, node, unit_type, project):
     """Return a list of Property objects of the metadata of the Tags in
@@ -410,7 +354,6 @@ def get_nodes_from_xpath(xpath, nodes):
     :param etree nodes: LXML etree object of nodes to search.
     :return list: The matched nodes, as ElementStringResult objects.
     """
-
     if len(xpath.strip()) == 0 or nodes in nodes.xpath("../" + xpath):
         return [nodes]
     return nodes.xpath(xpath)
@@ -455,3 +398,29 @@ def _assign_sentence_metadata(unit, all_parent_properties):
         sentences.extend(_assign_sentence_metadata(child, properties))
     return sentences
 
+def split_paragraph(para, length):
+    """given a string `para`, returns a list of sentence-tokenized substrings not longer 
+    than `length`. Performs the same operation recursively on all substrings until all 
+    are less than `length`.
+    """
+    paras = []
+    if len(para) < length:
+        paras.append(para)
+    else:
+        para1 = para[:length-1]
+        para2 = para[length-1:]
+
+        # remove trailing sentence fragment from 1st para
+        last_sent = sent_tokenize(para1)[-1]
+        last_sent_index = para1.index(last_sent)
+        para2 = para1[last_sent_index:] + para2
+        para1 = para1[:last_sent_index]
+        
+        # add para1 to results bc it is < length
+        paras.append(para1)
+
+        # recursively check the length of para2
+        for split_para in split_paragraph(para2, length):
+            paras.append(split_para)
+
+    return paras
