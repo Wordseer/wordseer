@@ -46,8 +46,8 @@ def count_documents(project, commit_interval):
 
         if count % commit_interval == 0:
             db.session.commit()
-            project_logger.info("Calculating count for document %s/%s", count,
-                len(documents))
+            # project_logger.info("Calculating count for document %s/%s", count,
+            #     len(documents))
 
     db.session.commit()
     project_logger.info('Counted %s documents.', len(documents))
@@ -89,8 +89,8 @@ def count_dependencies(project, commit_interval):
         dependency.save(False)
         if count % commit_interval == 0:
             db.session.commit()
-            project_logger.info("Calculating count for dependency %s/%s", count,
-                num_dependencies)
+            # project_logger.info("Calculating count for dependency %s/%s", count,
+            #     num_dependencies)
     db.session.commit()
     project_logger.info('Counted %s dependencies.', count)
 
@@ -132,8 +132,8 @@ def count_sequences(project, commit_interval):
 
         if count % commit_interval == 0:
             db.session.commit()
-            project_logger.info("Calculating count for sequence %s/%s", count,
-                num_sequences)
+            # project_logger.info("Calculating count for sequence %s/%s", count,
+            #     num_sequences)
 
     db.session.commit()
     project_logger.info('Counted %s sequences.', count)
@@ -172,8 +172,8 @@ def count_words(project, commit_interval):
         word.save(False)
         if count % commit_interval == 0:
             db.session.commit()
-            project_logger.info("Calculating count for word %s/%s", count,
-                num_words)
+            # project_logger.info("Calculating count for word %s/%s", count,
+            #     num_words)
 
     db.session.commit()
     project_logger.info('Counted %s words.', count)
@@ -229,7 +229,7 @@ def count_sentences_by_property(project, commit_interval):
             property_obj.save(False)
             if count % commit_interval == 0:
                 db.session.commit()
-                project_logger.info("Calculating sentence count for property/value pair %s", count)
+                # project_logger.info("Calculating sentence count for property/value pair %s", count)
 
     db.session.commit()
     project_logger.info('Counted %s property/value pairs.', count)
@@ -272,7 +272,7 @@ def count_most_frequent(project, commit_interval):
             freqword.save(False)
             if count % commit_interval == 0:
                 db.session.commit()
-                project_logger.info("Calculating frequent %s %s", pos, count)
+                # project_logger.info("Calculating frequent %s %s", pos, count)
 
         db.session.commit()
         project_logger.info('Counted %s frequent %s\'s.', count, pos)
@@ -301,7 +301,7 @@ def count_most_frequent(project, commit_interval):
         freqseq.save(False)
         if count % commit_interval == 0:
             db.session.commit()
-            project_logger.info("Calculating frequent sequence %s", count)
+            # project_logger.info("Calculating frequent sequence %s", count)
 
     db.session.commit()
     project_logger.info('Counted %s most frequent sequences.', count)

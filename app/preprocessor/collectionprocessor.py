@@ -82,7 +82,6 @@ class CollectionProcessor(object):
                 (app.config["WORD_TO_WORD_SIMILARITY"] and app.config["PART_OF_SPEECH_TAGGING"])
             ) and not "true" in logger.get(self.project,
                                            "finished_grammatical_processing").lower()):
-            self.project_logger.info("Parsing documents")
             self.parse_documents()
 
         self.project.status = Project.STATUS_DONE
@@ -168,7 +167,7 @@ class CollectionProcessor(object):
 
         for document in documents:
             if document.id > latest_id:
-                self.project_logger.info("Parsing document %s/%s (#%s)",
+                self.project_logger.info("Recording sequences for document %s/%s (#%s)",
                     str(documents_parsed + 1), str(len(documents)),
                     str(document.id))
 
@@ -176,7 +175,7 @@ class CollectionProcessor(object):
                 document_parser.parse_document(document)
                 seconds_elapsed = (datetime.now() - start_time).total_seconds()
 
-                self.project_logger.info("Time to parse document: %ss",
+                self.project_logger.info("Time to record sequences: %ss",
                     str(seconds_elapsed))
                 logger.log(self.project, "finished_grammatical_processing",
                     "false", logger.REPLACE)
