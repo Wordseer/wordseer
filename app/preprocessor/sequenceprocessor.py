@@ -65,8 +65,8 @@ class SequenceProcessor(object):
             for j in range(i+1, len(sentence.words) + 1):
                 # Check every word after the one at i
                 if j - i <= sequence_length:
-                    # If this word is less than five words away from i,
-                    # create a new Sequence (four or fewer words)
+                    # If this word is no more than `sequence_length` words away from i,
+                    # create a new Sequence
                     sequences.extend(self.get_sequence(sentence, i, j))
 
         # Write the sequences to the database using duplication check
