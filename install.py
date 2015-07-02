@@ -281,8 +281,10 @@ def setup_database():
     """
     print "Setting up database..."
     #TODO: Should we always call python2.7?
-    subprocess.call("python database.py create", shell=True)
-    subprocess.call("python database.py migrate", shell=True)
+    # subprocess.call("python database.py create", shell=True)
+    # subprocess.call("python database.py migrate", shell=True)
+    # subprocess.call("python database.py index", shell=True)
+    subprocess.call("python database.py reset", shell=True)
 
 def pip_is_installed():
     """Check if the correct version of pip is installed.

@@ -1,13 +1,15 @@
 """
 These are all the view functions for the app.
 """
-import os
-import threading
-import shutil
-import random
 import json
-from string import ascii_letters, digits
 import logging
+import os
+import random
+import shutil
+import threading
+import traceback
+
+from string import ascii_letters, digits
 
 from flask import redirect
 from flask import render_template
@@ -105,13 +107,15 @@ def project_show(project_id):
         # handle file upload
         
         if rel.role != ProjectsUsers.ROLE_ADMIN:
-            return #500 error
+            return app.login_manager.unauthorized()
 
         # For every file, check if it exists and if not then upload it to
         # the project directory and create a database record with its filename and
         # path.
 
         uploaded_files = request.files.getlist("uploaded_file")
+        upload_errors = []
+
         for uploaded_file in uploaded_files:
             filename = secure_filename(uploaded_file.filename)
             dest_path = os.path.join(app.config["UPLOAD_DIR"],
@@ -134,26 +138,35 @@ def project_show(project_id):
                     if doc_form.validate():
                         try:
                             # XML validation 
-                            etree.parse(uploaded_file)
+                            etree.fromstring(uploaded_file.read())
+                            uploaded_file.seek(0)
                             
                             uploaded_file.save(dest_path)
                             file_model = DocumentFile(path=dest_path, projects=[project])
                             file_model.save()
-                        except etree.XMLSyntaxError:
-                            doc_form.uploaded_file.errors.append(
-                                "The file %s is not well-formed XML." % uploaded_file.filename)
+                        except etree.XMLSyntaxError as err:
+                            upload_errors.append(
+                                "The file %s is not well-formed XML. Error details: %s" % (
+                                    uploaded_file.filename, 
+                                    json.dumps(traceback.format_exc()).replace('"', '')
+                                )
+                            )
                 
             else:
                 if ext == app.config["STRUCTURE_EXTENSION"]:
                     struc_form.validate()
-                    struc_form.uploaded_file.errors.append(
+                    upload_errors.append(
                         "A file with name " + os.path.split(dest_path)[1] + " already exists")
                     struc_active = True
 
                 else:
                     doc_form.validate()
-                    doc_form.uploaded_file.errors.append(
+                    upload_errors.append(
                         "A file with name " + os.path.split(dest_path)[1] + " already exists")
+
+        if upload_errors:
+            doc_form.validate()
+            doc_form.uploaded_file.errors.extend(upload_errors)
 
     # retrieve log info
     project_errors = project.get_errors()

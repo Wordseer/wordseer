@@ -48,10 +48,10 @@ class SequenceProcessor(object):
 
         return without_stops
 
-    def process(self, sentence, sequence_dict=None):
-        """Iterate and record every four word long sequence. The method records
-        using the ReaderWriter a list of sequences present in the given
-        sentence.
+    def process(self, sentence, sequence_dict=None, sequence_length=2):
+        """Iterate and record every sequence with length <= `sequence_length. 
+        The method records using the ReaderWriter a list of sequences present 
+        in the given sentence.
 
         :param Sentence sentence: The sentence to process,
         :return list: A list of Sequence objects, representing the results
@@ -64,9 +64,9 @@ class SequenceProcessor(object):
             self.previously_indexed = []
             for j in range(i+1, len(sentence.words) + 1):
                 # Check every word after the one at i
-                if j - i < 5:
-                    # If this word is less than five words away from i,
-                    # create a new Sequence (four or fewer words)
+                if j - i <= sequence_length:
+                    # If this word is no more than `sequence_length` words away from i,
+                    # create a new Sequence
                     sequences.extend(self.get_sequence(sentence, i, j))
 
         # Write the sequences to the database using duplication check

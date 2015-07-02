@@ -1,3 +1,4 @@
+from app.models.flask_security import User
 from app.models.project import Project
 from app.models.documentfile import DocumentFile
 from app.preprocessor.collectionprocessor import cp_run
@@ -19,6 +20,10 @@ database.reset()
 
 project = Project()
 project.save()
+
+user = User(email="test", password="test")
+user.add_project(project)
+user.save()
 
 files = [f for f in os.listdir(collection_dir) if
         os.path.isfile(os.path.join(collection_dir, f))]

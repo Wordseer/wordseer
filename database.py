@@ -65,6 +65,7 @@ def reset():
         print("Database not found; creating new database.")
 
     db.create_all()
+    index()
 
 def cache():
     """Copy the current database file to ``SQLALCHEMY_DATABASE_CACHE_PATH``.
@@ -169,6 +170,7 @@ def index():
         Index("ix_sequence_length_lemmatized", models.Sequence.length, models.Sequence.lemmatized),
         Index("ix_sequence_funcwords_length_id", models.Sequence.all_function_words, models.Sequence.length, models.Sequence.id),
         Index("ix_sequence_projid_id_lemmatized_sequence_length", models.Sequence.project_id, models.Sequence.id, models.Sequence.lemmatized, models.Sequence.sequence, models.Sequence.length),
+        Index("ix_sequence_sequence_projid", models.Sequence.sequence, models.Sequence.project_id),
         Index('ix_sequencecount_projid_id', models.SequenceCount.sequence_id, models.SequenceCount.id),
         Index('ix_seqinsentence_seqid_sentid', models.SequenceInSentence.sequence_id, models.SequenceInSentence.sentence_id),
         Index('ix_set_projid_parentid_type', models.Set.project_id, models.Set.parent_id, models.Set.type),

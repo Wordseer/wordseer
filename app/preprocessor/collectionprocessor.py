@@ -5,17 +5,15 @@ between the input and the pipeline.
 from datetime import datetime
 import logging
 import os
+import traceback
 
 from app import app
-from app.models import Project
+from app.models import Project, Base
 import database
-from . import logger
+from . import counter, logger, structureextractor
 from .documentparser import DocumentParser
-from .sequenceprocessor import SequenceProcessor
-from . import structureextractor
+from .helpers import json_escape
 from .stringprocessor import StringProcessor
-from . import counter
-from app.models import Document, Base
 
 class CollectionProcessor(object):
     """Process a collection of files.
@@ -27,7 +25,7 @@ class CollectionProcessor(object):
         self.project_logger = logger.ProjectLogger(self.pylogger, self.project)
 
     def process(self, collection_dir, docstruc_filename,
-        filename_extension, start_from_scratch):
+                filename_extension, start_from_scratch):
         """
         This function relies on several methods to:
 
@@ -36,6 +34,23 @@ class CollectionProcessor(object):
             tables
         3. Process the sentences by tokenizing and indexing the words
         4. Process the sentences by performing grammatical parsing
+
+        structure extractor:
+            - splits paragraph into sentences
+            - creates Sentence object
+            - adds Project to Sentence
+            - adds Properties to Sentence
+            - adds Sentence to Unit (which may also be a Document)
+
+            document parser:
+            -calls stringproc.parse on each Sentence
+                stringproc.parse:
+                - parses text with CoreNLP
+                - adds Words to Sentence
+                - adds Dependencies to Sentence
+            - calls sequenceproc.process on each Sentence
+                sequenceproc.process:
+                - adds Sequences to Sentence
 
         :param str collection_dir: The directory whose files should be
             processed.
@@ -58,19 +73,15 @@ class CollectionProcessor(object):
 
         # Extract metadata, populate documents, sentences, and doc structure
         # tables
-        if not "true" in logger.get(self.project,
-                "finished_recording_text_and_metadata"):
+        if not "true" in logger.get(self.project, "finished_recording_text_and_metadata"):
             self.project_logger.info("Extracting document text and metadata")
-            self.extract_record_metadata(collection_dir,
-                docstruc_filename, filename_extension)
+            self.extract_record_metadata(collection_dir, docstruc_filename, filename_extension)
 
         # Parse the documents
         if ((app.config["GRAMMATICAL_PROCESSING"] or
-                (app.config["WORD_TO_WORD_SIMILARITY"] and
-                app.config["PART_OF_SPEECH_TAGGING"])) and not
-                "true" in logger.get(self.project,
-                    "finished_grammatical_processing").lower()):
-            self.project_logger.info("Parsing documents")
+                (app.config["WORD_TO_WORD_SIMILARITY"] and app.config["PART_OF_SPEECH_TAGGING"])
+            ) and not "true" in logger.get(self.project,
+                                           "finished_grammatical_processing").lower()):
             self.parse_documents()
 
         self.project.status = Project.STATUS_DONE
@@ -93,7 +104,6 @@ class CollectionProcessor(object):
         have been extracted, ``finished_recording_text_and_metadata`` is set to
         ``true`` using the :mod:`~wordseerbackend.logger`.
 
-        :param StringProcessor str_proc: An instance of StringProcessor
         :param str collection_dir: The directory from which files should be
             parsed.
         :param str docstruc_file_name: A JSON description of the
@@ -101,42 +111,38 @@ class CollectionProcessor(object):
         :param str filename_extension: The extension of the files that contain
             documents.
         """
-        extractor = structureextractor.StructureExtractor(self.str_proc,
-            docstruc_filename)
+        extractor = structureextractor.StructureExtractor(self.project, docstruc_filename, self.str_proc)
 
         # Extract and record metadata, text for documents in the collection
         num_files_done = 1
         contents = []
         for filename in os.listdir(collection_dir):
-            if (os.path.splitext(filename)[1].lower() ==
-                filename_extension.lower()):
+            if os.path.splitext(filename)[1].lower() == filename_extension.lower():
                 contents.append(filename)
-
-        docs = [] # list of Documents
 
         for filename in contents:
             if (not "[" + str(num_files_done) + "]" in
-                logger.get(self.project, "text_and_metadata_recorded") and not
-                filename[0] == "."):
+                    logger.get(self.project, "text_and_metadata_recorded") and not
+                    filename[0] == "."):
                 logger.log(self.project, "finished_recording_text_and_metadata",
-                    "false", logger.REPLACE)
+                           "false", logger.REPLACE)
 
                 start_time = datetime.now()
-                docs = extractor.extract(os.path.join(collection_dir,
-                    filename))
+                extractor.extract(os.path.join(collection_dir, filename))
                 seconds_elapsed = (datetime.now() - start_time).total_seconds()
 
-                self.project_logger.info("Finished extracting and recording "
-                    "metadata for %s. Time: %ss (%s/%s).", filename,
+                self.project_logger.info(
+                    "Finished extracting and recording "
+                    "metadata for %s. Time: %ss (%s/%s).", json_escape(filename),
                     seconds_elapsed, str(num_files_done), str(len(contents)))
 
                 logger.log(self.project, "text_and_metadata_recorded",
-                    str(num_files_done), logger.UPDATE)
+                           str(num_files_done), logger.UPDATE)
 
             num_files_done += 1
 
         logger.log(self.project, "finished_recording_text_and_metadata", "true",
-            logger.REPLACE)
+                   logger.REPLACE)
 
     def parse_documents(self):
         """Parse documents in the database using
@@ -161,7 +167,7 @@ class CollectionProcessor(object):
 
         for document in documents:
             if document.id > latest_id:
-                self.project_logger.info("Parsing document %s/%s (#%s)",
+                self.project_logger.info("Recording sequences for document %s/%s (#%s)",
                     str(documents_parsed + 1), str(len(documents)),
                     str(document.id))
 
@@ -169,7 +175,7 @@ class CollectionProcessor(object):
                 document_parser.parse_document(document)
                 seconds_elapsed = (datetime.now() - start_time).total_seconds()
 
-                self.project_logger.info("Time to parse document: %ss",
+                self.project_logger.info("Time to record sequences: %ss",
                     str(seconds_elapsed))
                 logger.log(self.project, "finished_grammatical_processing",
                     "false", logger.REPLACE)
@@ -197,16 +203,22 @@ def cp_run(collection_dir, structure_file, extension, project_id):
         extension (str): Extension of the document files.
         project_id (int): Which project to use for this processing.
     """
+    start_time = datetime.now()
     if extension[0] != ".":
         extension = "." + extension
 
     project = Project.query.get(project_id)
     collection_processor = CollectionProcessor(project)
-    try:
-        collection_processor.process(collection_dir, structure_file, extension,
-           False)
-    except Exception as e:
-        project_logger = logger.ProjectLogger(logging.getLogger(__name__),
+    project_logger = logger.ProjectLogger(logging.getLogger(__name__),
             project)
-        project_logger.error("Fatal error: " + str(e))
+    
+    try:
+        collection_processor.process(collection_dir, structure_file, extension, False)
+    except Exception:
+        project_logger.error(
+            "Fatal error: " + 
+            json_escape(traceback.format_exc()))
+
+    total_time = (datetime.now() - start_time).total_seconds() / 60
+    project_logger.info("Total processing time: %.1f minutes", total_time)
 

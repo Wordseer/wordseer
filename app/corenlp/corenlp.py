@@ -393,8 +393,8 @@ class StanfordCoreNLP:
         # How much time should we give the parser to parse it?
         # the idea here is that you increase the timeout as a
         # function of the text's length.
-        # max_expected_time = max(5.0, 3 + len(to_send) / 5.0)
-        max_expected_time = max(300.0, len(to_send) / 3.0)
+        max_expected_time = max(5.0, 3 + len(to_send) / 5.0)
+        # max_expected_time = max(300.0, len(to_send) / 3.0)
 
         # repeated_input = self.corenlp.except("\n")  # confirm it
         t = self.corenlp.expect(["\nNLP> ", pexpect.TIMEOUT, pexpect.EOF,
