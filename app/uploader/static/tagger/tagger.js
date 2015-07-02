@@ -498,7 +498,7 @@ function processElement(el)
     if (active)
         removeElement(tag, id, nodeType);
     else
-        addElement(tag, id, nodeType);
+        addElement(tag, id, nodeType, true);
 }
 /**
  * Remvoe an element from buckets
