@@ -793,7 +793,7 @@ li span.multitable-level-1 {
 Base Components: Landing Page
 *******************************************************************************/
 $main-header-height: 109px;
-$huge-font-size: 40;
+$huge-font-size: 60px;
 $landing-page-margin: $panel-margin;
 $landing-page-padding: $panel-padding;
 div.landing-page {
@@ -803,21 +803,21 @@ div.landing-page {
 	margin: $landing-page-margin;
 	padding: $landing-page-padding;
 	div.landingpage-render-target {
-		position:absolute;
-		top: $main-header-height;
-		left: $landing-page-padding;
-		right: $landing-page-padding;
-		bottom: $landing-page-margin;
+		position:relative;
+		// top: $main-header-height;
+		// left: $landing-page-padding;
+		// right: $landing-page-padding;
+		// bottom: $landing-page-margin;
 	}
 	div.main-header {
-		height: $main-header-height;
+		// height: $main-header-height;
 		width: 100%;
 		font-family: $slab-serif;
 		font-weight: 700;
 		color: white;
-		font-size: $huge-font-size;
 		h1 {
-			margin: 0px;
+			margin: 0 8px;
+			font-size: $huge-font-size;
 		}
 	}
 }

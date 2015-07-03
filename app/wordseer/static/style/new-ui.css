@@ -983,24 +983,19 @@ div.landing-page {
 }
 /* line 805, new-ui.scss */
 div.landing-page div.landingpage-render-target {
-  position: absolute;
-  top: 109px;
-  left: 3px;
-  right: 3px;
-  bottom: 4.8px;
+  position: relative;
 }
 /* line 812, new-ui.scss */
 div.landing-page div.main-header {
-  height: 109px;
   width: 100%;
   font-family: "Bitter";
   font-weight: 700;
   color: white;
-  font-size: 40;
 }
-/* line 819, new-ui.scss */
+/* line 818, new-ui.scss */
 div.landing-page div.main-header h1 {
-  margin: 0px;
+  margin: 0 8px;
+  font-size: 60px;
 }
 
 /*******************************************************************************
