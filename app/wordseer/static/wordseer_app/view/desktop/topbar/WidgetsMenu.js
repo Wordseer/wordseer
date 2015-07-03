@@ -1,5 +1,5 @@
 /* Copyright 2012 Aditi Muralidharan. See the file "LICENSE" for the full license governing this code. */
-/** Contains buttons that open up
+/** [DEPRECATED]Contains buttons that open up
 {@link WordSeer.view.widget.Widget Widgets} that don't need a search input.
 These Widgets are:
 - {@link WordSeer.view.widget.DocumentBrowserWidget},
@@ -15,26 +15,14 @@ Ext.define('WordSeer.view.desktop.topbar.WidgetsMenu',{
 	extend: 'Ext.toolbar.Toolbar',
 	alias: 'widget.widgets-menu',
 	items: [
-		{
-			xtype: 'button',
-			action: 'document-browser-widget',
-			text: 'All Documents'
-		},
-		// {
-		// 	xtype: 'button',
-		// 	action: 'sentence-list-widget',
-		// 	text: 'All Sentences',
-		// },
-		// {
-		// 	xtype: 'button',
-		// 	action: 'word-frequencies-widget',
-		// 	text: 'Word Frequencies'
-		// },
-		{
-			xtype: 'button',
-			action: 'word-tree-widget',
-			text: 'Word Trees'
+	{
+		xtype: 'component',
+		autoEl: {
+			tag: 'a',
+			href: '/projects/',
+			html: '&laquo;Return to Project List'
 		}
+	}
 	]
 
 })

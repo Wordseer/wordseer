@@ -23,8 +23,8 @@ Ext.define('WordSeer.view.windowing.viewport.Viewport', {
 	 	{xtype: 'widgets-menu'},
    		     '-',
         {xtype:'universal-search-form'},
-        '-',
-        {xtype:'user-button'},
+        // '-',
+        // {xtype:'user-button'},
 	],
 	initComponent: function() {
 		this.addEvents('setchanged');
