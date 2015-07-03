@@ -25,15 +25,12 @@ stanford-corenlp
 # logs
 *.log
 
-app/wordseer/static/wordseer_app/css/config.rb
-
-app/wordseer/static/wordseer_app/css/.sass-cache/
+.sass-cache/
 
 *.ipynb
 
 *.scssc
 
-app/wordseer/static/style/config.rb
 /start_windows.bat
 preferences.json
 
