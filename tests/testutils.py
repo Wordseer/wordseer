@@ -13,16 +13,17 @@ from app.models import Sequence, Word, SequenceSet
 from app.wordseer import helpers
 import database
 
+@unittest.skip("A lot of these methods are probably unnecessary.")
 class TestUtils(unittest.TestCase):
     """Test the helpers module.
     """
     @classmethod
     def setUpClass(cls):
         database.clean()
-        cls.word1 = Word(word="foo", lemma="bar")
-        cls.word2 = Word(word="foo", lemma="baz")
-        cls.word3 = Word(word="bar", lemma="bar")
-        cls.word4 = Word(word="baz", lemma="qux")
+        cls.word1 = Word(lemma="bar")
+        cls.word2 = Word(lemma="baz")
+        cls.word3 = Word(lemma="bar")
+        cls.word4 = Word(lemma="qux")
 
         sequence1 = Sequence(words=[cls.word1, cls.word2])
         sequence2 = Sequence(words=[cls.word4])

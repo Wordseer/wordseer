@@ -40,6 +40,10 @@ class BaseConfig(object):
     UPLOAD_ROUTE = "/uploads/"
     MAP_ROUTE = "/map/"
     SAVE_MAP = "/save/"
+    ANALYZE_ROUTE = "/analyze/"
+    DELETE_ROUTE = "/delete/"
+    PROCESS_ROUTE = "/process/"
+    LOG_ROUTE = "/logs/"
 
     #Login settings
     SECURITY_REGISTERABLE = True
@@ -103,7 +107,7 @@ class BaseConfig(object):
     #WORDSEER_DIR = os.path.dirname(os.path.realpath(__file__))
 
     # NLP locations. Paths should be absolute.
-    CORE_NLP_DIR = os.path.join(ROOT, "stanford-corenlp/")
+    CORE_NLP_DIR = os.path.join(ROOT, "stanford-corenlp")
 
     # Processing options
     GRAMMATICAL_PROCESSING = True
@@ -174,4 +178,3 @@ class Testing(BaseConfig):
     SQLALCHEMY_ECHO = False
 
     PAGE_SIZE = 10
-

@@ -22,15 +22,15 @@ class Property(db.Model, Base):
 
     # Attributes
     unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
-    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
-    name = db.Column(db.String, index=True)
-    value = db.Column(db.String, index=True)
-    data_type = db.Column(db.String)
-    date_format = db.Column(db.String)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    property_metadata_id = db.Column(db.Integer, db.ForeignKey("property_metadata.id"))
+
+    name = db.Column(db.String)
+    value = db.Column(db.String)
+    property_metadata = db.relationship("PropertyMetadata", backref="properties")
 
     def __repr__(self):
         """Representation string for properties, showing the property name
         """
 
         return "<Property: " + str(self.name) + ">"
-

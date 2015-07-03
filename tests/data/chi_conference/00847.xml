@@ -1,0 +1,14 @@
+<article>
+<year>2011</year>
+<title>Placing a value on aesthetics in online casual games</title>
+<author>Andersen, Erik</author>
+<author>Liu, Yun-En</author>
+<author>Snider, Rich</author>
+<author>Szeto, Roy</author>
+<author>Popovi\'{c}, Zoran</author>
+<keyword>a/b testing</keyword>
+<keyword>aesthetics</keyword>
+<keyword>analytics</keyword>
+<keyword>games</keyword>
+<abstract>Game designers frequently invest in aesthetic improvements such as music, sound effects, and animations. However, their exact value for attracting and retaining players remains unclear. Seeking to estimate this value in two popular Flash games, we conducted a series of large-scale A/B tests in which we selectively removed aesthetic improvements and examined the effect of each component on play time, progress, and return rate. We found that music and sound effects had little or no effect on player retention in either game, while animations caused users to play more. We also found, counterintuitively, that optional rewards caused players to play less in both games. In one game, this gameplay modification affected play time three times as much as the largest aesthetic variation. Our methodology provides a way to determine where resources may be best spent during the game design and development process.</abstract>
+<article>

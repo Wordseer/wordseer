@@ -1,9 +1,10 @@
 from .base import Base
-from .cached_sentences import CachedSentences
+from .query import Query
 from .dependency import Dependency
 from .document import Document
 from .documentfile import DocumentFile
 from .flask_security import User, Role
+from .frequent_words import *
 from .grammaticalrelationship import GrammaticalRelationship
 from .log import *
 from .project import Project
@@ -15,6 +16,7 @@ from .sets import *
 from .structurefile import StructureFile
 from .unit import Unit
 from .word import Word
+from .counts import *
 
 from .association_objects import *
 from .association_tables import *

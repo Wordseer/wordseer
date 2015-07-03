@@ -13,7 +13,6 @@ class WordInSentence(db.Model, Base):
         sentence (Sentence): The ``Sentence`` in this relationship.
         position (int): The position of ``word`` in ``sentence``.
         space_before (str): The space before ``word`` (if any).
-        part_of_speech (str): The part of speech of ``word``.
         surface (str): The ``Word`` with exact capitalization.
     """
 
@@ -22,10 +21,7 @@ class WordInSentence(db.Model, Base):
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
     position = db.Column(db.Integer)
     space_before = db.Column(db.String)
-    part_of_speech = db.Column(db.String)
     surface = db.Column(db.String)
-
-    project = db.relationship("Project")
 
     sentence = db.relationship("Sentence",
         backref=db.backref(
@@ -51,9 +47,6 @@ class SequenceInSentence(db.Model, Base):
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
     position = db.Column(db.Integer)
 
-    project = db.relationship("Project")
-    document = db.relationship("Document")
-
     sequence = db.relationship("Sequence",
         backref=db.backref(
             "sequence_in_sentence", cascade="all, delete-orphan"))
@@ -73,8 +66,6 @@ class WordInSequence(db.Model, Base):
     word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
     sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
-
-    project = db.relationship("Project")
 
     word = db.relationship("Word",
         backref=db.backref(
@@ -108,9 +99,6 @@ class DependencyInSentence(db.Model, Base):
     governor_part_of_speech = db.Column(db.String)
     dependent_part_of_speech = db.Column(db.String)
 
-    project = db.relationship("Project")
-    document = db.relationship("Document")
-
     dependency = db.relationship("Dependency",
         backref=db.backref(
             "dependency_in_sentence", cascade="all, delete-orphan"))
@@ -119,3 +107,74 @@ class DependencyInSentence(db.Model, Base):
         backref=db.backref(
             "dependency_in_sentence", cascade="all, delete-orphan"))
 
+class ProjectsUsers(db.Model, Base):
+    """Associate Users with Projects.
+
+    Attributes:
+        user (User): The ``User`` in this relationship.
+        project (Project): The ``Project`` in this relationship.
+        role (int): The permissions of this ``User`` in this ``Project``.
+        ROLE_USER (int): The integer that represents a user role for
+            ``permissions``.
+        ROLE_ADMIN (int): Represents an admin role for ``permissions``.
+    """
+    ROLE_USER = 0
+    ROLE_ADMIN = 1
+
+    ROLE_DESCRIPTIONS = {
+        ROLE_USER: "User",
+        ROLE_ADMIN: "Admin"
+    }
+
+    def get_role_name(self):
+        """Return a human-readable role name.
+        """
+        return self.ROLE_DESCRIPTIONS[self.role]
+
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"))
+    project_id = db.Column(db.Integer(), db.ForeignKey("project.id"))
+    role = db.Column(db.Integer())
+
+    user = db.relationship("User", backref=db.backref("user_projects",
+        cascade="all, delete-orphan"))
+
+    project = db.relationship("Project", backref=db.backref("project_users",
+        cascade="all, delete-orphan"))
+
+class SentenceInQuery(db.Model, Base):
+    """Association object for sentences that match queries.
+
+    Attributes:
+        query (Query): The ``Query`` for this set of sentences.
+        sentence (Sentence): The ``Sentence`` in that matches this query
+        matched (bool): Whether this sentence matches the most recent piece
+            of the query.
+        num_matches (int): The total number of query pieces tried so far.
+    """
+    query_id = db.Column(db.Integer, db.ForeignKey("query.id"))
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
+    matched = db.Column(db.Boolean)
+    num_matches = db.Column(db.Integer)
+
+    query = db.relationship("Query",
+        backref=db.backref(
+            "sentence_in_query", cascade="all, delete-orphan"))
+
+    sentence = db.relationship("Sentence",
+        backref=db.backref(
+            "sentence_in_query", cascade="all, delete-orphan"))
+
+class PropertyOfSentence(db.Model, Base):
+    """Association object for properties belonging to sentences.
+
+    Attributes:
+        property (Property): The ``Property'' object that applies to this
+            sentence.
+        sentence (Sentence): The ``Sentence'' object that has this property.
+    """
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
+    sentence = db.relationship("Sentence", backref=db.backref("property_of_sentence"))
+    property_id = db.Column(db.Integer, db.ForeignKey("property.id"))
+    property = db.relationship("Property",
+        backref=db.backref("sentences_with_property",
+            cascade="all, delete-orphan"))

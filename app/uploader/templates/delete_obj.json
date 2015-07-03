@@ -1,0 +1,5 @@
+{
+	"status": "OK",
+	"obj_type": "{{obj_type}}",
+	"obj_id": {{obj_id}}
+}

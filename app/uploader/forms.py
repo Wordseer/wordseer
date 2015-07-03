@@ -1,18 +1,27 @@
 """
 This file stores all the relevant forms for the web application.
 """
-
 import os
-
+import pdb
 from flask_wtf import Form
 from flask import redirect
 from flask_wtf.file import FileAllowed, FileField, FileRequired
+from sqlalchemy.orm.exc import NoResultFound
+from flask_security.core import current_user
 from wtforms.fields import StringField, HiddenField
 from wtforms.validators import Required, ValidationError
 
 from app import app
-from .fields import ButtonField, MultiCheckboxField, MultiRadioField
-from ..models import Unit, Project, DocumentFile
+from .fields import ButtonField
+from .fields import MultiCheckboxField
+from .fields import MultiRadioField
+from .fields import DropdownField
+from ..models import Unit
+from ..models import Project
+from ..models import DocumentFile
+from ..models import ProjectsUsers
+from ..models import User
+from ..models import StructureFile
 
 class HiddenSubmitted(object):
     """A mixin to provide a hidden field called "submitted" which has a default
@@ -96,29 +105,56 @@ class DocumentUploadForm(Form, HiddenSubmitted):
 
     uploaded_file = FileField("File", validators=[
         FileRequired("You must select a file"),
-        FileAllowed(app.config["ALLOWED_EXTENSIONS"], "Invalid file type")
+        FileAllowed([app.config["DOCUMENT_EXTENSION"]], "Invalid file type")
+        ])
+
+class StructureUploadForm(Form, HiddenSubmitted):
+    """This is a form to upload files to the server. It handles both XML
+    and JSON files, and is used by the document_upload view.
+    """
+
+    upload_button = ButtonField(text="Upload", name="action")
+
+    uploaded_file = FileField("File", validators=[
+        FileRequired("You must select a file"),
+        FileAllowed([app.config["STRUCTURE_EXTENSION"]], "Invalid file type")
         ])
 
 class DocumentProcessForm(ProcessForm):
     """A ProcessForm configured to validate selections of documents.
     """
+    PROCESS = "p"
+    STRUCTURE = "s"
+    
     structure_file = MultiCheckboxField("Select",
         coerce=int,
         choices=[])
+    
     def validate_selection(form, field):
         """If the selection is for processing, then run is_processable on the
         selected files.
         If the selection is for structure mapping, then run reirect_to_tagger
         """
-
-        if form.process_button.data == form.PROCESS:
-            is_processable(docs=form.selection.data,
-                structure_files=form.structure_file.data)
-        else:
-            if not form.selection.data and not form.structure_file.data:
-                raise ValidationError("You must select at least one file.")
-        if form.structure_button.data == form.STRUCTURE:
-            is_mappable(ids=form.selection.data)
+        if form.process_button.data:
+            if form.process_button.data[0] == form.PROCESS:
+                structure_file = StructureFile.query.get(form.process_button.data[2:])
+                if not structure_file:
+                    raise ValidationError("This is not a structure file.")
+                project = structure_file.project
+           
+                if project.is_processable():
+                    return True
+                raise ValidationError("This project can't be processed.")
+            
+            elif form.structure_button.data[0] == form.STRUCTURE:
+                is_mappable(ids=[form.structure_button.data[2:]])
+        
+        elif form.process_button.data == form.DELETE:
+            if len(form.structure_file.data) > 0 or len(form.selection.data) > 0:
+                return True
+            else:
+                raise ValidationError("You must select at least one file to delete")
+        
 
 class ProjectCreateForm(Form, HiddenSubmitted):
     """Create new projects. This is simply a one-field form, requiring the
@@ -134,23 +170,15 @@ class ProjectCreateForm(Form, HiddenSubmitted):
     def validate_name(form, field):
         """Make sure there are no projects with this name existing.
         """
-        if Project.query.filter(Project.name == field.data).count() > 0:
+        user_project_names = [project.name for project in current_user.projects]
+        if field.data in user_project_names:
             raise ValidationError("A project with this name already exists")
 
 class ProjectProcessForm(ProcessForm):
     """A ProcessForm configured to validate selections of projects.
     """
-    def validate_selection(form, field):
-        """If the selection is for processing, then run is_processable on the
-        files of each selected project.
-        """
-        if form.process_button.data == form.PROCESS:
-            for project_id in form.selection.data:
-                project = Project.query.filter(Project.id == project_id).one()
-                is_processable(project=project)
-        else:
-            if not form.selection.data:
-                raise ValidationError("You must select a project to delete.")
+    DELETE = "d"
+    delete_button = ButtonField("Delete", name="action")
 
 class ConfirmDeleteForm(Form, HiddenSubmitted):
     """A form that will ask users to confirm their deletions.
@@ -165,4 +193,75 @@ class ConfirmDeleteForm(Form, HiddenSubmitted):
 
 class MapDocumentForm(Form, HiddenSubmitted):
     done = 0
+
+class ProjectPermissionsForm(Form, HiddenSubmitted):
+    """List and change project permissions.
+    """
+    UPDATE = "0"
+    DELETE = "-1"
+    CREATE = "1"
+
+    selection = MultiCheckboxField("Select",
+        coerce=int,
+        choices=[])
+
+    new_collaborator = StringField("Add new user")
+    possible_permissions = [(str(id), name) for id, name in
+        ProjectsUsers.ROLE_DESCRIPTIONS.items()]
+    create_permissions = DropdownField("Permissions", default="1",
+        choices=possible_permissions)
+    update_permissions = DropdownField("Permissions", default="1",
+        choices=possible_permissions)
+    create_button = ButtonField("Add collaborator", name="action", value=CREATE)
+    update_button = ButtonField("Set permissions", name="action", value=UPDATE)
+    delete_button = ButtonField("Delete", name="action", value=DELETE)
+
+    def validate_selection(form, field):
+        """Validate the selection. This only does anything if the UPDATE
+        or DELETE buttons have been pressed.
+        """
+        action = form.create_button.data # All buttons have the same data
+        if action == form.UPDATE or action == form.DELETE:
+            if not field.data:
+                raise ValidationError("You must make a selection")
+
+        if ((action == form.UPDATE and
+                form.update_permissions.data == str(ProjectsUsers.ROLE_USER))
+                or action == form.DELETE):
+            former_admins = []
+
+            for rel_id in field.data:
+                relationship = ProjectsUsers.query.get(rel_id)
+                if relationship.role == ProjectsUsers.ROLE_ADMIN:
+                    former_admins.append(relationship)
+
+            if former_admins:
+                project = former_admins[0].project
+                all_admins = ProjectsUsers.query.filter_by(project=project,
+                    role=ProjectsUsers.ROLE_ADMIN).all()
+                if all_admins == former_admins:
+                    raise ValidationError("At least one user must be an admin")
+        return True
+
+    def validate_new_collaborator(form, field):
+        """Validate the new_collaborator field. Only does anything if CREATE
+        button has been pressed.
+        """
+        action = form.create_button.data # All buttons have the same data
+        if action == form.CREATE:
+            users = User.query.all()
+            user_emails = [user.email for user in users]
+            existing_collaborators = [choice[1].user.id for choice in
+                form.selection.choices]
+
+            try:
+                new_user = User.query.filter_by(email = field.data).one()
+            except NoResultFound:
+                raise ValidationError("This user doesn't seem to be registered "
+                    "on this server.")
+
+            if new_user.id in existing_collaborators:
+                raise ValidationError("This user is already on this project.")
+
+        return True
 

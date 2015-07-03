@@ -1,0 +1,13 @@
+<article>
+<year>2008</year>
+<title>LivOlay: interactive ad-hoc registration and overlapping of applications for collaborative visual exploration</title>
+<author>Jiang, Hao</author>
+<author>Wigdor, Daniel</author>
+<author>Forlines, Clifton</author>
+<author>Borkin, Michelle</author>
+<author>Kauffmann, Jens</author>
+<author>Shen, Chia</author>
+<keyword>shared display groupware</keyword>
+<keyword>visual exploration</keyword>
+<abstract>The interoperability of disparate data types and sources has been a long standing problem and a hindering factor for the efficacy and efficiency in visual exploration applications. In this paper, we present a solution, called LivOlay, that enables the rapid visual overlay of live data rendered in different applications. Our tool addresses datasets in which visual registration of the information is necessary in order to allow for thorough understanding and visual analysis. We also discuss initial evaluation and user feedback of LivOlay.</abstract>
+<article>

@@ -1,7 +1,9 @@
 .select {
     width: 50px;
 }
-
+.emph {
+    font-size: 1.5em;
+}
 .btn-file {
     position: relative;
     overflow: hidden;
@@ -20,9 +22,26 @@
     cursor: inherit;
     display: block;
 }
+table {
+    width: 100%;
+}
+
+table.buttons td {
+    width: 100%;
+}
+
+td.fitted, th.fitted {
+    width: 1% !important;
+    white-space: nowrap;
+}
+
 input[readonly] {
     background-color: white !important;
     cursor: text !important;
+}
+
+.has-tooltip {
+    display: inline-block;
 }
 
 .align-top {
@@ -58,4 +77,8 @@ form + div.alert, input+div.alert, div.form-group+div.alert {
     /*background-color:rgba(255, 250, 155,.7);*/ 
     font-style: italic;
     font-weight: bolder;
+}
+
+.tab-content {
+    padding-top: 1em;
 }

@@ -1,143 +1,306 @@
 {
-    "structureName": "document",
-    "xpaths": [
-        "/PLAY"
-    ],
-    "titleXpaths": [
+  "titleXpaths": [],
+  "name": "PLAY",
+  "dataType": "string",
+  "xpathsFull": [
+    "/PLAY"
+  ],
+  "structureName": "PLAY",
+  "titleXpathsFull": [],
+  "tag": "PLAY",
+  "units": [
+    {
+      "titleXpaths": [
         "./TITLE/text()"
-    ],
-    "units": [
+      ],
+      "name": "Act",
+      "dataType": "string",
+      "xpathsFull": [
+        "/PLAY/ACT"
+      ],
+      "structureName": "ACT",
+      "titleXpathsFull": [
+        "/PLAY/ACT/TITLE/text()"
+      ],
+      "tag": "ACT",
+      "combine": false,
+      "units": [
         {
-            "belongsTo": "document",
-            "structureName": "act",
-            "xpaths": [
-                "./ACT"
-            ],
-            "units": [
+          "titleXpaths": [
+            "./TITLE/text()"
+          ],
+          "name": "Prologue",
+          "dataType": "string",
+          "xpathsFull": [
+            "/PLAY/ACT/PROLOGUE"
+          ],
+          "structureName": "PROLOGUE",
+          "titleXpathsFull": [
+            "/PLAY/ACT/PROLOGUE/TITLE/text()"
+          ],
+          "tag": "PROLOGUE",
+          "combine": false,
+          "units": [
+            {
+              "titleXpaths": [
+                "./SPEAKER/text()"
+              ],
+              "name": "Speaker",
+              "dataType": "string",
+              "xpathsFull": [
+                "/PLAY/ACT/PROLOGUE/SPEECH"
+              ],
+              "structureName": "SPEECH",
+              "titleXpathsFull": [
+                "/PLAY/ACT/PROLOGUE/SPEECH/SPEAKER/text()"
+              ],
+              "tag": "SPEECH",
+              "combine": false,
+              "units": [
                 {
-                    "belongsTo": "act",
-                    "structureName": "scene",
-                    "xpaths": [
-                        "./SCENE"
-                    ],
-                    "units": [
-                        {
-                            "belongsTo": "scene",
-                            "structureName": "speech",
-                            "xpaths": [
-                                "./SPEECH"
-                            ],
-                            "units": [
-                                {
-                                    "belongsTo": "speech",
-                                    "structureName": "sentence",
-                                    "combine": true,
-                                    "xpaths": [
-                                        "./LINE/text()"
-                                    ]
-                                }
-                            ],
-                            "metadata": [
-                                {
-                                    "belongsTo": "speech",
-                                    "propertyName": "speaker",
-                                    "xpaths": [
-                                        "./SPEAKER/text()"
-                                    ],
-                                    "nameIsDisplayed": false,
-                                    "valueIsDisplayed": true,
-                                    "displayName": "Speaker",
-                                    "isCategory": true,
-                                    "type": "string"
-                                },
-                                {
-                                    "belongsTo": "speech",
-                                    "propertyName": "StageDirection",
-                                    "xpaths": [
-                                        "./STAGEDIR/text()"
-                                    ],
-                                    "valueIsDisplayed": true,
-                                    "nameIsDisplayed": false,
-                                    "displayName": "Stage directions",
-                                    "isCategory": false,
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        {
-                            "belongsTo": "scene",
-                            "structureName": "stage",
-                            "xpaths": [
-                                "./STAGEDIR"
-                            ],
-                            "units": [
-                                {
-                                    "belongsTo": "stage",
-                                    "structureName": "sentence",
-                                    "xpaths": [
-                                        "./text()"
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "metadata": [
-                        {
-                            "belongsTo": "scene",
-                            "propertyName": "Scene",
-                            "xpaths": [
-                                "./TITLE/text()"
-                            ],
-                            "nameIsDisplayed": false,
-                            "displayName": "Scene",
-                            "valueIsDisplayed": true,
-                            "isCategory": true,
-                            "type": "string"
-                        }
-                    ]
+                  "titleXpaths": [],
+                  "name": "sentence",
+                  "dataType": "string",
+                  "xpathsFull": [
+                    "/PLAY/ACT/PROLOGUE/SPEECH/LINE/text()"
+                  ],
+                  "structureName": "LINE",
+                  "titleXpathsFull": [],
+                  "tag": "LINE",
+                  "combine": true,
+                  "xpaths": [
+                    "./LINE/text()"
+                  ],
+                  "type": "subunit",
+                  "id": "tagger-id-PLAYACTPROLOGUESPEECHLINE"
                 }
-            ],
-            "metadata": [
+              ],
+              "xpaths": [
+                "./SPEECH"
+              ],
+              "type": "subunit",
+              "id": "tagger-id-PLAYACTPROLOGUESPEECH",
+              "metadata": [
                 {
-                    "belongsTo": "act",
-                    "propertyName": "Act",
-                    "xpaths": [
-                        "./TITLE/text()"
-                    ],
-                    "valueIsDisplayed": true,
-                    "displayName": "Act",
-                    "nameIsDisplayed": false,
-                    "type": "string",
-                    "isCategory": true
+                  "isCategory": true,
+                  "displayName": "Speaker",
+                  "name": "Speaker",
+                  "dateFormat": "",
+                  "dataType": "string",
+                  "xpathsFull": [
+                    "/PLAY/ACT/PROLOGUE/SPEECH/SPEAKER"
+                  ],
+                  "propertyName": "Speaker",
+                  "valueIsDisplayed": true,
+                  "nameIsDisplayed": true,
+                  "tag": "SPEAKER",
+                  "xpaths": [
+                    "./SPEAKER"
+                  ],
+                  "type": "metadata",
+                  "id": "tagger-id-PLAYACTPROLOGUESPEECHSPEAKER",
+                  "isActive": true,
+                  "attr": ""
                 }
-            ]
-        }
-    ],
-    "metadata": [
-        {
-            "belongsTo": "document",
-            "propertyName": "Title",
-            "xpaths": [
-                "./TITLE/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "string",
-            "displayName": "Title",
-            "isCategory": true
+              ]
+            }
+          ],
+          "xpaths": [
+            "./PROLOGUE"
+          ],
+          "type": "subunit",
+          "id": "tagger-id-PLAYACTPROLOGUE",
+          "metadata": [
+            {
+              "isCategory": true,
+              "displayName": "Prologue",
+              "name": "Prologue",
+              "dateFormat": "",
+              "dataType": "string",
+              "xpathsFull": [
+                "/PLAY/ACT/PROLOGUE/TITLE"
+              ],
+              "propertyName": "Prologue",
+              "valueIsDisplayed": true,
+              "nameIsDisplayed": true,
+              "tag": "TITLE",
+              "xpaths": [
+                "./TITLE"
+              ],
+              "type": "metadata",
+              "id": "tagger-id-PLAYACTPROLOGUETITLE",
+              "isActive": true,
+              "attr": ""
+            }
+          ]
         },
         {
-            "belongsTo": "document",
-            "propertyName": "characters",
-            "xpaths": [
-                "PERSONAE/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": false,
-            "type": "string",
-            "displayName": "Characters",
-            "isCategory": false
+          "titleXpaths": [
+            "./TITLE/text()"
+          ],
+          "name": "Scene",
+          "dataType": "string",
+          "xpathsFull": [
+            "/PLAY/ACT/SCENE"
+          ],
+          "structureName": "SCENE",
+          "titleXpathsFull": [
+            "/PLAY/ACT/SCENE/TITLE/text()"
+          ],
+          "tag": "SCENE",
+          "combine": false,
+          "units": [
+            {
+              "titleXpaths": [
+                "./SPEAKER/text()"
+              ],
+              "name": "Speaker",
+              "dataType": "string",
+              "xpathsFull": [
+                "/PLAY/ACT/SCENE/SPEECH"
+              ],
+              "structureName": "SPEECH",
+              "titleXpathsFull": [
+                "/PLAY/ACT/SCENE/SPEECH/SPEAKER/text()"
+              ],
+              "tag": "SPEECH",
+              "combine": false,
+              "units": [
+                {
+                  "titleXpaths": [],
+                  "name": "sentence",
+                  "dataType": "string",
+                  "xpathsFull": [
+                    "/PLAY/ACT/SCENE/SPEECH/LINE/text()"
+                  ],
+                  "structureName": "LINE",
+                  "titleXpathsFull": [],
+                  "tag": "LINE",
+                  "combine": true,
+                  "xpaths": [
+                    "./LINE/text()"
+                  ],
+                  "type": "subunit",
+                  "id": "tagger-id-PLAYACTSCENESPEECHLINE"
+                }
+              ],
+              "xpaths": [
+                "./SPEECH"
+              ],
+              "type": "subunit",
+              "id": "tagger-id-PLAYACTSCENESPEECH",
+              "metadata": [
+                {
+                  "isCategory": true,
+                  "displayName": "Speaker",
+                  "name": "Speaker",
+                  "dateFormat": "",
+                  "dataType": "string",
+                  "xpathsFull": [
+                    "/PLAY/ACT/SCENE/SPEECH/SPEAKER"
+                  ],
+                  "propertyName": "Speaker",
+                  "valueIsDisplayed": true,
+                  "nameIsDisplayed": true,
+                  "tag": "SPEAKER",
+                  "xpaths": [
+                    "./SPEAKER"
+                  ],
+                  "type": "metadata",
+                  "id": "tagger-id-PLAYACTSCENESPEECHSPEAKER",
+                  "isActive": true,
+                  "attr": ""
+                }
+              ]
+            }
+          ],
+          "xpaths": [
+            "./SCENE"
+          ],
+          "type": "subunit",
+          "id": "tagger-id-PLAYACTSCENE",
+          "metadata": [
+            {
+              "isCategory": true,
+              "displayName": "Scene",
+              "name": "Scene",
+              "dateFormat": "",
+              "dataType": "string",
+              "xpathsFull": [
+                "/PLAY/ACT/SCENE/TITLE"
+              ],
+              "propertyName": "Scene",
+              "valueIsDisplayed": true,
+              "nameIsDisplayed": true,
+              "tag": "TITLE",
+              "xpaths": [
+                "./TITLE"
+              ],
+              "type": "metadata",
+              "id": "tagger-id-PLAYACTSCENETITLE",
+              "isActive": true,
+              "attr": ""
+            }
+          ]
         }
-    ]
+      ],
+      "xpaths": [
+        "./ACT"
+      ],
+      "type": "subunit",
+      "id": "tagger-id-PLAYACT",
+      "metadata": [
+        {
+          "isCategory": true,
+          "displayName": "Act",
+          "name": "Act",
+          "dateFormat": "",
+          "dataType": "string",
+          "xpathsFull": [
+            "/PLAY/ACT/TITLE"
+          ],
+          "propertyName": "Act",
+          "valueIsDisplayed": true,
+          "nameIsDisplayed": true,
+          "tag": "TITLE",
+          "xpaths": [
+            "./TITLE"
+          ],
+          "type": "metadata",
+          "id": "tagger-id-PLAYACTTITLE",
+          "isActive": true,
+          "attr": ""
+        }
+      ]
+    }
+  ],
+  "xpaths": [
+    "/PLAY"
+  ],
+  "filename": "r_and_j_act_i.xml",
+  "type": "document",
+  "id": "tagger-id-PLAY",
+  "metadata": [
+    {
+      "isCategory": true,
+      "displayName": "Title",
+      "name": "Title",
+      "dateFormat": "",
+      "dataType": "string",
+      "xpathsFull": [
+        "/PLAY/TITLE"
+      ],
+      "propertyName": "Title",
+      "valueIsDisplayed": true,
+      "nameIsDisplayed": true,
+      "tag": "TITLE",
+      "xpaths": [
+        "./TITLE"
+      ],
+      "type": "metadata",
+      "id": "tagger-id-PLAYTITLE",
+      "isActive": true,
+      "attr": ""
+    }
+  ]
 }
-

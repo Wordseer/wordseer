@@ -25,3 +25,13 @@ stanford-corenlp
 # logs
 *.log
 
+.sass-cache/
+
+*.ipynb
+
+*.scssc
+
+/start_windows.bat
+preferences.json
+
+requirements-pexpect.txt

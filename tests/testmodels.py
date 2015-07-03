@@ -23,6 +23,7 @@ from app.models import Log
 from app.models import InfoLog
 from app.models import ErrorLog
 from app.models import WarningLog
+from app.models import ProjectsUsers
 import database
 
 class TestWordModel(unittest.TestCase):
@@ -69,8 +70,8 @@ class TestSentenceModel(unittest.TestCase):
 
         assert sentence.text == text
 
-        word_1 = Word(word="hello")
-        word_2 = Word(word="world")
+        word_1 = Word(lemma="hello")
+        word_2 = Word(lemma="world")
 
         sentence.words.append(word_1)
         sentence.words.append(word_2)
@@ -97,36 +98,42 @@ class TestSentenceModel(unittest.TestCase):
         db.session.add_all([sequence1, sequence2])
         db.session.commit()
 
+        #Test with Project
+        project = Project()
+        sentence.project = project
+        db.session.add_all([project])
+        db.session.commit()
+
+
     def test_add_word(self):
         """Test the ``add_word()`` method of ``Sentence``.
         """
 
-        sentence = Sentence(text="foo")
-        word = Word(word="foo")
         project = Project()
+        sentence = Sentence(text="foo", project=project)
+        word = Word(lemma="foo")
 
         project.save()
         sentence.save()
         word.save()
 
         rel = sentence.add_word(word, position=4, space_before=" ",
-            part_of_speech="ADF", project=project)
+            project=project)
 
         assert rel.word == word
         assert rel.sentence == sentence
         assert rel.position == 4
         assert rel.space_before == " "
-        assert rel.part_of_speech == "ADF"
         assert rel.project == project
 
     def test_add_dependency(self):
         """Test the ``add_dependency()`` method of ``Sentence``.
         """
 
-        sentence = Sentence(text="foo")
-        word = Word(word="foo")
-        dependency = Dependency(governor=word)
         project = Project()
+        sentence = Sentence(text="foo", project=project)
+        word = Word(lemma="foo")
+        dependency = Dependency(governor=word)
 
         project.save()
         sentence.save()
@@ -146,9 +153,9 @@ class TestSentenceModel(unittest.TestCase):
         """Test the ``add_sequence()`` method of ``Sentence``.
         """
 
-        sentence = Sentence(text="foo")
-        sequence = Sequence(lemmatized=False)
         project = Project()
+        sentence = Sentence(text="foo", project=project)
+        sequence = Sequence(lemmatized=False)
 
         project.save()
         sentence.save()
@@ -218,7 +225,7 @@ class TestUnitModels(unittest.TestCase):
         assert unit.number == number
 
         sentence = Sentence()
-        sentence.words = [Word(word="hello"), Word(word="world")]
+        sentence.words = [Word(lemma="hello"), Word(lemma="world")]
         prop = Property(name="title", value="Hello World")
 
         unit.sentences.append(sentence)
@@ -473,4 +480,32 @@ class TestProjectModel(unittest.TestCase):
         assert project.get_infos() == info_logs
         assert project.get_errors() == error_logs
         assert project.get_warnings() == warning_logs
+
+class TestUserModel(unittest.TestCase):
+    """Test the ``User`` model.
+    """
+
+    def setUp(self):
+        database.clean()
+
+    def test_add_project(self):
+        user = User()
+        project = Project()
+        user.save()
+        project.save()
+        assoc_object = user.add_project(project, ProjectsUsers.ROLE_ADMIN,
+            False)
+
+        assert assoc_object.user == user
+        assert assoc_object.project == project
+
+    def test_association_proxies(self):
+        user = User()
+        project = Project()
+
+        user.projects = [project]
+        project.users = [user]
+
+        user.save()
+        project.save()
 

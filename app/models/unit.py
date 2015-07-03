@@ -27,9 +27,10 @@ class Unit(db.Model, Base):
     # We need to redefine ID here for the children relationship
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(64))
-    number = db.Column(db.Integer, index=True)
+    number = db.Column(db.Integer)
     parent_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
     name = db.Column(db.String)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     # Relationships
     children = db.relationship("Unit", backref=db.backref("parent",
@@ -57,4 +58,3 @@ class Unit(db.Model, Base):
 
         return "<Unit: " + " ".join([str(self.type),
             str(self.number)]) + ">"
-

@@ -3,11 +3,12 @@ Flask-SQLAlchemy==1.0
 Flask-Security==1.7.3
 SQLAlchemy==0.9.4
 #Sphinx==1.2.2
-lxml==3.3.5
+lxml==3.3.6
 mock==1.0.1
 sphinxcontrib-napoleon==0.2.8
 sqlalchemy-migrate==0.9.1
-stanford-corenlp-python
 nose
 nltk
-
+inflect==0.2.4
+unidecode >= 0.04.12
+xmltodict >= 0.4.6
