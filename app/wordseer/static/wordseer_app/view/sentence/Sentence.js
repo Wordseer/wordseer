@@ -122,7 +122,11 @@ Ext.define('WordSeer.view.sentence.Sentence', {
                 }else if(i== sentence.dep_index) {
                     cls += ' dep-highlight';
                 }
-                string_buffer.append(word.space_before);
+                console.log(word.space_before)
+                if (word.space_before == " ") string_buffer.append(word.space_before);
+                if (word.space_before == "\n") string_buffer.append("<br/>");
+                // string_buffer.append(word.space_before);
+                
                 string_buffer.append('<span class="' + cls +'" '
                     + ' onclick="Ext.getCmp(\''
                         + container_id +'\').fireEvent(\'wordclicked\', this);"'

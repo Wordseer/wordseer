@@ -103,8 +103,13 @@ class SentencesView(MethodView):
             html_classes = ["word"]
             if word_in_sentence.word.id in matching_words:
                 html_classes.append("search-highlight")
+            space = ""
+            if word_in_sentence.space_before == " ":
+                space = " "
+            if word_in_sentence.space_before == "\n":
+                space = "<br/>"
             word_html = "".join([
-                word_in_sentence.space_before, 
+                space, 
                 "<span ",
                 " word-id='", str(word_in_sentence.word.id),  "' ",
                 " position='", str(word_in_sentence.position), "' ",

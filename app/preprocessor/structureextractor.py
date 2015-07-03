@@ -129,7 +129,7 @@ class StructureExtractor(object):
                         # with the next sibling element of this type.
                         # NOTE: this isn't checking for siblings in the etree, 
                         # it's going to the next highest property node in the Structure File
-                        combined_sentence += str(node) + " "
+                        combined_sentence += str(node) + "\n"
                         combined_nodes.append(node)
                     else:
                         current_unit.sentences = self.get_sentences_from_node(structure,
@@ -148,7 +148,7 @@ class StructureExtractor(object):
             # self.project_logger.info("words (appx): %s", len(combined_sentence.split(' ')))
             
             # this code only runs for combined text nodes
-            new_sentences = self.get_sentences_from_text(combined_sentence)
+            new_sentences = self.get_sentences_from_text(combined_sentence.strip())
 
             for sentence in new_sentences:
                 sentence.properties = get_metadata(

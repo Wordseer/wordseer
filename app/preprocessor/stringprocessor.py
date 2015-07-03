@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 import logging
 from nltk.tokenize import sent_tokenize
+import re
 
 from app import app
 from app.corenlp import StanfordCoreNLP, ProcessError, TimeoutError
@@ -54,20 +55,11 @@ class StringProcessor(object):
         
         sentences = []
 
-        # parsed_sentence = parsed["sentences"][0]
-        # if len(parsed["sentences"]) > 1:
-        #     # TODO: handle this better so we don't lose data from additional sentences
-        #     project_logger.warning(
-        #         "More than one sentence passed in to StringProcessor.parse(): " +
-        #         json.dumps(sentence.text).replace('"', "'") +
-        #         " Some data may have been lost.") 
-        #     parsed_sentence["text"] += parsed["sentences"][1]["text"]
-
         for parsed_sentence in parsed['sentences']:
             sentence = Sentence(text = parsed_sentence['text'], project=self.project)
             sentence.save(False)
 
-            self.add_words(sentence, parsed_sentence)
+            self.add_words(sentence, parsed_sentence, text)
             self.add_grammatical_relations(sentence, parsed_sentence, relationships, dependencies)
 
             sentence.save(False)
@@ -140,24 +132,32 @@ class StringProcessor(object):
         # Parse successful, return parsed text
         return parsed_text
 
-    def add_words(self, sentence, parsed_sentence):
+    def add_words(self, sentence, parsed_sentence, raw_text):
         """Given a Sentence and its parsed text, and find the PoS, lemmas, 
         and space_befores of each word in the sentence, and add them to the
         Sentence object.
         """
-
         words = dict()
         position = 0
+        space = re.compile(r'\s')
+        cr = re.compile(r'[\n\r]')
 
         for word_data in parsed_sentence["words"]:
             surface = word_data[0]
             part_of_speech = word_data[1]["PartOfSpeech"]
             lemma = word_data[1]["Lemma"].lower()
-            space_before = " "
+            space_before = ""
+            if surface == "doth":
+                print raw_text
+                print parsed_sentence
 
             try:
-                if sentence.text[int(word_data[1]["CharacterOffsetBegin"]) - 1] != " ":
-                    space_before = ""
+                prevChar = raw_text[int(word_data[1]["CharacterOffsetBegin"]) - 1]
+                if space.match(prevChar):
+                    if cr.match(prevChar):
+                        space_before = "\n"
+                    else:
+                        space_before = " "
             except IndexError:
                 pass
 
