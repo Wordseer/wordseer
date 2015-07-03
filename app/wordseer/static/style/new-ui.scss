@@ -789,13 +789,80 @@ li span.multitable-level-1 {
 	@include metadata-category;
 }
 
+
+/*******************************************************************************
+Base Components: Toolbar
+*******************************************************************************/
+div.x-toolbar-default{
+	border: none;
+	background-color: #ffffff; 
+	background-image: none;
+	font-family: 'Open Sans', sans-serif;
+	margin-top: 3px;
+
+	.x-btn-inner {
+		font-family: 'Open Sans', sans-serif;
+	}
+
+	.x-btn-default-toolbar-small-over {
+		border-color: transparent;
+		background-image: none;
+		background-color: #ffffff;
+	}
+
+	#universal-search-form-body {
+		border: none;
+
+		.x-field {
+			margin-right: 8px;
+
+			tbody {
+				vertical-align: top;
+
+				.x-form-trigger {
+					background: url(icons/trigger.gif);
+				}
+			}
+
+			input{
+				font-family: 'Open Sans', sans-serif;
+			}
+
+			.x-form-item-label{
+				font-family: 'Open Sans', sans-serif;	
+			}
+		}
+
+		#universal-search-button {
+			background-image: none;
+			background-color: $background-lightblue;
+			
+			
+			.x-btn-inner{
+				color: #ffffff;	
+			}
+
+			.x-btn-over {
+				border: inherit;
+			}
+		}
+	}
+
+}
+
+
 /*******************************************************************************
 Base Components: Landing Page
 *******************************************************************************/
 $main-header-height: 109px;
-$huge-font-size: 40;
+$huge-font-size: 60px;
 $landing-page-margin: $panel-margin;
 $landing-page-padding: $panel-padding;
+
+#windowing-viewport-body {
+	border: none;
+}
+
 div.landing-page {
 	overflow: scroll;
 	background-color: $background-lightblue;
@@ -803,21 +870,21 @@ div.landing-page {
 	margin: $landing-page-margin;
 	padding: $landing-page-padding;
 	div.landingpage-render-target {
-		position:absolute;
-		top: $main-header-height;
-		left: $landing-page-padding;
-		right: $landing-page-padding;
-		bottom: $landing-page-margin;
+		position:relative;
+		// top: $main-header-height;
+		// left: $landing-page-padding;
+		// right: $landing-page-padding;
+		// bottom: $landing-page-margin;
 	}
 	div.main-header {
-		height: $main-header-height;
+		// height: $main-header-height;
 		width: 100%;
 		font-family: $slab-serif;
 		font-weight: 700;
 		color: white;
-		font-size: $huge-font-size;
 		h1 {
-			margin: 0px;
+			margin: 0 8px;
+			font-size: $huge-font-size;
 		}
 	}
 }
