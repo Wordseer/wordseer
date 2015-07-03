@@ -16,12 +16,10 @@ Ext.define('WordSeer.view.desktop.topbar.WidgetsMenu',{
 	alias: 'widget.widgets-menu',
 	items: [
 	{
-		xtype: 'component',
-		autoEl: {
-			tag: 'a',
-			href: '/projects/',
-			html: '&laquo;Return to Project List'
-		}
+		xtype: 'button',
+		href: '/projects/',
+		hrefTarget: "_self",
+		html: '&laquo;Return to Project List'
 	}
 	]
 

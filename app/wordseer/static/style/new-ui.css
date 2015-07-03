@@ -971,9 +971,73 @@ li span.multitable-level-1 span.metadata-category {
 }
 
 /*******************************************************************************
+Base Components: Toolbar
+*******************************************************************************/
+/* line 796, new-ui.scss */
+div.x-toolbar-default {
+  border: none;
+  background-color: #ffffff;
+  background-image: none;
+  font-family: 'Open Sans', sans-serif;
+  margin-top: 3px;
+}
+/* line 803, new-ui.scss */
+div.x-toolbar-default .x-btn-inner {
+  font-family: 'Open Sans', sans-serif;
+}
+/* line 807, new-ui.scss */
+div.x-toolbar-default .x-btn-default-toolbar-small-over {
+  border-color: transparent;
+  background-image: none;
+  background-color: #ffffff;
+}
+/* line 813, new-ui.scss */
+div.x-toolbar-default #universal-search-form-body {
+  border: none;
+}
+/* line 816, new-ui.scss */
+div.x-toolbar-default #universal-search-form-body .x-field {
+  margin-right: 8px;
+}
+/* line 819, new-ui.scss */
+div.x-toolbar-default #universal-search-form-body .x-field tbody {
+  vertical-align: top;
+}
+/* line 822, new-ui.scss */
+div.x-toolbar-default #universal-search-form-body .x-field tbody .x-form-trigger {
+  background: url(icons/trigger.gif);
+}
+/* line 827, new-ui.scss */
+div.x-toolbar-default #universal-search-form-body .x-field input {
+  font-family: 'Open Sans', sans-serif;
+}
+/* line 831, new-ui.scss */
+div.x-toolbar-default #universal-search-form-body .x-field .x-form-item-label {
+  font-family: 'Open Sans', sans-serif;
+}
+/* line 836, new-ui.scss */
+div.x-toolbar-default #universal-search-form-body #universal-search-button {
+  background-image: none;
+  background-color: #64839f;
+}
+/* line 841, new-ui.scss */
+div.x-toolbar-default #universal-search-form-body #universal-search-button .x-btn-inner {
+  color: #ffffff;
+}
+/* line 845, new-ui.scss */
+div.x-toolbar-default #universal-search-form-body #universal-search-button .x-btn-over {
+  border: inherit;
+}
+
+/*******************************************************************************
 Base Components: Landing Page
 *******************************************************************************/
-/* line 799, new-ui.scss */
+/* line 862, new-ui.scss */
+#windowing-viewport-body {
+  border: none;
+}
+
+/* line 866, new-ui.scss */
 div.landing-page {
   overflow: scroll;
   background-color: #64839f;
@@ -981,18 +1045,18 @@ div.landing-page {
   margin: 4.8px;
   padding: 3px;
 }
-/* line 805, new-ui.scss */
+/* line 872, new-ui.scss */
 div.landing-page div.landingpage-render-target {
   position: relative;
 }
-/* line 812, new-ui.scss */
+/* line 879, new-ui.scss */
 div.landing-page div.main-header {
   width: 100%;
   font-family: "Bitter";
   font-weight: 700;
   color: white;
 }
-/* line 818, new-ui.scss */
+/* line 885, new-ui.scss */
 div.landing-page div.main-header h1 {
   margin: 0 8px;
   font-size: 60px;
@@ -1001,7 +1065,7 @@ div.landing-page div.main-header h1 {
 /*******************************************************************************
 Base Components: Menu
 *******************************************************************************/
-/* line 830, new-ui.scss */
+/* line 897, new-ui.scss */
 .menu, .autosuggest-menu {
   padding: 1px;
   border: 2px solid #f7d04a;
@@ -1009,7 +1073,7 @@ Base Components: Menu
 }
 
 /* creates the larger triangle */
-/* line 837, new-ui.scss */
+/* line 904, new-ui.scss */
 .menu:before, .autosuggest-menu:before {
   top: 10px;
   /* controls vertical position */
@@ -1021,7 +1085,7 @@ Base Components: Menu
 }
 
 /* creates the smaller  triangle */
-/* line 846, new-ui.scss */
+/* line 913, new-ui.scss */
 .menu:after, .autosuggest-menu:after {
   top: 16px;
   /* value = (:before top) + (:before border-top) - (:after border-top) */
@@ -1032,13 +1096,13 @@ Base Components: Menu
   border-color: transparent #fff;
 }
 
-/* line 854, new-ui.scss */
+/* line 921, new-ui.scss */
 .menuitem, .autosuggest-menuitem {
   cursor: pointer;
   display: block;
   padding: 7.68px;
 }
-/* line 857, new-ui.scss */
+/* line 924, new-ui.scss */
 .menuitem.hovered, .hovered.autosuggest-menuitem {
   background: #f7d04a;
 }
@@ -1046,7 +1110,7 @@ Base Components: Menu
 /*******************************************************************************
 Derived Components: AutoSuggest Menu
 *******************************************************************************/
-/* line 867, new-ui.scss */
+/* line 934, new-ui.scss */
 .autosuggest-menu {
   border: 0px;
   -webkit-box-shadow: 10px, 0px, 5px;
@@ -1057,14 +1121,14 @@ Derived Components: AutoSuggest Menu
 /*******************************************************************************
 Base Components: Overviews
 *******************************************************************************/
-/* line 881, new-ui.scss */
+/* line 948, new-ui.scss */
 div.overview {
   position: static;
   margin: 4.8px;
   padding: 3px;
   margin-right: 50px;
 }
-/* line 886, new-ui.scss */
+/* line 953, new-ui.scss */
 div.overview div.overview-render-target {
   position: absolute;
   top: 100px;
@@ -1072,7 +1136,7 @@ div.overview div.overview-render-target {
   right: 3px;
   bottom: 4.8px;
 }
-/* line 893, new-ui.scss */
+/* line 960, new-ui.scss */
 div.overview div.overview-header {
   height: 109px;
   width: 100%;
@@ -1081,7 +1145,7 @@ div.overview div.overview-header {
   font-weight: 700;
   color: white;
 }
-/* line 901, new-ui.scss */
+/* line 968, new-ui.scss */
 div.overview div.range-facet {
   position: static !important;
   background-color: transparent;
@@ -1092,23 +1156,23 @@ div.overview div.range-facet div.databox-header {
   color: white;
   background-color: transparent;
 }
-/* line 903, new-ui.scss */
+/* line 970, new-ui.scss */
 div.overview div.range-facet .axis text {
   fill: #eeeeee;
 }
-/* line 906, new-ui.scss */
+/* line 973, new-ui.scss */
 div.overview div.range-facet .axis line, div.overview div.range-facet .axis path {
   stroke: #eeeeee;
 }
-/* line 909, new-ui.scss */
+/* line 976, new-ui.scss */
 div.overview div.range-facet .brush rect.extent {
   fill: #000000;
 }
-/* line 912, new-ui.scss */
+/* line 979, new-ui.scss */
 div.overview div.range-facet .background.bar {
   stroke: #eeeeee;
 }
-/* line 915, new-ui.scss */
+/* line 982, new-ui.scss */
 div.overview div.range-facet .title span {
   color: #eeeeee;
 }
@@ -1116,20 +1180,20 @@ div.overview div.range-facet .title span {
 /*******************************************************************************
 Derived Components: Range Facets
 *******************************************************************************/
-/* line 924, new-ui.scss */
+/* line 991, new-ui.scss */
 div.range-facet {
   height: 100px;
 }
-/* line 927, new-ui.scss */
+/* line 994, new-ui.scss */
 div.range-facet.x-box-item {
   position: static !important;
 }
-/* line 930, new-ui.scss */
+/* line 997, new-ui.scss */
 div.range-facet div.chart.collapsed {
   display: none;
 }
 
-/* line 937, new-ui.scss */
+/* line 1004, new-ui.scss */
 div.rangefacets div.range-facet div.databox-header {
   font-weight: bold;
   color: #64839f;
@@ -1151,7 +1215,7 @@ div.rangefacets div.range-facet div.databox-header span.metadata-category {
 /*******************************************************************************
 Base Components: Sentence List Widget
 *******************************************************************************/
-/* line 946, new-ui.scss */
+/* line 1013, new-ui.scss */
 div.sentence {
   font-family: "Bitter";
   line-height: 1.5;
@@ -1159,7 +1223,7 @@ div.sentence {
   margin-bottom: 6px;
 }
 
-/* line 953, new-ui.scss */
+/* line 1020, new-ui.scss */
 div.metatag {
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
   float: left;
@@ -1168,54 +1232,54 @@ div.metatag {
   border: 1px solid #808080;
   cursor: pointer;
 }
-/* line 960, new-ui.scss */
+/* line 1027, new-ui.scss */
 div.metatag span {
   display: table-cell;
   padding: 2px 6px;
   color: #808080;
 }
-/* line 964, new-ui.scss */
+/* line 1031, new-ui.scss */
 div.metatag span.key {
   font-weight: 700;
   text-transform: uppercase;
   font-size: 11px;
   border-right: 1px solid #808080;
 }
-/* line 970, new-ui.scss */
+/* line 1037, new-ui.scss */
 div.metatag span.value {
   font-size: 12px;
   font-weight: 400;
 }
-/* line 974, new-ui.scss */
+/* line 1041, new-ui.scss */
 div.metatag span.dir {
   display: inline;
 }
-/* line 978, new-ui.scss */
+/* line 1045, new-ui.scss */
 div.metatag:last-child {
   margin-bottom: 36px;
 }
-/* line 981, new-ui.scss */
+/* line 1048, new-ui.scss */
 div.metatag.active {
   background-color: #f7d04a;
 }
-/* line 984, new-ui.scss */
+/* line 1051, new-ui.scss */
 div.metatag.sorting {
   background-color: #fff2fe;
 }
-/* line 986, new-ui.scss */
+/* line 1053, new-ui.scss */
 div.metatag.sorting.lev0 {
   background-color: #ffd8fc;
 }
-/* line 989, new-ui.scss */
+/* line 1056, new-ui.scss */
 div.metatag.sorting.lev1 {
   background-color: #ffe7fd;
 }
-/* line 992, new-ui.scss */
+/* line 1059, new-ui.scss */
 div.metatag.sorting.lev2 {
   background-color: #fff2fe;
 }
 
-/* line 998, new-ui.scss */
+/* line 1065, new-ui.scss */
 div.rowsloading {
   text-align: center;
   padding: 31.45728px;
@@ -1223,7 +1287,7 @@ div.rowsloading {
   font-size: 18px;
   background-color: #fff2fe;
 }
-/* line 1005, new-ui.scss */
+/* line 1072, new-ui.scss */
 div.rowsloading.hidden {
   display: none;
 }
@@ -1231,56 +1295,56 @@ div.rowsloading.hidden {
 /*******************************************************************************
 Visualizations - metadata profile
 *******************************************************************************/
-/* line 1016, new-ui.scss */
+/* line 1083, new-ui.scss */
 .panel-header .controls, .panel-header .display {
   font-family: "Bitter";
   font-size: 12px;
   color: #64839f;
 }
-/* line 1021, new-ui.scss */
+/* line 1088, new-ui.scss */
 .panel-header .controls .viz-toggle, .panel-header .display .viz-toggle {
   display: inline-block;
   margin-left: 12.288px;
 }
 
-/* line 1029, new-ui.scss */
+/* line 1096, new-ui.scss */
 .viz-container {
   float: left;
   position: relative;
   margin-top: 31.45728px;
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
-/* line 1033, new-ui.scss */
+/* line 1100, new-ui.scss */
 .viz-container .timeselect {
   position: absolute;
   top: 7px;
   right: 5px;
 }
-/* line 1039, new-ui.scss */
+/* line 1106, new-ui.scss */
 .viz-container .wordfreq {
   width: 500px;
   height: 400px;
 }
-/* line 1043, new-ui.scss */
+/* line 1110, new-ui.scss */
 .viz-container .wordfreq .nvtooltip {
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
-/* line 1048, new-ui.scss */
+/* line 1115, new-ui.scss */
 .viz-container .wordfreq svg text {
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
-/* line 1057, new-ui.scss */
+/* line 1124, new-ui.scss */
 .viz-container div.property {
   font-size: 18px;
   font-weight: 700;
   margin-left: 50px;
 }
-/* line 1062, new-ui.scss */
+/* line 1129, new-ui.scss */
 .viz-container div.property a.download {
   padding-left: 10px;
   color: #64839f;
 }
-/* line 1067, new-ui.scss */
+/* line 1134, new-ui.scss */
 .viz-container div.property span.sort {
   display: inline-block;
   margin-left: 10px;
@@ -1288,12 +1352,12 @@ Visualizations - metadata profile
   position: relative;
   z-index: 10;
 }
-/* line 1074, new-ui.scss */
+/* line 1141, new-ui.scss */
 .viz-container div.property span.sort .sort-control {
   color: #64839f;
   padding-right: 15px;
 }
-/* line 1078, new-ui.scss */
+/* line 1145, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu {
   position: absolute;
   top: -9px;
@@ -1306,7 +1370,7 @@ Visualizations - metadata profile
   visibility: hidden;
   transition: visibility 0s ease 0.3s,opacity 0.3s ease;
 }
-/* line 1090, new-ui.scss */
+/* line 1157, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu i {
   padding: 5px;
   width: 100%;
@@ -1314,16 +1378,16 @@ Visualizations - metadata profile
   background-color: #eeeeee;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-/* line 1098, new-ui.scss */
+/* line 1165, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu i.selected {
   color: #64839f;
 }
-/* line 1102, new-ui.scss */
+/* line 1169, new-ui.scss */
 .viz-container div.property span.sort .sort-control .sort-menu i:hover {
   background-color: #64839f;
   color: #eeeeee;
 }
-/* line 1110, new-ui.scss */
+/* line 1177, new-ui.scss */
 .viz-container div.property span.sort .sort-control:hover .sort-menu {
   opacity: 1;
   visibility: visible;
@@ -1331,7 +1395,7 @@ Visualizations - metadata profile
   z-index: 999;
 }
 
-/* line 1128, new-ui.scss */
+/* line 1195, new-ui.scss */
 .c3-axis-x .tick text tspan:nth-child(n+5) {
   display: none;
 }

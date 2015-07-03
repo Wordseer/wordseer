@@ -9,6 +9,9 @@ Ext.define('WordSeer.view.autosuggest.PhrasesAutoSuggest', {
 		'WordSeer.store.PhrasesAutoSuggestStore'
 	],
 	alias: 'widget.phrases-autosuggest',
+	config: {
+		cls: 'x-table-plain'
+	},
 	initComponent: function() {
 		this.menu = {
 			xtype: 'autosuggest-menu',
