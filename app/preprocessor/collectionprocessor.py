@@ -218,6 +218,7 @@ def cp_run(collection_dir, structure_file, extension, project_id):
         project_logger.error(
             "Fatal error: " + 
             json_escape(traceback.format_exc()))
+        project.status = Project.STATUS_FAILED
 
     total_time = (datetime.now() - start_time).total_seconds() / 60
     project_logger.info("Total processing time: %.1f minutes", total_time)

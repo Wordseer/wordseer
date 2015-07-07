@@ -19,11 +19,13 @@ class Project(db.Model, Base):
     STATUS_UNPROCESSED = 0
     STATUS_PREPROCESSING = 1
     STATUS_DONE = 2
+    STATUS_FAILED = 3
 
     STATUS_NAMES = {
         STATUS_UNPROCESSED: "Not yet procesed.",
         STATUS_PREPROCESSING: "Preprocessing.",
-        STATUS_DONE: "Preprocessed."
+        STATUS_DONE: "Preprocessed.",
+        STATUS_FAILED: "Preprocessing failed."
     }
 
     # Attributes

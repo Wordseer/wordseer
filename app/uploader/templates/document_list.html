@@ -190,6 +190,9 @@
                         {% endif %}
                         {% if project.status == 2 %}
                         panel-success active
+                        {% endif %}
+                        {% if project.status == 3 %}
+                        panel-danger active
                         {% endif %}" id="log">
             <div class="panel-heading ">
                 <div class="panel-title">
@@ -202,6 +205,9 @@
                         {% endif %}
                         {% if project.status == 2 %}
                         processing complete.
+                        {% endif %}
+                        {% if project.status == 3 %}
+                        processing failed.
                         {% endif %}
                     </h4>
                 </div>
@@ -452,7 +458,7 @@ var getLogs = function(){
 var logPoll = function(){
     setTimeout(function(){
         // stop polling if processing is finished
-        if (project_status == 2) {
+        if (project_status >= 2) {
             window.location.href=window.location.href;
             return;
         }
