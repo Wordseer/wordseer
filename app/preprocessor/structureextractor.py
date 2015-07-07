@@ -84,9 +84,12 @@ class StructureExtractor(object):
 
         db.session.commit()
 
-        parsetime = self.string_processor.parsetime / len(document.all_sentences)
-        self.project_logger.info("CoreNLP speed: %.3fs per sentence", parsetime)
-        self.string_processor.parsetime = 0
+        try:
+            parsetime = self.string_processor.parsetime / len(document.all_sentences)
+            self.project_logger.info("CoreNLP speed: %.3fs per sentence", parsetime)
+            self.string_processor.parsetime = 0
+        except ZeroDivisionError as err:
+            self.project_logger.warning("No sentences recorded for document %s", document_file.path)
 
         return document_file
 
