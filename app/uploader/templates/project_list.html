@@ -35,13 +35,23 @@
                 </thead>
                 <tbody>
                     {% for project in projects %}
-                        <tr id="proj-{{project.id}}" {% if project.status == 3%}class="danger"{% endif %}>
+                        <tr id="proj-{{project.id}}" 
+                        {% if project.status == 3%}class="danger"{% endif %}
+                        {% if project.status == 1%}class="info"{% endif %}
+                        >
                             <td class="fitted">
                                 {% if project.status == 0 %}
                                     <a href="{{ url_for("uploader.project_show",
                                     project_id=project.id) }}", class="btn btn-default">
                                     <span class="glyphicon glyphicon-plus"></span>
                                     Add documents
+                                </a>
+                                {% endif %}
+                                {% if project.status == 1 or project.status == 3 %}
+                                <a href="{{ url_for("uploader.project_show",
+                                project_id=project.id) }}", class="btn btn-default">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                                    View logs
                                 </a>
                                 {% endif %}
                                 {% if project.status == 2 %}
@@ -54,12 +64,12 @@
                             </td>
                             <td class="emph">
                                 <label for="{{ project.id }}">
-                                        {{ project.name }}
-                                    </a>
-                                </label>
+                                    {{ project.name }} 
+                                    {% if project.status == 1 %}<em>(currently processing)</em>{% endif %}
+                                </label> 
                             </td>
                             <td class="fitted">
-                                {% if project.status > 0 %}
+                                {% if project.status == 2 %}
                                 <a href="{{ url_for("uploader.project_show",
                                 project_id=project.id) }}", class="btn btn-default">
                                 <span class="glyphicon glyphicon-info-sign"></span>
@@ -69,7 +79,7 @@
                                 
                             </td>
                             <td class="fitted">
-                                {% if project.admin %}
+                                {% if project.admin and project.status != 1 %}
                                 <a data-projid="{{project.id}}" class="btn btn-danger delete">
                                     <span class="glyphicon glyphicon-remove"></span>
                                     Delete

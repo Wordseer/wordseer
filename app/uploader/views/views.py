@@ -551,6 +551,7 @@ def process_files(collection_dir, structure_file, project):
         logger.info("Not processing as per config.")
         return
     project.status = Project.STATUS_PREPROCESSING
+    project.save()
     args = (collection_dir, structure_file, app.config["DOCUMENT_EXTENSION"],
             project.id)
     preprocessing_process = threading.Thread(target=cp_run, args=args)
