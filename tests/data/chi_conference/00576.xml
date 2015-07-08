@@ -12,4 +12,4 @@
 <keyword>tagging</keyword>
 <keyword>user interfaces</keyword>
 <abstract>Systems for fast search of personal information are rapidly becoming ubiquitous. Such systems promise to dramatically improve personal information management, yet most are modeled on Web search in which users know very little about the content that they are searching. We describe the design and deployment of a system called Phlat that optimizes search for personal information with an intuitive interface that merges search and browsing through a variety of associative and contextual cues. In addition, Phlat supports a unified tagging (labeling) scheme for organizing personal content across storage systems (files, email, etc.). The system has been deployed to hundreds of employees within our organization. We report on both quantitative and qualitative aspects of system use. Phlat is available as a free download at http://research.microsoft.com/adapt/phlat.</abstract>
-<article>
+</article>

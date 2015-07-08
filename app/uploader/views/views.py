@@ -185,6 +185,104 @@ def project_show(project_id):
         struc_form=struc_form, allowed_extensions_doc=[".xml"], 
         allowed_extensions_struc=[".json"], struc_active=struc_active, log_start=log_start)
 
+@uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>/upload", methods=["POST"])
+@login_required
+def file_upload(project_id):
+    """An ajax endpoint for adding files to a project
+    """
+    # does user have access to the project?
+    project = helpers.get_object_or_exception(Project,
+                                              Project.id == project_id,
+                                              exceptions.ProjectNotFoundException)
+    if project not in current_user.projects:
+        return app.login_manager.unauthorized()
+
+    # what is user's permission level?
+    rel = ProjectsUsers.query.filter_by(user=current_user,
+                                        project=project).one()
+
+    # handle file upload
+    if rel.role != ProjectsUsers.ROLE_ADMIN:
+        return app.login_manager.unauthorized()
+
+    doc_form = forms.DocumentUploadForm()
+    struc_form = forms.StructureUploadForm()
+
+    # should the structure tab be active because the struc form was submitted?
+    struc_active = False
+
+    # For every file, check if it exists and if not then upload it to
+    # the project directory and create a database record with its filename and
+    # path.
+
+    uploaded_files = request.files.getlist("uploaded_file")
+    upload_errors = []
+    filenames = []
+
+    for uploaded_file in uploaded_files:
+        filename = secure_filename(uploaded_file.filename)
+        dest_path = os.path.join(app.config["UPLOAD_DIR"],
+                                 str(project.id), filename)
+        ext = os.path.splitext(dest_path)[1][1:]
+        
+        # make sure file doesn't already exist
+        if not os.path.isfile(dest_path):
+            # Tell whether the uploaded file is a document file or a structure
+            # file, and create a Document or StructureFile instance accordingly.
+
+            if ext == app.config["STRUCTURE_EXTENSION"]:
+                if struc_form.validate():
+                    uploaded_file.save(dest_path)
+                    file_model = StructureFile(path=dest_path, project=project)
+                    file_model.save()
+                    struc_active = True
+                    filenames.append({"name": filename, "type": 'struc', "id": file_model.id})
+
+            else:
+                if doc_form.validate():
+                    try:
+                        # XML validation 
+                        etree.fromstring(uploaded_file.read())
+                        uploaded_file.seek(0)
+                        
+                        uploaded_file.save(dest_path)
+                        file_model = DocumentFile(path=dest_path, projects=[project])
+                        file_model.save()
+                        filenames.append({"name": filename, "type": 'doc', "id": file_model.id})
+
+                    except etree.XMLSyntaxError as err:
+                        upload_errors.append(
+                            "The file %s is not well-formed XML. Error details: %s" % (
+                                uploaded_file.filename, 
+                                json.dumps(traceback.format_exc()).replace('\\"', "'").replace('"', "")
+                            )
+                        )
+            
+        else:
+            if ext == app.config["STRUCTURE_EXTENSION"]:
+                struc_form.validate()
+                upload_errors.append(
+                    "A file with name " + os.path.split(dest_path)[1] + " already exists")
+                struc_active = True
+
+            else:
+                doc_form.validate()
+                upload_errors.append(
+                    "A file with name " + os.path.split(dest_path)[1] + " already exists")
+
+    if upload_errors:
+        if struc_active:
+            struc_form.validate()
+            struc_form.uploaded_file.errors.extend(upload_errors)
+        else:
+            doc_form.validate()
+            doc_form.uploaded_file.errors.extend(upload_errors)
+
+    return render_template(
+        'file_upload.json', doc_form=doc_form, struc_form=struc_form, project=project,
+        files=filenames)
+
+
 @uploader.route(app.config["LOG_ROUTE"] + "<int:project_id>")
 @login_required
 def project_log(project_id):
@@ -453,6 +551,7 @@ def process_files(collection_dir, structure_file, project):
         logger.info("Not processing as per config.")
         return
     project.status = Project.STATUS_PREPROCESSING
+    project.save()
     args = (collection_dir, structure_file, app.config["DOCUMENT_EXTENSION"],
             project.id)
     preprocessing_process = threading.Thread(target=cp_run, args=args)

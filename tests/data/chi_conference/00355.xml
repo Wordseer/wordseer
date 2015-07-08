@@ -9,4 +9,4 @@
 <keyword>colorpin</keyword>
 <keyword>security</keyword>
 <abstract>Automated teller machine (ATM) frauds are increasing drastically these days. When analyzing the most common attacks and the reasons for successful frauds, it becomes apparent that the main problem lies in the PIN based authentication which in itself does not provide any security features (besides the use of asterisks). That is, security is solely based on a user's behavior. Indirect input is one way to solve this problem. This mostly comes at the costs of adding overhead to the input process. We present ColorPIN, an authentication mechanism that uses indirect input to provide security enhanced PIN entry. At the same time, ColorPIN remains a one-to-one relationship between the length of the PIN and the required number of clicks. A user study showed that ColorPIN is significantly more secure than standard PIN entry while enabling good authentication speed in comparison with related systems.</abstract>
-<article>
+</article>

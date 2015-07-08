@@ -23,4 +23,4 @@
 <keyword>mobile recommendation systems</keyword>
 <keyword>user experience</keyword>
 <abstract>This paper presents a context-aware mobile recommender system, codenamed Magitti</i>. Magitti is unique in that it infers user activity from context and patterns of user behavior and, without its user having to issue a query, automatically generates recommendations for content matching. Extensive field studies of leisure time practices in an urban setting (Tokyo) motivated the idea, shaped the details of its design and provided data describing typical behavior patterns. The paper describes the fieldwork, user interface, system components and functionality, and an evaluation of the Magitti prototype.</abstract>
-<article>
+</article>

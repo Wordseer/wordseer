@@ -15,4 +15,4 @@
 <keyword>service design</keyword>
 <keyword>transit</keyword>
 <abstract>Crowd-sourcing social computing systems represent a new material for HCI designers. However, these systems are difficult to work with and to prototype, because they require a critical mass of participants to investigate social behavior. Service design is an emerging research area that focuses on how customers co-produce the services that they use, and thus it appears to be a great domain to apply this new material. To investigate this relationship, we developed Tiramisu, a transit information system where commuters share GPS traces and submit problem reports. Tiramisu processes incoming traces and generates real-time arrival time predictions for buses. We conducted a field trial with 28 participants. In this paper we report on the results and reflect on the use of field trials to evaluate crowd-sourcing prototypes and on how crowd sourcing can generate co-production between citizens and public services.</abstract>
-<article>
+</article>

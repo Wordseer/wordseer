@@ -84,9 +84,12 @@ class StructureExtractor(object):
 
         db.session.commit()
 
-        parsetime = self.string_processor.parsetime / len(document.all_sentences)
-        self.project_logger.info("CoreNLP speed: %.3fs per sentence", parsetime)
-        self.string_processor.parsetime = 0
+        try:
+            parsetime = self.string_processor.parsetime / len(document.all_sentences)
+            self.project_logger.info("CoreNLP speed: %.3fs per sentence", parsetime)
+            self.string_processor.parsetime = 0
+        except ZeroDivisionError as err:
+            self.project_logger.warning("No sentences recorded for document %s", document_file.path)
 
         return document_file
 
@@ -129,7 +132,7 @@ class StructureExtractor(object):
                         # with the next sibling element of this type.
                         # NOTE: this isn't checking for siblings in the etree, 
                         # it's going to the next highest property node in the Structure File
-                        combined_sentence += str(node) + "\n"
+                        combined_sentence += unicode(node) + "\n"
                         combined_nodes.append(node)
                     else:
                         current_unit.sentences = self.get_sentences_from_node(structure,
@@ -335,16 +338,10 @@ def get_xpath_text(xpath_pattern, node):
 
     return values
 
-def get_xml_text(node, encoding="utf-8", method="text"):
+def get_xml_text(node, method="text"):
     """Get the text from a etree node.
-
-    Skips the node if there is a decode error.
     """
-
-    try:
-        return unicode(etree.tostring(node, encoding=encoding, method=method)).strip()
-    except UnicodeDecodeError:
-        return None
+    return etree.tounicode(node, method=method).strip()
 
 def get_nodes_from_xpath(xpath, nodes):
     """If the selector is longer than 0 chars, then return the children

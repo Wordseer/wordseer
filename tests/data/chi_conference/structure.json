@@ -1,104 +1,122 @@
 {
-    "structureName": "document",
-    "xpaths": [
-        "article"
-    ],
-    "titleXpaths": [
-        "./title/text()"
-    ],
-    "units": [
-        {
-            "belongsTo": "document",
-            "structureName": "sentence",
-            "xpaths": [
-                "./abstract/text()"
-            ]
-        }
-    ],
-    "metadata": [
-        {
-            "belongsTo": "document",
-            "propertyName": "Author",
-            "xpaths": [
-                "./author/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "string",
-            "displayName": "Author",
-            "isCategory": true
-        },
-        {
-            "belongsTo": "document",
-            "propertyName": "Title",
-            "xpaths": [
-                "./title/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "string",
-            "displayName": "Title",
-            "isCategory": true
-        },
-        {
-            "belongsTo": "document",
-            "propertyName": "Year",
-            "xpaths": [
-                "./year/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "date_%Y",
-            "displayName": "Year",
-            "isCategory": true
-        },
-        {
-            "belongsTo": "document",
-            "propertyName": "Keyword",
-            "xpaths": [
-                "./keyword/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "string",
-            "displayName": "Keyword",
-            "isCategory": true
-        },
-        {
-            "belongsTo": "document",
-            "propertyName": "GeneralTerm",
-            "xpaths": [
-                "./general_term/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "string",
-            "displayName": "GeneralTerm",
-            "isCategory": true
-        },
-        {
-            "belongsTo": "document",
-            "propertyName": "Category",
-            "xpaths": [
-                "./category/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "string",
-            "displayName": "Category",
-            "isCategory": true
-        },
-        {
-            "belongsTo": "document",
-            "propertyName": "Conference",
-            "xpaths": [
-                "./conference/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "string",
-            "displayName": "Conference",
-            "isCategory": true
-        }
-    ]
+  "titleXpaths": [],
+  "name": "article",
+  "dataType": "string",
+  "xpathsFull": [
+    "/article"
+  ],
+  "structureName": "article",
+  "titleXpathsFull": [],
+  "tag": "article",
+  "units": [
+    {
+      "titleXpaths": [],
+      "name": "sentence",
+      "dataType": "string",
+      "xpathsFull": [
+        "/article/abstract/text()"
+      ],
+      "structureName": "abstract",
+      "titleXpathsFull": [],
+      "tag": "abstract",
+      "combine": false,
+      "xpaths": [
+        "./abstract/text()"
+      ],
+      "type": "subunit",
+      "id": "tagger-id-articleabstract"
+    }
+  ],
+  "xpaths": [
+    "/article"
+  ],
+  "filename": "00014.xml",
+  "type": "document",
+  "id": "tagger-id-article",
+  "metadata": [
+    {
+      "isCategory": true,
+      "displayName": "year",
+      "name": "year",
+      "dateFormat": "%Y",
+      "dataType": "date",
+      "xpathsFull": [
+        "/article/year"
+      ],
+      "propertyName": "year",
+      "valueIsDisplayed": true,
+      "nameIsDisplayed": true,
+      "tag": "year",
+      "xpaths": [
+        "./year"
+      ],
+      "type": "metadata",
+      "id": "tagger-id-articleyear",
+      "isActive": true,
+      "attr": ""
+    },
+    {
+      "isCategory": true,
+      "displayName": "title",
+      "name": "title",
+      "dateFormat": "",
+      "dataType": "string",
+      "xpathsFull": [
+        "/article/title"
+      ],
+      "propertyName": "title",
+      "valueIsDisplayed": true,
+      "nameIsDisplayed": true,
+      "tag": "title",
+      "xpaths": [
+        "./title"
+      ],
+      "type": "metadata",
+      "id": "tagger-id-articletitle",
+      "isActive": true,
+      "attr": ""
+    },
+    {
+      "isCategory": true,
+      "displayName": "author",
+      "name": "author",
+      "dateFormat": "",
+      "dataType": "string",
+      "xpathsFull": [
+        "/article/author"
+      ],
+      "propertyName": "author",
+      "valueIsDisplayed": true,
+      "nameIsDisplayed": true,
+      "tag": "author",
+      "xpaths": [
+        "./author"
+      ],
+      "type": "metadata",
+      "id": "tagger-id-articleauthor",
+      "isActive": true,
+      "attr": ""
+    },
+    {
+      "isCategory": true,
+      "displayName": "keyword",
+      "name": "keyword",
+      "dateFormat": "",
+      "dataType": "string",
+      "xpathsFull": [
+        "/article/keyword"
+      ],
+      "propertyName": "keyword",
+      "valueIsDisplayed": true,
+      "nameIsDisplayed": true,
+      "tag": "keyword",
+      "xpaths": [
+        "./keyword"
+      ],
+      "type": "metadata",
+      "id": "tagger-id-articlekeyword",
+      "isActive": true,
+      "attr": ""
+    }
+  ]
 }
