@@ -9,4 +9,4 @@
 <keyword>learnability</keyword>
 <keyword>understanding</keyword>
 <abstract>In this paper we present Ambient Help, a system that supports opportunistic learning by providing automatic, context-sensitive learning resources while a user works. Multiple videos and textual help resources are presented ambiently on a secondary display. We define and examine a collection of design consideration for this type of interface. After describing our implementation details, we report on an experiment which shows that Ambient Help supports finding more helpful information, while not having a negative impact on the user's productivity, as compared to a traditional help condition.</abstract>
-<article>
+</article>
