@@ -481,7 +481,25 @@
                             fCount += 1;
                             $("#" + file.type + " .progress .progress-bar-success")
                                 .css("width", (fCount / fTotal * 100) + "%");
-                            $("#" + file.type + " .progress .success-complete").html(fCount / fTotal * 100)
+                            $("#" + file.type + " .progress .success-complete").html(fCount / fTotal * 100);
+
+                            // can we enable any of the disabled buttons?
+                            var reloadMessage = "Reload the page to enable this function.";
+                            if ($("#doc .list-group li").length > 0) {
+                                // enable structure mapper
+                                $("span").has("#structure-button").attr("data-original-title", reloadMessage);
+
+                                if ($("#struc .list-group li").length > 0) {
+                                    // enable preprocessor
+                                    $("span").has("#process-button").attr("data-original-title", reloadMessage);
+                                }
+                            }
+
+                            // if (file.type == "struc") {
+                            //     $("#process-button").removeClass('disabled');
+                            //     // .tooltip('destroy');
+                            // }
+                            
                         });
 
                         // errors
