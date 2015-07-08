@@ -114,25 +114,32 @@
                             icon="glyphicon-cloud-upload"),
                         help=("Allowed extensions: " + allowed_extensions_doc|join(", ") +
                             ".")) }}
+                    <div class="progress hidden">
+                      <div class="progress-bar progress-bar-success progress-bar-striped" style="width: 0">
+                        <span class="sr-only"><span class="success-complete">0</span>% Complete (success)</span>
+                      </div>
+                      <div class="progress-bar progress-bar-danger progress-bar-striped" style="width: 0">
+                        <span class="sr-only"><span class="error-complete">0</span>% Complete (danger)</span>
+                      </div>
+                    </div>
+                    <div class="alert alert-danger hidden"><ul></ul></div>
                 </form>
             </div>
             {% endif %}
             
-            {% if project.document_files %}
-                <ul class="list-group">
-                    {% for document in project.document_files %}
-                    <li class="list-group-item" id="doc-{{ document.id }}">
-                        <a href="{{ url_for("uploader.get_file", filetype="doc", file_id=document.id) }}">{{ document.path.split('/')[-1] }}</a>
-                        <span data-toggle="tooltip" data-placement="top" class="has-tooltip pull-right" title="{{ delete_button_tooltip }}">
-                            <a class="delete btn btn-danger btn-xs {{mapper_button_class}}" data-prefix="doc" data-fileid="{{ document.id }}">
-                                <i class="glyphicon glyphicon-remove"></i>
-                            </a>
-                        </span>
-                    </li>
-                    
-                    {% endfor %}    
-                </ul>
-            {% else %}
+            <ul class="list-group">
+                {% for document in project.document_files %}
+                <li class="list-group-item" id="doc-{{ document.id }}">
+                    <a href="{{ url_for("uploader.get_file", filetype="doc", file_id=document.id) }}">{{ document.path.split('/')[-1] }}</a>
+                    <span data-toggle="tooltip" data-placement="top" class="has-tooltip pull-right" title="{{ delete_button_tooltip }}">
+                        <a class="delete btn btn-danger btn-xs {{mapper_button_class}}" data-prefix="doc" data-fileid="{{ document.id }}">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </span>
+                </li>                    
+                {% endfor %}    
+            </ul>
+            {% if not project.document_files %}
             <div class="panel-footer">
                 <p>There are no Documents in this project.</p>
                 <p>Use the form above to upload the documents you want to analyze.</p>
@@ -154,26 +161,33 @@
                             icon="glyphicon-cloud-upload"),
                         help=("Allowed extensions: " + allowed_extensions_struc|join(", ") +
                             ".")) }}
+                    <div class="progress hidden">
+                      <div class="progress-bar progress-bar-success progress-bar-striped" style="width: 0">
+                        <span class="sr-only"><span class="success-complete">0</span>% Complete (success)</span>
+                      </div>
+                      <div class="progress-bar progress-bar-danger progress-bar-striped" style="width: 0">
+                        <span class="sr-only"><span class="error-complete">0</span>% Complete (danger)</span>
+                      </div>
+                    </div>
+                    <div class="alert alert-danger hidden"><ul></ul></div>        
                 </form>
             </div>
             {% endif %}
 
-            {% if project.structure_files %}
-                <ul class="list-group">
-                    {% for file in project.structure_files %}
-                    <li class="list-group-item" id="struc-{{ file.id }}">
-                        <a href="{{ url_for("uploader.get_file", filetype="struc", file_id=file.id) }}">{{ file.path.split('/')[-1] }}</a>
-                        
-                        <span data-toggle="tooltip" data-placement="top" class="has-tooltip pull-right" title="{{ delete_button_tooltip }}">
-                            <a class="delete btn btn-danger btn-xs {{delete_button_class}}" data-prefix="struc" data-fileid="{{ file.id }}">
-                                <i class="glyphicon glyphicon-remove"></i>
-                            </a>
-                        </span>
-                    </li>
+            <ul class="list-group">
+                {% for file in project.structure_files %}
+                <li class="list-group-item" id="struc-{{ file.id }}">
+                    <a href="{{ url_for("uploader.get_file", filetype="struc", file_id=file.id) }}">{{ file.path.split('/')[-1] }}</a>
                     
-                    {% endfor %}    
-                </ul>
-            {% else %}
+                    <span data-toggle="tooltip" data-placement="top" class="has-tooltip pull-right" title="{{ delete_button_tooltip }}">
+                        <a class="delete btn btn-danger btn-xs {{delete_button_class}}" data-prefix="struc" data-fileid="{{ file.id }}">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </span>
+                </li>
+                {% endfor %}    
+            </ul>
+            {% if not project.structure_files %}
             <div class="panel-footer">
                 <p>There are no Structure Maps in this project.</p>
                 <p>Click the "Map Structure" button to create a structure map that tells Wordseer what content and metadata to extract from your XML documents.</p>
@@ -365,6 +379,7 @@
 
         });
 
+        // delete a file
         $("a.btn.delete").click(function(e){
             e.preventDefault();
 
@@ -415,6 +430,85 @@
                 });
         });
     
+        // file upload
+        var uploadForm = $('form.upload');
+
+        uploadForm.on('submit', function(e){
+            e.preventDefault();
+            var csrf_token = $(e.currentTarget).find("#csrf_token").val();
+            var finput = $(e.currentTarget).find('#uploaded_file').get(0);
+
+            // Get the selected files from the input.
+            var files = finput.files;
+
+            // progress calculation
+            var fTotal = files.length,
+                fCount = 0,
+                errCount = 0;
+            // reset progress bar
+            $(e.currentTarget).find(".progress .progress-bar")
+                .css("width", "0px");
+            $(e.currentTarget).find(".progress .progress-bar .sr-only span").html('0');
+
+            // Loop through each of the selected files.
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var formData = new FormData();
+                formData.append("csrf_token", csrf_token);
+                // Add the file to the request.
+                formData.append('uploaded_file', file, file.name);
+                $.ajax({
+                    type: "POST",
+                    url: "{{ url_for("uploader.file_upload", project_id=project.id) }}", 
+                    data: formData, 
+                    success: function(resp){
+                        // via ajax, update successes and errors
+                        var data = $.parseJSON(resp);
+
+                        // successes
+                        $.each(data.files, function(index, file){
+                            // add successfully uploaded file to list
+                            $("#" + file.type + " .list-group").append(
+                                '<li class="list-group-item list-group-item-success">'+file.filename+'</li>'
+                            );
+                            $("#" + file.type + " .panel-footer").remove();
+                            $("#" + file.type + " .progress").removeClass('hidden');
+                            fCount += 1;
+                            $("#" + file.type + " .progress .progress-bar-success")
+                                .css("width", (fCount / fTotal * 100) + "%");
+                            $("#" + file.type + " .progress .success-complete").html(fCount / fTotal * 100)
+                        });
+
+                        // errors
+                        $.each(data.doc_errors, function(index, err){
+                            // show errors
+                            $("#doc form .alert").removeClass("hidden").find('ul').append('<li>'+err+'</li>');
+                            $("#doc .progress").removeClass('hidden');
+                            errCount += 1;
+                            $("#doc .progress .progress-bar-danger")
+                                .css("width", (errCount / fTotal * 100) + "%");
+                            $("#doc .progress .error-complete").html(errCount / fTotal * 100)
+                        });
+
+                        $.each(data.struc_errors, function(index, err){
+                            // show errors
+                            $("#struc form .alert").removeClass("hidden").find('ul').append('<li>'+err+'</li>');
+                            $("#struc .progress").removeClass('hidden');
+                            errCount += 1;
+                            $("#struc .progress .progress-bar-danger")
+                                .css("width", (errCount / fTotal * 100) + "%");
+                            $("#struc .progress .error-complete").html(errCount / fTotal * 100)
+                        });
+                    },
+                    processData: false,
+                    contentType: false,
+                });
+            }
+            
+            // reset the form
+            e.currentTarget.reset();
+        });
+
         {% if project.status == 1 %}
         // poll for log updates
         logPoll();   

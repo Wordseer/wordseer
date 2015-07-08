@@ -70,9 +70,7 @@
             {{ help }}
         </p>
     {% endif %}
-    {% if show_errors %}
-        {{ render_errors(field.errors) }}
-    {% endif %}
+    
 {%- endmacro %}
 
 {% macro render_errors(errors) %}
