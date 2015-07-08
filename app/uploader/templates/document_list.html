@@ -468,9 +468,14 @@
                         // successes
                         $.each(data.files, function(index, file){
                             // add successfully uploaded file to list
-                            $("#" + file.type + " .list-group").append(
-                                '<li class="list-group-item list-group-item-success">'+file.filename+'</li>'
-                            );
+                            $('<li class="list-group-item list-group-item-success">'+file.filename+'</li>')
+                                .appendTo("#" + file.type + " .list-group")
+                                .tooltip({
+                                    placement: 'top',
+                                    title: "To view or delete this file you must reload the page."
+                                })
+                                ;
+
                             $("#" + file.type + " .panel-footer").remove();
                             $("#" + file.type + " .progress").removeClass('hidden');
                             fCount += 1;
