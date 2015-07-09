@@ -20,11 +20,10 @@ Ext.define('WordSeer.view.windowing.viewport.Viewport', {
 	},
 	layout: 'fit',
 	tbar: [
-	 	{xtype: 'widgets-menu'},
-   		     '-',
-        {xtype:'universal-search-form'},
-        // '-',
-        // {xtype:'user-button'},
+	 	' ',
+	 	'Search:',
+	 	' ',
+	 	{xtype:'universal-search-form'}
 	],
 	initComponent: function() {
 		this.addEvents('setchanged');

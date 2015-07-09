@@ -47,6 +47,12 @@ Ext.define('WordSeer.view.windowing.viewport.LandingPage',  {
                     cls: 'main-header',
                     children: [
                         {
+                            tag: 'a',
+                            href: '/projects',
+                            cls: 'all-projects',
+                            html: "&laquo; All projects"
+                        },
+                        {
                             tag: 'h1',
                             cls: 'main-header',
                             html: $('title').text(),

@@ -800,6 +800,10 @@ div.x-toolbar-default{
 	font-family: 'Open Sans', sans-serif;
 	margin-top: 3px;
 
+	.x-toolbar-text{
+		font-family: 'Open Sans', sans-serif;
+	}
+
 	.x-btn-inner {
 		font-family: 'Open Sans', sans-serif;
 	}
@@ -885,6 +889,12 @@ div.landing-page {
 		h1 {
 			margin: 0 8px;
 			font-size: $huge-font-size;
+		}
+
+		a.all-projects {
+			display: block;
+			margin: 0 8px;
+			color: $yellow;
 		}
 	}
 }
