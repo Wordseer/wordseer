@@ -91,7 +91,7 @@ Ext.define('WordSeer.controller.SearchController', {
 				click: this.searchButton,
 			},
 			'grammaticalrelationscombobox': {
-				select: this.updateFormSubmittable,
+				select: this.updateFormState,
 			},
 			'autosuggest-textfield': {
 				specialkey: this.SearchBoxKeypress,
@@ -427,16 +427,38 @@ Ext.define('WordSeer.controller.SearchController', {
 	},
 
 	// Grammatical search form controls.
-	updateFormSubmittable: function(combobox, newValue, oldValue, options){
-		if(newValue == ""){
+	updateFormState: function(combobox, newValue, oldValue, options){
+		
+		// toggle some search input options
+		if(newValue[0].raw.id == ""){ // "any match" i.e. plain keyword search
+			// clear and hide Dependency input
 			combobox
 			.up('form')
-			.down('textfield[name="dep"]').hide();
+			.down('textfield[name="dep"]').hide().setValue('');
+
+			// remove "Grammatical Relations" widget option
+			var gramRelRecord = combobox.up('form')
+			.down('switch-widget-combobox')
+				.store.findRecord('widget_xtype', 'search-widget');
+			if (gramRelRecord) {
+				combobox.up('form')
+				.down('switch-widget-combobox')
+					.store.remove(gramRelRecord);
+			}
+
 		} else {
+			// show Dependency input
 			combobox
 			.up('form')
 			.down('textfield[name="dep"]').show();
+
+			// add Grammatical Relations widget option
+			combobox.up('form')
+			.down('switch-widget-combobox')
+				.store
+				.add({widget_xtype: 'search-widget', name: 'Grammatical relations'});
 		}
+
 		this.checkIfSubmittable(combobox.up('form'));
 	},
 

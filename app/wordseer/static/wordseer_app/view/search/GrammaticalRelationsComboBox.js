@@ -8,7 +8,7 @@ Ext.define('WordSeer.view.search.GrammaticalRelationsComboBox', {
 	extend: 'Ext.form.field.ComboBox',
 	alias: 'widget.grammaticalrelationscombobox',
 	requires: [
-	'WordSeer.store.GrammaticalRelationsStore'
+    	'WordSeer.store.GrammaticalRelationsStore'
 	],
 	forceSelection:true,
     autoSelect:true,

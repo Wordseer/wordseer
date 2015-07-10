@@ -29,10 +29,6 @@ Ext.define('WordSeer.view.windowing.viewport.SwitchWidgetComboBox', {
                     name: 'Metadata Profile',
                 },
     			{
-    				widget_xtype: 'search-widget',
-    				name: 'Grammatical relations',
-    			},
-                {
                     widget_xtype: 'sentence-list-widget',
                     name: 'Sentence List',
                 },
@@ -43,18 +39,9 @@ Ext.define('WordSeer.view.windowing.viewport.SwitchWidgetComboBox', {
 				{
     				widget_xtype: 'document-browser-widget',
     				name: 'Document Table',
-    			},
-				{
-                    widget_xtype: 'document-viewer-widget',
-                    name: 'Reader'
-                },
-    			// {
-    			// 	widget_xtype: 'column-vis-widget',
-    			// 	name: 'Column Visualization',
-    			// }
+    			}
     		]
     	});
     	this.callParent(arguments);
     }
-
 });
