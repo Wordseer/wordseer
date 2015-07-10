@@ -63,10 +63,11 @@ Ext.define('WordSeer.view.search.GrammaticalSearchForm',{
             value: 'new',
             valueField: 'target',
             displayField: 'text',
+            editable: false,
             store: {
                 fields: ['target', 'text'],
-                data: [{target: 'new', text: 'in new tab'},
-                {target:'same', text: 'in current tab'}
+                data: [
+                    {target: 'new', text: 'in new tab'}
                 ]
             }
         },

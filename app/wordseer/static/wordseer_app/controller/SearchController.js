@@ -93,6 +93,9 @@ Ext.define('WordSeer.controller.SearchController', {
 			'grammaticalrelationscombobox': {
 				select: this.updateFormState,
 			},
+			'switch-widget-combobox': {
+				select: this.updateFormState,
+			},
 			'autosuggest-textfield': {
 				specialkey: this.SearchBoxKeypress,
 				change: this.SearchBoxChange,
@@ -426,38 +429,49 @@ Ext.define('WordSeer.controller.SearchController', {
 		})
 	},
 
-	// Grammatical search form controls.
+	// Search form controls.
 	updateFormState: function(combobox, newValue, oldValue, options){
 		
-		// toggle some search input options
-		if(newValue[0].raw.id == ""){ // "any match" i.e. plain keyword search
-			// clear and hide Dependency input
-			combobox
-			.up('form')
-			.down('textfield[name="dep"]').hide().setValue('');
+		if (combobox.xtype == "grammaticalrelationscombobox") {
+			// toggle some search input options
+			if(newValue[0].raw.id == ""){ // "any match" i.e. plain keyword search
+				// clear and hide Dependency input
+				combobox
+				.up('form')
+				.down('textfield[name="dep"]').hide().setValue('');
 
-			// remove "Grammatical Relations" widget option
-			var gramRelRecord = combobox.up('form')
-			.down('switch-widget-combobox')
-				.store.findRecord('widget_xtype', 'search-widget');
-			if (gramRelRecord) {
+				// remove "Grammatical Relations" widget option
+				var gramRelRecord = combobox.up('form')
+				.down('switch-widget-combobox')
+					.store.findRecord('widget_xtype', 'search-widget');
+				if (gramRelRecord) {
+					combobox.up('form')
+					.down('switch-widget-combobox')
+						.store.remove(gramRelRecord);
+				}
+
+			} else {
+				// show Dependency input
+				combobox
+				.up('form')
+				.down('textfield[name="dep"]').show();
+
+				// add Grammatical Relations widget option
 				combobox.up('form')
 				.down('switch-widget-combobox')
-					.store.remove(gramRelRecord);
+					.store
+					.add({widget_xtype: 'search-widget', name: 'Grammatical relations'});
 			}
-
-		} else {
-			// show Dependency input
-			combobox
-			.up('form')
-			.down('textfield[name="dep"]').show();
-
-			// add Grammatical Relations widget option
-			combobox.up('form')
-			.down('switch-widget-combobox')
-				.store
-				.add({widget_xtype: 'search-widget', name: 'Grammatical relations'});
-		}
+		} else if (combobox.xtype == "switch-widget-combobox") {
+			// only enable Current Tab search for Metadata Profile widget
+			var targetStore = combobox.up('form').down('combobox[name=target]').store
+			if (newValue[0].raw.widget_xtype == "word-frequencies-widget") {
+				targetStore.add({target: 'same', text: 'in current tab'})
+			} else {
+				targetStore.removeAt(targetStore.find('target', 'same'));
+				combobox.up('form').down('combobox[name=target]').select('new')
+			}
+		}		
 
 		this.checkIfSubmittable(combobox.up('form'));
 	},
