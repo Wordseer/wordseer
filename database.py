@@ -10,6 +10,7 @@ from sys import argv
 from app import app
 from app import db
 from app import models
+from app import association_tables
 from migrate.versioning import api
 import imp
 
@@ -108,16 +109,22 @@ def index():
     # create indices
     indices = [
         # single column indices
-        Index('ix_wordinsentence_wordid', models.WordInSentence.word_id),
-        Index('ix_wordinsentence_pos', models.WordInSentence.position),
         Index('ix_count_sentcount', models.Count.sentence_count),
         Index('ix_count_doccount', models.Count.document_count),
         Index('ix_count_projid', models.Count.project_id),
+        Index('ix_dependency_grammrelid', models.Dependency.grammatical_relationship_id),
+        Index('ix_depinsent_depid', models.DependencyInSentence.dependency_id),
+        Index('ix_depinsent_docid', models.DependencyInSentence.document_id),
+        Index('ix_depinsent_projid', models.DependencyInSentence.project_id),
         Index('ix_document_docfileid', models.Document.document_file_id),
         Index('ix_document_title', models.Document.title),
+        Index('ix_freqseq_projid', models.FrequentSequence.project_id),
+        Index('ix_freqword_projid', models.FrequentWord.project_id),
         Index('ix_grammrel_name', models.GrammaticalRelationship.name),
-        Index('ix_grammrel_proj', models.GrammaticalRelationship.project_id),
+        Index('ix_grammrel_projid', models.GrammaticalRelationship.project_id),
         Index('ix_log_item', models.Log.log_item),
+        Index('ix_projectsusers_projid', models.ProjectsUsers.project_id),
+        Index('ix_projectsusers_userid', models.ProjectsUsers.user_id),
         Index('ix_propmeta_pname', models.PropertyMetadata.property_name),
         Index('ix_propmeta_iscat', models.PropertyMetadata.is_category),
         Index('ix_propmeta_unittype', models.PropertyMetadata.unit_type),
@@ -130,6 +137,7 @@ def index():
         Index('ix_propofsentence_sentid', models.PropertyOfSentence.sentence_id),
         Index('ix_sentence_text', models.Sentence.text),
         Index('ix_sentence_projid', models.Sentence.project_id),
+        Index('ix_sentence_docid', models.Sentence.document_id),
         Index('ix_sentenceinquery_sentid', models.SentenceInQuery.sentence_id),
         Index('ix_sentenceinquery_queryid', models.SentenceInQuery.query_id),
         Index('ix_sequence_sequence', models.Sequence.sequence),
@@ -142,19 +150,33 @@ def index():
         Index('ix_seqinsentence_seqid', models.SequenceInSentence.sequence_id),
         Index('ix_seqinsentence_sentid', models.SequenceInSentence.sentence_id),
         Index('ix_seqinsentence_projid', models.SequenceInSentence.project_id),
+        Index('ix_seqinsentence_docid', models.SequenceInSentence.document_id),
         Index('ix_seqinsentence_pos', models.SequenceInSentence.position),
         Index('ix_set_userid', models.Set.user_id),
         Index('ix_set_projid', models.Set.project_id),
         Index('ix_set_type', models.Set.type),
+        Index('ix_strucfile_projid', models.StructureFile.project_id),
         Index('ix_unit_number', models.Unit.number),
+        Index('ix_unit_projid', models.Unit.project_id),
+        Index('ix_unit_parentid', models.Unit.parent_id),
         Index('ix_word_lemma', models.Word.lemma),
         Index('ix_word_pos', models.Word.part_of_speech),
         Index('ix_word_surface', models.Word.surface),
+        Index('ix_wordinsentence_wordid', models.WordInSentence.word_id),
+        Index('ix_wordinsentence_projid', models.WordInSentence.project_id),
+        Index('ix_wordinsentence_pos', models.WordInSentence.position),
+        Index('ix_wordinsequence_projid', models.WordInSequence.project_id),
+        Index('ix_wordinsequence_seqid', models.WordInSequence.sequence_id),
+        
         # TODO: it can't find this column in the table for some reason
         # Index('ix_wordcount_wordid', models.WordCount.word_id),
 
         # compound indices
         Index('ix_count_projid_id', models.Count.project_id, models.Count.id),
+        Index('ix_docsindocsets_docid_docsetid', association_tables.documents_in_documentsets.c.document_id, association_tables.documents_in_documentsets.c.documentset_id),
+        Index('ix_docfileinproj_docfileid_projid', association_tables.document_files_in_projects.c.document_file_id, association_tables.document_files_in_projects.c.project_id),
+        Index('ix_docfileinproj_projid_docfileid', association_tables.document_files_in_projects.c.project_id, association_tables.document_files_in_projects.c.document_file_id),
+        Index('ix_projectsusers_projid_userid', models.ProjectsUsers.project_id, models.ProjectsUsers.user_id),
         Index('ix_property_name_value', models.Property.name, models.Property.value),
         Index('ix_property_id_name_value', models.Property.id, models.Property.name, models.Property.value),
         Index("ix_property_projid_name_value", models.Property.project_id, models.Property.name, models.Property.value),
@@ -173,6 +195,7 @@ def index():
         Index("ix_sequence_sequence_projid", models.Sequence.sequence, models.Sequence.project_id),
         Index('ix_sequencecount_projid_id', models.SequenceCount.sequence_id, models.SequenceCount.id),
         Index('ix_seqinsentence_seqid_sentid', models.SequenceInSentence.sequence_id, models.SequenceInSentence.sentence_id),
+        Index('ix_seqinseqset_seqid_seqsetid', association_tables.sequences_in_sequencesets.c.sequence_id, association_tables.sequences_in_sequencesets.c.sequenceset_id),
         Index('ix_set_projid_parentid_type', models.Set.project_id, models.Set.parent_id, models.Set.type),
         Index('ix_set_projid_type', models.Set.project_id, models.Set.type),
         Index("ix_word_pos_id", models.Word.part_of_speech, models.Word.id),
