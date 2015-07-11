@@ -26,11 +26,7 @@ from .. import exceptions
 from .. import forms
 from .. import helpers
 from .. import uploader
-from ...models import DocumentFile
-from ...models import Project
-from ...models import StructureFile
-from ...models import User
-from ...models import ProjectsUsers
+from app.models import *
 from app import app
 from app import db
 from app.models import User
@@ -69,7 +65,7 @@ def home():
 def project_list():
     """A view for the list of a user's projects."""
     projects = []
-    for project in current_user.projects:
+    for project in [project for project in current_user.projects if not project.deleted]:
         rel = ProjectsUsers.query.filter_by(user=current_user,
                                             project=project).one()
         projects.append({
@@ -89,7 +85,7 @@ def project_show(project_id):
     project = helpers.get_object_or_exception(Project,
                                               Project.id == project_id,
                                               exceptions.ProjectNotFoundException)
-    if project not in current_user.projects:
+    if project not in [project for project in current_user.projects if not project.deleted]:
         return app.login_manager.unauthorized()
 
     # what is user's permission level?
@@ -102,71 +98,6 @@ def project_show(project_id):
 
     # should the structure tab be active because the struc form was submitted?
     struc_active = False
-
-    if request.method == "POST":
-        # handle file upload
-        
-        if rel.role != ProjectsUsers.ROLE_ADMIN:
-            return app.login_manager.unauthorized()
-
-        # For every file, check if it exists and if not then upload it to
-        # the project directory and create a database record with its filename and
-        # path.
-
-        uploaded_files = request.files.getlist("uploaded_file")
-        upload_errors = []
-
-        for uploaded_file in uploaded_files:
-            filename = secure_filename(uploaded_file.filename)
-            dest_path = os.path.join(app.config["UPLOAD_DIR"],
-                                     str(project.id), filename)
-            ext = os.path.splitext(dest_path)[1][1:]
-            
-            # make sure file doesn't already exist
-            if not os.path.isfile(dest_path):
-                # Tell whether the uploaded file is a document file or a structure
-                # file, and create a Document or StructureFile instance accordingly.
-
-                if ext == app.config["STRUCTURE_EXTENSION"]:
-                    if struc_form.validate():
-                        uploaded_file.save(dest_path)
-                        file_model = StructureFile(path=dest_path, project=project)
-                        file_model.save()
-                        struc_active = True
-
-                else:
-                    if doc_form.validate():
-                        try:
-                            # XML validation 
-                            etree.fromstring(uploaded_file.read())
-                            uploaded_file.seek(0)
-                            
-                            uploaded_file.save(dest_path)
-                            file_model = DocumentFile(path=dest_path, projects=[project])
-                            file_model.save()
-                        except etree.XMLSyntaxError as err:
-                            upload_errors.append(
-                                "The file %s is not well-formed XML. Error details: %s" % (
-                                    uploaded_file.filename, 
-                                    json.dumps(traceback.format_exc()).replace('"', '')
-                                )
-                            )
-                
-            else:
-                if ext == app.config["STRUCTURE_EXTENSION"]:
-                    struc_form.validate()
-                    upload_errors.append(
-                        "A file with name " + os.path.split(dest_path)[1] + " already exists")
-                    struc_active = True
-
-                else:
-                    doc_form.validate()
-                    upload_errors.append(
-                        "A file with name " + os.path.split(dest_path)[1] + " already exists")
-
-        if upload_errors:
-            doc_form.validate()
-            doc_form.uploaded_file.errors.extend(upload_errors)
 
     # retrieve log info
     project_errors = project.get_errors()
@@ -194,7 +125,7 @@ def file_upload(project_id):
     project = helpers.get_object_or_exception(Project,
                                               Project.id == project_id,
                                               exceptions.ProjectNotFoundException)
-    if project not in current_user.projects:
+    if project not in [project for project in current_user.projects if not project.deleted]:
         return app.login_manager.unauthorized()
 
     # what is user's permission level?
@@ -291,7 +222,7 @@ def project_log(project_id):
     project = helpers.get_object_or_exception(Project,
                                               Project.id == project_id,
                                               exceptions.ProjectNotFoundException)
-    if project not in current_user.projects:
+    if project not in [project for project in current_user.projects if not project.deleted]:
         return app.login_manager.unauthorized()
 
     start = request.args.get('start', 0)
@@ -320,7 +251,7 @@ def project_process(project_id):
     project = helpers.get_object_or_exception(Project,
                                               Project.id == project_id,
                                               exceptions.ProjectNotFoundException)
-    if project not in current_user.projects:
+    if project not in [project for project in current_user.projects if not project.deleted]:
         return app.login_manager.unauthorized()
 
     # does user have admin permissions?
@@ -397,7 +328,7 @@ def project_permissions(project_id):
     project = helpers.get_object_or_exception(Project,
                                               Project.id == project_id,
                                               exceptions.ProjectNotFoundException)
-    if project not in current_user.projects:
+    if project not in [project for project in current_user.projects if not project.deleted]:
         return app.login_manager.unauthorized()
 
     form = forms.ProjectPermissionsForm(prefix="permissions")
@@ -454,7 +385,7 @@ def delete_obj():
     project = helpers.get_object_or_exception(Project,
                                               Project.id == project_id,
                                               exceptions.ProjectNotFoundException)
-    if project not in current_user.projects:
+    if project not in [project for project in current_user.projects if not project.deleted]:
         return app.login_manager.unauthorized()
 
     # does user have admin permissions?
@@ -466,17 +397,24 @@ def delete_obj():
     # figure out what they want to delete, and delete it
     if obj_type == "project":
         obj = Project.query.get(obj_id)
+        
+        # just flag for deletion instead of actually deleting
+        obj.deleted = True
+        obj.save()
+        # TODO: implement garbage collection
+        return render_template("delete_obj.json", obj_type=obj_type, obj_id=obj_id)
+
     elif obj_type == "doc":
         obj = DocumentFile.query.get(obj_id)
     elif obj_type == "struc":
         obj = StructureFile.query.get(obj_id)
 
+    obj.delete()
+
     if os.path.isdir(obj.path):
         shutil.rmtree(obj.path)
     else:
         os.remove(obj.path)
-
-    obj.delete()
 
     return render_template("delete_obj.json", obj_type=obj_type, obj_id=obj_id)
 

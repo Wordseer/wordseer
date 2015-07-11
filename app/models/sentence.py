@@ -39,10 +39,10 @@ class Sentence(db.Model, Base):
 
     # Attributes
 
-    unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
-    document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
+    unit_id = db.Column(db.Integer, db.ForeignKey("unit.id", ondelete='CASCADE'))
+    document_id = db.Column(db.Integer, db.ForeignKey("document.id", ondelete='CASCADE'))
     text = db.Column(db.Text)
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
 
     # Relationships
 

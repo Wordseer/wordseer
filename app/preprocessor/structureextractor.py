@@ -388,7 +388,8 @@ def _assign_sentence_metadata(unit, all_parent_properties):
         for prop in properties:
             property_of_sentence = PropertyOfSentence(
                 property=prop,
-                sentence=sentence)
+                sentence=sentence,
+                project=unit.project)
             property_of_sentence.save()
             
     for child in unit.children:

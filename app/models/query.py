@@ -11,7 +11,7 @@ class Query(db.Model, Base):
     """
 
     # Attributes
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
     
     # Relationship
     project = db.relationship("Project")

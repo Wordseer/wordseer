@@ -34,7 +34,7 @@ class Dependency(db.Model, Base):
     # Attributes
 
     grammatical_relationship_id = db.Column(
-        db.Integer, db.ForeignKey("grammatical_relationship.id"))
+        db.Integer, db.ForeignKey("grammatical_relationship.id", ondelete='CASCADE'))
     governor_id = db.Column(db.Integer, db.ForeignKey("word.id"))
     dependent_id = db.Column(db.Integer, db.ForeignKey("word.id"))
 

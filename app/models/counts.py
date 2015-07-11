@@ -15,7 +15,7 @@ class Count(db.Model, Base):
     type = db.Column(db.String(64))
     sentence_count = db.Column(db.Integer, default=0)
     document_count = db.Column(db.Integer, default=0)
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
 
     # Inheritence
 
@@ -29,10 +29,10 @@ class WordCount(Count):
     """
 
     # We need to redefine ID here for polymorphic inheritance
-    id = db.Column(db.Integer, db.ForeignKey("count.id"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("count.id", ondelete='CASCADE'), primary_key=True)
 
     # Belongs to a word
-    word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
+    word_id = db.Column(db.Integer, db.ForeignKey("word.id", ondelete='CASCADE'))
     word = db.relationship("Word")
 
     __mapper_args__ = {
@@ -62,10 +62,10 @@ class SequenceCount(Count):
     """
 
     # We need to redefine ID here for polymorphic inheritance
-    id = db.Column(db.Integer, db.ForeignKey("count.id"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("count.id", ondelete='CASCADE'), primary_key=True)
 
     # Belongs to a sequence
-    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
+    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id", ondelete='CASCADE'))
     sequence = db.relationship("Sequence")
 
     __mapper_args__ = {
@@ -97,10 +97,10 @@ class DependencyCount(Count):
     """
 
     # We need to redefine ID here for polymorphic inheritance
-    id = db.Column(db.Integer, db.ForeignKey("count.id"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("count.id", ondelete='CASCADE'), primary_key=True)
 
     # Belongs to a dependency
-    dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id"))
+    dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id", ondelete='CASCADE'))
     dependency = db.relationship("Dependency")
 
     __mapper_args__ = {
@@ -130,10 +130,10 @@ class PropertyCount(Count):
     """
 
     # We need to redefine ID here for polymorphic inheritance
-    id = db.Column(db.Integer, db.ForeignKey("count.id"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("count.id", ondelete='CASCADE'), primary_key=True)
 
     # Belongs to a property_metadata
-    property_meta_id = db.Column(db.Integer, db.ForeignKey("property_metadata.id"))
+    property_meta_id = db.Column(db.Integer, db.ForeignKey("property_metadata.id", ondelete='CASCADE'))
     property_metadata = db.relationship("PropertyMetadata")
     property_value = db.Column(db.String)
 

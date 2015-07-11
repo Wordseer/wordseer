@@ -21,9 +21,9 @@ class Property(db.Model, Base):
     """
 
     # Attributes
-    unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
-    property_metadata_id = db.Column(db.Integer, db.ForeignKey("property_metadata.id"))
+    unit_id = db.Column(db.Integer, db.ForeignKey("unit.id", ondelete='CASCADE'))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
+    property_metadata_id = db.Column(db.Integer, db.ForeignKey("property_metadata.id", ondelete='CASCADE'))
 
     name = db.Column(db.String)
     value = db.Column(db.String)
