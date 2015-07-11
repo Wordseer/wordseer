@@ -26,11 +26,7 @@ from .. import exceptions
 from .. import forms
 from .. import helpers
 from .. import uploader
-from ...models import DocumentFile
-from ...models import Project
-from ...models import StructureFile
-from ...models import User
-from ...models import ProjectsUsers
+from app.models import *
 from app import app
 from app import db
 from app.models import User
@@ -466,17 +462,32 @@ def delete_obj():
     # figure out what they want to delete, and delete it
     if obj_type == "project":
         obj = Project.query.get(obj_id)
+        
+        # delete association objects directly by project_id instead of cascading, for speed reasons
+        # DependencyInSentence.query.filter(DependencyInSentence.project_id == obj_id).delete()
+        # WordInSentence.query.filter(WordInSentence.project_id == obj_id).delete()
+        # WordInSequence.query.filter(WordInSequence.project_id == obj_id).delete()
+        # SequenceInSentence.query.filter(SequenceInSentence.project_id == obj_id).delete()
+        # ProjectsUsers.query.filter(ProjectsUsers.project_id == obj_id).delete()
+        # PropertyOfSentence.query.filter(PropertyOfSentence.project_id == obj_id).delete()
+        
+        # Counts.query.filter(Counts.project_id == obj_id).delete(False)
+
+
+
     elif obj_type == "doc":
         obj = DocumentFile.query.get(obj_id)
     elif obj_type == "struc":
         obj = StructureFile.query.get(obj_id)
+
+    obj.delete()
 
     if os.path.isdir(obj.path):
         shutil.rmtree(obj.path)
     else:
         os.remove(obj.path)
 
-    obj.delete()
+    
 
     return render_template("delete_obj.json", obj_type=obj_type, obj_id=obj_id)
 

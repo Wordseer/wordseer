@@ -15,10 +15,10 @@ class FrequentWord(db.Model, Base):
 	"""
 	# fields
 	word = db.Column(db.String)
-	word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
+	word_id = db.Column(db.Integer, db.ForeignKey("word.id", ondelete='CASCADE'))
 	pos = db.Column(db.String)
 	sentence_count = db.Column(db.Integer)
-	project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+	project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
 
 class FrequentSequence(db.Model, Base):
 	"""Index of the most frequent Sequences in a project
@@ -31,6 +31,6 @@ class FrequentSequence(db.Model, Base):
 	"""
 	# fields
 	sequence = db.Column(db.String)
-	sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
+	sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id", ondelete='CASCADE'))
 	sentence_count = db.Column(db.Integer)
-	project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+	project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))

@@ -37,38 +37,114 @@ class Project(db.Model, Base):
     active_project = None
 
     # Relationships
-    counts = db.relationship("Count", backref="project", lazy="dynamic", 
-                             cascade="all, delete-orphan")
-    dependency_in_sentence = db.relationship("DependencyInSentence", backref="project", 
-                                             lazy="dynamic", cascade="all, delete-orphan")
-    document_files = db.relationship("DocumentFile", single_parent=True,
-                                     secondary="document_files_in_projects", 
-                                     backref="projects", cascade="all, delete-orphan")
-    frequent_words = db.relationship("FrequentWord", backref="project", lazy="dynamic",
-                                     cascade="all, delete-orphan")
-    frequent_sequences = db.relationship("FrequentSequence", backref="project", lazy="dynamic",
-                                         cascade="all, delete-orphan")
-    grammatical_rel = db.relationship("GrammaticalRelationship", backref="project", lazy="dynamic",
-                                      cascade="all, delete-orphan")
-    logs = db.relationship("Log", backref="project", cascade="all, delete-orphan")
-    properties = db.relationship("Property", backref="project", lazy="dynamic", 
-                                 cascade="all, delete-orphan")
-    sentences = db.relationship("Sentence", backref="project", lazy="dynamic",
-                                cascade="all, delete-orphan")
-    sequences = db.relationship("Sequence", backref="project", lazy="dynamic",
-                                cascade="all, delete-orphan")
-    sequence_in_sentence = db.relationship("SequenceInSentence", backref="project", 
-                                           lazy="dynamic", cascade="all, delete-orphan")
-    sets = db.relationship("Set", backref="project", lazy="dynamic", cascade="all, delete-orphan")
-    structure_files = db.relationship("StructureFile", backref="project",
-                                      cascade="all, delete-orphan")
-    units = db.relationship("Unit", backref="project", lazy="dynamic", cascade="all, delete-orphan")
-    users = association_proxy("project_users", "user",
-                              creator=lambda user: ProjectsUsers(user=user))
-    word_in_sentence = db.relationship("WordInSentence", backref="project", 
-                                       lazy="dynamic", cascade="all, delete-orphan")
-    word_in_sequence = db.relationship("WordInSequence", backref="project", 
-                                       lazy="dynamic", cascade="all, delete-orphan")
+    counts = db.relationship(
+        "Count", 
+        backref="project", 
+        lazy="dynamic", 
+        cascade="all, delete-orphan",
+        passive_deletes=True
+        )
+    dependency_in_sentence = db.relationship(
+        "DependencyInSentence", 
+        backref="project", 
+        lazy="dynamic", 
+        cascade="all, delete-orphan",
+        passive_deletes=True
+        )
+    document_files = db.relationship( # ? oddly configured relationship
+        "DocumentFile", 
+        single_parent=True,
+        secondary="document_files_in_projects", 
+        backref="projects", 
+        cascade="all, delete-orphan",
+        passive_deletes=True
+        )
+    frequent_words = db.relationship(
+        "FrequentWord", 
+        backref="project", 
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    frequent_sequences = db.relationship(
+        "FrequentSequence", 
+        backref="project", 
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    grammatical_rel = db.relationship(
+        "GrammaticalRelationship", 
+        backref="project", 
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    logs = db.relationship(
+        "Log", 
+        backref="project", 
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    properties = db.relationship(
+        "Property", 
+        backref="project", 
+        lazy="dynamic", 
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    properties_of_sentences = db.relationship(
+        "PropertyOfSentence", 
+        backref="project", 
+        lazy="dynamic", 
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    sentences = db.relationship(
+        "Sentence", 
+        backref="project", 
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    sequences = db.relationship(
+        "Sequence", 
+        backref="project", 
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    sequence_in_sentence = db.relationship(
+        "SequenceInSentence", 
+        backref="project", 
+        lazy="dynamic", 
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    sets = db.relationship(
+        "Set", 
+        backref="project", 
+        lazy="dynamic", 
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    structure_files = db.relationship(
+        "StructureFile", 
+        backref="project",
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    units = db.relationship(
+        "Unit", 
+        backref="project", 
+        lazy="dynamic", 
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    users = association_proxy(
+        "project_users", 
+        "user",
+        creator=lambda user: ProjectsUsers(user=user))
+    word_in_sentence = db.relationship(
+        "WordInSentence", 
+        backref="project", 
+        lazy="dynamic", 
+        cascade="all, delete-orphan",
+        passive_deletes=True)
+    word_in_sequence = db.relationship(
+        "WordInSequence", 
+        backref="project", 
+        lazy="dynamic", 
+        cascade="all, delete-orphan",
+        passive_deletes=True)
 
     def is_processable(self):
         """Check if this project can be processed.

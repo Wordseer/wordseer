@@ -16,16 +16,21 @@ class WordInSentence(db.Model, Base):
         surface (str): The ``Word`` with exact capitalization.
     """
 
-    word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
-    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    word_id = db.Column(db.Integer, db.ForeignKey("word.id", ondelete='CASCADE'))
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id", ondelete='CASCADE'))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
     position = db.Column(db.Integer)
     space_before = db.Column(db.String)
     surface = db.Column(db.String)
 
-    sentence = db.relationship("Sentence",
+    sentence = db.relationship(
+        "Sentence",
         backref=db.backref(
-            "word_in_sentence", cascade="all, delete-orphan"))
+            "word_in_sentence", 
+            cascade="all, delete-orphan",
+            passive_deletes=True
+        )
+    )
 
     word = db.relationship("Word",
         backref=db.backref(
@@ -41,10 +46,10 @@ class SequenceInSentence(db.Model, Base):
             ``sentence``.
     """
 
-    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
-    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
-    document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id", ondelete='CASCADE'))
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id", ondelete='CASCADE'))
+    document_id = db.Column(db.Integer, db.ForeignKey("document.id", ondelete='CASCADE'))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
     position = db.Column(db.Integer)
 
     sequence = db.relationship("Sequence",
@@ -63,9 +68,9 @@ class WordInSequence(db.Model, Base):
         sequence (Sequence): The ``Sequence`` in this relationship.
     """
 
-    word_id = db.Column(db.Integer, db.ForeignKey("word.id"))
-    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    word_id = db.Column(db.Integer, db.ForeignKey("word.id", ondelete='CASCADE'))
+    sequence_id = db.Column(db.Integer, db.ForeignKey("sequence.id", ondelete='CASCADE'))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
 
     word = db.relationship("Word",
         backref=db.backref(
@@ -90,10 +95,10 @@ class DependencyInSentence(db.Model, Base):
     """
     #TODO: is POS redundant here?
 
-    dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id"))
-    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
-    document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id", ondelete='CASCADE'))
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id", ondelete='CASCADE'))
+    document_id = db.Column(db.Integer, db.ForeignKey("document.id", ondelete='CASCADE'))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
     governor_index = db.Column(db.Integer)
     dependent_index = db.Column(db.Integer)
     governor_part_of_speech = db.Column(db.String)
@@ -131,8 +136,8 @@ class ProjectsUsers(db.Model, Base):
         """
         return self.ROLE_DESCRIPTIONS[self.role]
 
-    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"))
-    project_id = db.Column(db.Integer(), db.ForeignKey("project.id"))
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete='CASCADE'))
+    project_id = db.Column(db.Integer(), db.ForeignKey("project.id", ondelete='CASCADE'))
     role = db.Column(db.Integer())
 
     user = db.relationship("User", backref=db.backref("user_projects",
@@ -151,8 +156,8 @@ class SentenceInQuery(db.Model, Base):
             of the query.
         num_matches (int): The total number of query pieces tried so far.
     """
-    query_id = db.Column(db.Integer, db.ForeignKey("query.id"))
-    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
+    query_id = db.Column(db.Integer, db.ForeignKey("query.id", ondelete='CASCADE'))
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id", ondelete='CASCADE'))
     matched = db.Column(db.Boolean)
     num_matches = db.Column(db.Integer)
 
@@ -172,9 +177,21 @@ class PropertyOfSentence(db.Model, Base):
             sentence.
         sentence (Sentence): The ``Sentence'' object that has this property.
     """
-    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id"))
-    sentence = db.relationship("Sentence", backref=db.backref("property_of_sentence"))
-    property_id = db.Column(db.Integer, db.ForeignKey("property.id"))
-    property = db.relationship("Property",
-        backref=db.backref("sentences_with_property",
-            cascade="all, delete-orphan"))
+    sentence_id = db.Column(db.Integer, db.ForeignKey("sentence.id", ondelete='CASCADE'))
+    property_id = db.Column(db.Integer, db.ForeignKey("property.id", ondelete='CASCADE'))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
+    
+    
+    # relationshps
+    property = db.relationship(
+        "Property",
+        backref=db.backref(
+            "sentences_with_property",
+            cascade="all, delete-orphan", 
+            passive_deletes=True
+        )
+    )
+
+    sentence = db.relationship(
+        "Sentence", 
+        backref=db.backref("property_of_sentence"))

@@ -27,10 +27,10 @@ class Document(Unit, NonPrimaryKeyEquivalenceMixin):
 
     # Attributes
     # We need to redefine ID here for polymorphic inheritance
-    id = db.Column(db.Integer, db.ForeignKey("unit.id"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("unit.id", ondelete='CASCADE'), primary_key=True)
     title = db.Column(db.String)
     sentence_count = db.Column(db.Integer)
-    document_file_id = db.Column(db.Integer, db.ForeignKey("document_file.id"))
+    document_file_id = db.Column(db.Integer, db.ForeignKey("document_file.id", ondelete='CASCADE'))
 
     # Documents should not have parents
     parent_id = None

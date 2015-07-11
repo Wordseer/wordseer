@@ -36,12 +36,12 @@ class Set(db.Model, Base):
     # Attributes
     # We need to redefine ID to nest sets
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete='CASCADE'))
     name = db.Column(db.String)
     creation_date = db.Column(db.DateTime)
     type = db.Column(db.String, index=True)
-    parent_id = db.Column(db.Integer, db.ForeignKey("set.id"))
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    parent_id = db.Column(db.Integer, db.ForeignKey("set.id", ondelete='CASCADE'))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
 
     # Relationships
     children = db.relationship("Set", backref=db.backref("parent",
@@ -75,7 +75,7 @@ class SequenceSet(Set):
         sequences (list): A list of ``Sequence``s in this ``SequenceSet``.
     """
 
-    id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("set.id", ondelete='CASCADE'), primary_key=True)
     sequences = db.relationship("Sequence",
         secondary="sequences_in_sequencesets",
         backref="sets")
@@ -127,7 +127,7 @@ class SentenceSet(Set):
         sentences (list): A list of ``Sentence``\s in this ``SentenceSet``.
     """
 
-    id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("set.id", ondelete='CASCADE'), primary_key=True)
     sentences = db.relationship("Sentence",
         secondary="sentences_in_sentencesets",
         backref="sets")
@@ -174,7 +174,7 @@ class DocumentSet(Set):
         documents (list): A list of ``Document``\s in this ``DocumentSet``.
     """
 
-    id = db.Column(db.Integer, db.ForeignKey("set.id"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("set.id", ondelete='CASCADE'), primary_key=True)
     documents = db.relationship("Document",
         secondary="documents_in_documentsets",
         backref="sets")

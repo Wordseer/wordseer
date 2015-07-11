@@ -41,8 +41,18 @@ Database Set Up
 """
 
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
+
 db = SQLAlchemy(app)
 from app.models import *
+
+# make sure foreign keys are enabled for sqlite
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
 
 """
 Authentication setup
