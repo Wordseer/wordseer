@@ -32,6 +32,7 @@ class Project(db.Model, Base):
     name = db.Column(db.String)
     path = db.Column(db.String)
     status = db.Column(db.Integer, default=STATUS_UNPROCESSED)
+    deleted = db.Column(db.Boolean, default=False)
 
     # Active project indicator
     active_project = None
