@@ -33,11 +33,12 @@ class AssociatedWordsView(MethodView):
         if project is None:
             return # 500 error
 
-        
-        search_param = loads(params["search"][0])[0]
-        sequence_ids = Word.get_matching_sequence_ids(search_param['gov'])
-        sentences = SequenceInSentence.query.filter(
-            SequenceInSentence.sequence_id.in_(sequence_ids)).subquery()
+        # retrieve the cached query to get associated words for 
+        query = None
+        if "query_id" in keys:
+            query = Query.query.get(params["query_id"])
+        if query is None:
+            return # 500 error  
 
         associated_words = db.session.query(
             Word.id.label("id"),
@@ -46,10 +47,9 @@ class AssociatedWordsView(MethodView):
             func.count(WordInSentence.sentence_id.distinct()).label("count"),
             func.count(Sentence.document_id.distinct()).label("doc_count")
             ).\
+        filter(WordInSentence.sentence_id.in_([sentence.id for sentence in query.sentences])).\
         filter(WordInSentence.word_id == Word.id).\
         filter(Sentence.id == WordInSentence.sentence_id).\
-        join(sentences, WordInSentence.sentence_id ==
-                        sentences.c.sentence_id).\
         group_by(Word.id)
     
         response = {"Synsets": [], "Words": []}
@@ -67,7 +67,9 @@ class AssociatedWordsView(MethodView):
 
             # calculate tf*idf
             tf = word.count
-            df = db.session.query(WordCount.document_count).filter(WordCount.word_id == word.id)[0][0]
+            df = db.session.query(WordCount.document_count).\
+                filter(WordCount.word_id == word.id).\
+                filter(WordCount.project_id == params["project_id"])[0][0]
             idf = alldocs / df
             row["score_sentences"] = tf * math.log(idf)
             response["Words"].append(row)
