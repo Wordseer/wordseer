@@ -34,15 +34,6 @@ Ext.define('WordSeer.model.DocumentModel', {
 			'matches', 'document_set'];
 		}
 	},
-	proxy: {
-		type:'ajax',
-		noCache: false,
-		reader: 'json',
-		url: ws_project_path + project_id + "/document_contents/",
-		extraParams: {
-			include_text: 'false',
-		}
-	},
 	fields: [
 		{name: 'has_text', type: 'boolean', default: false},
 		'units',

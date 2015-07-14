@@ -24,39 +24,6 @@ Ext.define('WordSeer.controller.DocumentsController', {
 		'sentence.SentenceList'
 	],
 	init: function() {
-//		console.log('Document controller initialized');
-		Ext.Ajax.request({
-			url: ws_project_path + project_id + '/meta_properties/',
-			method:'GET',
-			disableCaching: false,
-			params:{
-				unit: 'document'
-			},
-			scope:this,
-			success:function(response){
-				var resp = Ext.decode(response.responseText);
-				var data = resp.results;
-				var newFields = [
-					{name: 'has_text', type: 'boolean', default: false},
-					'units',
-					'children',
-					{name:'id', type:'int'},
-					'title',
-					'metadata',
-					{name:'matches', type:'int', sortType: 'asInt'},
-					{name:'document_set', type:'string', defaultValue: '', text:'Sets'},
-				];
-				for (var i = 0; i < data.length; i++) {
-					newFields.push({
-						text: data[i].nameToDisplay?data[i].nameToDisplay:data[i].propertyName,
-						name: data[i].propertyName,
-						type: data[i].type == 'number'? 'float': 'auto',
-						sortType: data[i].type == 'number'? 'asFloat': '',
-					});
-				}
-				WordSeer.model.DocumentModel.setFields(newFields);
-			}
-		});
 		//Load up the store of documents.
 		this.getStore('DocumentStore').load();
 		this.control({

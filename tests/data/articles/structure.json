@@ -1,16 +1,12 @@
 {
-  "titleXpaths": [
-    "./title/text()"
-  ],
+  "titleXpaths": [],
   "name": "article",
   "dataType": "string",
   "xpathsFull": [
     "/article"
   ],
-  "structureName": "article",
-  "titleXpathsFull": [
-    "/article/title/text()"
-  ],
+  "structureName": "document",
+  "titleXpathsFull": [],
   "tag": "article",
   "units": [
     {
@@ -29,12 +25,29 @@
       ],
       "type": "subunit",
       "id": "tagger-id-articletext"
+    },
+    {
+      "titleXpaths": [],
+      "name": "tag",
+      "dataType": "string",
+      "xpathsFull": [
+        "/article/tags/tag"
+      ],
+      "structureName": "tag",
+      "titleXpathsFull": [],
+      "tag": "tag",
+      "combine": false,
+      "xpaths": [
+        "./tags/tag"
+      ],
+      "type": "subunit",
+      "id": "tagger-id-articletagstag"
     }
   ],
   "xpaths": [
     "/article"
   ],
-  "filename": "post2.xml",
+  "filename": "post1.xml",
   "type": "document",
   "id": "tagger-id-article",
   "metadata": [
@@ -119,48 +132,6 @@
       ],
       "type": "metadata",
       "id": "tagger-id-articlenumber",
-      "isActive": true,
-      "attr": ""
-    },
-    {
-      "isCategory": true,
-      "displayName": "foobar",
-      "name": "foobar",
-      "dateFormat": "",
-      "dataType": "string",
-      "xpathsFull": [
-        "/article/foobar"
-      ],
-      "propertyName": "foobar",
-      "valueIsDisplayed": true,
-      "nameIsDisplayed": true,
-      "tag": "foobar",
-      "xpaths": [
-        "./foobar"
-      ],
-      "type": "metadata",
-      "id": "tagger-id-articlefoobar",
-      "isActive": true,
-      "attr": ""
-    },
-    {
-      "isCategory": true,
-      "displayName": "tag",
-      "name": "tag",
-      "dateFormat": "",
-      "dataType": "string",
-      "xpathsFull": [
-        "/article/tags/tag"
-      ],
-      "propertyName": "tag",
-      "valueIsDisplayed": true,
-      "nameIsDisplayed": true,
-      "tag": "tag",
-      "xpaths": [
-        "./tags/tag"
-      ],
-      "type": "metadata",
-      "id": "tagger-id-articletagstag",
       "isActive": true,
       "attr": ""
     }

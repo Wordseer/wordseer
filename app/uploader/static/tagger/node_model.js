@@ -152,6 +152,7 @@ var NodeModel = function() {
         if (self.attributes.isRoot)
         {
             self.attributes.type = DOCUMENT_TAG;
+            self.attributes.structureName = DOCUMENT_TAG;
             self.attributes.filename = filename;
             self.attributes.url = url;
             self.attributes.xml = xml;
