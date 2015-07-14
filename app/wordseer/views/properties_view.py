@@ -54,27 +54,21 @@ class PropertiesView(MethodView):
     of property names is the top level and the values for a given property are
     under it. 
     """
-    def restrict_query_to_cached_sentences(self, values, params):
-        # Restrict to just the sentences that match the given query.
-        values = values.join(
-        PropertyOfSentence,
-            PropertyOfSentence.property_id == Property.id).\
-        join(SentenceInQuery,
-            PropertyOfSentence.sentence_id ==
-            SentenceInQuery.sentence_id).\
-        filter(SentenceInQuery.query_id == params["query_id"][0])
-        return values
-
+    
     def get_metadata_counts(self, params, project, property):
         if "query_id" in params:
             values = db.session.query(
                 Property.value.label("value"),
                 func.count(Property.unit_id.distinct()).label("unit_count")
-            )
-            values = self.restrict_query_to_cached_sentences(values, params)
-
-            # filter(Property.project_id == project.id).\
-            values.filter(not_(Property.name.contains("_set"))).\
+            ).\
+            join(
+                PropertyOfSentence,
+                PropertyOfSentence.property_id == Property.id).\
+            join(SentenceInQuery,
+                PropertyOfSentence.sentence_id ==
+                SentenceInQuery.sentence_id).\
+            filter(SentenceInQuery.query_id == params["query_id"][0]).\
+            filter(not_(Property.name.contains("_set"))).\
             filter(Property.name == property.property_name).\
             group_by(Property.value)
         else:
@@ -116,7 +110,7 @@ class PropertiesView(MethodView):
         params = dict(kwargs, **request.args)
         project = None
         if "project_id" in kwargs.keys():
-            project = Project.query.get(kwargs["project_id"])
+            project = Project.query.get(params.get("project_id"))
         if project is None:
             # TODO: real error response
             print("Project not found")
@@ -135,6 +129,7 @@ class PropertiesView(MethodView):
 
         results = []
         for property in properties:
+            print property
             type = property.data_type
             # if type is missing for some reason, fall back to String
             if type == None:
@@ -143,8 +138,8 @@ class PropertiesView(MethodView):
             if type == "date":
                 type += "_" + property.date_format
 
-            values = self.get_metadata_counts(params, project, property)
-            values.extend(self.get_metadata_counts_for_sets(
+            prop_values = self.get_metadata_counts(params, project, property)
+            prop_values.extend(self.get_metadata_counts_for_sets(
                 params, project, property))
 
             metadata = {
@@ -154,13 +149,10 @@ class PropertiesView(MethodView):
                 "type": type,
                 "children": []
             }
-            for value in values:
+            for value in prop_values:
                 as_dict = value._asdict()
+                print as_dict
                 text = value.value
-                # if "_set" in property.property_name:
-                #     print "\n", "=" * 30, "\n Set value:", value.value
-                #     set = Set.query.get(value.value)
-                #     text = set.name
                 document_count = value.unit_count
                 if "document_count" in as_dict:
                     document_count = value.document_count
@@ -171,7 +163,7 @@ class PropertiesView(MethodView):
                         "propertyName": property.property_name,
                         "displayName": property.property_name,
                         "text": text,
-                        "value": value.value,
+                        "value": text,
                         "leaf": True
                         }
                 if view_type == "list":

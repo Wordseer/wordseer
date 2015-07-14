@@ -21,6 +21,5 @@ Ext.define("WordSeer.store.MetadataListStore", {
 	sorters: [{property:'count', direction: 'DESC'}],
 	constructor: function(config) {
 		this.callParent(arguments);
-		this.getProxy().setExtraParam('user', getUsername());
 	}
 });

@@ -157,11 +157,8 @@ Ext.define('WordSeer.controller.MetadataController', {
     respondToSearch: function(panel, formValues) {
         if (!panel.formValues) panel.formValues = formValues;
         if (!panel.getLayoutPanelModel().isSameSlice()) {
-            Ext.apply(formValues, formValues.search[0]);
-            panel.getLayoutPanelModel().getMetadataListStore().load(
-                {params:formValues.serialize()});
+            // new slice, refresh available metadata filters
             this.getMetadata(formValues, panel);
-//            console.log('Loading metadata');
         }
     },
 
@@ -227,13 +224,14 @@ Ext.define('WordSeer.controller.MetadataController', {
                 width: 360,
                 height: 600,
                 maxHeight: 700,
-                items: [{
+                items: [
+                    {
                         xtype: 'stringfacets',
                         filterFn: function(record) {
                             return record.get('type') == "string" &&
                             record.get('propertyName').indexOf('_set') == -1;
                         },
-                        store:panel.getLayoutPanelModel()
+                        store: panel.getLayoutPanelModel()
                             .getMetadataTreeStore(),
                     },
                     {
