@@ -30,7 +30,6 @@ Ext.define('WordSeer.controller.DocumentsController', {
 			method:'GET',
 			disableCaching: false,
 			params:{
-				instance:getInstance(),
 				unit: 'document'
 			},
 			scope:this,

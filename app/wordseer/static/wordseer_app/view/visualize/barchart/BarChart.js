@@ -270,8 +270,7 @@
 
       $(this.getEl().dom).find("a.download").remove();
       $(this.getEl().dom)
-        .prepend("<a class='download' download='" + (getInstance() +
-          " grammatical search results " + context)
+        .prepend("<a class='download' download='" + " grammatical search results " + context
           + "' href='" +data_url + "'>data</a>");
       $(this.getEl().dom).find("a.download").css("padding-left", "70px")
     }

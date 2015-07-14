@@ -11,8 +11,6 @@
       extraParams:{
          operation:'listflat',
          collectiontype:'sentence',
-         instance:getInstance(),
-         user: getUsername(),
       },
       reader: {
           type: 'json',

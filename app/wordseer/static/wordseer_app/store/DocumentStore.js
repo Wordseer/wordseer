@@ -10,8 +10,6 @@
 			root: 'results',
 		},
 		extraParams: {
-			instance:getInstance(),
-	        user:getUsername(),
 	        include_text: false,
 	    },
 	},

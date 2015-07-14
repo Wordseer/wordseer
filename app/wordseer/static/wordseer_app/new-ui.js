@@ -20,7 +20,6 @@ Ext.application({
     requires: [
         'WordSeer.view.windowing.viewport.Viewport',
         'WordSeer.view.table.Table',
-        'WordSeer.view.user.SignIn',
         'Ext.util.History',
     ],
     controllers: [
@@ -41,11 +40,9 @@ Ext.application({
         'PhraseSetsController',
         'WordTreeController',
         'WordFrequenciesController',
-        'UrlHistoryController',
-        'UserController'
+        'UrlHistoryController'
     ],
     launch: function() {
-        sessionStorage['username'] =  'test';
         var me = this;
         APP = {
             getSearchableWidgets: function() {
@@ -144,6 +141,7 @@ Ext.application({
                 ];
             }
         };
+
         var store_cfg = {fields:['word', 'count']};
 
         Ext.create('Ext.container.Viewport', {
@@ -151,6 +149,17 @@ Ext.application({
             items: {
 
             }
+        });
+
+        // start the main WordSeer application
+        // by initializing HistoryItems and Viewport
+        // Ext.getStore('HistoryItemStore').getProxy().id = ('HistoryItemStore-' +
+        //     getInstance());
+        Ext.getStore('HistoryItemStore').load();
+        var viewport = Ext.ComponentQuery.query('viewport')[0];
+        viewport.removeAll();
+        viewport.add({
+            xtype: 'windowing-viewport'
         });
 
         // set up Ext History utility
@@ -175,25 +184,19 @@ Ext.application({
 
         // initialize history
         Ext.History.init(function(){
-            // if user is signed in, look for URL token
-            if (me.getController("UserController").isSignedIn()) {
-                me.getController("UserController").signUserIn();
-                // if there's a hash in URL, get it
-                var token = document.location.hash.slice(1);
-                // it no token, just send to landing page
-                if (token == "") {
-                    token = "home"
-                }
-                me.getController("UrlHistoryController").dispatch(token);
-            } else {
-                // go to sign-in page
-                console.log("not signed in");
+            // retrieve the history token from URL
+            var token = document.location.hash.slice(1);
+            // if no token, just send to landing page
+            if (token == "") {
+                token = "home"
             }
+            me.getController("UrlHistoryController").dispatch(token);
         });
 
         // handle history changes
         Ext.History.on('change', function(token){
             me.getController("UrlHistoryController").dispatch(token);
         });
+
     }
 });

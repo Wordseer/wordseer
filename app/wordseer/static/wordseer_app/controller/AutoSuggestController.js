@@ -47,8 +47,6 @@ Ext.define('WordSeer.controller.AutoSuggestController', {
 				url: ws_api_path +
 					'search-suggestions/grammatical-relation-phrases/',
 				params: {
-					instance: getInstance(),
-					user: getUsername(),
 					query: query,
 					type: menuitem.record.get('class')
 				},

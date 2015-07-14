@@ -47,9 +47,7 @@ Ext.define('WordSeer.controller.PhrasesController', {
 			panel.formValues = formValues;
 		} else {
 			if (!panel.getLayoutPanelModel().isSameSlice()) {
-				var params = {
-					instance: getInstance()
-				};
+				var params = {};
 				Ext.apply(params, formValues.serialize());
 				if (formValues.search && formValues.search.length > 0) {
 					Ext.apply(params, formValues.search[0]);
@@ -73,9 +71,7 @@ Ext.define('WordSeer.controller.PhrasesController', {
 	@param {Object} scope The scope in which to execute the callback.
 	*/
 	fetchFrequentPhrases: function(formValues, phrases_list_view) {
-		var params = {
-			instance: getInstance()
-		};
+		var params = {};
 		Ext.apply(params, formValues.serialize());
 		if (formValues.search && formValues.search.length > 0) {
 			Ext.apply(params, formValues.search[0]);

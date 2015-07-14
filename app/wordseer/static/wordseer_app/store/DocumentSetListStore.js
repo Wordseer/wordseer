@@ -12,8 +12,6 @@ Ext.define('WordSeer.store.DocumentSetListStore', {
       extraParams:{
          operation:'listflat',
          collectiontype:'document',
-         instance:getInstance(),
-         user: getUsername(),
       },
       reader: {
           type: 'json',
@@ -22,6 +20,5 @@ Ext.define('WordSeer.store.DocumentSetListStore', {
     },
     constructor: function(config) {
       this.callParent(arguments);
-      this.getProxy().setExtraParam('user', getUsername());
     }
 });

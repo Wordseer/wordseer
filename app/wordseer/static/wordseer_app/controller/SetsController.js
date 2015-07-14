@@ -22,8 +22,8 @@ Ext.define('WordSeer.controller.SetsController', {
 			'DocumentSetStore',
 	],
 	init: function() {
-		Ext.getStore('DocumentSetStore').load({params:{user:getUsername()}});
-		Ext.getStore('SentenceSetStore').load({params:{user:getUsername()}});
+		Ext.getStore('DocumentSetStore').load();
+		Ext.getStore('SentenceSetStore').load();
 //		console.log('SetsController initialized');
 		this.control({
 			'layout-panel': {
@@ -168,7 +168,7 @@ Ext.define('WordSeer.controller.SetsController', {
 	deleteSet: function(button) {
 		var menu = button.up('set-context-menu');
 		menu.record.delete(function(operation) {
-			menu.store.load({params:{user:getUsername()}});
+			menu.store.load();
 		}, this);
 		if (menu.view.selected.length > 0 ){
 			menu.view.selected.removeAll();
@@ -298,7 +298,7 @@ Ext.define('WordSeer.controller.SetsController', {
 			var parent = menuitem.getParent();
 			if (parent) {
 				parent.newSet(function(operation) {
-					store.load({params:{user:getUsername()}});
+					store.load();
 				}, this, menuitem.getValue());
 			}
 			menuitem.up('wordseer-menu').close(10);
@@ -333,7 +333,7 @@ Ext.define('WordSeer.controller.SetsController', {
 			var new_name = menuitem.getValue();
 			var store = menuitem.getStore();
 			menuitem.record.rename(new_name, function(){
-				store.load({params:{user:getUsername()}});
+				store.load();
 				}, this);
 			menuitem.up('wordseer-menu').close(10);
 		}
@@ -360,8 +360,7 @@ Ext.define('WordSeer.controller.SetsController', {
 						success: function(record){
 							if (textfield.ids.length > 0) {
 								record.addItems(textfield.ids, function(){
-									textfield.store.load(
-										{params:{user:getUsername()}});
+									textfield.store.load();
 									this.getController('MetadataController')
 									.subsetsChanged();
 								}, this);

@@ -62,9 +62,6 @@ function getAllTags(){
 /** gets all the collections **/
 function getAllCollections(){
     data = {};
-    if(isSignedIn()){
-        data['user'] = getUsername();
-    }
 	$.getJSON("src/php/listallcollections.php", data, function(data){
 		allCollections = data.collections;
 		$("select.collection.select").html("");
@@ -157,35 +154,6 @@ function spaceBetweenWords(word1, word2){
 	} else {
 	    return " ";
 	}
-}
-
-/* accesses session storage to find out what the username is*/
-function getUsername(){
-    return sessionStorage["username"];
-}
-
-/* removes the field "username" from session storage */
-function signUserOut(){
-	sessionStorage.removeItem("username");
-}
-
-/* accesses session storage to set a username*/
-function setUsername(name){
-    if (typeof(sessionStorage) == 'undefined' ) {
-		alert('Your browser does not support this feature, try upgrading.');
-	}
-	else{
-		sessionStorage["username"] =  name;
-	}
-}
-
-/* accesses session storage to find out what the instance is*/
-function getInstance(){
-    return sessionStorage.getItem('INSTANCE');
-}
-
-function setInstance(name) {
-	sessionStorage.setItem('INSTANCE', name);
 }
 
 /* checks if an element is visible */

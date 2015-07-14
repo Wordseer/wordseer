@@ -62,7 +62,6 @@ Ext.define('WordSeer.view.autosuggest.AutoSuggestMenu', {
 		me.getStore().load({
 			scope: me,
 			params: {
-				user: getUsername(),
 				query: query,
 				search_lemmas: search_lemmas
 			},

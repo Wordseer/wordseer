@@ -125,7 +125,7 @@ Ext.define('WordSeer.controller.PhraseSetsController', {
 			record.delete(function() {
 				phrase_set_window.close();
 				Ext.getStore('PhraseSetStore')
-					.load({params:{user:getUsername()}});
+					.load();
 				this.getController('MetadataController').subsetsChanged();
 			}, this);
 		}
@@ -204,7 +204,7 @@ Ext.define('WordSeer.controller.PhraseSetsController', {
 			if (record) {
 					record.rename(new_name, function(){
 						Ext.getStore('PhraseSetStore')
-							.load({params:{user:getUsername()}});
+							.load();
 						var header = this.up('header');
 						header.remove(this);
 						header.is_being_renamed = false;

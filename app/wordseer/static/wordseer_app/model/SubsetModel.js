@@ -22,9 +22,7 @@ Ext.define('WordSeer.model.SubsetModel', {
         type: 'ajax',
         url: ws_api_path + ws_project_path + project_id + '/sets',
         extraParams: {
-            instance: getInstance(),
             operation: 'read',
-            user: getUsername(),
         },
         reader: {
             type: 'json',
@@ -137,7 +135,6 @@ Ext.define('WordSeer.model.SubsetModel', {
                 name: name,
                 parent:this.get('id'),
                 collectiontype:this.getSubsetType(),
-                user: getUsername(),
             },
         });
         this.getProxy().create(create_operation, callback, scope);
@@ -157,7 +154,6 @@ Ext.define('WordSeer.model.SubsetModel', {
             params:{
                 operation:'delete',
                 id: this.get('id'),
-                user: getUsername(),
             },
         });
         this.getProxy().destroy(delete_operation, callback, scope);
@@ -186,7 +182,6 @@ Ext.define('WordSeer.model.SubsetModel', {
                 update: 'rename',
                 id: this.get('id'),
                 newName: new_name,
-                user: getUsername(),
             },
         });
         this.set('text', new_name);
@@ -203,7 +198,6 @@ Ext.define('WordSeer.model.SubsetModel', {
             params:{
                 operation:'read',
                 id: this.get('id'),
-                user: getUsername(),
             },
         });
         this.getProxy().read(read_operation);

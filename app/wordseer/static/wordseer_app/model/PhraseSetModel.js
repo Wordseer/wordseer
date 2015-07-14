@@ -34,7 +34,6 @@ Ext.define('WordSeer.model.PhraseSetModel', {
         params: {
           type: 'read',
           id: this.get('id'),
-          user: getUsername(),
         },
       });
       this.getProxy().read(read_operation, function(operation) {

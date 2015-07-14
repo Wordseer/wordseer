@@ -24,14 +24,9 @@ Ext.define('WordSeer.store.FrequentWordsStore', {
 			type: 'json',
 			root: 'results'
 		},
-		extraParams: {
-			instance: getInstance(),
-			user: getUsername()
-		},
 	},
 	sorters: [{property: "count", direction: "DESC"}],
 	constructor: function(config) {
 		this.callParent(arguments);
-		this.getProxy().setExtraParam('user', getUsername());
 	}
 });

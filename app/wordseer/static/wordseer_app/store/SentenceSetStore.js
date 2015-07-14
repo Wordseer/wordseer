@@ -12,9 +12,7 @@ Ext.define('WordSeer.store.SentenceSetStore', {
         type: 'ajax',
         url: ws_project_path + project_id + '/sets/',
         extraParams: {
-            user: getUsername(),
             collectiontype: 'sentence',
-            instance: getInstance(),
             operation: 'list',
         },
         reader: {

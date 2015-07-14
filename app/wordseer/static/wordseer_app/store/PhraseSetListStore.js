@@ -16,8 +16,6 @@ Ext.define('WordSeer.store.PhraseSetListStore', {
       extraParams:{
          operation:'listflat',
          collectiontype:'phrase',
-         instance:getInstance(),
-         user: getUsername(),
       },
       reader: {
           type: 'json',

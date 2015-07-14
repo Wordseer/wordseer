@@ -117,7 +117,6 @@ Ext.define('WordSeer.controller.SearchController', {
 
 		var formValues = Ext.create('WordSeer.model.FormValues');
 		formValues.widget_xtype = 'sentence-list-widget';
-		console.log(record)
 		if (record instanceof WordSeer.model.PhraseModel ||
 			record instanceof WordSeer.model.WordModel) {
 			// will be different property if single word or phrase
@@ -363,8 +362,6 @@ Ext.define('WordSeer.controller.SearchController', {
 				} else {
 					// If it's a new slice, we're going to need a new query ID.
 					var parameters = formValues.serialize();
-					parameters.user = getUsername();
-					parameters.instance = getInstance();
 					// clear the previous query ID from the cache.
 					Ext.Ajax.request({
 						method: 'GET',
@@ -372,7 +369,6 @@ Ext.define('WordSeer.controller.SearchController', {
 							this.current_query_id,
 						timeout: 90000000,
 						params: {
-							user: getUsername(),
 							clear: 'true',
 						}
 					});

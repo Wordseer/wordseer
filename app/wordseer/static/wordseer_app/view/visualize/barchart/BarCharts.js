@@ -39,8 +39,6 @@
                 Ext.apply(this, formValues.search[0]);
                 var params = Ext.apply({
                     statistics:'true',
-                    user:getUsername(),
-                    instance:getInstance(),
                 }, formValues.serialize());
                 Ext.apply(params, formValues.search[0]);
                 this.data = Ext.Ajax.request({

@@ -9,7 +9,6 @@ Ext.define('WordSeer.view.windowing.viewport.TopBar', {
     requires: [
         'WordSeer.view.desktop.topbar.WidgetsMenu',
         'WordSeer.view.search.UniversalSearchForm',
-        'WordSeer.view.desktop.topbar.User',
     ],
     items:[
         {xtype: 'widgets-menu', flex:1},
