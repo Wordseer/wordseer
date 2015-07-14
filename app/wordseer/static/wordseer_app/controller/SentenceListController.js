@@ -30,7 +30,6 @@ Ext.define('WordSeer.controller.SentenceListController', {
 						if (store.data.length == store.totalCount) {
 							// all data is loaded from server:
 							// hide the "rows loading" placeholder
-							// debugger;
 							this.el.down('.rowsloading').addCls('hidden')
 						}
 					}, grid);

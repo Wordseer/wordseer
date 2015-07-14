@@ -11,17 +11,6 @@ Ext.define('WordSeer.view.document.DocumentGrid',{
         'WordSeer.view.collections.SetsToolbar',
         'WordSeer.model.DocumentModel',
     ],
-    viewConfig: {
-        listeners: {
-            beforerender: function() {
-                console.time('document-grid drawn');
-            },
-            added: function() {
-//                console.log('hi');
-                console.timeEnd('document-grid drawn');
-            }
-        }
-    },
     checkboxes: true,
     multiSelect: true,
     onlyCheckboxSelect: true,
@@ -110,9 +99,12 @@ Ext.define('WordSeer.view.document.DocumentGrid',{
             }
         ];
 
+        this.columnsLoaded = false;
+
         this.store.on('load', function(store, records, successful){
             // choose columns to display based on property fields returned
-            if (successful) {
+            if (successful && me.columnsLoaded == false) {
+                me.columnsLoaded = true;
                 var model = me.store.model;
                 var base_field_names = model.getBaseFieldNames();
                 var returned_fields = Object.keys(records[0].raw);
