@@ -147,10 +147,6 @@ class StringProcessor(object):
             part_of_speech = word_data[1]["PartOfSpeech"]
             lemma = word_data[1]["Lemma"].lower()
             space_before = ""
-            if surface == "doth":
-                print raw_text
-                print parsed_sentence
-
             try:
                 prevChar = raw_text[int(word_data[1]["CharacterOffsetBegin"]) - 1]
                 if space.match(prevChar):
