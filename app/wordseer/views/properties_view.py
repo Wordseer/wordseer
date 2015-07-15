@@ -129,7 +129,6 @@ class PropertiesView(MethodView):
 
         results = []
         for property in properties:
-            print property
             type = property.data_type
             # if type is missing for some reason, fall back to String
             if type == None:
@@ -151,7 +150,6 @@ class PropertiesView(MethodView):
             }
             for value in prop_values:
                 as_dict = value._asdict()
-                print as_dict
                 text = value.value
                 document_count = value.unit_count
                 if "document_count" in as_dict:
