@@ -76,14 +76,15 @@ Ext.define('WordSeer.view.document.DocumentGrid',{
         this.addEvents('search');
         this.columns = [
             {
-                headerTitle:'Matches',
+                headerTitle:'Sentences Matching Query',
                 field:'matches',
                 itemID:'matchColumn',
-                width:50
+                flex: 1
             },
             {
                 headerTitle: 'Sets',
                 field: 'document_set',
+                flex: 1,
                 renderer: function(record, field) {
                     var sets = record.get(field);
                     var html = "";
