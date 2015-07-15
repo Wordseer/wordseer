@@ -37,8 +37,16 @@ class AssociatedWordsView(MethodView):
         query = None
         if "query_id" in keys:
             query = Query.query.get(params["query_id"])
+            sentences = query.sentences
         if query is None:
-            return # 500 error  
+            search_param = loads(params["search"][0])[0]
+            sequence_ids = Word.get_matching_sequence_ids(search_param['gov'])
+            sentences = Sentence.query.\
+                filter(Sentence.project_id == project.id).\
+                filter(SequenceInSentence.sequence_id.in_(sequence_ids)).\
+                filter(Sentence.id == SequenceInSentence.sentence_id)
+
+            
 
         associated_words = db.session.query(
             Word.id.label("id"),
@@ -47,7 +55,7 @@ class AssociatedWordsView(MethodView):
             func.count(WordInSentence.sentence_id.distinct()).label("count"),
             func.count(Sentence.document_id.distinct()).label("doc_count")
             ).\
-        filter(WordInSentence.sentence_id.in_([sentence.id for sentence in query.sentences])).\
+        filter(WordInSentence.sentence_id.in_([sentence.id for sentence in sentences])).\
         filter(WordInSentence.word_id == Word.id).\
         filter(Sentence.id == WordInSentence.sentence_id).\
         group_by(Word.id)
