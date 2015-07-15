@@ -94,11 +94,17 @@ Ext.define('WordSeer.controller.DocumentsController', {
 
 	/* Search for documents */
 	searchForDocuments: function(formValues, grid){
+		var me = this;
 		var params = {
 			include_text: false,
 		};
 		Ext.apply(params, formValues.serialize());
 		grid.formValues = params;
+
+		// activate the download link
+		grid.getStore().on('load', function(store){
+			me.getController("DataExportController").exportTable(grid)
+		})
 		grid.getStore().load({
 			params: params,
 		});

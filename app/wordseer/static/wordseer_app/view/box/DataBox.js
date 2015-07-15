@@ -165,7 +165,7 @@ Ext.define('WordSeer.view.box.DataBox',  {
 	appendToolsToDomHelperSpec: function(spec, tools, idToTrigger) {
 		for (var i = 0; i < tools.length; i++) {
 			spec.push({
-				tag: 'span',
+				tag: 'a',
 				type: tools[i],
 				cls: 'action-button action-button-' + tools[i]
 			});

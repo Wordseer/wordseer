@@ -13,6 +13,7 @@ Ext.define('WordSeer.controller.SentenceListController', {
 		'widget.SentenceTableWidget',
 	],
 	init: function() {
+		var me = this;
 		this.control({
 			'sentence-list, sentence-table': {
 				/** Makes the {@link WordSeer.view.sentence.SentenceList}'s
@@ -30,7 +31,10 @@ Ext.define('WordSeer.controller.SentenceListController', {
 						if (store.data.length == store.totalCount) {
 							// all data is loaded from server:
 							// hide the "rows loading" placeholder
-							this.el.down('.rowsloading').addCls('hidden')
+							this.el.down('.rowsloading').addCls('hidden');
+
+							// activate the download link
+							me.getController("DataExportController").exportTable(grid)
 						}
 					}, grid);
 

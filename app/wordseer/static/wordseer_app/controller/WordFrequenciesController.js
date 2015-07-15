@@ -1,6 +1,5 @@
 /* Copyright 2012 Aditi Muralidharan. See the file "LICENSE" for the full license governing this code. */
-/** The controller for the WordFrequencies.
-http://trifacta.github.io/vega/
+/** The controller for the Metadata Profile.
 */
 Ext.define('WordSeer.controller.WordFrequenciesController', {
 	extend: 'Ext.app.Controller',
@@ -303,7 +302,6 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 					.attr("class", "wordfreq")
 						;
 
-			// debugger;
 			var chart_opts = {
 				bindto: profile,
 				size: {

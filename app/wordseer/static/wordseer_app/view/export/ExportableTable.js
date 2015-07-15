@@ -18,36 +18,27 @@ Ext.define('WordSeer.view.export.ExportableTable', {
 		fileTitle: null
 	},
 
-	/** Checks which the visible columns are, then iterates through the records
-	in the Store adding a line of separator-delimited values for each record.
-
-	@param {String} separator The delimiter by which to separate values for each
-	field.
-	@param {Boolean} no_headers Whether or not to include a first line that
-	names the columns.
+	/** Checks which the visible columns are, then constructs a CSV of them.
 
 	@return {String} file_contents The contents of the file.
 	*/
-	generateFileContents: function(separator, no_headers) {
-		var file_contents = new goog.string.StringBuffer();
-		if (!separator) {
-			separator = "\t";
-		}
+	generateFileContents: function() {
+		var file_contents = [];
 		var columns = this.columns;
 		if (columns) {
 			var visible_indexes = [];
 			var headers = [];
 			for (var i = 0; i < columns.length; i++) {
 				var column = columns[i];
-				if (column.isVisible()) {
+				if (!column.hidden) {
 					visible_indexes.push(column.field);
 					headers.push(column.headerTitle);
 				}
 			}
-			if (!no_headers) {
-				// Add a header line.
-				file_contents.append(headers.join(separator) + "\n");
-			}
+			
+			// Add a header line.
+			file_contents.push(headers);
+			
 			// Add a line for each record.
 			var store = this.getStore();
 			if (store) {
@@ -63,10 +54,10 @@ Ext.define('WordSeer.view.export.ExportableTable', {
 						}
 						values.push(value);
 					}
-					file_contents.append(values.join(separator) + "\n");
+					file_contents.push(values);
 				});
 			}
-			return file_contents.toString();
+			return d3.csv.format(file_contents);
 		}
 	}
 });

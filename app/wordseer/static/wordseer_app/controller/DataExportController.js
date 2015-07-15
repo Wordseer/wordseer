@@ -15,13 +15,6 @@ Ext.define('WordSeer.controller.DataExportController', {
 			'tool[action=export-svg]': {
 				'click': this.exportSvg,
 			},
-			'exportable-grid-panel': {
-				actionButtonClicked: function(table, type, button) {
-					if (type == 'save') {
-						this.exportTable(table, button);
-					}
-				}
-			}
 		});
 	},
 
@@ -31,40 +24,32 @@ Ext.define('WordSeer.controller.DataExportController', {
 	data to export.
 	@param {Ext.Element} button The clicked-on tool.
 	*/
-	exportTable: function (table, button) {
-		var file_contents = "";
-		if (table) {
-			file_contents = table.generateFileContents("\t");
-		}
-		var link_href = "data:application/octet-stream," +
-			escape(file_contents);
-		var table_name = table.title;
-
-		if (table.fileTitle) {
-			table_name = table.fileTitle;
-		}
-		var context = "";
-		var widget = table.up('widget');
-		if (widget) {
-			var formValues = widget.getFormValues();
-			var text = formValues.toText();
-			if (text.length > 0) {
-				context = " for " + text;
+	exportTable: function (grid) {
+		if (grid.getEl().down('.action-button-save')) {
+			var saveButton = grid.getEl().down('.action-button-save').dom;
+			var file_contents = grid.generateFileContents();
+			var link_href = "data:application/octet-stream," +
+				escape(file_contents);
+			var table_name = grid.title;
+	
+			if (grid.fileTitle) {
+				table_name = grid.fileTitle;
 			}
+			var context = "";
+			var widget = grid.up('widget');
+			if (widget) {
+				var formValues = widget.getFormValues();
+				var text = formValues.toText();
+				if (text.length > 0) {
+					context = " for " + text;
+				}
+			}
+			var download_name = table_name + context + ".csv";
+			$(saveButton).attr({
+				download: download_name,
+				href: link_href
+			})
 		}
-		var download_name = getInstance() +" "+ table_name + context + ".tsv";
-		var download_html = " <a class='download' download=\"" + download_name +
-			"\" href=\"" + link_href +"\">tsv</a>";
-		var dh = Ext.DomHelper;
-		download_link = {
-			tag: 'a',
-			href: link_href,
-			cls: 'download',
-			download: download_name,
-			html: 'Download'
-		};
-		dh.insertAfter(button, download_link);
-		button.destroy();
 	},
 
 	/** Replaces the tool with a link to a downloadable file containing the

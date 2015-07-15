@@ -42,7 +42,7 @@ class SentencesView(MethodView):
                                                         matching_words),
                     "id": sentence.id,
                     "document_id": sentence.document_id,
-                    "sentence_set": " ".join([str(set.id) for set in sentence.sets])                 
+                    "sentence_set": " ".join([str(set.id) for set in sentence.sets]),
                 }
                 self.add_metadata_properties(sentence, result)
                 results.append(result)
@@ -131,6 +131,7 @@ class SentencesView(MethodView):
     def make_sentence_dict(self, sentence, matching_words):
         sentence_dict = {}
         sentence_dict["words"] = self.make_sentence_html(sentence, matching_words)
+        sentence_dict["text"] = sentence.text
         return sentence_dict
 
     def post(self):
