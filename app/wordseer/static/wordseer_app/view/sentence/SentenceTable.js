@@ -9,6 +9,7 @@ Ext.define('WordSeer.view.sentence.SentenceTable',{
         'WordSeer.view.sentence.Sentence',
         'WordSeer.view.collections.SetsToolbar',
     ],
+    mixins: ['WordSeer.view.sentence.SentenceMixins'],
     checkboxes: true,
     multiSelect: true,
     onlyCheckboxSelect: true,
@@ -143,7 +144,8 @@ Ext.define('WordSeer.view.sentence.SentenceTable',{
                         .makeSubsetTag(id);
                 }
             }
-            var i = 0;
+            // make individual words clickable and highlight search terms
+            html = view.makeWordsClickable(html, view.id);
             return {
                 tag: 'td',
                 html: html

@@ -9,6 +9,7 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
         'WordSeer.view.sentence.Sentence',
         'WordSeer.view.collections.SetsToolbar',
     ],
+    mixins: ['WordSeer.view.sentence.SentenceMixins'],
     checkboxes: true,
     multiSelect: true,
     onlyCheckboxSelect: true,
@@ -149,31 +150,11 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
         }
 
         // make individual words clickable and highlight search terms
-        var i = 0;
-        html = html.replace(/class='word'/g,
-            function(match) {
-                cls = "word ";
-                // *********************************
-                // TODO: this highlighting code doesn't work
-                // sentence.gov_index is undefined
-                // *********************************
-                // if (sentence.gov_index.contains(i.toString())) {
-                //     // cls += "gov-highlight ";
-                //     cls += ' search-highlight';
-                // }
-                // if (sentence.dep_index == i) {
-                //     // cls += "dep-highlight ";
-                //     cls += ' search-highlight';
-                // }
-                i += 1;
-                return (' onclick="Ext.getCmp(\'' +
-                    me.id +'\').fireEvent(\'wordclicked\', this, ' +
-                    'Ext.getCmp(\'' + me.id +'\'));"' +
-               "container-id='" +me.id+"' class='" + cls + "'");
-            });
-            return {
-                tag: 'td',
-                html: html
-            };
+        html = view.makeWordsClickable(html, view.id);
+        
+        return {
+            tag: 'td',
+            html: html
+        };
     },
 });
