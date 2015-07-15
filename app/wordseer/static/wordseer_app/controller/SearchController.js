@@ -75,6 +75,73 @@ Ext.define('WordSeer.controller.SearchController', {
 				itemclick: this.metadataFilterChanged,
 			},
 		});
+
+		// dynamically populate the metadata fields
+		// load metadata for Document unit
+		Ext.Ajax.request({
+			url: ws_project_path + project_id + '/meta_properties/',
+			method:'GET',
+			disableCaching: false,
+			params:{
+				unit: 'document'
+			},
+			scope:this,
+			success:function(response){
+				var resp = Ext.decode(response.responseText);
+				var data = resp.results;
+				var newFields = [
+					{name: 'has_text', type: 'boolean', default: false},
+					'units',
+					'children',
+					{name:'id', type:'int'},
+					'title',
+					'metadata',
+					{name:'matches', type:'int', sortType: 'asInt'},
+					{name:'document_set', type:'string', defaultValue: '', text:'Sets'},
+				];
+				for (var i = 0; i < data.length; i++) {
+					newFields.push({
+						text: data[i].nameToDisplay,
+						name: data[i].propertyName,
+						type: data[i].type == 'number'? 'float': 'auto',
+						sortType: data[i].type == 'number'? 'asFloat': '',
+						hidden: data[i].valueIsDisplayed === 0,
+					});
+				}
+				WordSeer.model.DocumentModel.setFields(newFields);
+			}
+		});
+		
+		// load metadata for Sentence unit
+		Ext.Ajax.request({
+			url: ws_api_path + ws_project_path + project_id + '/meta_properties',
+			method:'GET',
+			disableCaching: false,
+			params:{
+				unit: 'sentence'
+			},
+			scope:this,
+			success:function(response){
+				var resp = Ext.decode(response.responseText);
+				var data = resp.results;
+				var newFields = [
+					{name:'sentence', type: 'auto'},
+					{name: 'id', type:'int'},
+					{name: 'document_id', type: 'int'},
+					{name: 'sentence_set', type: 'string', defaultValue:"", hidden: true},
+				];
+				for (var i = 0; i < data.length; i++) {
+					newFields.push({
+						text: data[i].nameToDisplay,
+						name: data[i].propertyName,
+						type: data[i].type == 'number'? 'float': 'auto',
+						sortType: data[i].type == 'number'? 'asFloat': '',
+						hidden: data[i].valueIsDisplayed === 0,
+					});
+				}
+				WordSeer.model.SentenceSearchResultModel.setFields(newFields);
+			}
+		});
 	},
 
 	/**
@@ -315,77 +382,6 @@ Ext.define('WordSeer.controller.SearchController', {
 	new search parameters.
 	*/
 	initSearch: function(panel, formValues) {
-		// dynamically populate the metadata fields
-		if (formValues.widget_xtype == "document-browser-widget") {
-			// load metadata for Document unit
-			Ext.Ajax.request({
-				url: ws_project_path + project_id + '/meta_properties/',
-				method:'GET',
-				disableCaching: false,
-				params:{
-					unit: 'document'
-				},
-				scope:this,
-				success:function(response){
-					var resp = Ext.decode(response.responseText);
-					var data = resp.results;
-					var newFields = [
-						{name: 'has_text', type: 'boolean', default: false},
-						'units',
-						'children',
-						{name:'id', type:'int'},
-						'title',
-						'metadata',
-						{name:'matches', type:'int', sortType: 'asInt'},
-						{name:'document_set', type:'string', defaultValue: '', text:'Sets'},
-					];
-					for (var i = 0; i < data.length; i++) {
-						newFields.push({
-							text: data[i].nameToDisplay,
-							name: data[i].propertyName,
-							type: data[i].type == 'number'? 'float': 'auto',
-							sortType: data[i].type == 'number'? 'asFloat': '',
-							hidden: data[i].valueIsDisplayed === 0,
-						});
-					}
-					WordSeer.model.DocumentModel.setFields(newFields);
-				}
-			});
-		} else {
-			// load metadata for Sentence unit
-			Ext.Ajax.request({
-				url: ws_api_path + ws_project_path + project_id + '/meta_properties',
-				method:'GET',
-				disableCaching: false,
-				params:{
-					unit: 'sentence'
-				},
-				scope:this,
-				success:function(response){
-					var resp = Ext.decode(response.responseText);
-					var data = resp.results;
-					var newFields = [
-						{name:'sentence', type: 'auto'},
-						{name: 'id', type:'int'},
-						{name: 'document_id', type: 'int'},
-						{name: 'sentence_set', type: 'string', defaultValue:"", hidden: true},
-					];
-					for (var i = 0; i < data.length; i++) {
-						newFields.push({
-							text: data[i].nameToDisplay,
-							name: data[i].propertyName,
-							type: data[i].type == 'number'? 'float': 'auto',
-							sortType: data[i].type == 'number'? 'asFloat': '',
-							hidden: data[i].valueIsDisplayed === 0,
-						});
-					}
-					WordSeer.model.SentenceSearchResultModel.setFields(newFields);
-				}
-			});
-		}
-		
-
-
 		formValues.query_id = this.current_query_id;
 		panel.formValues = formValues;
 		var widget = panel.down('widget');
