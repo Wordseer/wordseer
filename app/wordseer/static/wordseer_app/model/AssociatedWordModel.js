@@ -7,6 +7,7 @@ Ext.define('WordSeer.model.AssociatedWordModel', {
 		{name:'count', type: 'auto', default: 0},
 		{name:'doc_count', type: 'auto', default: 0},
 		{name:'score_sentences', type: 'float', default:0.0},
-		{name:'category', type:'string'}
+		{name:'category', type:'string'},
+		{name:'class', type:'string', defaultValue: "word"}
 	],
 });

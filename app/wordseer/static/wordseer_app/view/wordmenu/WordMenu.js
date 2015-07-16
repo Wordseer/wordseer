@@ -90,7 +90,7 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
         // with buttons depending on exactly what was clicked.
         var menuItems = [];
 
-        if (sentence_id != -1) {
+        if (sentence_id >= 0) {
             menuItems.push({
                 text: "<span class='wordmenu-label'>Sentence</span>",
                 menu: {
