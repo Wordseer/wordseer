@@ -191,6 +191,9 @@ Ext.define('WordSeer.controller.SearchController', {
 		// Get the form values.
 		var form = button.up('form');
 		var values = form.getValues();
+		if (values.gov.trim().indexOf(" ") > 0) {
+			values.govtype = "phrase";
+		}
 
 		var formValues = Ext.create('WordSeer.model.FormValues');
 		Ext.apply(formValues, values);

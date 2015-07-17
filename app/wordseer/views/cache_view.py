@@ -43,8 +43,7 @@ class QueryCacheView(MethodView):
             some_filtering_happened = True
         if 'search' in keys:
             search_params = loads(params['search'][0])
-            final_result = self.apply_search_filters(search_params,
-                                                     sentence_query)
+            final_result = self.apply_search_filters(search_params, sentence_query)
             if params["separate_sub_searches"] and len(search_params) > 1:
                 for search in search_params:
                     search_query = Query()

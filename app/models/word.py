@@ -7,8 +7,7 @@ from .base import Base
 from .project import Project
 from .sentence import Sentence
 from .sequence import Sequence
-from .association_objects import WordInSentence
-from .association_objects import WordInSequence
+from .association_objects import WordInSentence, WordInSequence, SequenceInSentence
 from .sets import SequenceSet
 from .counts import WordCount
 from .mixins import NonPrimaryKeyEquivalenceMixin
@@ -97,8 +96,10 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
             for sequence in sequences:
                 ids.append(sequence.id)
         if query_string is not None:
+            # wildcard search
+            query_string = query_string.replace('*', '%')
             s = Sequence.query.filter(
-                Sequence.sequence.like(query_string.lower()))
+                Sequence.sequence.like(query_string.lower() + "%"))
             for sequence in s:
                 ids.append(sequence.id)
         return ids
@@ -124,14 +125,26 @@ class Word(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
             A query object with sentences that match the given query parameters.
         """
         if "gov" in search_query_dict:
-            is_set_id = search_query_dict["govtype"] != "word"
+            is_set_id = search_query_dict["govtype"] == "set"
+            is_phrase = search_query_dict["govtype"] == "phrase"
             search_lemmas = "all_word_forms" in search_query_dict and search_query_dict["all_word_forms"] == 'on'
-            matching_word_ids = Word.get_matching_word_ids(
-                search_query_dict["gov"], is_set_id, search_lemmas)
-            sentence_query = sentence_query.\
-                join(WordInSentence,
-                    WordInSentence.sentence_id == Sentence.id).\
-                filter(WordInSentence.word_id.in_(matching_word_ids))
+            
+            if is_phrase:
+                phrase_ids = Word.get_matching_sequence_ids(search_query_dict["gov"])
+
+                sentence_query = sentence_query.\
+                    join(SequenceInSentence, SequenceInSentence.sentence_id == Sentence.id).\
+                    filter(SequenceInSentence.sequence_id.in_(phrase_ids))
+
+            else:
+                matching_word_ids = Word.get_matching_word_ids(
+                    search_query_dict["gov"], is_set_id, search_lemmas)
+            
+                sentence_query = sentence_query.\
+                    join(WordInSentence,
+                        WordInSentence.sentence_id == Sentence.id).\
+                    filter(WordInSentence.word_id.in_(matching_word_ids))
+
             return sentence_query
         return sentence_query
 
