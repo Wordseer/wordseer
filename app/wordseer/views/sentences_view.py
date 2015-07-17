@@ -51,15 +51,29 @@ class SentencesView(MethodView):
     def get_matching_words(self, params):
         matching_words = []
         if "gov" in params and "govtype" in params and params["gov"][0]:
-            is_set_id = params["govtype"][0] != "word"
-            search_lemmas = "all_word_forms" in params and params["all_word_forms"][0] == 'on'
-            matching_words.extend(Word.get_matching_word_ids(params["gov"][0],
-                is_set_id, search_lemmas))
+            if params["govtype"][0] == "phrase":
+                phrase_ids = Word.get_matching_sequence_ids(params["gov"][0])
+                for phrase_id in phrase_ids: 
+                    words_in_phrase = WordInSequence.query.\
+                        filter(WordInSequence.sequence_id == phrase_id).all()
+                    matching_words.extend([word.word_id for word in words_in_phrase])
+            else:
+                is_set_id = params["govtype"][0] != "word"
+                search_lemmas = "all_word_forms" in params and params["all_word_forms"][0] == 'on'
+                matching_words.extend(Word.get_matching_word_ids(params["gov"][0],
+                    is_set_id, search_lemmas))
         if "dep" in params and "deptype" in params and params["dep"][0]:
             is_set_id = params["deptype"][0] != "word"
             search_lemmas = "all_word_forms" in params and params["all_word_forms"][0] == 'on'
             matching_words.extend(Word.get_matching_word_ids(params["dep"][0],
                 is_set_id, search_lemmas))
+        if "phrases" in params and params["phrases"][0] != "[]":
+            for phrase in params["phrases"]:
+                components = phrase.split("_")
+                phrase_id = int(components[1])
+                words_in_phrase = WordInSequence.query.\
+                    filter(WordInSequence.sequence_id == phrase_id).all()
+                matching_words.extend([word.word_id for word in words_in_phrase])
         return matching_words
 
     def make_single_sentence_view(self, sentence, matching_words):

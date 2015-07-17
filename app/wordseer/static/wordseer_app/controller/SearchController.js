@@ -155,13 +155,9 @@ Ext.define('WordSeer.controller.SearchController', {
 
 		var formValues = Ext.create('WordSeer.model.FormValues');
 		formValues.widget_xtype = 'sentence-list-widget';
-		if (record instanceof WordSeer.model.PhraseModel ||
-			record instanceof WordSeer.model.WordModel) {
-			// will be different property if single word or phrase
-			var gov = record.data.word ? record.data.word : record.data.sequence;
-
+		if (record instanceof WordSeer.model.WordModel) {
 			var values = {
-				"gov": gov,
+				"gov": record.data.word,
 				"govtype": "word",
 				"dep": "",
 				"deptype": "word",
@@ -172,6 +168,8 @@ Ext.define('WordSeer.controller.SearchController', {
 			formValues.search.push(values);
 		} else if (record instanceof WordSeer.model.MetadataModel ){
 			formValues.metadata.push(record);
+		} else if (record instanceof WordSeer.model.PhraseModel) {
+			formValues.phrases.push(record)
 		}
 		var history_item = this.getController('HistoryController')
 			.newHistoryItem(formValues);
@@ -193,6 +191,9 @@ Ext.define('WordSeer.controller.SearchController', {
 		// Get the form values.
 		var form = button.up('form');
 		var values = form.getValues();
+		if (values.gov.trim().indexOf(" ") > 0) {
+			values.govtype = "phrase";
+		}
 
 		var formValues = Ext.create('WordSeer.model.FormValues');
 		Ext.apply(formValues, values);
