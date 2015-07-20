@@ -318,10 +318,10 @@ Ext.define('WordSeer.controller.WordMenuController',{
 			deptype: dep_type,
 			relation: relation,
 		});
-		var widget_xtype = 'search-widget';
-		if (relation === "") {
+		// var widget_xtype = 'search-widget';
+		// if (relation === "") {
 			widget_xtype = 'sentence-list-widget';
-		}
+		// }
 		this.getController('SearchController').searchWith(
 			{widget_xtype: widget_xtype}, word_model_instance
 		);

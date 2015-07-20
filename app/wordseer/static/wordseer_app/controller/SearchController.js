@@ -476,14 +476,14 @@ Ext.define('WordSeer.controller.SearchController', {
 				.down('textfield[name="dep"]').hide().setValue('');
 
 				// remove "Grammatical Relations" widget option
-				var gramRelRecord = combobox.up('form')
-				.down('switch-widget-combobox')
-					.store.findRecord('widget_xtype', 'search-widget');
-				if (gramRelRecord) {
-					combobox.up('form')
-					.down('switch-widget-combobox')
-						.store.remove(gramRelRecord);
-				}
+				// var gramRelRecord = combobox.up('form')
+				// .down('switch-widget-combobox')
+				// 	.store.findRecord('widget_xtype', 'search-widget');
+				// if (gramRelRecord) {
+				// 	combobox.up('form')
+				// 	.down('switch-widget-combobox')
+				// 		.store.remove(gramRelRecord);
+				// }
 
 			} else {
 				// show Dependency input
@@ -492,10 +492,10 @@ Ext.define('WordSeer.controller.SearchController', {
 				.down('textfield[name="dep"]').show();
 
 				// add Grammatical Relations widget option
-				combobox.up('form')
-				.down('switch-widget-combobox')
-					.store
-					.add({widget_xtype: 'search-widget', name: 'Grammatical relations'});
+				// combobox.up('form')
+				// .down('switch-widget-combobox')
+				// 	.store
+				// 	.add({widget_xtype: 'search-widget', name: 'Grammatical relations'});
 			}
 		} else if (combobox.xtype == "switch-widget-combobox") {
 			// only enable Current Tab search for Metadata Profile widget

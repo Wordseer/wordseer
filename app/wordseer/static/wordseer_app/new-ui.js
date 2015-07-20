@@ -75,10 +75,10 @@ Ext.application({
                                     widget_xtype: 'word-frequencies-widget',
                                     text: 'Metadata Profile',
                                 },
-                                {
-                                    widget_xtype: 'search-widget',
-                                    text: 'Grammatical Relations',
-                                },
+                                // {
+                                //     widget_xtype: 'search-widget',
+                                //     text: 'Grammatical Relations',
+                                // },
                                 {
                                     widget_xtype: 'sentence-list-widget',
                                     text: 'Sentence List',
@@ -94,15 +94,15 @@ Ext.application({
             },
             getWidgets: function() {
                 return [
-                    {
-                        widget_xtype: 'search-widget',
-                        text: 'Search',
-                        inputClass: [
-                            'word',
-                            'phrase-set',
-                            'grammatical'
-                        ]
-                    },
+                    // {
+                    //     widget_xtype: 'search-widget',
+                    //     text: 'Search',
+                    //     inputClass: [
+                    //         'word',
+                    //         'phrase-set',
+                    //         'grammatical'
+                    //     ]
+                    // },
                     {
                         widget_xtype: 'word-frequencies-widget',
                         text: 'Metadata Profile',
