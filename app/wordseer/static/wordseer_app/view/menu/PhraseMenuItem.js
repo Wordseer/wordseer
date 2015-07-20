@@ -30,35 +30,35 @@ Ext.define("WordSeer.view.menu.PhraseMenuItem", {
 				text: 'See sentences ('+ me.sentenceCount +")",
 				action: 'search-for-phrase',
 			},
-			{
-				text: "<span class='wordmenu-label'>Add</span> to set",
-				menu: {
-					xtype: 'set-menu',
-					type: 'add',
-					store: Ext.getStore('PhraseSetStore'),
-					ids: [me.text]
-				}
-			}
+			// {
+			// 	text: "<span class='wordmenu-label'>Add</span> to set",
+			// 	menu: {
+			// 		xtype: 'set-menu',
+			// 		type: 'add',
+			// 		store: Ext.getStore('PhraseSetStore'),
+			// 		ids: [me.text]
+			// 	}
+			// }
 		];
 		// Are there any sets to which this phrase belongs? If so, give the
 		// option to remove them.
-		sets_containing_this_phrase = [];
-		Ext.getStore('PhraseSetStore').getRootNode().cascadeBy( function(set) {
-				if (set.get('phrases').indexOf(me.phrase) != -1) {
-					sets_containing_this_word.push(set);
-				}
-			});
-		if (sets_containing_this_word.length > 0) {
-			me.menu.push({
-				text: "<span class='wordmenu-label'>Remove</span> from set",
-				menu: {
-					xtype: 'set-menu',
-					type: 'remove',
-					store: Ext.getStore('PhraseSetStore'),
-					ids: [me.text],
-				}
-			});
-		}
+		// sets_containing_this_phrase = [];
+		// Ext.getStore('PhraseSetStore').getRootNode().cascadeBy( function(set) {
+		// 		if (set.get('phrases').indexOf(me.phrase) != -1) {
+		// 			sets_containing_this_word.push(set);
+		// 		}
+		// 	});
+		// if (sets_containing_this_word.length > 0) {
+		// 	me.menu.push({
+		// 		text: "<span class='wordmenu-label'>Remove</span> from set",
+		// 		menu: {
+		// 			xtype: 'set-menu',
+		// 			type: 'remove',
+		// 			store: Ext.getStore('PhraseSetStore'),
+		// 			ids: [me.text],
+		// 		}
+		// 	});
+		// }
 		this.callParent(arguments);
 	}
 });
