@@ -10,42 +10,42 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
         'WordSeer.view.collections.SetsToolbar',
     ],
     mixins: ['WordSeer.view.sentence.SentenceMixins'],
-    checkboxes: true,
+    checkboxes: false,
     multiSelect: true,
     onlyCheckboxSelect: true,
     options: [
-        {
-            option: {
-                tag: 'span',
-                cls: 'button disabled',
-                html: 'Add selected to Set',
-                action: 'add',
-            },
-            listeners: [
-                {
-                    event: 'click'
-                },
-                {
-                    event: 'mouseleave'
-                }
-            ]
-        },
-        {
-            option: {
-                tag: 'span',
-                html: 'Remove selected from Set',
-                cls: 'button disabled',
-                action: 'remove',
-            },
-            listeners: [
-                {
-                    event: 'click',
-                },
-                {
-                    event: 'mouseleave'
-                }
-            ]
-        },
+        // {
+        //     option: {
+        //         tag: 'span',
+        //         cls: 'button disabled',
+        //         html: 'Add selected to Set',
+        //         action: 'add',
+        //     },
+        //     listeners: [
+        //         {
+        //             event: 'click'
+        //         },
+        //         {
+        //             event: 'mouseleave'
+        //         }
+        //     ]
+        // },
+        // {
+        //     option: {
+        //         tag: 'span',
+        //         html: 'Remove selected from Set',
+        //         cls: 'button disabled',
+        //         action: 'remove',
+        //     },
+        //     listeners: [
+        //         {
+        //             event: 'click',
+        //         },
+        //         {
+        //             event: 'mouseleave'
+        //         }
+        //     ]
+        // },
 
     ],
     initComponent: function(){

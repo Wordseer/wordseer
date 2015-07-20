@@ -47,43 +47,43 @@ Ext.define('WordSeer.view.menu.ResultListMenu', {
 					: 'Open document',
 			});
 		}
-		var sets_store = me.getType() == 'sentence' ?
-		Ext.getStore('SentenceSetStore')
-		: Ext.getStore('DocumentSetStore');
+		// var sets_store = me.getType() == 'sentence' ?
+		// Ext.getStore('SentenceSetStore')
+		// : Ext.getStore('DocumentSetStore');
 
-		items.push({
-			xtype: 'wordseer-menuitem',
-			menu: {
-				xtype: 'set-menu',
-				store: sets_store,
-				type: 'add',
-				ids: itemIds
-			},
-			text: 'Add to set...'
-		});
+		// items.push({
+		// 	xtype: 'wordseer-menuitem',
+		// 	menu: {
+		// 		xtype: 'set-menu',
+		// 		store: sets_store,
+		// 		type: 'add',
+		// 		ids: itemIds
+		// 	},
+		// 	text: 'Add to set...'
+		// });
 
-		remove_from_set_options = [];
-		sets_store.getRootNode().cascadeBy(function(set) {
-			if (!set.isRoot()) {
-				if (set.get('ids').filter(function(x){
-					return x.id == itemIds[0];
-				}).length > 0) {
-					remove_from_set_options.push(set);
-				}
-			}
-		});
-		if (remove_from_set_options.length > 0) {
-			items.push({
-				xtype: 'wordseer-menuitem',
-				menu: {
-					xtype: 'set-menu',
-					store: sets_store,
-					type: 'remove',
-					ids: itemIds
-				},
-				text: 'Remove from set...'
-			});
-		}
+		// remove_from_set_options = [];
+		// sets_store.getRootNode().cascadeBy(function(set) {
+		// 	if (!set.isRoot()) {
+		// 		if (set.get('ids').filter(function(x){
+		// 			return x.id == itemIds[0];
+		// 		}).length > 0) {
+		// 			remove_from_set_options.push(set);
+		// 		}
+		// 	}
+		// });
+		// if (remove_from_set_options.length > 0) {
+		// 	items.push({
+		// 		xtype: 'wordseer-menuitem',
+		// 		menu: {
+		// 			xtype: 'set-menu',
+		// 			store: sets_store,
+		// 			type: 'remove',
+		// 			ids: itemIds
+		// 		},
+		// 		text: 'Remove from set...'
+		// 	});
+		// }
 		me.items = items;
 		me.callParent(arguments);
 	}
