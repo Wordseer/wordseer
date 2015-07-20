@@ -89,12 +89,12 @@ Ext.define('WordSeer.view.windowing.viewport.LayoutPanel',  {
                             type: 'filters',
                             html: 'Filters'
                         },
-                        {
-                            tag: 'span',
-                            cls: 'panel-header-menubutton sets',
-                            type: 'sets',
-                            html: 'Sets'
-                        },
+                        // {
+                        //     tag: 'span',
+                        //     cls: 'panel-header-menubutton sets',
+                        //     type: 'sets',
+                        //     html: 'Sets'
+                        // },
                         {
                             tag: 'select',
                             cls: 'panel-header-widget-select',
