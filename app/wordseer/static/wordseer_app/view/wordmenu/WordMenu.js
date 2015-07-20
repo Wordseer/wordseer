@@ -126,37 +126,37 @@ Ext.define('WordSeer.view.wordmenu.WordMenu', {
 
         if (cls == 'word') {
             // The option to add this word to a set.
-            menuItems.push({
-                text: "<span class='wordmenu-label'>Add</span> to set",
-                menu: {
-                    xtype: 'set-menu',
-                    type: 'add',
-                    store: Ext.getStore('PhraseSetStore'),
-                    ids: [current.get('word')],
-                }
-            });
+            // menuItems.push({
+            //     text: "<span class='wordmenu-label'>Add</span> to set",
+            //     menu: {
+            //         xtype: 'set-menu',
+            //         type: 'add',
+            //         store: Ext.getStore('PhraseSetStore'),
+            //         ids: [current.get('word')],
+            //     }
+            // });
 
             // Are there any sets to which this word belongs? If so, give the
             // option to remove them.
-            sets_containing_this_word = [];
-            var word = current.get('word');
-            Ext.getStore('PhraseSetStore').getRootNode().cascadeBy(function(set) {
-                if (set.get('phrases').indexOf(word) != -1) {
-                    sets_containing_this_word.push(set);
-                }
-            });
-            if (sets_containing_this_word.length > 0) {
-                menuItems.push({
-                    text: "<span class='wordmenu-label'>Remove</span> from set",
-                    menu: {
-                        xtype: 'set-menu',
-                        type: 'remove',
-                        store: Ext.getStore('PhraseSetStore'),
-                        ids: [current.get('word')],
-                    }
+            // sets_containing_this_word = [];
+            // var word = current.get('word');
+            // Ext.getStore('PhraseSetStore').getRootNode().cascadeBy(function(set) {
+            //     if (set.get('phrases').indexOf(word) != -1) {
+            //         sets_containing_this_word.push(set);
+            //     }
+            // });
+            // if (sets_containing_this_word.length > 0) {
+            //     menuItems.push({
+            //         text: "<span class='wordmenu-label'>Remove</span> from set",
+            //         menu: {
+            //             xtype: 'set-menu',
+            //             type: 'remove',
+            //             store: Ext.getStore('PhraseSetStore'),
+            //             ids: [current.get('word')],
+            //         }
 
-                });
-            }
+            //     });
+            // }
         }
 
         if (cls == 'word' || cls == 'phrase-set') {

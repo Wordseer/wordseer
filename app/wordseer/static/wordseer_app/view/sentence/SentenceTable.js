@@ -11,41 +11,41 @@ Ext.define('WordSeer.view.sentence.SentenceTable',{
     ],
     mixins: ['WordSeer.view.sentence.SentenceMixins'],
     checkboxes: true,
-    multiSelect: true,
+    multiSelect: false,
     onlyCheckboxSelect: true,
     options: [
-        {
-            option: {
-                tag: 'span',
-                cls: 'button disabled',
-                html: 'Add selected to Set',
-                action: 'add',
-            },
-            listeners: [
-                {
-                    event: 'click'
-                },
-                {
-                    event: 'mouseleave'
-                }
-            ]
-        },
-        {
-            option: {
-                tag: 'span',
-                html: 'Remove selected from Set',
-                cls: 'button disabled',
-                action: 'remove',
-            },
-            listeners: [
-                {
-                    event: 'click',
-                },
-                {
-                    event: 'mouseleave'
-                }
-            ]
-        },
+        // {
+        //     option: {
+        //         tag: 'span',
+        //         cls: 'button disabled',
+        //         html: 'Add selected to Set',
+        //         action: 'add',
+        //     },
+        //     listeners: [
+        //         {
+        //             event: 'click'
+        //         },
+        //         {
+        //             event: 'mouseleave'
+        //         }
+        //     ]
+        // },
+        // {
+        //     option: {
+        //         tag: 'span',
+        //         html: 'Remove selected from Set',
+        //         cls: 'button disabled',
+        //         action: 'remove',
+        //     },
+        //     listeners: [
+        //         {
+        //             event: 'click',
+        //         },
+        //         {
+        //             event: 'mouseleave'
+        //         }
+        //     ]
+        // },
 
     ],
 

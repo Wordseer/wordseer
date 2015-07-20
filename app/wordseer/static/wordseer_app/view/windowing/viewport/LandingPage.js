@@ -15,7 +15,7 @@ Ext.define('WordSeer.view.windowing.viewport.LandingPage',  {
     requires: [
       'WordSeer.view.overview.FrequentWordsOverview',
       'WordSeer.view.overview.MetadataOverview',
-      'WordSeer.view.overview.SetsOverview',
+      // 'WordSeer.view.overview.SetsOverview',
 
     ],
     layout: {
@@ -103,10 +103,10 @@ Ext.define('WordSeer.view.windowing.viewport.LandingPage',  {
                 xtype: 'metadata-overview',
                 model: this.getLayoutPanelModel(),
             },
-            {
-                xtype: 'sets-overview',
-                model: this.getLayoutPanelModel()
-            }
+            // {
+            //     xtype: 'sets-overview',
+            //     model: this.getLayoutPanelModel()
+            // }
         ];
         this.callParent(arguments);
         this.addListener('afterrender', function(me) {

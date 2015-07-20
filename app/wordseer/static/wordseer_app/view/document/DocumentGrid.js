@@ -12,41 +12,41 @@ Ext.define('WordSeer.view.document.DocumentGrid',{
         'WordSeer.model.DocumentModel',
     ],
     checkboxes: true,
-    multiSelect: true,
+    multiSelect: false,
     onlyCheckboxSelect: true,
     options: [
-        {
-            option: {
-                tag: 'span',
-                cls: 'button disabled',
-                html: 'Add to group',
-                action: 'add',
-            },
-            listeners: [
-                {
-                    event: 'click'
-                },
-                {
-                    event: 'mouseleave'
-                }
-            ]
-        },
-        {
-            option: {
-                tag: 'span',
-                html: 'Remove from group',
-                cls: 'button disabled',
-                action: 'remove',
-            },
-            listeners: [
-                {
-                    event: 'click',
-                },
-                {
-                    event: 'mouseleave'
-                }
-            ]
-        },
+        // {
+        //     option: {
+        //         tag: 'span',
+        //         cls: 'button disabled',
+        //         html: 'Add to group',
+        //         action: 'add',
+        //     },
+        //     listeners: [
+        //         {
+        //             event: 'click'
+        //         },
+        //         {
+        //             event: 'mouseleave'
+        //         }
+        //     ]
+        // },
+        // {
+        //     option: {
+        //         tag: 'span',
+        //         html: 'Remove from group',
+        //         cls: 'button disabled',
+        //         action: 'remove',
+        //     },
+        //     listeners: [
+        //         {
+        //             event: 'click',
+        //         },
+        //         {
+        //             event: 'mouseleave'
+        //         }
+        //     ]
+        // },
 
     ],
     initComponent: function() {
@@ -81,23 +81,23 @@ Ext.define('WordSeer.view.document.DocumentGrid',{
                 itemID:'matchColumn',
                 flex: 1
             },
-            {
-                headerTitle: 'Sets',
-                field: 'document_set',
-                flex: 1,
-                renderer: function(record, field) {
-                    var sets = record.get(field);
-                    var html = "";
-                    if (sets.trim().length  > 0) {
-                        var ids = sets.trim().split(" ");
-                        for (var j = 0; j < ids.length; j++) {
-                            html += WordSeer.model.
-                                SubsetModel.makeSubsetTag(ids[j]);
-                        }
-                    }
-                    return {html:html, tag:'td'};
-                }
-            }
+            // {
+            //     headerTitle: 'Sets',
+            //     field: 'document_set',
+            //     flex: 1,
+            //     renderer: function(record, field) {
+            //         var sets = record.get(field);
+            //         var html = "";
+            //         if (sets.trim().length  > 0) {
+            //             var ids = sets.trim().split(" ");
+            //             for (var j = 0; j < ids.length; j++) {
+            //                 html += WordSeer.model.
+            //                     SubsetModel.makeSubsetTag(ids[j]);
+            //             }
+            //         }
+            //         return {html:html, tag:'td'};
+            //     }
+            // }
         ];
 
         this.columnsLoaded = false;

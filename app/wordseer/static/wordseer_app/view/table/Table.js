@@ -173,13 +173,13 @@ Ext.define('WordSeer.view.table.Table', {
 			cols.push({
 				tag: 'th',
 				cls: 'table-head table-select-all',
-				children: [
-					{
-						tag: 'input',
-						type: 'checkbox',
-						cls: 'table-select-all'
-					}
-				]
+				// children: [
+				// 	{
+				// 		tag: 'input',
+				// 		type: 'checkbox',
+				// 		cls: 'table-select-all'
+				// 	}
+				// ]
 			});
 		}
 
