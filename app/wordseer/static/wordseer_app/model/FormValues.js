@@ -286,18 +286,18 @@ Ext.define('WordSeer.model.FormValues', {
 				formValues.search = Ext.decode(serialized.search);
 				var collection = null;
 				var id = parseInt(serialized.collection);
-				if (Ext.getStore('DocumentSetStore').getById(id)) {
-					collection = Ext.getStore('DocumentSetStore')
-						.getById(id);
-				} else if (Ext.getStore('SentenceSetStore')
-					.getById(id)) {
-					collection = Ext.getStore(
-						'SentenceSetStore').getById(id);
-				} else if (Ext.getStore('PhraseSetStore')
-					.getById(id)) {
-					collection = Ext.getStore(
-						'PhraseSetStore').getById(id);
-				}
+				// if (Ext.getStore('DocumentSetStore').getById(id)) {
+				// 	collection = Ext.getStore('DocumentSetStore')
+				// 		.getById(id);
+				// } else if (Ext.getStore('SentenceSetStore')
+				// 	.getById(id)) {
+				// 	collection = Ext.getStore(
+				// 		'SentenceSetStore').getById(id);
+				// } else if (Ext.getStore('PhraseSetStore')
+				// 	.getById(id)) {
+				// 	collection = Ext.getStore(
+				// 		'PhraseSetStore').getById(id);
+				// }
 
 				formValues.collection = (serialized.collection == 'all'
 					|| (collection == null)) ? 'all' : collection;
