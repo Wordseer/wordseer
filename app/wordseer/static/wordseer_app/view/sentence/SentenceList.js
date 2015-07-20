@@ -10,8 +10,8 @@ Ext.define('WordSeer.view.sentence.SentenceList',{
         'WordSeer.view.collections.SetsToolbar',
     ],
     mixins: ['WordSeer.view.sentence.SentenceMixins'],
-    checkboxes: false,
-    multiSelect: true,
+    checkboxes: true,
+    multiSelect: false,
     onlyCheckboxSelect: true,
     options: [
         // {

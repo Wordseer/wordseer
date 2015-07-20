@@ -11,8 +11,8 @@ Ext.define('WordSeer.view.document.DocumentGrid',{
         'WordSeer.view.collections.SetsToolbar',
         'WordSeer.model.DocumentModel',
     ],
-    checkboxes: false,
-    multiSelect: true,
+    checkboxes: true,
+    multiSelect: false,
     onlyCheckboxSelect: true,
     options: [
         // {
