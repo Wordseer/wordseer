@@ -57,7 +57,6 @@ Ext.define('WordSeer.view.autosuggest.AutoSuggestMenu', {
 
 	refresh: function(query, search_lemmas) {
 		var me = this;
-		console.log(search_lemmas, typeof search_lemmas)
 		me.removeAll();
 		me.getStore().load({
 			scope: me,
