@@ -80,14 +80,14 @@ Ext.define('WordSeer.view.windowing.viewport.LayoutPanel',  {
                             tag: 'span',
                             cls: 'panel-header-menubutton frequent-words',
                             type: 'frequent-words',
-                            html: 'Co-occurring<br>Terms',
+                            html: 'Co-occurring <br/>Words',
 
                         },
                         {
                             tag: 'span',
                             cls: 'panel-header-menubutton filters',
                             type: 'filters',
-                            html: 'Filters'
+                            html: 'Metadata <br/>Filters'
                         },
                         // {
                         //     tag: 'span',
@@ -96,9 +96,17 @@ Ext.define('WordSeer.view.windowing.viewport.LayoutPanel',  {
                         //     html: 'Sets'
                         // },
                         {
-                            tag: 'select',
-                            cls: 'panel-header-widget-select',
-                            children: widget_options
+                            tag: 'span', 
+                            cls: 'panel-header-menubutton',
+                            children: [{
+                                tag: "label",
+                                children: [{
+                                    tag: 'select',
+                                    cls: 'panel-header-widget-select',
+                                    children: widget_options
+                                }],
+                                html: 'Panel view: <br/>'
+                            }]
                         },
                     ]
                 },
