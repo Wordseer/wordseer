@@ -428,6 +428,10 @@ div.panelheader {
 			cursor: pointer;
 		}
 	}
+	select.panel-header-widget-select {
+		margin: ($panel-header-height - $select-box-height)/2;
+		height: $select-box-height;
+	}
 
 	div.panel-header-navcontrols {
 		float: right;
