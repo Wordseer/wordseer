@@ -327,7 +327,7 @@ class StanfordCoreNLP:
             # CoNLL classifier (~50sec)
             # PCFG (~3sec)
             # timeouts = [20, 200, 600, 600, 20]
-            timeouts = [20, 200]
+            timeouts = [50, 300]
 
             for i in xrange(2):
                 self.corenlp.expect("done", timeout=timeouts[i])  # Load model
@@ -394,7 +394,6 @@ class StanfordCoreNLP:
         # the idea here is that you increase the timeout as a
         # function of the text's length.
         max_expected_time = max(5.0, 3 + len(to_send) / 5.0)
-        # max_expected_time = max(300.0, len(to_send) / 3.0)
 
         # repeated_input = self.corenlp.except("\n")  # confirm it
         t = self.corenlp.expect(["\nNLP> ", pexpect.TIMEOUT, pexpect.EOF,
