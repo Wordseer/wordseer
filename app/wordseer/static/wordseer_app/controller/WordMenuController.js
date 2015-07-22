@@ -302,9 +302,9 @@ Ext.define('WordSeer.controller.WordMenuController',{
 	grammaticalSearchOptionClicked: function(button) {
 		var current = button.getCurrent();
 		var relation = button.getRelation();
-		var search_term = (button.getCurrent().getClass() == 'word' ?
-			button.getCurrent().get('word') : button.getCurrent().get('id'));
-		var search_type = button.getCurrent().getClass();
+		var search_term = (current.get('class') == 'word' ?
+			current.get('word') : current.get('id'));
+		var search_type = current.get('class');
 		var gov = button.getGov() ? button.getGov() : '';
 		var gov_type = button.getGov()? search_type : 'word';
 		var dep = button.getDep() ? button.getDep() : '';
