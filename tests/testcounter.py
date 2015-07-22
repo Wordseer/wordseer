@@ -25,6 +25,8 @@ class CounterTests(unittest.TestCase):
     @mock.patch.object(counter, "count_sequences", autospec=True)
     @mock.patch.object(counter, "count_dependencies", autospec=True)
     @mock.patch.object(counter, "count_words", autospec=True)
+    @mock.patch.object(counter, "count_sentences_by_property", autospec=True)
+    @mock.patch.object(counter, "count_most_frequent", autospec=True)
     def test_count_all(self, mock_count_words, mock_count_dependencies,
             mock_count_sequences, mock_count_documents):
         """Test the count_all function.
@@ -70,6 +72,7 @@ class CounterTests(unittest.TestCase):
         """
         interval = 2
 
+        mock_sentence = mock.create_autospec(Sentence)
         mock_dependency_count = mock.create_autospec(DependencyCount)
         mock_dependency.query.get.return_value.get_counts.return_value = \
                 mock_dependency_count
@@ -108,6 +111,8 @@ class CounterTests(unittest.TestCase):
         mock_sequence_count = mock.create_autospec(SequenceCount)
         mock_sequence.query.get.return_value.get_counts.return_value = \
                 mock_sequence_count
+        mock_sentence = mock.create_autospec(Sentence)
+
 
         rows = []
 
@@ -139,8 +144,9 @@ class CounterTests(unittest.TestCase):
         """Test the count_words method.
         """
         interval = 2
-
+      
         mock_word_count = mock.create_autospec(WordCount)
+        mock_sentence = mock.create_autospec(Sentence)
         mock_word.query.get.return_value.get_counts.return_value = \
                 mock_word_count
 
@@ -155,7 +161,6 @@ class CounterTests(unittest.TestCase):
         mock_db.session.execute.return_value.fetchall.return_value = rows
 
         mock_project = mock.create_autospec(Project)
-
         counter.count_words(mock_project, interval)
 
         word_id_calls = [mock.call(i) for i in range(0, interval * 2 + 1)]

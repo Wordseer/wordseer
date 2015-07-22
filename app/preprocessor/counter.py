@@ -150,7 +150,6 @@ def count_words(project, commit_interval):
     logger = logging.getLogger(__name__)
     project_logger = ProjectLogger(logger, project)
 
-    num_words = db.session.query(Word.id).count()
     word_counts = db.session.query(
         Word.id.label("word_id"),
         func.count(Sentence.document_id.distinct()).label("document_count"),
@@ -172,8 +171,6 @@ def count_words(project, commit_interval):
         word.save(False)
         if count % commit_interval == 0:
             db.session.commit()
-            # project_logger.info("Calculating count for word %s/%s", count,
-            #     num_words)
 
     db.session.commit()
     project_logger.info('Counted %s words.', count)
