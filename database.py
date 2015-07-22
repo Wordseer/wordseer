@@ -173,9 +173,15 @@ def index():
 
         # compound indices
         Index('ix_count_projid_id', models.Count.project_id, models.Count.id),
+        Index("ix_dependency_govid_depid_id", models.Dependency.governor_id, models.Dependency.dependent_id, 
+              models.Dependency.id),
+        Index("ix_dependency_depid_govid_id", models.Dependency.dependent_id, models.Dependency.governor_id,
+              models.Dependency.id),
         Index('ix_docsindocsets_docid_docsetid', association_tables.documents_in_documentsets.c.document_id, association_tables.documents_in_documentsets.c.documentset_id),
         Index('ix_docfileinproj_docfileid_projid', association_tables.document_files_in_projects.c.document_file_id, association_tables.document_files_in_projects.c.project_id),
         Index('ix_docfileinproj_projid_docfileid', association_tables.document_files_in_projects.c.project_id, association_tables.document_files_in_projects.c.document_file_id),
+        Index("ix_grammrel_projid_id_name", models.GrammaticalRelationship.project_id, 
+              models.GrammaticalRelationship.id, models.GrammaticalRelationship.name),
         Index('ix_projectsusers_projid_userid', models.ProjectsUsers.project_id, models.ProjectsUsers.user_id),
         Index('ix_property_name_value', models.Property.name, models.Property.value),
         Index('ix_property_id_name_value', models.Property.id, models.Property.name, models.Property.value),
@@ -201,6 +207,7 @@ def index():
         Index("ix_word_pos_id", models.Word.part_of_speech, models.Word.id),
         Index("ix_word_surface_lemma", models.Word.surface, models.Word.lemma),
         Index('ix_wordcount_wordid_id', models.WordCount.word_id, models.WordCount.id),
+        Index('ix_wordinsent_projid_wordid', models.WordInSentence.project_id, models.WordInSentence.word_id),
         Index('ix_wordinsent_wordid_sentid', models.WordInSentence.word_id, models.WordInSentence.sentence_id),
         # TODO: it can't find this column in the table for some reason
         # Index('ix_wordcount_projid_wordid', models.WordCount.project_id, models.WordCount.word_id),

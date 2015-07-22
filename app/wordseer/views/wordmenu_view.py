@@ -46,6 +46,7 @@ class GrammaticalSearchOptionsView(MethodView):
             Word.surface.label("word"),
             func.count(DependencyInSentence.sentence_id).label("count")).\
         join(Dependency, Dependency.dependent_id == Word.id).\
+        filter(GrammaticalRelationship.project_id == project.id).\
         filter(GrammaticalRelationship.id ==
             Dependency.grammatical_relationship_id).\
         filter(Dependency.governor_id.in_(word_ids)).\
@@ -57,6 +58,7 @@ class GrammaticalSearchOptionsView(MethodView):
             Word.surface.label("word"),
             func.count(DependencyInSentence.sentence_id).label("count")).\
         join(Dependency, Dependency.governor_id == Word.id).\
+        filter(GrammaticalRelationship.project_id == project.id).\
         filter(Dependency.dependent_id.in_(word_ids)).\
         filter(GrammaticalRelationship.id ==
                Dependency.grammatical_relationship_id).\
@@ -69,8 +71,9 @@ class GrammaticalSearchOptionsView(MethodView):
         for relation in govs:
             self.add_relation_to_response(response, "dep", relation);
 
-        response["search"] = WordInSentence.query.filter(
-            WordInSentence.word_id.in_(word_ids)).count()
+        response["search"] = WordInSentence.query.\
+            filter(WordInSentence.project_id == project.id).\
+            filter(WordInSentence.word_id.in_(word_ids)).count()
 
         return jsonify(response)
 
