@@ -492,7 +492,7 @@ class ProjectPermissionsTests(unittest.TestCase):
             })
 
         assert result.status_code == 200
-        assert "doesn&#39;t seem to be" in result.data
+        assert "This user does not exist." in result.data
 
     def test_create_existing(self):
         """Add an existing user.

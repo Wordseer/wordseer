@@ -257,8 +257,8 @@ class ProjectPermissionsForm(Form, HiddenSubmitted):
             try:
                 new_user = User.query.filter_by(email = field.data).one()
             except NoResultFound:
-                raise ValidationError("This user doesn't seem to be registered "
-                    "on this server.")
+                raise ValidationError("This user does not exist. (Users must register for an account " + 
+                    "before you can add them as collaborators.)")
 
             if new_user.id in existing_collaborators:
                 raise ValidationError("This user is already on this project.")
