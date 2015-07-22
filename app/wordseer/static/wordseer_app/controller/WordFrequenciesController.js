@@ -160,27 +160,13 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 
 		// create normalize toggle
 		var display = d3.select('#' + panel.id + ' .panel-header .display');
-		var norm = display.selectAll('span')
-			.data([{'value': 'raw', 'label': 'Raw Counts'},
-				   {'value': 'norm', 'label': '% of Total'}
-			])
-			.enter()
-				.append('span')
-				.attr('class', 'viz-toggle')
-				;
-		norm.append('input')
-			.attr('type', 'radio')
-			.attr('value', function(d){
-				return d.value;
+		
+		var norm = display.selectAll('input');
+		norm.attr('name', 'display_' + panel.id)
+			.attr('id', function(){
+				return this.value + '_' + panel.id;
 			})
-			.attr('name', 'display_' + panel.id)
-			.attr('id', function(d){
-				return d.value + '_' + panel.id;
-			})
-			.property('checked', function(d){
-				return d.value == 'raw';
-			})
-			.on('change', function(d,i){
+			.on('change', function(){
 				var svg = d3.selectAll('#'+panel.id+' .viz-container svg');
 				// reset all the sort controls
 				d3.selectAll('.sort-control')
@@ -190,7 +176,7 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 							return d == 'fa-sort-alpha-asc';
 						});
 
-				if (d.value == "norm") {
+				if (this.value == "norm") {
 					// normalize data to total for profile
 					_.each(c3_charts, function(chart, key){
 						if (data[key].datatype == "string" || data[key].datatype == "number") {
@@ -223,17 +209,15 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 								// normalize to 100%
 								_.each(rows, function(row,row_i){
 									if (row_i > 0){
-										console.log(row)
 										_.each(row, function(c,i,a){
 											if (i > 0) {
-												console.log(c, totals[row_i])
 												a[i] = c / totals[row_i][1];
 											}
 										})
 									}
 								})
 								chart.load({
-									rows: rows
+									rows: rows,
 								});
 
 								// formatting changes
@@ -242,10 +226,11 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 								groups.push("(other)");
 								chart.groups([groups]);
 								chart.axis.max({y: 0.99})
+								
 							}
 						}
 					})
-				} else if (d.value == "raw"){
+				} else if (this.value == "raw"){
 					// de-normalize the data
 					_.each(c3_charts, function(chart, key){
 						if (data[key].datatype == "string" || data[key].datatype == "number") {
@@ -254,23 +239,20 @@ Ext.define('WordSeer.controller.WordFrequenciesController', {
 							// unstack the bars
 							chart.groups([]);
 							// reset axis to max value
-							var all_vals = _.flatten(_.rest(rows));
+							var all_vals = _.flatten(
+								_.map(_.rest(rows), 
+									function(row){ 
+										return _.rest(row)
+									})
+								);
 							chart.axis.max({y: _.max(all_vals)});
 							chart.load({
-								unload: ['(other)'],
+								unload: ["(other)"],
 								rows: rows
 							})
 						}
 					})
 				}
-			})
-			;
-		norm.append('label')
-			.attr('for', function(d){
-				return d.value + '_' + panel.id;
-			})
-			.text(function(d){
-				return d.label;
 			})
 			;
 

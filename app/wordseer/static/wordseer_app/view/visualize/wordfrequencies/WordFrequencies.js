@@ -10,13 +10,56 @@ Ext.define('WordSeer.view.visualize.wordfrequencies.WordFrequencies', {
 		{
 			xtype: 'component',
 			itemId: 'panel-header',
-			html: '\
-				<div class="databox-header">\
-					<h2 class="databox-header">Metadata Profile</h2>\
-					<div class="controls">PROPERTIES:</div>\
-					<div class="display">DISPLAY AS:</div>\
-				</div>',
-			cls: 'panel-header'
+			autoEl: {
+				tag: 'div',
+				cls: "panel-header databox-header",
+				children: [
+					{
+						tag: 'h2',
+						cls: "databox-header",
+						html: 'Metadata Profile'
+					},
+					{
+						tag: 'div',
+						cls: "controls",
+						html: 'PROPERTIES:'
+					},
+					{
+						tag: 'div',
+						cls: 'display',
+						html: 'DISPLAY AS:',
+						children: [
+							{
+								tag: 'label',
+								cls: 'viz-toggle',
+								children: [
+									{
+										tag: "input",
+										type: "radio",
+										value: "raw",
+										checked: "checked",
+										style: "float: left;"
+									}
+								],
+								html: 'Raw Counts'
+							},
+							{
+								tag: 'label',
+								cls: 'viz-toggle',
+								children: [
+									{
+										tag: "input",
+										type: "radio",
+										value: "norm",
+										style: "float: left;"
+									}
+								],
+								html: "% of Total"
+							}
+						]
+					}
+				] 
+			}
 		}, {
 			xtype: 'component',
 			itemId: 'canvas',
