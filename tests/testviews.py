@@ -55,6 +55,7 @@ class TestSetViews(unittest.TestCase):
     def tearDown(self):
         db.session.close()
 
+    @unittest.skip("sets disabled in current release")
     def test_crud_init(self):
         """test the ``sets.CRUD`` class __init__"""
         with self.client as c:
@@ -64,6 +65,7 @@ class TestSetViews(unittest.TestCase):
             response = c.get("/api/sets/?instance=bar")
             self.assertEqual(response.status_code, 400, msg=response.status_code)
 
+    @unittest.skip("sets disabled in current release")
     def test_read(self):
         """test the ``sets.CRUD.read`` view"""
 
@@ -90,6 +92,7 @@ class TestSetViews(unittest.TestCase):
 
             # TODO: 'ids' and 'phrases'
 
+    @unittest.skip("sets disabled in current release")
     def test_list(self):
         """test the ``sets.CRUD.list`` view"""
 
@@ -120,6 +123,7 @@ class TestSetViews(unittest.TestCase):
             self.assertEqual(data["children"][0]["children"][1]["text"],
                 "test4", msg=data)
 
+    @unittest.skip("sets disabled in current release")
     def test_list_flat(self):
         """test the ``sets.CRUD.list_flat`` method"""
 
@@ -149,6 +153,7 @@ class TestSetViews(unittest.TestCase):
             data = json.loads(response.data)
             self.assertEqual(data["sets"][0]["text"], "all", msg=data)
 
+    @unittest.skip("sets disabled in current release")
     def test_create(self):
         """test the ``sets.CRUD.create`` method"""
 
