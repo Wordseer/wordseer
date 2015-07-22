@@ -69,7 +69,7 @@ class SequenceProcessorTests(unittest.TestCase):
         document = Document()
         sentence = Sentence(text="The quick brown fox jumped over the lazy dog",
             document=document)
-        sentence.word_in_sentence = [WordInSentence(word=Word(lemma="the"),
+        sentence.words = [WordInSentence(word=Word(lemma="the"),
                 surface="the"),
             WordInSentence(word=Word(lemma="fox"), surface="fox"),
             WordInSentence(word=Word(lemma="jump"), surface="jumped"),
