@@ -13,32 +13,32 @@ You can find much more information on WordSeer, including demo videos, use case 
 
 ## Installation
 
-Be prepared: you may have to do a little command-line voodoo to install and launch WordSeer! But once it is up and running, you will access it through a web browser.
-
-### Prerequisites
-
-Before attempting to install WordSeer, make sure your computer has the following software installed:
-
-- [Python 2.7](https://python.org/download) (Python 3.x is NOT supported at this time)
-- [Java 1.8 or later](https://www.java.com/en/download/manual.jsp)
-
-### Download
+Be prepared: you may have to do a little command-line voodoo to install and launch WordSeer! 
+But once it is up and running, you will access it through a web browser.
 
 The latest release of WordSeer is available as a .zip file from this GitHub repository 
 [here](https://github.com/Wordseer/wordseer/archive/master.zip). Download this file and 
 extract its contents wherever you want; WordSeer will keep all the files it needs to run 
 in this folder.
 
-### For Mac OS X users
+#### Prerequisites
 
-tktk
+Before attempting to install WordSeer, make sure your computer has the following software installed:
 
-### For Windows users
+- [Python 2.7](https://python.org/download) (Python 3.x is NOT supported at this time)
+- [Java 1.8 or later](https://www.java.com/en/download/manual.jsp)
+
+#### Mac OS X installer
+
+Double-click `Install Wordseer (Mac)` in the folder where you extracted WordSeer and follow the prompts.
+You may need administrator privileges to complete some parts of the installation.
+
+#### Windows installer
 
 Double click on `install.bat` in the folder where you extracted WordSeer and follow the prompts.
 You may need administrator privileges to complete some parts of the installation.
 
-### For Linux users
+#### Installing from the command line
 
 Open the extracted WordSeer folder in your command-line terminal.
 
@@ -56,7 +56,25 @@ If you know what you want, run `install.py -h` to view known console flags.
 
 After installation has completed, you are ready to run WordSeer.
 
-### Linux/OS X
+#### Mac OS X launcher
+
+Double-click `Wordseer (Mac).app`. 
+
+You will see a console window with an IP address. The launcher will open 
+this address in your default web browser, but if you close that window and need
+to return to WordSeer, use this address. 
+
+To quit Wordseer, close the console window.
+
+#### Windows launcher
+
+Double-click `wordseer.bat`.
+
+You will see a console window with an IP address. Navigate
+to that address in your browser and you should see the WordSeer welcome
+screen.
+
+#### Launching WordSeer from the command line
 
 Run `wordseer.py`:
 
@@ -66,15 +84,8 @@ You will see a console window with an IP address. Navigate
 to that address in your browser and you should see the WordSeer welcome
 screen.
 
-### Windows
 
-Double click on `wordseer.bat`.
-
-You will see a console window with an IP address. Navigate
-to that address in your browser and you should see the WordSeer welcome
-screen.
-
-## Using WordSeer for the first time
+## Using WordSeer
 
 You will be asked to register and log in to use WordSeer; this allows multiple users
 to collaborate on analysis projects, and the account information you enter will only
@@ -85,7 +96,7 @@ Once you've logged in, you can create new Projects, which are self-contained col
 of documents that you want to analyze. To explore your documents in WordSeer, you must 
 first upload and process them. WordSeer only accepts documents in **XML format** at this point.
 
-### Analyzing documents with WordSeer
+#### Analyzing documents with WordSeer
 
 If you want to test out WordSeer before loading your own collection, we have included several
 example collections with this download; they are located in the `tests/data/` directory. Each 
@@ -109,7 +120,7 @@ clicking it launches the WordSeer text analysis environment for that project.
 You can learn more about the analysis capabilities of WordSeer and view some video demos and tutorials 
 at our [website](http://wordseer.berkeley.edu/).
 
-### Importing your own document collection into WordSeer
+#### Importing your own document collection into WordSeer
 
 If you've gotten this far, you probably have your own collection of documents that you want to analyze.
 Good news: as of version 4.0, WordSeer includes a Structure Mapper tool that lets you tell
