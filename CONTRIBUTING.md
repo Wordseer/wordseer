@@ -1,7 +1,20 @@
 # How to contribute to Wordseer
 
-If you'd like to contribute, we'll be happy to have your help. Here's an
-overview of our development process.
+If you'd like to contribute, we'll be happy to have your help. 
+
+First and foremost, feel free to get in touch! The WordSeer project is directed by [Prof. Marti Hearst](http://people.ischool.berkeley.edu/~hearst/) 
+at the University of California, Berkeley, School of Information; you may contact her via email 
+at hearst@berkeley.edu.
+
+We welcome both technical and non-technical contributions to the WordSeer project. Sure, 
+there are software bugs to be fixed (and [plenty of them](https://github.com/Wordseer/wordseer/issues)),
+but there are also features to be designed and user studies to be done. 
+
+WordSeer began with Aditi Muralidharan's PhD research and engineering at UC Berkeley with Prof. Hearst; 
+there is a wealth of information on that research available on [the WordSeer website](http://wordseer.berkeley.edu/publications-2/)
+that can provide useful background for both technical and non-technical contributors.
+
+If you're looking to dive in and start coding, here's an overview of our development process.
 
 ## Branching
 
@@ -22,11 +35,11 @@ Unit tests must always be passing in `master`.
 
 ## Ways to contribute
 
-1. [Report bugs](https://github.com/Wordseer/wordseer_flask/issues/new)
+1. [Report bugs](https://github.com/Wordseer/wordseer/issues/new)
 
 2. Fix bugs - we have a conveniently organized
-[system](https://waffle.io/wordseer/wordseer_flask) for contributors to see
-what's ready to be [worked on](https://github.com/Wordseer/wordseer_flask/issues?q=is%3Aopen+is%3Aissue+label%3Aready).
+[system](https://waffle.io/Wordseer/wordseer) for contributors to see
+what's ready to be [worked on](https://github.com/Wordseer/wordseer/issues?q=is%3Aopen+is%3Aissue+label%3Aready).
 Once you've fixed something, you can create a pull request.
 
 ## Documentation
@@ -47,7 +60,7 @@ Simply run `runtests.py`:
 ## Version history
 
 Up through versions 3.X, Wordseer was a collection of PHP/MySQL and JavaScript 
-apps. This repository initiates version 4, which is a reimplementation of WordSeer's
+applications. This repository initiates version 4, which is a reimplementation of WordSeer's
 PHP components in Python/SQLite that can be run on local machines without requiring
 a web server setup. There are two primary components to this new codebase:
 
