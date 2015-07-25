@@ -262,7 +262,11 @@ def project_process(project_id):
 
     # retrieve the structure file and start processing
     structure_file = StructureFile.query.get(request.form["struc_id"])
-    if structure_file.project != project:
+    if structure_file == None or structure_file.project != project:
+        return app.login_manager.unauthorized()
+
+    # don't let a project be processed more than once
+    if project.status != Project.STATUS_UNPROCESSED:
         return app.login_manager.unauthorized()
 
     process_files(project.path, structure_file.path, project)
