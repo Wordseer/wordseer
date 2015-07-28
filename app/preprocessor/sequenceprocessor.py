@@ -48,7 +48,7 @@ class SequenceProcessor(object):
 
         return without_stops
 
-    def process(self, sentence, sequence_dict=None, sequence_length=2):
+    def process(self, sentence, sequence_dict=None, sequence_length=4):
         """Iterate and record every sequence with length <= `sequence_length. 
         The method records using the ReaderWriter a list of sequences present 
         in the given sentence.

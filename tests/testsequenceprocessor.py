@@ -21,7 +21,7 @@ class SequenceProcessorTests(unittest.TestCase):
         """Obtain a SequenceProcessor.
         """
         database.clean()
-        self.project = mock.create_autospec(Project)
+        self.project = Project()
         self.seq_proc = SequenceProcessor(self.project)
 
 
@@ -68,14 +68,17 @@ class SequenceProcessorTests(unittest.TestCase):
         """
         document = Document()
         sentence = Sentence(text="The quick brown fox jumped over the lazy dog",
-            document=document)
-        sentence.word_in_sentence = [WordInSentence(word=Word(lemma="the"),
-                surface="the"),
-            WordInSentence(word=Word(lemma="fox"), surface="fox"),
-            WordInSentence(word=Word(lemma="jump"), surface="jumped"),
-            WordInSentence(word=Word(lemma="over"), surface="over"),
-            WordInSentence(word=Word(lemma="the"), surface="the"),
-            WordInSentence(word=Word(lemma="dog"), surface="dog")]
+            document=document, project = self.project)
+        words = [
+            Word(lemma="the", surface="the"),
+            Word(lemma="fox", surface="fox"),
+            Word(lemma="jump", surface="jumped"),
+            Word(lemma="over", surface="over"),
+            Word(lemma="the", surface="the"),
+            Word(lemma="dog", surface="dog")]
+        for index, word in enumerate(words): 
+            word.save()
+            sentence.add_word(word, index+1, " ", word.surface, self.project)
         sentence.save()
 
         result = self.seq_proc.process(sentence)
@@ -133,6 +136,9 @@ class SequenceProcessorTests(unittest.TestCase):
             }
         }
 
+        print sequence_sequences
+        # TODO: the seqproc isn't making phrases of words separated by a stopword,
+        # but this code expects it to.
         self.failUnless(sequence_sequences == key)
 
 def split_sequences(sequences):

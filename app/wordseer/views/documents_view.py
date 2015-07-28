@@ -21,7 +21,7 @@ class DocumentsView(MethodView):
             if "query_id" in keys:
                 query = Query.query.get(params["query_id"])
         if project is None:
-            abort(500)
+            return 
         documents = project.get_documents()
         if query is not None:
             documents = db.session.query(

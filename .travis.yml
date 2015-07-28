@@ -1,6 +1,6 @@
 language: python
 python:
     - "2.7"
-install: "python install.py"
+install: "python install.py -f"
 script: "python runtests.py"
-
+sudo: false

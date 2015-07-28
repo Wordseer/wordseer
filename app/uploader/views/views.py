@@ -262,7 +262,11 @@ def project_process(project_id):
 
     # retrieve the structure file and start processing
     structure_file = StructureFile.query.get(request.form["struc_id"])
-    if structure_file.project != project:
+    if structure_file == None or structure_file.project != project:
+        return app.login_manager.unauthorized()
+
+    # don't let a project be processed more than once
+    if project.status != Project.STATUS_UNPROCESSED:
         return app.login_manager.unauthorized()
 
     process_files(project.path, structure_file.path, project)
@@ -338,7 +342,7 @@ def project_permissions(project_id):
     for ownership in ownerships:
         form.selection.add_choice(ownership.id, ownership)
 
-    if request.method == "POST":
+    if request.method == "POST" and form.validate():
         selected_rels = request.form.getlist("permissions-selection")
         ownerships = [ProjectsUsers.query.get(id) for id in selected_rels]
         
@@ -357,15 +361,10 @@ def project_permissions(project_id):
         if request.form["action"] == form.CREATE:
             email = request.form["permissions-new_collaborator"]
             role = int(request.form["permissions-create_permissions"])
-            try:
-                user = User.query.filter(User.email == email).one()
-                rel = user.add_project(project=project, role=role)
-                form.selection.add_choice(rel.id, rel)
-            except NoResultFound:
-                form.selection.errors = list(form.selection.errors)
-                form.selection.errors.append(
-                    "User " + email + " does not exist. (Users must register for an account" + 
-                    "before you can add them as collaborators.)")
+            user = User.query.filter(User.email == email).one()
+            rel = user.add_project(project=project, role=role)
+            form.selection.add_choice(rel.id, rel)
+            
 
     return render_template("project_permissions.html", project=project, form=form)
 
