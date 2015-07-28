@@ -55,7 +55,7 @@ class DocumentParser(object):
                 # self.string_processor.parse(sentence, relationships,
                 #     dependencies)
                 
-                self.sequence_processor.process(sentence, sequences)
+                self.sequence_processor.process(sentence, sequences, 2)
                 
                 count += 1
                 current_max = sentence.id
