@@ -1,11 +1,11 @@
 # WordSeer
-## A Text Analysis Environment for Humanities Scholars
+## A Text Analysis Environment for Humanities Scholars and Social Scientists
 
 [![Stories in Ready](https://badge.waffle.io/wordseer/wordseer.png?label=ready&title=Ready)](https://waffle.io/wordseer/wordseer)
 [![Build Status](https://travis-ci.org/Wordseer/wordseer.svg?branch=master)](https://travis-ci.org/Wordseer/wordseer)
 [![Documentation](https://readthedocs.org/projects/wordseer/badge/?version=latest)](http://wordseer.readthedocs.org/en/latest/)
 
-[WordSeer](http://wordseer.berkeley.edu/) is a text analysis environment that combines visualization, information retrieval, sensemaking and and natural language processing to make the contents of text navigable, accessible, and useful. You can run WordSeer on your local machine or on a shared server, and you access it via your modern web browser of choice ([Google Chrome](https://www.google.com/chrome/browser/desktop/index.html) works best, though).
+[WordSeer](http://wordseer.berkeley.edu/) is a text analysis environment that combines visualization, information retrieval, sensemaking and natural language processing to make the contents of text navigable, accessible, and useful. You can run WordSeer on your local machine or on a shared server, and you access it via your modern web browser of choice ([Google Chrome](https://www.google.com/chrome/browser/desktop/index.html) works best, though).
 
 If you're a scholar who's interested in using Wordseer for your research, read on. If you want to learn more about how to contribute to WordSeer's ongoing design and development, take a look at our [Guidelines for Contributors](https://github.com/Wordseer/wordseer/blob/master/CONTRIBUTING.markdown).
 
