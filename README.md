@@ -16,8 +16,8 @@ You can find much more information on WordSeer, including demo videos, use case 
 Be prepared: you may have to do a little command-line voodoo to install and launch WordSeer! 
 But once it is up and running, you will access it through a web browser.
 
-The latest release of WordSeer is available as a .zip file from this GitHub repository 
-[here](https://github.com/Wordseer/wordseer/archive/master.zip). Download this file and 
+The latest release of WordSeer is available as a .zip or .tar.gz file from this GitHub repository 
+[here](https://github.com/Wordseer/wordseer/releases/latest). Download this file and 
 extract its contents wherever you want; WordSeer will keep all the files it needs to run 
 in this folder.
 
@@ -76,7 +76,11 @@ screen.
 
 #### Launching WordSeer from the command line
 
-Run `wordseer.py`:
+If you installed WordSeer in a virtual environment, be sure to activate it first: 
+
+    source venv/bin/activate
+
+Then launch WordSeer with the following command:
 
     ./wordseer.py
     
