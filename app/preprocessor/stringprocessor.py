@@ -145,7 +145,13 @@ class StringProcessor(object):
         for word_data in parsed_sentence["words"]:
             surface = word_data[0]
             part_of_speech = word_data[1]["PartOfSpeech"]
-            lemma = word_data[1]["Lemma"].lower()
+            try:
+                lemma = word_data[1]["Lemma"].lower()
+            except AttributeError as err:
+                # this word wasn't recognized as a word by the parser,
+                # it's probably a weird character or something
+                lemma = "*" * (int(word_data[1]["CharacterOffsetEnd"]) - int(word_data[1]["CharacterOffsetBegin"]))
+                surface = "*" * (int(word_data[1]["CharacterOffsetEnd"]) - int(word_data[1]["CharacterOffsetBegin"]))
             space_before = ""
             try:
                 prevChar = raw_text[int(word_data[1]["CharacterOffsetBegin"]) - 1]
@@ -199,12 +205,24 @@ class StringProcessor(object):
                 dependent_index = int(dependency[4]) - 1
                 governor_pos = parsed_sentence["words"][governor_index][1]\
                     ["PartOfSpeech"]
-                governor_lemma = parsed_sentence["words"][governor_index][1]\
-                    ["Lemma"].lower()
+                try:
+                    governor_lemma = parsed_sentence["words"][governor_index][1]\
+                        ["Lemma"].lower()
+                except AttributeError:
+                    # this word wasn't recognized as a word by the parser,
+                    # it's probably a weird character or something
+                    governor_lemma = "*" * (int(parsed_sentence["words"][governor_index][1]["CharacterOffsetEnd"]) - int(parsed_sentence["words"][governor_index][1]["CharacterOffsetBegin"]))
+                    governor = governor_lemma[:]
                 dependent_pos = parsed_sentence["words"][dependent_index][1]\
                     ["PartOfSpeech"]
-                dependent_lemma = parsed_sentence["words"][dependent_index][1]\
-                    ["Lemma"].lower()
+                try:
+                    dependent_lemma = parsed_sentence["words"][dependent_index][1]\
+                        ["Lemma"].lower()
+                except AttributeError:
+                    # this word wasn't recognized as a word by the parser,
+                    # it's probably a weird character or something
+                    dependent_lemma = "*" * (int(parsed_sentence["words"][dependent_index][1]["CharacterOffsetEnd"]) - int(parsed_sentence["words"][dependent_index][1]["CharacterOffsetBegin"]))
+                    dependent = dependent_lemma[:]
                 grammatical_relationship = dependency[0]
 
                 # If dictionaries are present, run with duplication handling
