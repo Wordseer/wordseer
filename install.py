@@ -419,14 +419,6 @@ def main():
 
     args = parser.parse_args()
     
-    new_path_dirs = []
-    path_dirs = os.environ["PATH"].split(":")
-    for path_dir in path_dirs:
-        if "conda" not in path_dir:
-            new_path_dirs.append(path_dir)
-
-    os.environ["PATH"] = ":".join(new_path_dirs)
-
     if args.interactive:
         install_interactively()
 
