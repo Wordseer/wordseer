@@ -10,9 +10,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from app.models import *
-from app import db
+from app import app, db
 from . import logger
-from .helpers import json_escape
+from .helpers import json_escape, split_keepsep
 
 class StructureExtractor(object):
     """This class parses an XML file according to the format given in a
@@ -177,7 +177,7 @@ class StructureExtractor(object):
         sentences = []
 
         # 1000 characters seems to be the choke point for CoreNLP 3.5.2
-        for subtext in split_paragraph(text, 1000):
+        for subtext in split_paragraph(text):
             sentences.extend(self.string_processor.parse(subtext, {}, {}))
         return sentences
 
@@ -396,11 +396,13 @@ def _assign_sentence_metadata(unit, all_parent_properties):
         sentences.extend(_assign_sentence_metadata(child, properties))
     return sentences
 
-def split_paragraph(para, length):
-    """given a string `para`, returns a list of sentence-tokenized substrings not longer 
-    than `length`. Performs the same operation recursively on all substrings until all 
-    are less than `length`.
+def split_paragraph(para):
+    """given a string `para`, returns a list of substrings not longer than `length`,
+    broken on sentence boundaries. Performs the same operation recursively on all substrings until all 
+    are less than `SENTENCE_MAX_LENGTH`. Splits sentences that are too long on
+    reasonable punctuation marks.
     """
+    length = app.config['SENTENCE_MAX_LENGTH']
     paras = []
     if len(para) < length:
         paras.append(para)
@@ -411,14 +413,67 @@ def split_paragraph(para, length):
         # remove trailing sentence fragment from 1st para
         last_sent = sent_tokenize(para1)[-1]
         last_sent_index = para1.index(last_sent)
-        para2 = para1[last_sent_index:] + para2
-        para1 = para1[:last_sent_index]
         
-        # add para1 to results bc it is < length
-        paras.append(para1)
+        if last_sent_index > 0:
+            # if 0, there are no sentence boundaries
+            para2 = para1[last_sent_index:] + para2
+            para1 = para1[:last_sent_index]
 
-        # recursively check the length of para2
-        for split_para in split_paragraph(para2, length):
-            paras.append(split_para)
+            # add para1 to results bc it is < length
+            paras.append(para1)
+            # recursively check the length of para2
+            for split_para in split_paragraph(para2):
+                paras.append(split_para)
+
+        else:
+            # there are no sentence boundaries lower than length
+            
+            # Attempt to split on a suitable punctuation mark
+            # Order: semicolon, double-dash, colon, comma
+
+            # Mini helper function to get indices of punctuation marks
+
+            split_characters = app.config["SPLIT_CHARACTERS"]
+            subsentences = None
+
+            for character in split_characters:
+                subsentences = split_keepsep(para, character)
+
+                # If all subsentences fit the length limit, exit the loop
+                if all([len(subsentence) < length for subsentence in subsentences]):
+                    break
+
+                # Otherwise, reset subsentences and try again
+                else:
+                    subsentences = None
+
+            # If none of the split characters worked, force split on nearest word boundary < length
+            if not subsentences:
+                subsentences = make_subsentences(para)
+
+            paras.extend(subsentences)
+
+            # set some kind of flag that tells the structure extractor to combine partial sentences
 
     return paras
+
+def make_subsentences(text):
+    """Split an excessively long sentence into strings shorter than max length set on config 
+    """
+    length = app.config["SENTENCE_MAX_LENGTH"]
+    subsentences = []
+
+    part1 = text[:length]
+    splitpoint = part1.rindex(" ")
+    part1 = text[:splitpoint]
+    part2 = text[splitpoint:]
+
+    subsentences.append(part1)
+
+    if len(part2) > length:
+        for subsentence in make_subsentences(part2):
+            subsentences.append(subsentence)
+    else:
+        subsentences.append(part2)
+
+    return subsentences

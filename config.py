@@ -115,7 +115,7 @@ class BaseConfig(object):
     WORD_TO_WORD_SIMILARITY = True
     SEQUENCE_INDEXING = True
     SKIP_SENTENCE_ON_ERROR = False
-    SENTENCE_MAX_LENGTH = 40
+    SENTENCE_MAX_LENGTH = 1000
 
     # Logging config
     LOG_SENTENCE_TRUNCATE_LENGTH = 140

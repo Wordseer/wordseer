@@ -62,10 +62,9 @@ class StringProcessor(object):
             self.add_words(sentence, parsed_sentence, text)
             self.add_grammatical_relations(sentence, parsed_sentence, relationships, dependencies)
 
-            sentence.save(False)
-
+            sentence.save(False)            
             sentences.append(sentence)
-        
+            
         return sentences
 
     def parse_with_error_handling(self, text):

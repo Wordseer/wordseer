@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<!DOCTYPE PLAY SYSTEM "play.dtd">
+
+<PLAY>
+<TITLE>The Tragedy of Antony and Cleopatra</TITLE>
+
+<FM>
+<P>Text placed in the public domain by Moby Lexical Tools, 1992.</P>
+<P>SGML markup by Jon Bosak, 1992-1994.</P>
+<P>XML version by Jon Bosak, 1996-1998.</P>
+<P>This work may be freely copied and distributed worldwide.</P>
+</FM>
+
+
+<PERSONAE>
+<TITLE>Dramatis Personae</TITLE>
+
+
+<PGROUP>
+<PERSONA>MARK ANTONY</PERSONA>
+<PERSONA>OCTAVIUS CAESAR</PERSONA>
+<PERSONA>M. AEMILIUS LEPIDUS</PERSONA>
+<GRPDESCR>triumvirs.</GRPDESCR>
+</PGROUP>
+
+<PERSONA>SEXTUS POMPEIUS</PERSONA>
+</PERSONAE>
+
+<SCNDESCR>SCENE  In several parts of the Roman empire.</SCNDESCR>
+
+<PLAYSUBT>ANTONY AND CLEOPATRA</PLAYSUBT>
+
+<ACT><TITLE>ACT I</TITLE>
+
+<SCENE><TITLE>SCENE I.  Alexandria. A room in CLEOPATRA's palace.</TITLE>
+<STAGEDIR>Enter DEMETRIUS and PHILO</STAGEDIR>
+
+<SPEECH>
+<SPEAKER>PHILO</SPEAKER>
+<LINE>Nay, but this dotage of our general's</LINE>
+<LINE>O'erflows the measure: those his goodly eyes,</LINE>
+<LINE>That o'er the files and musters of the war</LINE>
+<LINE>Have glow'd like plated Mars, now bend, now turn,</LINE>
+<LINE>The office and devotion of their view</LINE>
+<LINE>Upon a tawny front: his captain's heart,</LINE>
+<LINE>Which in the scuffles of great fights hath burst</LINE>
+<LINE>The buckles on his breast, reneges all temper,</LINE>
+<LINE>And is become the bellows and the fan</LINE>
+<LINE>To cool a gipsy's lust.</LINE>
+<STAGEDIR>Flourish. Enter ANTONY, CLEOPATRA, her Ladies,
+the Train, with Eunuchs fanning her</STAGEDIR>
+<LINE>Look, where they come:</LINE>
+<LINE>Take but good note, and you shall see in him.</LINE>
+<LINE>The triple pillar of the world transform'd</LINE>
+<LINE>Into a strumpet's fool: behold and see.</LINE>
+</SPEECH>
+
+<SPEECH>
+<SPEAKER>CLEOPATRA</SPEAKER>
+<LINE>If it be love indeed, tell me how much.</LINE>
+</SPEECH>
+
+<SPEECH>
+<SPEAKER>TITANIA</SPEAKER>
+<LINE>These are the forgeries of jealousy:</LINE>
+<LINE>And never, since the middle summer's spring,</LINE>
+<LINE>Met we on hill, in dale, forest or mead,</LINE>
+<LINE>By paved fountain or by rushy brook,</LINE>
+<LINE>Or in the beached margent of the sea,</LINE>
+<LINE>To dance our ringlets to the whistling wind,</LINE>
+<LINE>But with thy brawls thou hast disturb'd our sport.</LINE>
+<LINE>Therefore the winds, piping to us in vain,</LINE>
+<LINE>As in revenge, have suck'd up from the sea</LINE>
+<LINE>Contagious fogs; which falling in the land</LINE>
+<LINE>Have every pelting river made so proud</LINE>
+<LINE>That they have overborne their continents:</LINE>
+<LINE>The ox hath therefore stretch'd his yoke in vain,</LINE>
+<LINE>The ploughman lost his sweat, and the green corn</LINE>
+<LINE>Hath rotted ere his youth attain'd a beard;</LINE>
+<LINE>The fold stands empty in the drowned field,</LINE>
+<LINE>And crows are fatted with the murrion flock;</LINE>
+<LINE>The nine men's morris is fill'd up with mud,</LINE>
+<LINE>And the quaint mazes in the wanton green</LINE>
+<LINE>For lack of tread are undistinguishable:</LINE>
+<LINE>The human mortals want their winter here;</LINE>
+<LINE>No night is now with hymn or carol blest:</LINE>
+<LINE>Therefore the moon, the governess of floods,</LINE>
+<LINE>Pale in her anger, washes all the air,</LINE>
+<LINE>That rheumatic diseases do abound:</LINE>
+<LINE>And thorough this distemperature we see</LINE>
+<LINE>The seasons alter: hoary-headed frosts</LINE>
+<LINE>Far in the fresh lap of the crimson rose,</LINE>
+<LINE>And on old Hiems' thin and icy crown</LINE>
+<LINE>An odorous chaplet of sweet summer buds</LINE>
+<LINE>Is, as in mockery, set: the spring, the summer,</LINE>
+<LINE>The childing autumn, angry winter, change</LINE>
+<LINE>Their wonted liveries, and the mazed world,</LINE>
+<LINE>By their increase, now knows not which is which:</LINE>
+<LINE>And this same progeny of evils comes</LINE>
+<LINE>From our debate, from our dissension;</LINE>
+<LINE>We are their parents and original.</LINE>
+</SPEECH>
+</SCENE>
+</ACT>
+</PLAY>

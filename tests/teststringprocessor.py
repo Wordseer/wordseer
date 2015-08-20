@@ -2,13 +2,21 @@
 """
 import mock
 import unittest
+import json
+from lxml import etree
+import pdb
 
 from app.models.sentence import Sentence
 from app.models.dependency import Dependency
 from app.models.project import Project
+from app.models.documentfile import DocumentFile 
+from app.models.association_objects import WordInSentence
+
 from app.preprocessor import stringprocessor
+from app.preprocessor.structureextractor import *
+
 import database
-import pdb
+
 t = stringprocessor.StringProcessor(Project())
 
 class CommonTests(object):
@@ -176,4 +184,127 @@ class ParseWithErrorHandlingTest(unittest.TestCase):
         expected_result = t.parser.raw_parse(text)
 
         self.failUnless(result == expected_result)
+
+class LongSentenceTests(unittest.TestCase):
+    def setUp(self):
+        """Parse the brief example"""
+        database.clean()
+        self.path = "tests/data/long_sentences/"
+        self.structure_file = self.path + "structure.json"
+        self.input_file = self.path + "document.xml"
+
+        self.input_project = Project()
+        t.project = self.input_project
+
+        self.input_project.document_files.append(
+            DocumentFile(path=self.input_file))
+        self.input_project.save()
+
+        with open(self.structure_file) as f:
+            self.json = json.load(f)
+
+        self.xml = etree.parse(self.input_file)
+        self.extractor = StructureExtractor(self.input_project,
+            self.structure_file, t)
+
+    def test_long_sent_parsing(self):
+        """test that long paragraphs are split and their spaces indexed properly by the parser
+        """
+        # run the parser
+        self.extractor.extract(self.input_file)
+
+        sentences = self.input_project.sentences
+        
+        # test short paragraph with normal sentences
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[0].id).all()
+        self.assertEqual(words[2].surface, "a")
+        self.assertEqual(words[2].space_before, " ")
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[1].id).all()
+        self.assertEqual(words[2].surface, "the")
+        self.assertEqual(words[2].space_before, " ")
+
+        # test long paragraph with normal sentences
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[3].id).all()
+        self.assertEqual(words[2].surface, "a")
+        self.assertEqual(words[2].space_before, " ")
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[4].id).all()
+        self.assertEqual(words[7].surface, "ipsum")
+        self.assertEqual(words[7].space_before, " ")
+
+        # test long sentence with punctuation
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[5].id).all()
+        self.assertEqual(words[7].surface, "long")
+        self.assertEqual(words[7].space_before, " ")
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[6].id).all()
+        self.assertEqual(words[6].surface, "consectetur")
+        self.assertEqual(words[6].space_before, " ")
+
+        # test long sentence with no punctuation
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[8].id).all()
+        self.assertEqual(words[3].surface, "hella")
+        self.assertEqual(words[3].space_before, " ")
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[9].id).all()
+        self.assertEqual(words[2].surface, "sodales")
+        self.assertEqual(words[2].space_before, " ")
+
+        # test no punctuation with recursion
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[10].id).all()
+        self.assertEqual(words[3].surface, "even")
+        self.assertEqual(words[3].space_before, " ")
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[11].id).all()
+        self.assertEqual(words[1].surface, "facilisis")
+        self.assertEqual(words[1].space_before, " ")
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[12].id).all()
+        self.assertEqual(words[2].surface, "Fusce")
+        self.assertEqual(words[2].space_before, " ")
+
+
+class LongSentencePlayTests(unittest.TestCase):
+    def setUp(self):
+        """Parse the brief example"""
+        database.clean()
+        self.path = "tests/data/plays/"
+        self.structure_file = self.path + "structure.json"
+        self.input_file = self.path + "brief_example.xml"
+
+        self.input_project = Project()
+        t.project = self.input_project
+
+        self.input_project.document_files.append(
+            DocumentFile(path=self.input_file))
+        self.input_project.save()
+
+        with open(self.structure_file) as f:
+            self.json = json.load(f)
+
+        self.xml = etree.parse(self.input_file)
+        self.extractor = StructureExtractor(self.input_project,
+            self.structure_file, t)
+
+    def test_long_speech(self):
+        """Test long sentences in combined paragraphs with line breaks
+        """
+
+        # run the parser
+        self.extractor.extract(self.input_file)
+
+        sentences = self.input_project.sentences
+
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[4].id).all()
+        self.assertEqual(words[3].surface, "forgeries")
+        self.assertEqual(words[3].space_before, " ")
+        self.assertEqual(words[7].surface, "And")
+        self.assertEqual(words[7].space_before, "\n")
+
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[5].id).all()
+        self.assertEqual(words[10].surface, "As")
+        self.assertEqual(words[10].space_before, "\n")
+        self.assertEqual(words[11].surface, "in")
+        self.assertEqual(words[11].space_before, " ")
+
+        words = WordInSentence.query.filter(WordInSentence.sentence_id == sentences[6].id).all()
+        self.assertEqual(words[4].surface, "land")
+        self.assertEqual(words[4].space_before, " ")
+        self.assertEqual(words[5].surface, "Have")
+        self.assertEqual(words[5].space_before, "\n")
 

@@ -375,7 +375,7 @@ class StanfordCoreNLP:
 
         # CoreNLP interactive shell cannot recognize newline
         if '\n' in text or '\r' in text:
-            to_send = re.sub("[\r\n]", " ", text).strip()
+            to_send = re.sub("[\r\n]", " ", text)
         else:
             to_send = text
 

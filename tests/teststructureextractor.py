@@ -191,7 +191,7 @@ class PlayTests(CommonTests, unittest.TestCase):
         """Set up local variables.
         """
         super(PlayTests, self).setUp(
-            "tests/data/shakespeare/", "structure.json", "brief_example.xml")
+            "tests/data/plays/", "structure.json", "brief_example.xml")
 
     @unittest.skip("Whatever this was testing is way outdated, need to start over")
     def test_get_sentences_from_node(self):
@@ -207,6 +207,59 @@ class PlayTests(CommonTests, unittest.TestCase):
         self.failUnless(self.extractor.get_sentences_from_node(self.json["units"][0],
             self.xml.getroot())[0].text == etree.tostring(
             self.xml.getroot()[5], method="text").strip() + "\n")
+
+class LongSentenceTests(CommonTests, unittest.TestCase):
+    """Tests specific to documents with long sentences that need to be split.
+    """
+    def setUp(self):
+        """shouldn't have to do any database stuff to make this work
+        """
+        pass
+
+    def test_split_paragraph(self):
+        """Tests for split_paragraph()"""
+        
+        # short sentences should pass through
+        short_sentence = " lacinia metus at, ullamcorper arcu Sed eu vestibulum lectus, sed pulvinar tortor Donec euismod lobortis diam ac ullamcorper Nullam aliquet sagittis tellus, vel pellentesque justo tristique sed Curabitur lacinia sagittis odio, ut hendrerit elit aliquam pellentesque Fusce aliquet odio eget est dapibus, aliquet auctor dolor aliquam Proin id nisl consectetur, euismod velit id, placerat urna Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas Nullam in facilisis augue Nullam vel porta tellus Pellentesque aliquam ante in bibendum tincidunt."
+        expected = [short_sentence]
+        result = split_paragraph(short_sentence)
+        self.assertEqual(result, expected)
+
+        # long sentences should split on punctuation
+        # semicolon has higher priority than comma
+        long_sentence_with_punc = "Lorem ipsum dolor sit amet, consectetur adipiscing elit Phasellus sit amet maximus tellus, id dapibus urna Quisque risus mi, volutpat ut dui sit amet, aliquet accumsan quam Integer elementum quis ipsum non elementum Etiam ac lorem mauris Lorem ipsum dolor sit amet, consectetur adipiscing elit Mauris augue lectus, volutpat eu vehicula ac, ullamcorper eget metus Vestibulum vitae metus consectetur, viverra lectus nec, cursus risus Suspendisse est enim, hendrerit mollis molestie ut, vestibulum nec lorem Nulla vel mi malesuada; lacinia metus at, ullamcorper arcu Sed eu vestibulum lectus, sed pulvinar tortor Donec euismod lobortis diam ac ullamcorper Nullam aliquet sagittis tellus, vel pellentesque justo tristique sed Curabitur lacinia sagittis odio, ut hendrerit elit aliquam pellentesque Fusce aliquet odio eget est dapibus, aliquet auctor dolor aliquam Proin id nisl consectetur, euismod velit id, placerat urna Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas Nullam in facilisis augue Nullam vel porta tellus Pellentesque aliquam ante in bibendum tincidunt."
+        
+        expected = [
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit Phasellus sit amet maximus tellus, id dapibus urna Quisque risus mi, volutpat ut dui sit amet, aliquet accumsan quam Integer elementum quis ipsum non elementum Etiam ac lorem mauris Lorem ipsum dolor sit amet, consectetur adipiscing elit Mauris augue lectus, volutpat eu vehicula ac, ullamcorper eget metus Vestibulum vitae metus consectetur, viverra lectus nec, cursus risus Suspendisse est enim, hendrerit mollis molestie ut, vestibulum nec lorem Nulla vel mi malesuada;",
+            " lacinia metus at, ullamcorper arcu Sed eu vestibulum lectus, sed pulvinar tortor Donec euismod lobortis diam ac ullamcorper Nullam aliquet sagittis tellus, vel pellentesque justo tristique sed Curabitur lacinia sagittis odio, ut hendrerit elit aliquam pellentesque Fusce aliquet odio eget est dapibus, aliquet auctor dolor aliquam Proin id nisl consectetur, euismod velit id, placerat urna Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas Nullam in facilisis augue Nullam vel porta tellus Pellentesque aliquam ante in bibendum tincidunt."
+        ]
+
+        result = split_paragraph(long_sentence_with_punc)
+        self.assertEqual(result, expected, msg=result)
+
+        # if there's no suitable punctuation, long sentence should just split on word bounds
+        long_sentence_no_punc = "Nullam nec egestas purus Aliquam tincidunt in enim nec egestas Donec eget nunc vitae turpis mollis ultricies in vitae turpis Proin porttitor turpis eget tellus rutrum faucibus Proin nisl mi ultricies non augue non malesuada porttitor erat Integer turpis elit luctus sed semper sed condimentum sed orci Mauris vel neque ac arcu mollis blandit non ut felis Integer justo dui lacinia ac aliquam in feugiat quis nisl Donec tempus orci vel velit ultrices tincidunt eget ac purus Mauris iaculis ipsum ac nisi placerat eu viverra sapien sollicitudin Vivamus scelerisque sagittis dolor a commodo massa auctor non Fusce nec volutpat ipsum Nullam luctus neque at est auctor nec convallis dui facilisis Aenean non eros mi Nullam ligula dui consectetur at quam in gravida fringilla lacus Vivamus pulvinar dignissim justo vel finibus leo egestas id Vestibulum tincidunt varius sem sit amet volutpat enim feugiat a Maecenas eget rutrum lorem Nulla facilisis velit non efficitur sodales erat nulla vulputate risus nec varius ligula turpis ut quam Aliquam erat volutpat Maecenas pulvinar ac quam eu condimentum Proin pulvinar luctus massa et faucibus Integer ullamcorper nibh ac quam facilisis vestibulum Pellentesque et tellus eros Proin porttitor lorem ut nulla gravida vestibulum Donec at lorem et velit rhoncus aliquam sed tempor odio cras amet."
+
+        expected = [
+            "Nullam nec egestas purus Aliquam tincidunt in enim nec egestas Donec eget nunc vitae turpis mollis ultricies in vitae turpis Proin porttitor turpis eget tellus rutrum faucibus Proin nisl mi ultricies non augue non malesuada porttitor erat Integer turpis elit luctus sed semper sed condimentum sed orci Mauris vel neque ac arcu mollis blandit non ut felis Integer justo dui lacinia ac aliquam in feugiat quis nisl Donec tempus orci vel velit ultrices tincidunt eget ac purus Mauris iaculis ipsum ac nisi placerat eu viverra sapien sollicitudin Vivamus scelerisque sagittis dolor a commodo massa auctor non Fusce nec volutpat ipsum Nullam luctus neque at est auctor nec convallis dui facilisis Aenean non eros mi Nullam ligula dui consectetur at quam in gravida fringilla lacus Vivamus pulvinar dignissim justo vel finibus leo egestas id Vestibulum tincidunt varius sem sit amet volutpat enim feugiat a Maecenas eget rutrum lorem Nulla facilisis velit non efficitur sodales erat nulla vulputate risus", 
+            " nec varius ligula turpis ut quam Aliquam erat volutpat Maecenas pulvinar ac quam eu condimentum Proin pulvinar luctus massa et faucibus Integer ullamcorper nibh ac quam facilisis vestibulum Pellentesque et tellus eros Proin porttitor lorem ut nulla gravida vestibulum Donec at lorem et velit rhoncus aliquam sed tempor odio cras amet."
+        ]
+
+        result = split_paragraph(long_sentence_no_punc)
+        self.assertEqual(result, expected, msg=result)
+
+        # make sure the function recurses as expected
+        extra_long_sentence_no_punc = "Nullam nec egestas purus Aliquam tincidunt in enim nec egestas Donec eget nunc vitae turpis mollis ultricies in vitae turpis Proin porttitor turpis eget tellus rutrum faucibus Proin nisl mi ultricies non augue non malesuada porttitor erat Integer turpis elit luctus sed semper sed condimentum sed orci Mauris vel neque ac arcu mollis blandit non ut felis Integer justo dui lacinia ac aliquam in feugiat quis nisl Donec tempus orci vel velit ultrices tincidunt eget ac purus Mauris iaculis ipsum ac nisi placerat eu viverra sapien sollicitudin Vivamus scelerisque sagittis dolor a commodo massa auctor non Fusce nec volutpat ipsum Nullam luctus neque at est auctor nec convallis dui facilisis Aenean non eros mi Nullam ligula dui consectetur at quam in gravida fringilla lacus Vivamus pulvinar dignissim justo vel finibus leo egestas id Vestibulum tincidunt varius sem sit amet volutpat enim feugiat a Maecenas eget rutrum lorem Nulla facilisis velit non efficitur sodales erat nulla vulputate risus nec varius ligula turpis ut quam Aliquam erat volutpat Maecenas pulvinar ac quam eu condimentum Proin pulvinar luctus massa et faucibus Integer ullamcorper nibh ac quam facilisis vestibulum Pellentesque et tellus eros Proin porttitor lorem ut nulla gravida vestibulum Donec at lorem et velit rhoncus aliquam sed tempor odio cras amet Nullam nec egestas purus Aliquam tincidunt in enim nec egestas Donec eget nunc vitae turpis mollis ultricies in vitae turpis Proin porttitor turpis eget tellus rutrum faucibus Proin nisl mi ultricies non augue non malesuada porttitor erat Integer turpis elit luctus sed semper sed condimentum sed orci Mauris vel neque ac arcu mollis blandit non ut felis Integer justo dui lacinia ac aliquam in feugiat quis nisl Donec tempus orci vel velit ultrices tincidunt eget ac purus Mauris iaculis ipsum ac nisi placerat eu viverra sapien sollicitudin Vivamus scelerisque sagittis dolor a commodo massa auctor non Fusce nec volutpat ipsum Nullam luctus neque at est auctor nec convallis dui facilisis Aenean non eros mi Nullam ligula dui consectetur at quam in gravida fringilla lacus Vivamus pulvinar dignissim justo vel finibus leo egestas id Vestibulum tincidunt varius sem sit amet volutpat enim feugiat a Maecenas eget rutrum lorem Nulla facilisis velit non efficitur sodales erat nulla vulputate risus nec varius ligula turpis ut quam Aliquam erat volutpat Maecenas pulvinar ac quam eu condimentum Proin pulvinar luctus massa et faucibus Integer ullamcorper nibh ac quam facilisis vestibulum Pellentesque et tellus eros Proin porttitor lorem ut nulla gravida vestibulum Donec at lorem et velit rhoncus aliquam sed tempor odio cras amet."
+
+        expected = [
+            "Nullam nec egestas purus Aliquam tincidunt in enim nec egestas Donec eget nunc vitae turpis mollis ultricies in vitae turpis Proin porttitor turpis eget tellus rutrum faucibus Proin nisl mi ultricies non augue non malesuada porttitor erat Integer turpis elit luctus sed semper sed condimentum sed orci Mauris vel neque ac arcu mollis blandit non ut felis Integer justo dui lacinia ac aliquam in feugiat quis nisl Donec tempus orci vel velit ultrices tincidunt eget ac purus Mauris iaculis ipsum ac nisi placerat eu viverra sapien sollicitudin Vivamus scelerisque sagittis dolor a commodo massa auctor non Fusce nec volutpat ipsum Nullam luctus neque at est auctor nec convallis dui facilisis Aenean non eros mi Nullam ligula dui consectetur at quam in gravida fringilla lacus Vivamus pulvinar dignissim justo vel finibus leo egestas id Vestibulum tincidunt varius sem sit amet volutpat enim feugiat a Maecenas eget rutrum lorem Nulla facilisis velit non efficitur sodales erat nulla vulputate risus", 
+            " nec varius ligula turpis ut quam Aliquam erat volutpat Maecenas pulvinar ac quam eu condimentum Proin pulvinar luctus massa et faucibus Integer ullamcorper nibh ac quam facilisis vestibulum Pellentesque et tellus eros Proin porttitor lorem ut nulla gravida vestibulum Donec at lorem et velit rhoncus aliquam sed tempor odio cras amet Nullam nec egestas purus Aliquam tincidunt in enim nec egestas Donec eget nunc vitae turpis mollis ultricies in vitae turpis Proin porttitor turpis eget tellus rutrum faucibus Proin nisl mi ultricies non augue non malesuada porttitor erat Integer turpis elit luctus sed semper sed condimentum sed orci Mauris vel neque ac arcu mollis blandit non ut felis Integer justo dui lacinia ac aliquam in feugiat quis nisl Donec tempus orci vel velit ultrices tincidunt eget ac purus Mauris iaculis ipsum ac nisi placerat eu viverra sapien sollicitudin Vivamus scelerisque sagittis dolor a commodo massa auctor non Fusce nec volutpat ipsum Nullam luctus neque at est auctor",
+            " nec convallis dui facilisis Aenean non eros mi Nullam ligula dui consectetur at quam in gravida fringilla lacus Vivamus pulvinar dignissim justo vel finibus leo egestas id Vestibulum tincidunt varius sem sit amet volutpat enim feugiat a Maecenas eget rutrum lorem Nulla facilisis velit non efficitur sodales erat nulla vulputate risus nec varius ligula turpis ut quam Aliquam erat volutpat Maecenas pulvinar ac quam eu condimentum Proin pulvinar luctus massa et faucibus Integer ullamcorper nibh ac quam facilisis vestibulum Pellentesque et tellus eros Proin porttitor lorem ut nulla gravida vestibulum Donec at lorem et velit rhoncus aliquam sed tempor odio cras amet."
+        ]
+
+        result = split_paragraph(extra_long_sentence_no_punc)
+        self.assertEqual(result, expected, msg=result)
+
 
 def compare_metadata(dict_metadata, other_metadata):
     """Compare a list of ``Property`` objects to a ``dict``.
