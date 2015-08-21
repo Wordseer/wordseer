@@ -65,7 +65,7 @@ def home():
 def project_list():
     """A view for the list of a user's projects."""
     projects = []
-    for project in [project for project in current_user.projects if not project.deleted]:
+    for project in [proj for proj in current_user.projects if not proj.deleted]:
         rel = ProjectsUsers.query.filter_by(user=current_user,
                                             project=project).one()
         projects.append({
@@ -85,7 +85,7 @@ def project_show(project_id):
     project = helpers.get_object_or_exception(Project,
                                               Project.id == project_id,
                                               exceptions.ProjectNotFoundException)
-    if project not in [project for project in current_user.projects if not project.deleted]:
+    if project not in [proj for proj in current_user.projects if not proj.deleted]:
         return app.login_manager.unauthorized()
 
     # what is user's permission level?
@@ -125,7 +125,7 @@ def file_upload(project_id):
     project = helpers.get_object_or_exception(Project,
                                               Project.id == project_id,
                                               exceptions.ProjectNotFoundException)
-    if project not in [project for project in current_user.projects if not project.deleted]:
+    if project not in [proj for proj in current_user.projects if not proj.deleted]:
         return app.login_manager.unauthorized()
 
     # what is user's permission level?
@@ -222,7 +222,7 @@ def project_log(project_id):
     project = helpers.get_object_or_exception(Project,
                                               Project.id == project_id,
                                               exceptions.ProjectNotFoundException)
-    if project not in [project for project in current_user.projects if not project.deleted]:
+    if project not in [proj for proj in current_user.projects if not proj.deleted]:
         return app.login_manager.unauthorized()
 
     start = request.args.get('start', 0)
@@ -251,7 +251,7 @@ def project_process(project_id):
     project = helpers.get_object_or_exception(Project,
                                               Project.id == project_id,
                                               exceptions.ProjectNotFoundException)
-    if project not in [project for project in current_user.projects if not project.deleted]:
+    if project not in [proj for proj in current_user.projects if not proj.deleted]:
         return app.login_manager.unauthorized()
 
     # does user have admin permissions?
@@ -332,7 +332,7 @@ def project_permissions(project_id):
     project = helpers.get_object_or_exception(Project,
                                               Project.id == project_id,
                                               exceptions.ProjectNotFoundException)
-    if project not in [project for project in current_user.projects if not project.deleted]:
+    if project not in [proj for proj in current_user.projects if not proj.deleted]:
         return app.login_manager.unauthorized()
 
     form = forms.ProjectPermissionsForm(prefix="permissions")
@@ -384,7 +384,7 @@ def delete_obj():
     project = helpers.get_object_or_exception(Project,
                                               Project.id == project_id,
                                               exceptions.ProjectNotFoundException)
-    if project not in [project for project in current_user.projects if not project.deleted]:
+    if project not in [proj for proj in current_user.projects if not proj.deleted]:
         return app.login_manager.unauthorized()
 
     # does user have admin permissions?
