@@ -198,8 +198,8 @@ class StringProcessor(object):
         for dependency in parsed_sentence["dependencies"]:
             # We don't want to make a dependency involving ROOT
             if int(dependency[2]) > 0 and int(dependency[4]) > 0:
-                governor = dependency[1]
-                dependent = dependency[3]
+                governor_surface = dependency[1]
+                dependent_surface = dependency[3]
                 governor_index = int(dependency[2]) - 1
                 dependent_index = int(dependency[4]) - 1
                 governor_pos = parsed_sentence["words"][governor_index][1]\
@@ -211,7 +211,7 @@ class StringProcessor(object):
                     # this word wasn't recognized as a word by the parser,
                     # it's probably a weird character or something
                     governor_lemma = "*" * (int(parsed_sentence["words"][governor_index][1]["CharacterOffsetEnd"]) - int(parsed_sentence["words"][governor_index][1]["CharacterOffsetBegin"]))
-                    governor = governor_lemma[:]
+                    governor_surface = governor_lemma[:]
                 dependent_pos = parsed_sentence["words"][dependent_index][1]\
                     ["PartOfSpeech"]
                 try:
@@ -221,7 +221,7 @@ class StringProcessor(object):
                     # this word wasn't recognized as a word by the parser,
                     # it's probably a weird character or something
                     dependent_lemma = "*" * (int(parsed_sentence["words"][dependent_index][1]["CharacterOffsetEnd"]) - int(parsed_sentence["words"][dependent_index][1]["CharacterOffsetBegin"]))
-                    dependent = dependent_lemma[:]
+                    dependent_surface = dependent_lemma[:]
                 grammatical_relationship = dependency[0]
 
                 # If dictionaries are present, run with duplication handling
@@ -250,13 +250,13 @@ class StringProcessor(object):
                     # corresponding word
                     governor = Word.query.filter_by(
                         lemma=governor_lemma,
-                        surface=governor.lower(),
+                        surface=governor_surface.lower(),
                         part_of_speech=governor_pos).first()
 
                     # Same as above for the dependent in the relationship
                     dependent = Word.query.filter_by(
                         lemma=dependent_lemma,
-                        surface=dependent.lower(),
+                        surface=dependent_surface.lower(),
                         part_of_speech=dependent_pos).first()
 
                     try:
@@ -264,11 +264,9 @@ class StringProcessor(object):
                         dependent.id
                     except:
                         project_logger.error(
-                            "Governor or dependent not "
-                            "found; giving up on parse. This likely indicates "
-                            "an error in the preprocessing; rerunning the "
-                            "preprocessor is recommended.")
-                        project_logger.info(sentence)
+                            "Governor (%s) or dependent (%s) not "
+                            "found; skipping grammatical relationship (%s).", governor_surface, dependent_surface, grammatical_relationship)
+                        project_logger.info(sentence.text)
                         
                         return #die
 
