@@ -65,6 +65,20 @@ def reset():
     except OSError:
         print("Database not found; creating new database.")
 
+    # clear out uploads directory
+    shutil.rmtree(app.config["UPLOAD_DIR"], ignore_errors=True)
+    os.mkdir(app.config["UPLOAD_DIR"])
+    with open(app.config["UPLOAD_DIR"] + '/.gitignore', 'w') as ignorefile:
+        gitignore = """# This directory needs to exist for uploads to work, but git does not support
+# empty directories.
+
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
+"""
+        ignorefile.write(gitignore)
+
     db.create_all()
     index()
 
