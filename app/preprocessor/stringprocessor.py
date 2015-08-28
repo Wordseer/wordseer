@@ -265,8 +265,9 @@ class StringProcessor(object):
                     except:
                         project_logger.error(
                             "Governor (%s) or dependent (%s) not "
-                            "found; skipping grammatical relationship (%s).", governor_surface, dependent_surface, grammatical_relationship)
-                        project_logger.info(sentence.text)
+                            "found; skipping grammatical relationship (%s). Sentence: (%s)", 
+                            governor_surface, dependent_surface, grammatical_relationship, 
+                            sentence.text)
                         
                         return #die
 
