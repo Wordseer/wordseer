@@ -222,7 +222,6 @@ def index():
         Index("ix_word_surface_lemma", models.Word.surface, models.Word.lemma),
         Index('ix_wordcount_wordid_id', models.WordCount.word_id, models.WordCount.id),
         Index('ix_wordinsent_projid_wordid', models.WordInSentence.project_id, models.WordInSentence.word_id),
-        Index('ix_wordinsent_wordid_sentid', models.WordInSentence.word_id, models.WordInSentence.sentence_id),
         # TODO: it can't find this column in the table for some reason
         # Index('ix_wordcount_projid_wordid', models.WordCount.project_id, models.WordCount.word_id),
 
