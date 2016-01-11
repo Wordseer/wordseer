@@ -111,6 +111,11 @@ in the "Documents" tab, and upload the JSON file under the "Structure Maps" tab.
 and choose a structure map from the list that appears (there should be only one, and it should be 
 the one you just uploaded).
 
+**IMPORTANT NOTE:** this beta release of WordSeer cannot handle large collections very well. The exact 
+definition of "large" depends on how powerful your machine is, but as a rule of thumb: two or three 
+Shakespeare plays should be fine, but the Complete Works will give you problems. (We could use help 
+fixing this shortcoming: if you or a collaborator think you can help, please see our [Guidelines for Contributors](https://github.com/Wordseer/wordseer/blob/master/CONTRIBUTING.markdown) and get in touch.)
+
 Take note: **processing can be SLOW.** The good news, though, is that you only need to do it once. 
 Depending on the number, length, and complexity of the documents in your project, it may take anywhere 
 from 30 seconds to several hours. Processing runs in the background and you can close the browser window
