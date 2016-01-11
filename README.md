@@ -26,7 +26,7 @@ in this folder.
 Before attempting to install WordSeer, make sure your computer has the following software installed:
 
 - [Python 2.7](https://python.org/download) (Python 3.x is NOT supported at this time)
-- [Java 1.8 or later](https://www.java.com/en/download/manual.jsp)
+- [Java Development Kit 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
 #### Mac OS X installer
 
