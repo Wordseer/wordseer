@@ -1,9 +1,0 @@
-<article>
-<year>2002</year>
-<title>Leveraging the asymmetric sensitivity of eye contact for videoconference</title>
-<author>Chen, Milton</author>
-<keyword>eye contact</keyword>
-<keyword>gaze perception</keyword>
-<keyword>videoconferencing</keyword>
-<abstract>Eye contact is a natural and often essential element in the language of visual communication. Unfortunately, perceiving eye contact is difficult in most video-conferencing systems and hence limits their effectiveness. We conducted experiments to determine how accurately people perceive eye contact. We discovered that the sensitivity to eye contact is asymmetric, in that we are an order of magnitude less sensitive to eye contact when people look below our eyes than when they look to the left, right, or above our eyes. Additional experiments support a theory that people are prone to perceive eye contact, that is, we will think that someone is making eye contact with us unless we are certain that the person is not looking into our eyes. These experimental results suggest parameters for the design of videoconferencing systems. As a demonstration, we were able to construct from commodity components a simple dyadic videoconferencing prototype that supports eye contact</abstract>
-</article>
