@@ -5,6 +5,7 @@ from .sentence import Sentence
 from .association_objects import WordInSequence, SequenceInSentence
 from .counts import SequenceCount
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.schema import Index
 
 class Sequence(db.Model, Base):
     """A sequence of at most 4 consecutive words in a sentence.
@@ -31,14 +32,14 @@ class Sequence(db.Model, Base):
 
     # Attributes
 
-    sequence = db.Column(db.String, index=True)
-    lemmatized = db.Column(db.Boolean, index=True)
-    has_function_words = db.Column(db.Boolean, index=True)
-    all_function_words = db.Column(db.Boolean, index=True)
-    length = db.Column(db.Integer, index=True)
+    sequence = db.Column(db.String)
+    lemmatized = db.Column(db.Boolean)
+    has_function_words = db.Column(db.Boolean)
+    all_function_words = db.Column(db.Boolean)
+    length = db.Column(db.Integer)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
 
     # Relationships
-
     words = association_proxy("word_in_sequence", "word",
         creator=lambda word: WordInSequence(word=word))
 
@@ -57,12 +58,13 @@ class Sequence(db.Model, Base):
     def get_counts(self, project=None):
 
         # project argument assigned active_project if not present
-        if project == None: project = Project.active_project
+        if project == None:
+            project = Project.active_project
 
-        return SequenceCount.find_or_create(
-            sequence_id = self.id,
-            project_id = project.id,
-        )
+        return SequenceCount.fast_find_or_initialize(
+            "sequence_id = %s and project_id = %s" % (self.id, project.id),
+            sequence_id = self.id, project_id = project.id)
+
 
     def add_word(self, word, project=None, force=True):
         """Add a word to this sequence within the scope of the project
@@ -77,7 +79,7 @@ class Sequence(db.Model, Base):
             project = project
         )
         word_in_sequence.save(force=force)
-        
+
         return word_in_sequence
 
     def __repr__(self):

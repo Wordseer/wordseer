@@ -1,82 +1,143 @@
 {
-    "structureName": "document",
-    "xpaths": [
-        "/article"
-    ],
-    "titleXpaths": [
-        "./title/text()"
-    ],
-    "units": [
-        {
-            "belongsTo": "document",
-            "structureName": "sentence",
-            "combine": true,
-            "xpaths": [
-                "./text/text()"
-            ]
-        }
-    ],
-    "metadata": [
-        {
-            "belongsTo": "document",
-            "propertyName": "Author",
-            "xpaths": [
-                "./author/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "string",
-            "displayName": "Author",
-            "isCategory": true
-        },
-        {
-            "belongsTo": "document",
-            "propertyName": "Title",
-            "xpaths": [
-                "./title/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "string",
-            "displayName": "Title",
-            "isCategory": true
-        },
-        {
-            "belongsTo": "document",
-            "propertyName": "Time",
-            "xpaths": [
-                "./time/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "date_%Y-%m-%d",
-            "displayName": "Time",
-            "isCategory": true
-        },
-        {
-            "belongsTo": "document",
-            "propertyName": "Number",
-            "xpaths": [
-                "./number/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "number",
-            "displayName": "Number",
-            "isCategory": true
-        },
-        {
-            "belongsTo": "document",
-            "propertyName": "Tag",
-            "xpaths": [
-                "./tags/tag/text()"
-            ],
-            "valueIsDisplayed": true,
-            "nameIsDisplayed": true,
-            "type": "string",
-            "displayName": "Tag",
-            "isCategory": true
-        }
-    ]
+  "titleXpaths": [],
+  "name": "article",
+  "dataType": "string",
+  "xpathsFull": [
+    "/article"
+  ],
+  "structureName": "document",
+  "titleXpathsFull": [],
+  "tag": "article",
+  "units": [
+    {
+      "titleXpaths": [],
+      "name": "sentence",
+      "dataType": "string",
+      "xpathsFull": [
+        "/article/text/text()"
+      ],
+      "structureName": "text",
+      "titleXpathsFull": [],
+      "tag": "text",
+      "combine": true,
+      "xpaths": [
+        "./text/text()"
+      ],
+      "type": "subunit",
+      "id": "tagger-id-articletext"
+    }
+  ],
+  "xpaths": [
+    "/article"
+  ],
+  "filename": "post2.xml",
+  "type": "document",
+  "id": "tagger-id-article",
+  "metadata": [
+    {
+      "isCategory": true,
+      "displayName": "time",
+      "name": "time",
+      "dateFormat": "%Y-%m-%d",
+      "dataType": "date",
+      "xpathsFull": [
+        "/article/time"
+      ],
+      "propertyName": "time",
+      "valueIsDisplayed": true,
+      "nameIsDisplayed": true,
+      "tag": "time",
+      "xpaths": [
+        "./time"
+      ],
+      "type": "metadata",
+      "id": "tagger-id-articletime",
+      "isActive": true,
+      "attr": ""
+    },
+    {
+      "isCategory": true,
+      "displayName": "title",
+      "name": "title",
+      "dateFormat": "",
+      "dataType": "string",
+      "xpathsFull": [
+        "/article/title"
+      ],
+      "propertyName": "title",
+      "valueIsDisplayed": true,
+      "nameIsDisplayed": true,
+      "tag": "title",
+      "xpaths": [
+        "./title"
+      ],
+      "type": "metadata",
+      "id": "tagger-id-articletitle",
+      "isActive": true,
+      "attr": ""
+    },
+    {
+      "isCategory": true,
+      "displayName": "author",
+      "name": "author",
+      "dateFormat": "",
+      "dataType": "string",
+      "xpathsFull": [
+        "/article/author"
+      ],
+      "propertyName": "author",
+      "valueIsDisplayed": true,
+      "nameIsDisplayed": true,
+      "tag": "author",
+      "xpaths": [
+        "./author"
+      ],
+      "type": "metadata",
+      "id": "tagger-id-articleauthor",
+      "isActive": true,
+      "attr": ""
+    },
+    {
+      "isCategory": true,
+      "displayName": "number",
+      "name": "number",
+      "dateFormat": "",
+      "dataType": "number",
+      "xpathsFull": [
+        "/article/number"
+      ],
+      "propertyName": "number",
+      "valueIsDisplayed": true,
+      "nameIsDisplayed": true,
+      "tag": "number",
+      "xpaths": [
+        "./number"
+      ],
+      "type": "metadata",
+      "id": "tagger-id-articlenumber",
+      "isActive": true,
+      "attr": ""
+    },
+    {
+      "isCategory": true,
+      "displayName": "tag",
+      "name": "tag",
+      "dateFormat": "",
+      "dataType": "string",
+      "xpathsFull": [
+        "/article/tags/tag"
+      ],
+      "propertyName": "tag",
+      "valueIsDisplayed": true,
+      "nameIsDisplayed": true,
+      "tag": "tag",
+      "xpaths": [
+        "./tags/tag"
+      ],
+      "type": "metadata",
+      "id": "tagger-id-articletagstag",
+      "isActive": true,
+      "attr": ""
+    }
+  ]
 }
-

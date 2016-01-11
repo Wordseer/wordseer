@@ -13,5 +13,5 @@ class StructureFile(db.Model, Base):
     """
 
     path = db.Column(db.String)
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
 

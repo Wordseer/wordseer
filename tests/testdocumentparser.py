@@ -28,6 +28,7 @@ class DocumentParserTests(unittest.TestCase):
                 self.mock_str_proc,
                 self.project)
 
+    @unittest.skip("DocumentParser no longer calls StringProcessor")
     @patch("app.preprocessor.documentparser.db", autospec=True)
     def test_parse_document(self, mock_db, mock_logger):
         """Test the parse_document method.
@@ -50,7 +51,8 @@ class DocumentParserTests(unittest.TestCase):
         for i in range(0, runs):
             mock_sents.append(MagicMock(id=i, name="Sentence " + str(i)))
 
-        mock_doc = create_autospec(Document, all_sentences=mock_sents)
+        mock_doc = create_autospec(Document)
+        mock_doc.all_sentences = mock_sents
 
         # Configure the mock parser
         mock_products = MagicMock(name="Mock products")

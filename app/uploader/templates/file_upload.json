@@ -1,0 +1,22 @@
+{
+	"status": "OK",
+	"files": [
+	{% for file in files %}
+		{
+			"filename": "{{file.name}}",
+			"type": "{{file.type}}",
+			"id": {{file.id}}
+		}{% if not loop.last %},{% endif %}
+		{% endfor %}
+	],
+	"doc_errors": [
+		{% for error in doc_form.uploaded_file.errors %}
+		"{{error}}"{% if not loop.last %},{% endif %}
+		{% endfor %}
+	],
+	"struc_errors": [
+		{% for error in struc_form.uploaded_file.errors %}
+		"{{error}}"{% if not loop.last %},{% endif %}
+		{% endfor %}
+	]
+}

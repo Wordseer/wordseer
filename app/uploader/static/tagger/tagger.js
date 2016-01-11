@@ -160,8 +160,6 @@ function previewStructureFile()
         $(this).hide();
     });
     ;
-    console.log(json);
-
     return false;
 }
 /**
@@ -498,7 +496,7 @@ function processElement(el)
     if (active)
         removeElement(tag, id, nodeType);
     else
-        addElement(tag, id, nodeType);
+        addElement(tag, id, nodeType, true);
 }
 /**
  * Remvoe an element from buckets
@@ -764,13 +762,12 @@ function saveRenameDialogue()
     //rename node
     if (new_name.length > 0)
         node.rename(new_name);
-
+    
     if (nodes.map[new_target_id])
     {
         //update node title and data type
         node.setTitleAsXPath(nodes.map[new_target_id].attributes.xpaths[0]);
         node.setTitleNode(new_target_id);
-
         nodes.map[new_target_id].setDataType(data_type);
         var tag;
 //        refreshElement(id);

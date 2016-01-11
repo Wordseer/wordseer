@@ -1,88 +1,609 @@
 {% import "macros.html" as macros %}
-{% extends "item_list.html" %}
-{% block scripts %}
-{{ super() }}
-<script src="{{ url_for('uploader.static',
-        filename='upload-input-group.js') }}"></script>
-
-</script>
-{% endblock %}
+{% extends "item_list_sidebar.html" %}
 {% block title %}Document List{% endblock %}
 {% block page_header %}
 {{ macros.breadcrumbs([
-        (url_for('uploader.projects'), "Projects"),
+        (url_for('uploader.project_list'), "Projects"),
         ("", project.name)
         ])}}
 {% endblock %}
 
-{% block creation_header %}Upload new document{% endblock %}
+{% set tooltip_args = {"data-toggle": "tooltip", "data-placement": "top"} %}
+{% set process_button_class = "" %}
+{% set mapper_button_class = "" %}
+{% set delete_button_class = "" %}
+{% set analyze_button_class = "" %}
+
+{% if not project.is_processable() %}
+    {% set process_button_class = " disabled" %}
+    {% set process_button_tooltip = "This project cannot be processed" %}
+{% endif %}
+
+{% if not project.document_files %}
+    {% set mapper_button_class = "disabled" %}
+    {% set mapper_button_tooltip = "You need to upload at least one document first." %}
+    {% set process_button_tooltip = "You need to upload at least one document first." %}
+{% endif %}
+
+{% if not project.structure_files %}
+    {% set process_button_tooltip = "You need to upload or create a structure map first." %}
+{% endif %}
+
+{% if project.status > 0 %}
+    {% set mapper_button_tooltip = "You can only do this before processing" %}
+    {% set delete_button_tooltip = "You can only do this before processing" %}
+    {% set mapper_button_class = " disabled" %}
+    {% set delete_button_class = "disabled" %}    
+{% endif %} 
+
+{% if project.status < 2 %}
+    {% set analyze_button_tooltip = "You can only do this after processing" %}
+    {% set analyze_button_class = " disabled" %}
+{% endif %}
+
+{% if user_role == 0 %}
+    {% set mapper_button_class = " disabled" %}
+    {% set delete_button_class = " disabled" %}    
+    {% set process_button_class = " disabled" %}
+    {% set process_button_tooltip = "You don't have permission to do this" %}
+    {% set delete_button_tooltip = "You don't have permission to do this" %}
+    {% set mapper_button_tooltip = "You don't have permission to do this" %}
+    {% set permissions_button_tooltip = "You don't have permission to do this" %}
+{% endif %}
+
 {% block creation_form %}
-<form method="POST" enctype="multipart/form-data"
-      class="form-inline clearfix" role="form">
-    {{ create_form.hidden_tag() }}
-    {{ macros.render_field(create_form.uploaded_file,
-                multiple="multiple",
-                accept=allowed_extensions|join(", "),
-                button=create_form.upload_button(
-                    class="btn btn-primary left-margin",
-                    icon="glyphicon-cloud-upload"),
-                help=("Allowed extensions: " + allowed_extensions|join(", ") +
-                    ".")) }}
-</form>
+<!-- buttons -->
+    <span data-toggle="tooltip" data-placement="top" class="has-tooltip" 
+        title="{{ analyze_button_tooltip }}">
+            <a class="btn btn-primary {{ analyze_button_class }}" 
+            role="button" href="{{url_for('wordseer.ext_app', project_id=project.id)}}"}>
+                <i class="glyphicon glyphicon-search"></i> Explore data
+            </a> 
+    </span>&nbsp;
+    
+    <span data-toggle="tooltip" data-placement="top" class="has-tooltip" 
+        title="{{ process_button_tooltip }}">
+        <a class="btn btn-warning {{process_button_class}}" id="process-button">
+            <i class="glyphicon glyphicon-tasks"></i>
+            Process documents
+        </a>
+    </span>&nbsp;
+
+    <span data-toggle="tooltip" data-placement="top" class="has-tooltip" 
+        title="{{ mapper_button_tooltip }}">
+        <a class="btn btn-info {{mapper_button_class}}" id='structure-button'>
+            <i class="glyphicon glyphicon-list"></i>
+            Map document structure
+        </a> 
+    </span>&nbsp;
+
+    {% if user_role > 0 %}
+    <span data-toggle="tooltip" data-placement="top" class="has-tooltip" 
+        title="{{ permissions_button_tooltip }}">
+    <a href="{{ url_for("uploader.project_permissions", project_id=project.id) }}",
+       class="btn btn-default"><i class="glyphicon glyphicon-user"></i> Users</a>
+    </span>
+    {% endif %}
+
 {% endblock %}
 
-{% block list_header %}Existing documents{% endblock %}
 {% block list_form %}
-    {% if process_form.selection.choices %}
-        {{ macros.render_errors(process_form.selection.errors) }}
-        <form method="POST" role="form">
-            <table class="table table-striped table-hover click-anywhere">
-                <thead>
-                    <tr>
-                        <th class="select">
-                            Select (<a href="#" class="check-all">All</a>)
-                        </th>
-                        <th>
-                            {{ heading }}
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for choice in process_form.structure_file %}
-                        <tr>
-                            <td>
-                                {{ choice }}
-                            </td>
-                            <td>
-                                <label for="{{ choice.id }}">
+    
 
-                                    <a href="{{ url_for("uploader.document_show",
-                                        project_id=project.id,
-                                        document_file_id=choice.data) }}">
-                                     {{ choice.label.text }}
-                                </label>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {{ process_form.hidden_tag() }}
-            {{ macros.selection_table(process_form.selection, "document",
-                "table table-striped table-hover click-anywhere",
-                "File Name", "uploader.document_show", project_id=project.id) }}
-            {{ macros.show_logs(project_errors, "alert alert-danger") }}
-            {{ macros.show_logs(project_warnings, "alert alert-warning") }}
-            {{ macros.show_logs(project_infos, "alert alert-info") }}
-    <h3>Selected file actions:</h3>
-    {{ process_form.structure_button(class="btn btn-info",
-                icon="glyphicon-list", id='structure-button') }}
-    {{ process_form.process_button(class="btn btn-primary",
-                icon="glyphicon-tasks") }}
-    {{ process_form.delete_button(class="btn btn-danger",
-                icon="glyphicon-remove") }}
-        </form>
-    {% else %}
-        <p>There are no files in this project.</p>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="{% if project.status == 0 and not struc_active %}active{% endif %}"><a href="#doc" aria-controls="doc" role="tab" data-toggle="tab">Documents</a></li>
+        <li role="presentation" class="{% if project.status == 0 and struc_active %}active{% endif %}"><a href="#struc" aria-controls="struc" role="tab" data-toggle="tab">Structure Maps</a></li>
+        <li role="presentation" class="{% if project.status > 0 %}active{% endif %}"><a href="#log" aria-controls="log" role="tab" data-toggle="tab">Processing Log</a></li>
+        
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane {% if project.status == 0 and not struc_active %}active {% endif %}panel panel-default" id="doc">
+            {% if project.status == 0 and user_role > 0 %}
+            <div class="panel-body">
+                <form method="POST" enctype="multipart/form-data"
+                      class="form-inline clearfix upload" role="form" >
+                    {{ doc_form.hidden_tag() }}
+                    {{ macros.render_field(doc_form.uploaded_file,
+                        multiple="multiple",
+                        accept=allowed_extensions_doc|join(", "),
+                        button=doc_form.upload_button(
+                            class="btn btn-primary left-margin",
+                            icon="glyphicon-cloud-upload"),
+                        help=("Allowed extensions: " + allowed_extensions_doc|join(", ") +
+                            ".")) }}
+                    <div class="progress hidden">
+                      <div class="progress-bar progress-bar-success progress-bar-striped" style="width: 0">
+                        <span class="sr-only"><span class="success-complete">0</span>% Complete (success)</span>
+                      </div>
+                      <div class="progress-bar progress-bar-danger progress-bar-striped" style="width: 0">
+                        <span class="sr-only"><span class="error-complete">0</span>% Complete (danger)</span>
+                      </div>
+                    </div>
+                    <div class="alert alert-danger hidden"><ul></ul></div>
+                </form>
+            </div>
+            {% endif %}
+            
+            <ul class="list-group">
+                {% for document in project.document_files %}
+                <li class="list-group-item" id="doc-{{ document.id }}">
+                    <a href="{{ url_for("uploader.get_file", filetype="doc", file_id=document.id) }}">{{ document.path.split('/')[-1] }}</a>
+                    <span data-toggle="tooltip" data-placement="top" class="has-tooltip pull-right" title="{{ delete_button_tooltip }}">
+                        <a class="delete btn btn-danger btn-xs {{mapper_button_class}}" data-prefix="doc" data-fileid="{{ document.id }}">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </span>
+                </li>                    
+                {% endfor %}    
+            </ul>
+            {% if not project.document_files %}
+            <div class="panel-footer">
+                <p>There are no Documents in this project.</p>
+                <p>Use the form above to upload the documents you want to analyze.</p>
+            </div>
+            {% endif %}
+
+         </div>
+         <div role="tabpanel" class="tab-pane panel panel-default {% if project.status == 0 and struc_active %}active{% endif %}" id="struc">
+            {% if project.status == 0 and user_role > 0 %}
+            <div class="panel-body">
+                <form method="POST" enctype="multipart/form-data"
+                      class="form-inline clearfix upload" role="form">
+                    {{ struc_form.hidden_tag() }}
+                    {{ macros.render_field(struc_form.uploaded_file,
+                        multiple="multiple",
+                        accept=allowed_extensions_struc|join(", "),
+                        button=struc_form.upload_button(
+                            class="btn btn-primary left-margin",
+                            icon="glyphicon-cloud-upload"),
+                        help=("Allowed extensions: " + allowed_extensions_struc|join(", ") +
+                            ".")) }}
+                    <div class="progress hidden">
+                      <div class="progress-bar progress-bar-success progress-bar-striped" style="width: 0">
+                        <span class="sr-only"><span class="success-complete">0</span>% Complete (success)</span>
+                      </div>
+                      <div class="progress-bar progress-bar-danger progress-bar-striped" style="width: 0">
+                        <span class="sr-only"><span class="error-complete">0</span>% Complete (danger)</span>
+                      </div>
+                    </div>
+                    <div class="alert alert-danger hidden"><ul></ul></div>        
+                </form>
+            </div>
+            {% endif %}
+
+            <ul class="list-group">
+                {% for file in project.structure_files %}
+                <li class="list-group-item" id="struc-{{ file.id }}">
+                    <a href="{{ url_for("uploader.get_file", filetype="struc", file_id=file.id) }}">{{ file.path.split('/')[-1] }}</a>
+                    
+                    <span data-toggle="tooltip" data-placement="top" class="has-tooltip pull-right" title="{{ delete_button_tooltip }}">
+                        <a class="delete btn btn-danger btn-xs {{delete_button_class}}" data-prefix="struc" data-fileid="{{ file.id }}">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </span>
+                </li>
+                {% endfor %}    
+            </ul>
+            {% if not project.structure_files %}
+            <div class="panel-footer">
+                <p>There are no Structure Maps in this project.</p>
+                <p>Click the "Map Structure" button to create a structure map that tells Wordseer what content and metadata to extract from your XML documents.</p>
+                <p>If you already have a Structure Map (in JSON format), you can just upload it with the form above.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div role="tabpanel" class="tab-pane panel logpanel {% if project.status == 0 %}
+                        panel-default
+                        {% endif %}
+                        {% if project.status == 1 %}
+                        panel-info active
+                        {% endif %}
+                        {% if project.status == 2 %}
+                        panel-success active
+                        {% endif %}
+                        {% if project.status == 3 %}
+                        panel-danger active
+                        {% endif %}" id="log">
+            <div class="panel-heading ">
+                <div class="panel-title">
+                    <h4>Status: 
+                        {% if project.status == 0 %}
+                        not processed.
+                        {% endif %}
+                        {% if project.status == 1 %}
+                        currently processing.
+                        {% endif %}
+                        {% if project.status == 2 %}
+                        processing complete.
+                        {% endif %}
+                        {% if project.status == 3 %}
+                        processing failed.
+                        {% endif %}
+                    </h4>
+                </div>
+            </div>
+            <div class="panel-body">
+            {{ macros.show_logs(project_errors, "alert alert-danger", "Errors") }}
+            {{ macros.show_logs(project_warnings, "alert alert-warning", "Warnings") }}
+            {{ macros.show_logs(project_infos, "alert alert-info", "Info") }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+<h2>Directions</h2>
+<ol>
+    <li>Prepare a directory to upload with the files that you want to process.</li>
+    <li>Upload your files in the Documents tab.</li>
+    <li>Click the "Map document structure" button to access the structure mapper. Follow
+        the on screen directions to create a description of the structure of
+        your collection's xml files. (If you already have a JSON structure map file, you can upload it in the Structure Maps tab).</li>
+    <li>To process your documents for analysis, click the "Process documents" button. You may generate several structure files, but you can only use one when
+        processing. (Depending on the size and complexity of your documents, this may take a while. The Processing Log tab will keep you updated on Wordseer's progress.)</li>
+    <li>Once processing is finished, the "Explore data" button will be enabled. Click it to launch the Wordseer text analysis tool.</li>
+    </ol>
+</div>
+{% endblock %}
+
+{% block toplevel %}
+    {% if project.status == 0 and user_role > 0 %}
+    <div class="modal fade" id="mapperSelect" role="dialog" aria-labelledby="mapperSelectLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Choose the XML file you want to map</h4>
+                </div>
+                <div class="modal-body">
+                    <p>To continue to the Structure Mapper, select one file from this list to serve as an example of how your documents are structured.</p>
+                    <p class="small">The Structure Map is a set of instructions that Wordseer will use to extract content and metadata from your documents. Wordseer assumes that all files in a project follow the same schema, so you only need to map one file. (If your files don't all follow the same schema, you should remove or replace any non-conforming XML files before processing or the processor will fail or produce unreliable results.)</p>
+
+                    <div class="list-group">
+                        <div class="list-group-item list-group-item-info">
+                            <h4>Choose a document to map.</h4>
+                        </div>
+                        {% for document in project.document_files %}
+                        <a class="list-group-item" href="#" data-fileid="{{document.id}}">
+                            {{ document.path.split('/')[-1] }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="processConfirm" role="dialog" aria-labelledby="processConfirmLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Process all documents with a Structure Map</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Once you select a Structure Map, Wordseer will use it to extract the content and metadata from <strong>all</strong> the XML documents you have uploaded to this Project. When this processing is complete, you will be able to access the Wordseer analysis tool by clicking on the "Explore Data" button.</p>
+                    <p class="small">The Structure Map is a set of instructions that Wordseer will use to extract content and metadata from your documents. Wordseer assumes that all files in a project follow the same schema, so you only need to map one file. (If your files don't all follow the same schema, you should remove or replace any non-conforming XML files before processing or the processor will fail or produce unreliable results.)</p>
+
+                    <div class="list-group">
+                        <div class="list-group-item list-group-item-info">
+                            <h4>Choose a Structure Map to begin processing.</h4>
+                        </div>
+                        {% for file in project.structure_files %}
+                        <a class="list-group-item" href="#" data-fileid="{{file.id}}">
+                            {{ file.path.split('/')[-1] }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ macros.modal_confirmation() }}
+
     {% endif %}
 {% endblock %}
 
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('uploader.static',
+        filename='upload-input-group.js') }}"></script>
+<script src="{{ url_for('uploader.static',
+        filename='tooltips.js') }}"></script>
+
+{% if project.status < 2 and user_role > 0 %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        // selection dialog for xml structure mapper
+        $("#structure-button:not(.disabled)").click(function(e){
+            e.preventDefault();
+
+            $("#mapperSelect").modal("show");
+
+            $("#mapperSelect a.list-group-item").click(function(e){
+                e.preventDefault();
+                var fileid = e.currentTarget.dataset.fileid;
+                map_url = "{{ url_for("uploader.document_map", project_id=project.id, document_file_id=0) }}";
+                map_url = map_url.slice(0,-1) + fileid
+                window.location =  map_url;
+            });
+        });
+
+        // initiate processing
+        $("#process-button:not(.disabled)").click(function(e){
+            e.preventDefault();
+
+            $("#processConfirm").modal("show");
+
+            $("#processConfirm a.list-group-item").click(function(e){
+                e.preventDefault();
+                var fileid = e.currentTarget.dataset.fileid,
+                    process_url = "{{ url_for("uploader.project_process", project_id=project.id) }}",
+                    request = $.post(process_url, {struc_id: fileid});
+                
+                request.done(function(resp){
+
+                        $("#processConfirm").modal("hide");
+                        
+                        // update project status display
+                        var log = $('.logpanel');
+                        log.removeClass('panel-default').addClass('panel-info');
+                        log.find('.panel-title h4').html('Status: currently processing.');
+                        $('.nav-tabs li').last().find('a').click();
+
+                        project_status = 1;
+                        logPoll();
+
+                        // disable buttons
+                        $('#structure-button, #process-button').addClass('disabled');
+
+                    })
+                    .fail(function(resp){
+                        failAlert($('.tab-pane#log .panel-body'), "processor failed: " +  resp.statusText);
+                        $('.nav-tabs li').last().find('a').click();
+                        $("#processConfirm").modal("hide");
+                    });
+            });
+
+        });
+
+        // delete a file
+        $("a.btn.delete").click(function(e){
+            e.preventDefault();
+
+            // confirmation dialog
+            $("#confirmDelete .modal-title").text('Delete this file permanently?')
+            $("#confirmDelete").modal("show");
+
+            // clear old click handler, replace with new one
+            $("#confirmDelete #confirm")
+                .off("click")
+                .on("click", function(){
+                    var me = this;
+                    $(me).removeClass('btn-danger')
+                        .addClass('btn-default')
+                        .text("Deleting...");
+
+                    var file_id = e.currentTarget.dataset.fileid,
+                        request = $.post("{{ url_for("uploader.delete_obj")}}", {
+                            project_id: {{ project.id }},
+                            obj_type: e.currentTarget.dataset.prefix,
+                            obj_id: file_id,
+                        });
+
+                    request.done(function(resp){
+                        $("#confirmDelete").modal("hide");
+
+                        var data = $.parseJSON(resp),
+                            rowToDelete = $("#" + e.currentTarget.dataset.prefix + "-" + data.obj_id);
+
+                        rowToDelete.remove();
+                        
+                        // reset the delete button
+                        $(me).addClass('btn-danger')
+                            .removeClass('btn-default')
+                            .text("Delete");
+
+                    }).fail(function(resp){
+
+                        $("#confirmDelete").modal("hide");
+
+                        failAlert($('.tab-pane#' + e.currentTarget.dataset.prefix + " .panel-body"), "Deletion failed: " +  resp.statusText);
+
+                        // reset the delete button
+                        $(me).addClass('btn-danger')
+                            .removeClass('btn-default')
+                            .text("Delete");
+                    });
+                });
+        });
+    
+        // file upload
+        var uploadForm = $('form.upload');
+
+        uploadForm.on('submit', function(e){
+            e.preventDefault();
+            var csrf_token = $(e.currentTarget).find("#csrf_token").val();
+            var finput = $(e.currentTarget).find('#uploaded_file').get(0);
+
+            // Get the selected files from the input.
+            var files = finput.files;
+
+            // progress calculation
+            var fTotal = files.length,
+                fCount = 0,
+                errCount = 0;
+            // reset progress bar
+            $(e.currentTarget).find(".progress .progress-bar")
+                .css("width", "0px");
+            $(e.currentTarget).find(".progress .progress-bar .sr-only span").html('0');
+
+            // Loop through each of the selected files.
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var formData = new FormData();
+                formData.append("csrf_token", csrf_token);
+                // Add the file to the request.
+                formData.append('uploaded_file', file, file.name);
+                $.ajax({
+                    type: "POST",
+                    url: "{{ url_for("uploader.file_upload", project_id=project.id) }}", 
+                    data: formData, 
+                    success: function(resp){
+                        // via ajax, update successes and errors
+                        var data = $.parseJSON(resp);
+
+                        // successes
+                        $.each(data.files, function(index, file){
+                            // add successfully uploaded file to list
+                            $('<li class="list-group-item list-group-item-success">'+file.filename+'</li>')
+                                .appendTo("#" + file.type + " .list-group")
+                                .tooltip({
+                                    placement: 'top',
+                                    title: "To view or delete this file you must reload the page."
+                                })
+                                ;
+
+                            $("#" + file.type + " .panel-footer").remove();
+                            $("#" + file.type + " .progress").removeClass('hidden');
+                            fCount += 1;
+                            $("#" + file.type + " .progress .progress-bar-success")
+                                .css("width", (fCount / fTotal * 100) + "%");
+                            $("#" + file.type + " .progress .success-complete").html(fCount / fTotal * 100);
+
+                            // can we enable any of the disabled buttons?
+                            var reloadMessage = "Reload the page to enable this function.";
+                            if ($("#doc .list-group li").length > 0) {
+                                // enable structure mapper
+                                $("span").has("#structure-button").attr("data-original-title", reloadMessage);
+
+                                if ($("#struc .list-group li").length > 0) {
+                                    // enable preprocessor
+                                    $("span").has("#process-button").attr("data-original-title", reloadMessage);
+                                }
+                            }
+
+                            // if (file.type == "struc") {
+                            //     $("#process-button").removeClass('disabled');
+                            //     // .tooltip('destroy');
+                            // }
+                            
+                        });
+
+                        // errors
+                        $.each(data.doc_errors, function(index, err){
+                            // show errors
+                            $("#doc form .alert").removeClass("hidden").find('ul').append('<li>'+err+'</li>');
+                            $("#doc .progress").removeClass('hidden');
+                            errCount += 1;
+                            $("#doc .progress .progress-bar-danger")
+                                .css("width", (errCount / fTotal * 100) + "%");
+                            $("#doc .progress .error-complete").html(errCount / fTotal * 100)
+                        });
+
+                        $.each(data.struc_errors, function(index, err){
+                            // show errors
+                            $("#struc form .alert").removeClass("hidden").find('ul').append('<li>'+err+'</li>');
+                            $("#struc .progress").removeClass('hidden');
+                            errCount += 1;
+                            $("#struc .progress .progress-bar-danger")
+                                .css("width", (errCount / fTotal * 100) + "%");
+                            $("#struc .progress .error-complete").html(errCount / fTotal * 100)
+                        });
+                    },
+                    processData: false,
+                    contentType: false,
+                });
+            }
+            
+            // reset the form
+            e.currentTarget.reset();
+        });
+
+        {% if project.status == 1 %}
+        // poll for log updates
+        logPoll();   
+        {% endif %}                         
+    });
+
+var log_start = {{ log_start }},
+    project_status = {{ project.status }};
+
+var getLogs = function(){
+    var request = $.get("{{ url_for("uploader.project_log", project_id=project.id)}}", {start: log_start});
+
+    request.done(function(resp){
+        var data = $.parseJSON(resp);
+        log_start = Math.max(log_start, data.max);
+        project_status = data.status;
+
+        // append any new log messages to the dom
+        $.each(data.infos, function(i, logdata){
+            $('.processlog.alert-info').removeClass('hidden');
+            $('.processlog.alert-info ul')
+                .append('<li><em>' + logdata.log_item + "</em>: " + logdata.item_value + '</li>');
+        });
+        $.each(data.warnings, function(i, logdata){
+            $('.processlog.alert-warning').removeClass('hidden');
+            $('.processlog.alert-warning ul')
+                .append('<li><em>' + logdata.log_item + "</em>: " + logdata.item_value + '</li>');
+        });
+        $.each(data.errors, function(i, logdata){
+            $('.processlog.alert-danger').removeClass('hidden');
+            $('.processlog.alert-danger ul')
+                .append('<li><em>' + logdata.log_item + "</em>: " + logdata.item_value + '</li>');
+        })
+
+
+    }).fail(function(resp){
+        failAlert($('.tab-pane#log .panel-body'), "request for logs failed: " +  resp.statusText);
+    })
+};
+
+var logPoll = function(){
+    setTimeout(function(){
+        // stop polling if processing is finished
+        if (project_status >= 2) {
+            window.location.href=window.location.href;
+            return;
+        }
+
+        // otherwise:
+        getLogs();
+        // recurse
+        logPoll();
+    }, 5000);
+}
+
+var failAlert = function(target, text){
+
+    var alertEl = $('<div></div>')
+        .addClass('alert alert-danger alert-dismissable')
+        .attr('role', 'alert')
+        .css("margin-top", "10px");
+
+    alertEl.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+
+    alertEl.append("<span>" + text + "</span>");
+    
+    alertEl.prependTo(target);
+
+    // initialize the js plugin
+    alertEl.alert();
+}
+
+</script>
+{% endif %}
+{% endblock %}

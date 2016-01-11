@@ -8,6 +8,7 @@ from .project import Project
 from .association_objects import DependencyInSentence
 from .association_objects import SequenceInSentence
 from .association_objects import WordInSentence
+from .association_objects import PropertyOfSentence
 from .counts import WordCount, DependencyCount, SequenceCount
 
 class Sentence(db.Model, Base):
@@ -38,9 +39,10 @@ class Sentence(db.Model, Base):
 
     # Attributes
 
-    unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
-    document_id = db.Column(db.Integer, db.ForeignKey("document.id"))
-    text = db.Column(db.Text, index=True)
+    unit_id = db.Column(db.Integer, db.ForeignKey("unit.id", ondelete='CASCADE'))
+    document_id = db.Column(db.Integer, db.ForeignKey("document.id", ondelete='CASCADE'))
+    text = db.Column(db.Text)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
 
     # Relationships
 
@@ -56,7 +58,8 @@ class Sentence(db.Model, Base):
     document = db.relationship("Document", foreign_keys=[document_id],
         backref="all_sentences")
 
-    properties = db.relationship("Property", backref="sentence")
+    properties = association_proxy("property_of_sentence", "property",
+        creator=lambda property: PropertyOfSentence(property=property))
 
     def __repr__(self):
         """Representation of the sentence, showing its text.
@@ -67,7 +70,7 @@ class Sentence(db.Model, Base):
         return "<Sentence: " + str(self.text) + ">"
 
     def add_word(self, word, position=None, space_before="",
-        part_of_speech="", project=None, force=True):
+        surface=None, project=None, force=True):
         """Add a word to the sentence by explicitly creating the association
         object.
 
@@ -78,7 +81,6 @@ class Sentence(db.Model, Base):
             position (int): The position (0-indexed) of ``word`` in this
                 ``Sentence``.
             space_before (str): The space before ``word``, if any.
-            part_of_speech (str): The part of speech of ``word``.
             project (Project): The ``Project`` that scopes this relationship
 
         Returns:
@@ -91,11 +93,11 @@ class Sentence(db.Model, Base):
 
         word_in_sentence = WordInSentence(
             word=word,
+            surface=surface,
             project=project,
             sentence=self,
             position=position,
             space_before=space_before,
-            part_of_speech=part_of_speech,
         )
 
         word_in_sentence.save(force=force)
@@ -167,4 +169,3 @@ class Sentence(db.Model, Base):
         sequence_in_sentence.save(force=force)
 
         return sequence_in_sentence
-

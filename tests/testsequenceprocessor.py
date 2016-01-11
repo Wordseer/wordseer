@@ -5,12 +5,13 @@ Tests for the SequenceProcessor class.
 import mock
 import unittest
 
+from app.models.association_objects import WordInSentence
 from app.models.document import Document
 from app.models.project import Project
 from app.models.word import Word
 from app.models.sentence import Sentence
 from app.preprocessor.sequenceprocessor import (SequenceProcessor,
-    join_tws, LEMMA, WORD)
+    join_words, LEMMA, WORD)
 import database
 
 class SequenceProcessorTests(unittest.TestCase):
@@ -20,59 +21,66 @@ class SequenceProcessorTests(unittest.TestCase):
         """Obtain a SequenceProcessor.
         """
         database.clean()
-        self.project = mock.create_autospec(Project)
+        self.project = Project()
         self.seq_proc = SequenceProcessor(self.project)
 
-        self.words = [Word(lemma="first", word="first"),
-            Word(lemma="second", word="second"),
-            Word(lemma="third", word="third")]
-        self.string = "first second third"
-
-    def test_join_lemmas(self):
-        """Test join_lemmas()
-        """
-        self.failUnless(join_tws(self.words, " ", LEMMA) == self.string)
 
     def test_join_words(self):
         """Test join_words()
         """
-        self.failUnless(join_tws(self.words, " ", WORD) == self.string)
+        words_in_sentences = [WordInSentence(surface="First", word=Word(lemma="first")),
+            WordInSentence(surface="Second", word=Word(lemma="second")),
+            WordInSentence(surface="Third", word=Word(lemma="third"))]
+        lemma_string = "first second third"
+        word_string = "First Second Third"
+
+        assert join_words(words_in_sentences, LEMMA) == lemma_string
+        assert join_words(words_in_sentences, WORD) == word_string
 
     def test_remove_stops(self):
         """Test remove_stops()
         """
-        with_stops = [Word(word="."),
-            Word(word="a"),
-            Word(word="around"),
-            Word(word="empire"),
-            Word(word="!"),
-            Word(word="Camelot"),
-            Word(word="theirs"),
-            Word(word="who"),
-            Word(word="wouldst"),
-            Word(word="were"),
-            Word(word="again")]
+        with_stops = [WordInSentence(word=Word(lemma=".")),
+            WordInSentence(word=Word(lemma="a")),
+            WordInSentence(word=Word(lemma="around")),
+            WordInSentence(word=Word(lemma="empire")),
+            WordInSentence(word=Word(lemma="!")),
+            WordInSentence(word=Word(lemma="Camelot")),
+            WordInSentence(word=Word(lemma="theirs")),
+            WordInSentence(word=Word(lemma="who")),
+            WordInSentence(word=Word(lemma="wouldst")),
+            WordInSentence(word=Word(lemma="were")),
+            WordInSentence(word=Word(lemma="again"))]
 
-        without_stops = [Word(word="empire"),
-            Word(word="Camelot")]
+        without_stops = [WordInSentence(word=Word(lemma="empire")),
+            WordInSentence(word=Word(lemma="Camelot"))]
+        result = self.seq_proc.remove_stops(with_stops)
+
+        without_stops_words = [word.word for word in without_stops]
+        result_words = [word.word for word in result]
 
         removed = self.seq_proc.remove_stops(with_stops)
 
-        self.failUnless(self.seq_proc.remove_stops(with_stops) == without_stops)
+        self.failUnless(result_words == without_stops_words)
 
     def test_process(self):
         """Test process()
         """
         document = Document()
         sentence = Sentence(text="The quick brown fox jumped over the lazy dog",
-            words=[Word(lemma="the", word="the"),
-                Word(lemma="fox", word="fox"),
-                Word(lemma="jump", word="jumped"),
-                Word(lemma="over", word="over"),
-                Word(lemma="the", word="the"),
-                Word(lemma="dog", word="dog")],
-            id=1,
-            document=document)
+            document=document, project = self.project)
+        words = [
+            Word(lemma="the", surface="the"),
+            Word(lemma="fox", surface="fox"),
+            Word(lemma="jump", surface="jumped"),
+            Word(lemma="over", surface="over"),
+            Word(lemma="the", surface="the"),
+            Word(lemma="dog", surface="dog")]
+        for index, word in enumerate(words): 
+            word.save()
+            sentence.add_word(word, index+1, " ", word.surface, self.project)
+        sentence.save()
+
         result = self.seq_proc.process(sentence)
         sequences = split_sequences(result)
         sequence_sequences = get_sequence_text(sequences)
@@ -128,6 +136,9 @@ class SequenceProcessorTests(unittest.TestCase):
             }
         }
 
+        print sequence_sequences
+        # TODO: the seqproc isn't making phrases of words separated by a stopword,
+        # but this code expects it to.
         self.failUnless(sequence_sequences == key)
 
 def split_sequences(sequences):

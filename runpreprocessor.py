@@ -1,11 +1,18 @@
+from app.models.flask_security import User
 from app.models.project import Project
 from app.models.documentfile import DocumentFile
 from app.preprocessor.collectionprocessor import cp_run
 
 import os
+import sys
 import database
 
-collection_dir = os.path.join("tests", "data", "personals")
+collection_name = "articles"
+
+if len(sys.argv) > 1 and sys.argv[1]:
+    collection_name = sys.argv[1]
+
+collection_dir = os.path.join("tests", "data", collection_name)
 extension = ".xml"
 structure_file = os.path.join(collection_dir, "structure.json")
 
@@ -13,6 +20,10 @@ database.reset()
 
 project = Project()
 project.save()
+
+user = User(email="test", password="test")
+user.add_project(project)
+user.save()
 
 files = [f for f in os.listdir(collection_dir) if
         os.path.isfile(os.path.join(collection_dir, f))]

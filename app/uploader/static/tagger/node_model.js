@@ -152,6 +152,7 @@ var NodeModel = function() {
         if (self.attributes.isRoot)
         {
             self.attributes.type = DOCUMENT_TAG;
+            self.attributes.structureName = DOCUMENT_TAG;
             self.attributes.filename = filename;
             self.attributes.url = url;
             self.attributes.xml = xml;
@@ -196,6 +197,39 @@ var NodeModel = function() {
             if (!self.map[key])
                 self.map[key] = item;
         });
+    };
+    /**
+     * remove a child from this node (either unit or metadata based on node type)
+     * @param {NodeModel} node
+     * @returns {undefined}
+     */
+    self.removeChild = function(node)
+    {
+//        self.attributes.sub_xpaths.push(node.attributes.xpathsFull[0]);
+        delete self.attributes.sub_xpaths[self.attributes.sub_xpaths.indexOf(node.attributes.xpathsFull[0])];
+//        if(!self.attributes.children)
+        _.each(self.attributes.children, function(item, index) {
+            if (item.attributes.id == node.attributes.id)
+                delete self.attributes.children[index]
+        });
+        if (node.attributes.type === METADATA_TAG)
+            _.each(self.attributes.metadata, function(item, index) {
+                if (item.attributes.id == node.attributes.id)
+                    delete self.attributes.metadata[index]
+            });
+//            self.attributes.metadata.push(node);
+        else
+            _.each(self.attributes.units, function(item, index) {
+                if (item.attributes.id == node.attributes.id)
+                    delete self.attributes.untis[index]
+            });
+//            self.attributes.units.push(node);
+        delete self.map[node.attributes.id]
+//        _.each(node.map, function(item, key)
+//        {
+//            if (!self.map[key])
+//                self.map[key] = item;
+//        });
     };
     /**
      * If if this node has any unit or metadata childrent
@@ -312,6 +346,7 @@ var NodeModel = function() {
     self.setTitleAsText = function(title) {
         self.rename(title);
     };
+    
     /**
      * Set the titleXPath of this node to another node's XPath
      * @param {string} titleXPath
@@ -331,6 +366,7 @@ var NodeModel = function() {
         self.map[id].attributes.isTitle = true;
         self.attributes.titleId = id;
         self.attributes.titleXpaths = self.attributes.titelXpathsFull = [self.map[id].attributes.xpathsFull[0]];
+
     };
     /**
      * Reset the tile node as empty
@@ -478,7 +514,21 @@ var NodeModel = function() {
             json['metadata'] = [];
             _.each(self.attributes.metadata, function(unit) {
                 json.metadata.push(unit.toJSONAll());
+                // correct metadata names so they don't take on the title's tag name, 
+                // if the title is a separate element
+                if (json.titleXpaths.length > 0) {
+                    _.last(json.metadata).displayName = json.name;
+                    _.last(json.metadata).propertyName = json.name;
+                    _.last(json.metadata).name = json.name;    
+                }
+                
                 json.children.push(unit.toJSONAll());
+                // some metadata info comes from here during cleanup()
+                if (_.last(json.children).type == METADATA_TAG && json.titleXpaths.length > 0){
+                    _.last(json.children).displayName = json.name;
+                    _.last(json.children).propertyName = json.name;
+                    _.last(json.children).name = json.name;
+                }
             });
         }
         if (self.attributes.units.length > 0)
@@ -500,7 +550,7 @@ var NodeModel = function() {
      */
     self.toActiveJSON = function() {
         var jsonIn = self.toJSONAll(), json;
-//        console.log(jsonIn);
+       console.log(jsonIn);
 
         function cleanUp(node, parent)
         {

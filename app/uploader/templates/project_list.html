@@ -5,9 +5,10 @@
     {{ macros.breadcrumbs([("", "Projects")]) }}
 {% endblock %}
 {% block creation_header %}Create new project{% endblock %}
+
 {% block creation_form %}
     <form method="POST" enctype="multipart/form-data" class="form-inline"
-        role="form">
+        role="form" id="createProject">
         {{ macros.render_errors(create_form.name.errors) }}
         {{ create_form.hidden_tag() }}
         {{ macros.render_field(create_form.name, label_class="sr-only",
@@ -16,22 +17,80 @@
             icon="glyphicon-ok") }}
     </form>
 {% endblock %}
+
 {% block list_header %}Existing projects{% endblock %}
 {% block list_form %}
-    {% if process_form.selection.choices %}
-        <form method="POST" role="form">
-            {{ process_form.hidden_tag() }}
-            {{ macros.selection_table(process_form.selection,
-                "project",
-                "table table-striped table-hover click-anywhere",
-                "Project Name", "uploader.project_show") }}
-            <h3>Selected file actions:</h3>
-            {{ process_form.process_button(class="btn btn-primary",
-                icon="glyphicon-tasks") }}
-            {{ process_form.delete_button(class="btn btn-danger",
-                icon="glyphicon-remove") }}
-            {{ macros.render_errors(process_form.selection.errors) }}
-        </form>
+    {% if projects %}
+            <table class="table table-striped table-hover buttons click-anywhere">
+                <thead>
+                    <tr>
+                        <th class="fitted">
+                        </th>
+                        <th class="emph">
+                            Project Name
+                        </th>
+                        <th class="fitted">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                        <tr id="proj-{{project.id}}" 
+                        {% if project.status == 3%}class="danger"{% endif %}
+                        {% if project.status == 1%}class="info"{% endif %}
+                        >
+                            <td class="fitted">
+                                {% if project.status == 0 %}
+                                    <a href="{{ url_for("uploader.project_show",
+                                    project_id=project.id) }}", class="btn btn-default">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    Add documents
+                                </a>
+                                {% endif %}
+                                {% if project.status == 1 or project.status == 3 %}
+                                <a href="{{ url_for("uploader.project_show",
+                                project_id=project.id) }}", class="btn btn-default">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                                    View logs
+                                </a>
+                                {% endif %}
+                                {% if project.status == 2 %}
+                                <a class="btn btn-primary {{ analyze_button_class }}" role="button"
+                                    href="{{url_for('wordseer.ext_app', project_id=project.id)}}"}>
+                                    <span class="glyphicon glyphicon-search"></span>
+                                    Explore data
+                                </a>
+                                {% endif %}
+                            </td>
+                            <td class="emph">
+                                <label for="{{ project.id }}">
+                                    {{ project.name }} 
+                                    {% if project.status == 1 %}<em>(currently processing)</em>{% endif %}
+                                </label> 
+                            </td>
+                            <td class="fitted">
+                                {% if project.status == 2 %}
+                                <a href="{{ url_for("uploader.project_show",
+                                project_id=project.id) }}", class="btn btn-default">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                                    View logs
+                                </a>
+                                {% endif %}
+                                
+                            </td>
+                            <td class="fitted">
+                                {% if project.admin and project.status != 1 %}
+                                <a data-projid="{{project.id}}" class="btn btn-danger delete">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    Delete
+                                </a>
+                                {% endif %}
+                            </td>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        
     {% else %}
         <p>You own no projects.</p>
     {% endif %}
@@ -40,3 +99,87 @@
     {{ macros.modal_confirmation() }}
 {% endblock %}
 
+{% block scripts %}
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $("form#createProject").submit(function(e){
+            e.preventDefault();
+            var project_name = $(e.currentTarget).find("#name").val(),
+                csrf_token = $(e.currentTarget).find("#csrf_token").val(),
+                request = $.post("{{ url_for("uploader.project_create")}}", {name: project_name, csrf_token: csrf_token});
+            request.done(function(resp){
+                var data = $.parseJSON(resp);
+                window.location = "{{ url_for("uploader.project_list") }}" + data.project_id;
+            }).fail(function(data){
+                failAlert($('#createProject'), "Project creation failed: " +  data.statusText);
+            });
+        });
+
+        $("a.btn.delete").click(function(e){
+            e.preventDefault();
+
+            // confirmation dialog
+            $("#confirmDelete .modal-title").text('Delete this project permanently?')
+            $("#confirmDelete").modal("show");
+
+            // clear old click handler, replace with new one
+            $("#confirmDelete #confirm")
+                .off("click")
+                .on("click", function(){
+                    var me = this;
+                    $(me).removeClass('btn-danger')
+                        .addClass('btn-default')
+                        .text("Deleting...");
+
+                    var project_id = e.currentTarget.dataset.projid,
+                        csrf_token = $("#csrf_token").val(),
+                        request = $.post("{{ url_for("uploader.delete_obj")}}", {
+                            project_id: project_id,
+                            obj_type: "project",
+                            obj_id: project_id,
+                            csrf_token: csrf_token
+                        });
+                    request.done(function(resp){
+                        var data = $.parseJSON(resp),
+                            rowToDelete = $("tr#proj-" + data.obj_id);
+
+                        $("#confirmDelete").modal("hide");
+                        rowToDelete.remove();
+                        
+                        // reset the delete button
+                        $(me).addClass('btn-danger')
+                            .removeClass('btn-default')
+                            .text("Delete");
+
+                    }).fail(function(data){
+                        $("#confirmDelete").modal("hide");
+                        
+                        failAlert($('#createProject'), "Project deletion failed: " +  data.statusText);
+
+                        // reset the delete button
+                        $(me).addClass('btn-danger')
+                            .removeClass('btn-default')
+                            .text("Delete");
+                    });
+                });
+        });
+    })
+
+    var failAlert = function(target, text){
+
+        var alertEl = $('<div></div>')
+            .addClass('alert alert-danger alert-dismissable')
+            .attr('role', 'alert')
+            .css("margin-top", "10px");
+
+        alertEl.appendTo(target);
+
+        alertEl.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+
+        alertEl.append("<span>" + text + "</span>");
+        
+        // initialize the js plugin
+        alertEl.alert();
+    }
+    </script>
+{% endblock %}

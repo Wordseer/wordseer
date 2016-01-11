@@ -4,10 +4,12 @@
 <author>allison</author>
 <tags>
  <tag>Tag 1</tag>
- <tag>Tag 2</tag>
 </tags>
 <number>3</number>
 <text>
 	This is the text of post 3. There are two sentences here.
+</text>
+<text>
+	This is the beginning of a very long sentence: Lorem ipsum dolor sit amet, consectetur adipiscing elit Phasellus sit amet maximus tellus, id dapibus urna Quisque risus mi, volutpat ut dui sit amet, aliquet accumsan quam Integer elementum quis ipsum non elementum Etiam ac lorem mauris Lorem ipsum dolor sit amet, consectetur adipiscing elit Mauris augue lectus, volutpat eu vehicula ac, ullamcorper eget metus Vestibulum vitae metus consectetur, viverra lectus nec, cursus risus Suspendisse est enim, hendrerit mollis molestie ut, vestibulum nec lorem Nulla vel mi malesuada; lacinia metus at, ullamcorper arcu Sed eu vestibulum lectus, sed pulvinar tortor Donec euismod lobortis diam ac ullamcorper Nullam aliquet sagittis tellus, vel pellentesque justo tristique sed Curabitur lacinia sagittis odio, ut hendrerit elit aliquam pellentesque Fusce aliquet odio eget est dapibus, aliquet auctor dolor aliquam Proin id nisl consectetur, euismod velit id, placerat urna Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas Nullam in facilisis augue Nullam vel porta tellus Pellentesque aliquam ante in bibendum tincidunt.
 </text>
 </article>

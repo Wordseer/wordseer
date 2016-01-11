@@ -1,29 +1,51 @@
-from app.models import *
-from app import db
-from sqlalchemy import func, distinct
+if __name__ == "__main__":
 
-# Check sequence counts
+    root = os.path.join("home", "keien", "dev", "wordseer_flask")
 
-for seqsent in SequenceInSentence.query.all():
-    sequence = seqsent.sequence
+    # Read the args and connect to the databases
+    old_db = create_engine("mysql://keien@localhost/" + sys.argv[1])
+    new_db = create_engine("sqlite:////" + os.path.join(root, sys.argv[2]))
 
-    real_sentence_count = int(db.session.execute("""
-        SELECT COUNT(*) AS count
-        FROM sequence_in_sentence
-        WHERE sequence_id = {0}
-    """.format(sequence.id)).fetchone().count)
+    # Pick some sentences from new database
+    sentence_ids = get_random_id_from("sentence", new_db, 50)
+    sentence_texts = [ Sentence.query.get(id).text for id in sentence_ids ]
 
-    if real_sentence_count != sequence.sentence_count:
-        print("Mismatched sentence count for " + str(sequence))
-        print('Calculated count: %s; real count: %s' % (sequence.sentence_count, real_sentence_count))
+    # Find matches in the old database
+    matched_sentences = [ old_db.execute(
+        """
+            SELECT *
+            FROM sentence
+            WHERE sentence.sentence = ?
+        """,
+        sentence
+    ).fetchone() for sentence in sentences_old_texts ]
 
-    real_document_count = int(db.session.execute("""
-        SELECT COUNT(DISTINCT document_id) AS count
-        FROM sequence_in_sentence
-        WHERE sequence_id = {0}
-    """.format(sequence.id)).fetchone().count)
+    print(matched_sentences)
 
-    if real_document_count != sequence.document_count:
-        print("Mismatched document count for " + str(sequence))
-        print('Calculated count: %s; real count: %s' % (sequence.document_count, real_document_count))
-        print("")
+def get_random_id_from(table, db, n=1):
+
+    ids = []
+
+    for i in range(0, n):
+
+        count_query = """
+            SELECT COUNT(*) as count
+            FROM {table}
+        """.format(table = table)
+
+        count = db.execute(count_query).fetchone().count
+
+        random_index = random.randint(0, count-1)
+
+        id_query = """
+            SELECT id
+            FROM {table}
+        """.format(table = table)
+
+        ids.append(int(db.execute(id_query).fetchall()[random_index].id))
+
+    if n == 1:
+        return ids[0]
+    else:
+        return tuple(ids)
+

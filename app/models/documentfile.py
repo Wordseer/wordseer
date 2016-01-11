@@ -17,5 +17,9 @@ class DocumentFile(db.Model, Base):
     """
 
     path = db.Column(db.String)
-    documents = db.relationship("Document", backref="document_file")
+    documents = db.relationship(
+        "Document", 
+        backref="document_file", 
+        cascade="all, delete-orphan",
+        passive_deletes=True)
 

@@ -39,16 +39,16 @@
                     toggling -->
                     <div class="collapse navbar-collapse"
                          id="bs-example-navbar-collapse-1">
-                        {% if current_user.is_authenticated() %}
+                        {% if current_user.is_authenticated %}
                         <ul class="nav navbar-nav">
                             <li><a
-                                    href="{{ url_for('uploader.projects') }}">
+                                    href="{{ url_for('uploader.project_list') }}">
                                     Projects
                                 </a></li>
                         </ul>
                         {% endif %}
                         <ul class="nav navbar-nav navbar-right">
-                            {% if not current_user.is_authenticated() %}
+                            {% if not current_user.is_authenticated %}
                             <li>
                                 <a href="{{ url_for_security('login') }}">
                                     Log in

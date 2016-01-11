@@ -1,0 +1,32 @@
+{
+	"status": "OK",
+	"max": {{ max }},
+	"status": {{ status }},
+	"infos": [
+		{% for log in infos %}
+		{
+			"id": {{ log.id }},
+			"log_item": "{{ log.log_item }}",
+			"item_value": "{{ log.item_value }}"
+		}{% if not loop.last %},{% endif %}
+		{% endfor %}
+	],
+	"warnings": [
+		{% for log in warnings %}
+		{
+			"id": {{ log.id }},
+			"log_item": "{{ log.log_item }}",
+			"item_value": "{{ log.item_value }}"
+		}{% if not loop.last %},{% endif %}
+		{% endfor %}
+	],
+	"errors": [
+		{% for log in errors %}
+		{
+			"id": {{ log.id }},
+			"log_item": "{{ log.log_item }}",
+			"item_value": "{{ log.item_value }}"
+		}{% if not loop.last %},{% endif %}
+		{% endfor %}
+	]
+}

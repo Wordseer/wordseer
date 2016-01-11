@@ -14,9 +14,9 @@ class Log(db.Model, Base, NonPrimaryKeyEquivalenceMixin):
     """
 
     id = db.Column(db.Integer, primary_key=True)
-    log_item = db.Column(db.String(100), nullable=False, index=True)
+    log_item = db.Column(db.String(100), nullable=False)
     item_value = db.Column(db.Text, nullable=False)
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
     type = db.Column(db.String)
 
     __mapper_args__ = {
@@ -47,4 +47,3 @@ class InfoLog(Log):
     __mapper_args__ = {
         "polymorphic_identity": "info"
     }
-

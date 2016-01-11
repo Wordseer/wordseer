@@ -1,17 +1,14 @@
 {% macro modal_confirmation() -%}
-{# Print a confirmation dialog for deletions. This is currently
-non-functional. #}
+{# Print a confirmation dialog for deletions.#}
 <div class="modal fade" id="confirmDelete" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">Delete Parmanently</h4>
+        <h4 class="modal-title">Delete Permanently</h4>
       </div>
       <div class="modal-body">
-        <p>Are you sure about this ?</p>
-      </div>
-      <div class="modal-footer">
+        <p>Are you sure about this?</p>
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-danger" id="confirm">Delete</button>
       </div>
@@ -45,7 +42,7 @@ non-functional. #}
     {% if field.type == "FileField" %}
         <div class="input-group col-xs-6 col-md-4 pull-left">
             <span class="input-group-btn">
-                <span class="btn btn-primary btn-file">
+                <span class="btn btn-default btn-file">
                     {{ field.label(class="sr-only") }}
                     {{ field.label.text }}
                     {{ field(**kwargs)|safe }}
@@ -76,6 +73,7 @@ non-functional. #}
     {% if show_errors %}
         {{ render_errors(field.errors) }}
     {% endif %}
+    
 {%- endmacro %}
 
 {% macro render_errors(errors) %}
@@ -168,16 +166,15 @@ non-functional. #}
     </table>
 {% endmacro %}
 
-{% macro show_logs(logs, div_class) %}
+{% macro show_logs(logs, div_class, title) %}
     {# Print a list of errors. #}
-    {% if logs %}
-        <div class="{{div_class}}">
-            <ul>
-                {% for log in logs %}
-                <li><em>{{log.log_item}}</em>: {{log.item_value}}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
+    <div class="processlog {{div_class}} {% if not logs %}hidden{% endif %}">
+        <h3>{{ title }}</h3>
+        <ul>
+            {% for log in logs %}
+            <li><em>{{log.log_item}}</em>: {{log.item_value}}</li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endmacro %}
 

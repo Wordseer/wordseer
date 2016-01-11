@@ -67,7 +67,7 @@ class TestCollectionProcessor(unittest.TestCase):
                 if entry[0] == filename:
                     return entry[1]
 
-        mock_strucex_instance = mock_strucex.StructureExtractor("", "")
+        mock_strucex_instance = mock_strucex.StructureExtractor("", "", "")
         mock_strucex_instance.extract.side_effect = extract_docs
 
         # Run the SUT

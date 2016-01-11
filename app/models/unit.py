@@ -27,15 +27,24 @@ class Unit(db.Model, Base):
     # We need to redefine ID here for the children relationship
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(64))
-    number = db.Column(db.Integer, index=True)
-    parent_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
+    number = db.Column(db.Integer)
+    parent_id = db.Column(db.Integer, db.ForeignKey("unit.id", ondelete='CASCADE'))
     name = db.Column(db.String)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id", ondelete='CASCADE'))
 
     # Relationships
-    children = db.relationship("Unit", backref=db.backref("parent",
-        remote_side=[id]))
-    sentences = db.relationship("Sentence", backref="unit")
-    properties = db.relationship("Property", backref="unit", lazy="dynamic")
+    children = db.relationship(
+        "Unit", 
+        backref=db.backref("parent", remote_side=[id]))
+    sentences = db.relationship(
+        "Sentence", 
+        backref="unit", 
+        cascade="all, delete-orphan", 
+        passive_deletes=True)
+    properties = db.relationship(
+        "Property", 
+        backref="unit", 
+        lazy="dynamic")
 
     __mapper_args__ = {
         "polymorphic_identity": "unit",
@@ -57,4 +66,3 @@ class Unit(db.Model, Base):
 
         return "<Unit: " + " ".join([str(self.type),
             str(self.number)]) + ">"
-
