@@ -35,3 +35,5 @@ stanford-corenlp
 preferences.json
 
 requirements-pexpect.txt
+
+get-pip.py

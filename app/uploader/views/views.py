@@ -55,7 +55,7 @@ def check_form_token():
 def home():
     """Display the home page, or go direct to project list if logged in.
     """
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         return redirect(app.config["PROJECT_ROUTE"])
     else:
         return render_template("home.html")
