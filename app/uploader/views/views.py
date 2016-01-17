@@ -18,6 +18,7 @@ from flask import send_from_directory
 from flask import session
 from flask_security.core import current_user
 from flask_security.decorators import login_required
+from flask_security.utils import login_user
 from lxml import etree
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug import secure_filename
@@ -59,6 +60,16 @@ def home():
         return redirect(app.config["PROJECT_ROUTE"])
     else:
         return render_template("home.html")
+
+@uploader.route("/demo")
+def start_demo():
+    """Login as a restricted demo user that can view pre-loaded demo project(s). 
+    User with email "demo@wordseer.berkeley.edu" must exist in the database. 
+    Will log out current user immediately.
+    """
+    demo_user = User.query.filter(User.email=='demo@wordseer.berkeley.edu').one()
+    login_user(demo_user)
+    return redirect(app.config["PROJECT_ROUTE"])
 
 @uploader.route(app.config["PROJECT_ROUTE"])
 @login_required
