@@ -82,7 +82,7 @@
                                 {% if project.admin and project.status != 1 %}
                                 <a data-projid="{{project.id}}" class="btn btn-danger delete">
                                     <span class="glyphicon glyphicon-remove"></span>
-                                    Delete
+                                    Trash
                                 </a>
                                 {% endif %}
                             </td>
@@ -93,6 +93,13 @@
         
     {% else %}
         <p>You own no projects.</p>
+    {% endif %}
+
+    {% if deleted_projects %}
+    <a class="btn btn-danger empty-trash">
+        <span class="glyphicon glyphicon-trash"></span>
+        Empty Trash
+    </a>
     {% endif %}
 {% endblock %}
 {% block toplevel %}
@@ -163,6 +170,63 @@
                     });
                 });
         });
+
+        $('a.btn.empty-trash').click(function(e){
+            var trashButton = this;
+            e.preventDefault();
+
+            // confirmation dialog
+            $("#confirmDelete .modal-title").text('Delete trashed projects permanently? (Warning: this operation may take a long time.)')
+            $("#confirmDelete").modal("show");
+
+            // clear old click handler, replace with new one
+            $("#confirmDelete #confirm")
+                .off("click")
+                .on("click", function(){
+                    var me = this;
+                    // show status in confirmation button and original trash button
+                    $(me).removeClass('btn-danger')
+                        .addClass('btn-default')
+                        .text("Emptying trash...");
+                    $(trashButton).removeClass('btn-danger')
+                        .addClass('btn-default')
+                        .attr('disabled', true)
+                        .text("Emptying trash...");
+
+                    var csrf_token = $("#csrf_token").val(),
+                        request = $.ajax("{{ url_for("uploader.empty_trash")}}", {
+                            method: "DELETE",
+                        });
+                    request.done(function(resp){
+                        $("#confirmDelete").modal("hide");
+                        
+                        // reset the buttons
+                        $(me).addClass('btn-danger')
+                            .removeClass('btn-default')
+                            .text("Delete");
+
+                        $(trashButton).addClass('btn-danger')
+                            .removeClass('btn-default')
+                            .attr('disabled', false)
+                            .html('<span class="glyphicon glyphicon-trash"></span>Empty Trash');
+
+                    }).fail(function(data){
+                        $("#confirmDelete").modal("hide");
+                        
+                        failAlert($('#createProject'), "Empty trash failed: " +  data.statusText);
+
+                        // reset the delete button
+                        $(me).addClass('btn-danger')
+                            .removeClass('btn-default')
+                            .text("Delete");
+
+                        $(trashButton).addClass('btn-danger')
+                            .removeClass('btn-default')
+                            .attr('disabled', false)
+                            .html('<span class="glyphicon glyphicon-trash"></span>Empty Trash');
+                    });
+                })
+        })
     })
 
     var failAlert = function(target, text){

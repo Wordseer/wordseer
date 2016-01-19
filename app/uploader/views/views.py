@@ -65,17 +65,45 @@ def home():
 def project_list():
     """A view for the list of a user's projects."""
     projects = []
-    for project in [proj for proj in current_user.projects if not proj.deleted]:
+    deleted_projects = False
+    for project in [proj for proj in current_user.projects]:
         rel = ProjectsUsers.query.filter_by(user=current_user,
                                             project=project).one()
-        projects.append({
-            "name": project.name,
-            "id": project.id,
-            "status": project.status,
-            "admin": rel.role == ProjectsUsers.ROLE_ADMIN
-        })
-    return render_template("project_list.html", projects=projects, 
+        if project.deleted:
+            # don't let users delete projects they don't admin
+            if rel.role == ProjectsUsers.ROLE_ADMIN:
+                deleted_projects = True
+        else:
+            projects.append({
+                "name": project.name,
+                "id": project.id,
+                "status": project.status,
+                "admin": rel.role == ProjectsUsers.ROLE_ADMIN
+            })
+
+    return render_template("project_list.html", projects=projects,
+                           deleted_projects=deleted_projects,
                            create_form=forms.ProjectCreateForm())
+
+@csrf.exempt
+@uploader.route("/emptytrash", methods=["DELETE"])
+@login_required
+def empty_trash():
+    """An endpoint view to remove projects marked for deletion from the database.
+    """
+    for_deletion = []
+    # find deleted projects, and delete them if the user has admin permission
+    for project in [proj for proj in current_user.projects if proj.deleted]:
+        rel = ProjectsUsers.query.filter_by(user=current_user,
+                                            project=project).one()
+        if rel.role == ProjectsUsers.ROLE_ADMIN:
+            print "Deleting %s (%s)" % (project.name, project.id)
+            project.delete()
+            print "Project deleted."
+
+
+    return render_template("empty_trash.json")
+
 
 @uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>", methods=["GET", "POST"])
 @login_required
