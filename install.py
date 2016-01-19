@@ -231,8 +231,8 @@ def install_python_packages(reqs=REQUIREMENTS_FULL, full=True):
         # install pexpect - differs by platform
         pexpect = "requirements-pexpect.txt"
         with open(pexpect, 'w') as reqfile:
-            PEXPECT = "pexpect >= 2.4"
-            WINPEXPECT = "winpexpect >= 1.5"
+            PEXPECT = "pexpect == 2.4"
+            WINPEXPECT = "winpexpect == 1.5"
             reqfile.truncate()
 
             if "win32" in sys.platform or "cygwin" in sys.platform:
