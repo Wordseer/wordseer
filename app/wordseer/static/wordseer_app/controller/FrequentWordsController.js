@@ -178,7 +178,11 @@ Ext.define('WordSeer.controller.FrequentWordsController', {
 	lollipop: function(component){
 		var svg = d3.select(component.el.dom)
 			.selectAll('.distinct .lollipop')
-			.datum(function(){ return this.dataset; });
+			.datum(function(){ 
+				// browser support for dataset on SVG is spotty, so access
+				// the data attribute manually -_-
+				return {score_sentences: this.getAttribute('data-score_sentences')}; 
+			});
 
 		var maxscore = d3.max(svg.data(), function(d){
 			return +d.score_sentences;
