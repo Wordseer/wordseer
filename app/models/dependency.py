@@ -7,7 +7,7 @@ from .word import Word
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from app import db
-from base import Base
+from .base import Base
 
 class Dependency(db.Model, Base):
     """A representation of the grammatical dependency between two words.
