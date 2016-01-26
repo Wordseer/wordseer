@@ -1,5 +1,5 @@
 from app import db
-from base import Base
+from .base import Base
 
 class Unit(db.Model, Base):
     """A model representing a unit (or segment) of text.

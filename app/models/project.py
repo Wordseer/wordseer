@@ -3,7 +3,7 @@
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from app import db
-from base import Base
+from .base import Base
 from .log import Log
 from .association_objects import ProjectsUsers
 

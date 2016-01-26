@@ -2,7 +2,7 @@
 """
 
 from app import db
-from base import Base
+from .base import Base
 
 class PropertyMetadata(db.Model, Base):
     """Describes ``Property`` objects of the same type: metametadata, if you

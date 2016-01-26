@@ -3,7 +3,7 @@ detail than simply two foreign key columns.
 """
 
 from app import db
-from base import Base
+from .base import Base
 
 class WordInSentence(db.Model, Base):
     """Association object for ``Word``\s in ``Sentence``\s.

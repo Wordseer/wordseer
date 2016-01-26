@@ -1,7 +1,7 @@
 """Storage for precomputed lists of most frequent words and sequences in a project
 """
 from app import app, db
-from base import Base
+from .base import Base
 
 class FrequentWord(db.Model, Base):
 	"""Index of the most frequent words in a project by part of speech.

@@ -1,5 +1,5 @@
 from app import db
-from base import Base
+from .base import Base
 
 class Property(db.Model, Base):
     """A model representing a property of a unit.
