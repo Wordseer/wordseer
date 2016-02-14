@@ -19,7 +19,6 @@ from flask import session
 from flask_security.core import current_user
 from flask_security.decorators import login_required
 from flask_security.utils import login_user
-from lxml import etree
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug import secure_filename
 
@@ -35,6 +34,7 @@ from app import csrf
 
 if app.config["INSTALL_TYPE"] == "full":
     from app.preprocessor.collectionprocessor import cp_run
+    from lxml import etree
 
 def generate_form_token():
     """Sets a token to prevent double posts."""
@@ -127,102 +127,106 @@ def project_show(project_id):
         struc_form=struc_form, allowed_extensions_doc=[".xml"], 
         allowed_extensions_struc=[".json"], struc_active=struc_active, log_start=log_start)
 
+ 
 @uploader.route(app.config["PROJECT_ROUTE"] + "<int:project_id>/upload", methods=["POST"])
 @login_required
 def file_upload(project_id):
     """An ajax endpoint for adding files to a project
     """
-    # does user have access to the project?
-    project = helpers.get_object_or_exception(Project,
-                                              Project.id == project_id,
-                                              exceptions.ProjectNotFoundException)
-    if project not in [proj for proj in current_user.projects if not proj.deleted]:
-        return app.login_manager.unauthorized()
+    if app.config["INSTALL_TYPE"] == "full":
+        # does user have access to the project?
+        project = helpers.get_object_or_exception(Project,
+                                                  Project.id == project_id,
+                                                  exceptions.ProjectNotFoundException)
+        if project not in [proj for proj in current_user.projects if not proj.deleted]:
+            return app.login_manager.unauthorized()
 
-    # what is user's permission level?
-    rel = ProjectsUsers.query.filter_by(user=current_user,
-                                        project=project).one()
+        # what is user's permission level?
+        rel = ProjectsUsers.query.filter_by(user=current_user,
+                                            project=project).one()
 
-    # handle file upload
-    if rel.role != ProjectsUsers.ROLE_ADMIN:
-        return app.login_manager.unauthorized()
+        # handle file upload
+        if rel.role != ProjectsUsers.ROLE_ADMIN:
+            return app.login_manager.unauthorized()
 
-    doc_form = forms.DocumentUploadForm()
-    struc_form = forms.StructureUploadForm()
+        doc_form = forms.DocumentUploadForm()
+        struc_form = forms.StructureUploadForm()
 
-    # should the structure tab be active because the struc form was submitted?
-    struc_active = False
+        # should the structure tab be active because the struc form was submitted?
+        struc_active = False
 
-    # For every file, check if it exists and if not then upload it to
-    # the project directory and create a database record with its filename and
-    # path.
+        # For every file, check if it exists and if not then upload it to
+        # the project directory and create a database record with its filename and
+        # path.
 
-    uploaded_files = request.files.getlist("uploaded_file")
-    upload_errors = []
-    filenames = []
+        uploaded_files = request.files.getlist("uploaded_file")
+        upload_errors = []
+        filenames = []
 
-    for uploaded_file in uploaded_files:
-        filename = secure_filename(uploaded_file.filename)
-        dest_path = os.path.join(app.config["UPLOAD_DIR"],
-                                 str(project.id), filename)
-        ext = os.path.splitext(dest_path)[1][1:]
-        
-        # make sure file doesn't already exist
-        if not os.path.isfile(dest_path):
-            # Tell whether the uploaded file is a document file or a structure
-            # file, and create a Document or StructureFile instance accordingly.
-
-            if ext == app.config["STRUCTURE_EXTENSION"]:
-                if struc_form.validate():
-                    uploaded_file.save(dest_path)
-                    file_model = StructureFile(path=dest_path, project=project)
-                    file_model.save()
-                    struc_active = True
-                    filenames.append({"name": filename, "type": 'struc', "id": file_model.id})
-
-            else:
-                if doc_form.validate():
-                    try:
-                        # XML validation 
-                        etree.fromstring(uploaded_file.read())
-                        uploaded_file.seek(0)
-                        
-                        uploaded_file.save(dest_path)
-                        file_model = DocumentFile(path=dest_path, projects=[project])
-                        file_model.save()
-                        filenames.append({"name": filename, "type": 'doc', "id": file_model.id})
-
-                    except etree.XMLSyntaxError as err:
-                        upload_errors.append(
-                            "The file %s is not well-formed XML. Error details: %s" % (
-                                uploaded_file.filename, 
-                                json.dumps(traceback.format_exc()).replace('\\"', "'").replace('"', "")
-                            )
-                        )
+        for uploaded_file in uploaded_files:
+            filename = secure_filename(uploaded_file.filename)
+            dest_path = os.path.join(app.config["UPLOAD_DIR"],
+                                     str(project.id), filename)
+            ext = os.path.splitext(dest_path)[1][1:]
             
-        else:
-            if ext == app.config["STRUCTURE_EXTENSION"]:
-                struc_form.validate()
-                upload_errors.append(
-                    "A file with name " + os.path.split(dest_path)[1] + " already exists")
-                struc_active = True
+            # make sure file doesn't already exist
+            if not os.path.isfile(dest_path):
+                # Tell whether the uploaded file is a document file or a structure
+                # file, and create a Document or StructureFile instance accordingly.
 
+                if ext == app.config["STRUCTURE_EXTENSION"]:
+                    if struc_form.validate():
+                        uploaded_file.save(dest_path)
+                        file_model = StructureFile(path=dest_path, project=project)
+                        file_model.save()
+                        struc_active = True
+                        filenames.append({"name": filename, "type": 'struc', "id": file_model.id})
+
+                else:
+                    if doc_form.validate():
+                        try:
+                            # XML validation 
+                            etree.fromstring(uploaded_file.read())
+                            uploaded_file.seek(0)
+                            
+                            uploaded_file.save(dest_path)
+                            file_model = DocumentFile(path=dest_path, projects=[project])
+                            file_model.save()
+                            filenames.append({"name": filename, "type": 'doc', "id": file_model.id})
+
+                        except etree.XMLSyntaxError as err:
+                            upload_errors.append(
+                                "The file %s is not well-formed XML. Error details: %s" % (
+                                    uploaded_file.filename, 
+                                    json.dumps(traceback.format_exc()).replace('\\"', "'").replace('"', "")
+                                )
+                            )
+                
+            else:
+                if ext == app.config["STRUCTURE_EXTENSION"]:
+                    struc_form.validate()
+                    upload_errors.append(
+                        "A file with name " + os.path.split(dest_path)[1] + " already exists")
+                    struc_active = True
+
+                else:
+                    doc_form.validate()
+                    upload_errors.append(
+                        "A file with name " + os.path.split(dest_path)[1] + " already exists")
+
+        if upload_errors:
+            if struc_active:
+                struc_form.validate()
+                struc_form.uploaded_file.errors.extend(upload_errors)
             else:
                 doc_form.validate()
-                upload_errors.append(
-                    "A file with name " + os.path.split(dest_path)[1] + " already exists")
+                doc_form.uploaded_file.errors.extend(upload_errors)
 
-    if upload_errors:
-        if struc_active:
-            struc_form.validate()
-            struc_form.uploaded_file.errors.extend(upload_errors)
-        else:
-            doc_form.validate()
-            doc_form.uploaded_file.errors.extend(upload_errors)
-
-    return render_template(
-        'file_upload.json', doc_form=doc_form, struc_form=struc_form, project=project,
-        files=filenames)
+        return render_template(
+            'file_upload.json', doc_form=doc_form, struc_form=struc_form, project=project,
+            files=filenames)
+    else:
+        pass
 
 
 @uploader.route(app.config["LOG_ROUTE"] + "<int:project_id>")
@@ -258,30 +262,33 @@ def project_log(project_id):
 def project_process(project_id):
     """ An AJAX endpoint to initiate the preprocessor for the project.
     """
-    # does user have access to the project?
-    project = helpers.get_object_or_exception(Project,
-                                              Project.id == project_id,
-                                              exceptions.ProjectNotFoundException)
-    if project not in [proj for proj in current_user.projects if not proj.deleted]:
-        return app.login_manager.unauthorized()
+    if app.config["INSTALL_TYPE"] == "full":
+        # does user have access to the project?
+        project = helpers.get_object_or_exception(Project,
+                                                  Project.id == project_id,
+                                                  exceptions.ProjectNotFoundException)
+        if project not in [proj for proj in current_user.projects if not proj.deleted]:
+            return app.login_manager.unauthorized()
 
-    # does user have admin permissions?
-    rel = ProjectsUsers.query.filter_by(user=current_user,
-                                        project=project).one()
-    if rel.role != ProjectsUsers.ROLE_ADMIN:
-        return app.login_manager.unauthorized()
+        # does user have admin permissions?
+        rel = ProjectsUsers.query.filter_by(user=current_user,
+                                            project=project).one()
+        if rel.role != ProjectsUsers.ROLE_ADMIN:
+            return app.login_manager.unauthorized()
 
-    # retrieve the structure file and start processing
-    structure_file = StructureFile.query.get(request.form["struc_id"])
-    if structure_file == None or structure_file.project != project:
-        return app.login_manager.unauthorized()
+        # retrieve the structure file and start processing
+        structure_file = StructureFile.query.get(request.form["struc_id"])
+        if structure_file == None or structure_file.project != project:
+            return app.login_manager.unauthorized()
 
-    # don't let a project be processed more than once
-    if project.status != Project.STATUS_UNPROCESSED:
-        return app.login_manager.unauthorized()
+        # don't let a project be processed more than once
+        if project.status != Project.STATUS_UNPROCESSED:
+            return app.login_manager.unauthorized()
 
-    process_files(project.path, structure_file.path, project)
-    return render_template("process_project.json", project_id=project.id)
+        process_files(project.path, structure_file.path, project)
+        return render_template("process_project.json", project_id=project.id)
+    else:
+        pass
 
 
 @csrf.exempt
@@ -294,32 +301,36 @@ def upload_structure_file(project_id, document_id):
     Retireve the JSON object from te request, write it to a json file and
     save it back to the project.
     """
-    json_data = request.json
-    dest_path = ''
-    filename = ''
-    counter = 0
-    while os.path.isfile(dest_path) or counter == 0:
-        suffix = ''
-        if counter > 0:
-            suffix = '_%s'%counter
-        filename = json_data['filename']+"_structure"+suffix+".json"
-        filename = secure_filename(filename)
-        dest_path = os.path.join(app.config["UPLOAD_DIR"],
-                                 str(project_id), filename)
-        counter += 1
+    if app.config["INSTALL_TYPE"] == "full":
 
-    if not os.path.isfile(dest_path):
-        sfile = open(dest_path, 'w')
-        sfile.write(json.dumps(json_data))
-        sfile.close()
-        project = Project.query.get(project_id)
-        structure_file = StructureFile(path=dest_path, project=project)
-        structure_file.save()
+        json_data = request.json
+        dest_path = ''
+        filename = ''
+        counter = 0
+        while os.path.isfile(dest_path) or counter == 0:
+            suffix = ''
+            if counter > 0:
+                suffix = '_%s'%counter
+            filename = json_data['filename']+"_structure"+suffix+".json"
+            filename = secure_filename(filename)
+            dest_path = os.path.join(app.config["UPLOAD_DIR"],
+                                     str(project_id), filename)
+            counter += 1
 
+        if not os.path.isfile(dest_path):
+            sfile = open(dest_path, 'w')
+            sfile.write(json.dumps(json_data))
+            sfile.close()
+            project = Project.query.get(project_id)
+            structure_file = StructureFile(path=dest_path, project=project)
+            structure_file.save()
+
+        else:
+            return "A file with name " + os.path.split(dest_path)[1] + " already exists"
+
+        return 'ok'
     else:
-        return "A file with name " + os.path.split(dest_path)[1] + " already exists"
-
-    return 'ok'
+        pass
 
 @uploader.route(app.config["PROJECT_ROUTE"] + "new", methods=["POST"])
 @login_required

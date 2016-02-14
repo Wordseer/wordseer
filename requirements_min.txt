@@ -7,3 +7,4 @@ pexpect==3.2
 sqlalchemy-migrate==0.9.1
 mock==1.0.1
 inflect==0.2.4
+nltk==3.1
