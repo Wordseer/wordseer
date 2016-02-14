@@ -1,8 +1,8 @@
 import sys
-import site
 
 # use the virtualenv
-site.addsitedir('/projects/wordseer/flask_demo/venv/lib/python2.7/site-packages')
+activate_this = '/projects/wordseer/flask-demo/venv/bin/activate_this.py'
+execfile(activate_this, dict(__file__=activate_this))
 
 # update the path
 base_path = '/projects/wordseer/flask_demo/'
