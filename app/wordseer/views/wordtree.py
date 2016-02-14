@@ -7,7 +7,7 @@ from sqlalchemy.sql.expression import desc
 from nltk import word_tokenize
 
 from app import db
-from app.models.flask_security import User
+from app.models.user import User
 from app.models import *
 from app.wordseer import wordseer
 

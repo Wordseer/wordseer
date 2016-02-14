@@ -7,7 +7,7 @@ from flask.views import MethodView
 from sqlalchemy import func
 
 from app import db
-from app.models.flask_security import User
+from app.models.user import User
 from app.models import *
 from app.wordseer import wordseer
 

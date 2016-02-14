@@ -58,8 +58,8 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 Authentication setup
 """
 
-user_datastore = SQLAlchemyUserDatastore(db, flask_security.User,
-    flask_security.Role)
+user_datastore = SQLAlchemyUserDatastore(db, user.User,
+    user.Role)
 security = Security(app, user_datastore)
 
 from app.uploader import uploader as uploader_bp
