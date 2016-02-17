@@ -1,24 +1,18 @@
 # How to contribute to Wordseer
 
-If you'd like to contribute, we'll be happy to have your help. 
+We have released this software as is and are no longer officially supporting it; it was part of a research project that is now complete. That said, we hope that people find it useful and take it upon themselves to improve it. While we're not actively developing Wordseer at this point, this GitHub repo is still being monitored and we are happy to respond to inquiries and pull requests.
 
-First and foremost, feel free to get in touch! The WordSeer project is directed by [Prof. Marti Hearst](http://people.ischool.berkeley.edu/~hearst/) 
-at the University of California, Berkeley, School of Information; you may contact her via email 
-at hearst@berkeley.edu.
+You may find the information below useful if you want to fork this repo and make some improvements.
 
-We welcome both technical and non-technical contributions to the WordSeer project. Sure, 
-there are software bugs to be fixed (and [plenty of them](https://github.com/Wordseer/wordseer/issues)),
-but there are also features to be designed and user studies to be done. 
+## History
 
-WordSeer began with Aditi Muralidharan's PhD research and engineering at UC Berkeley with Prof. Hearst; 
+WordSeer began with Aditi Muralidharan's PhD research and engineering at UC Berkeley with Prof. Marti Hearst; 
 there is a wealth of information on that research available on [the WordSeer website](http://wordseer.berkeley.edu/publications-2/)
-that can provide useful background for both technical and non-technical contributors.
-
-If you're looking to dive in and start coding, here's an overview of our development process.
+that can provide useful background for both technical and non-technical contributions.
 
 ## Branching
 
-We have two main branches:
+This repo has two main branches:
 
 - `master`, for stable, production-ready code
 - `development`, for recent and unstable code
