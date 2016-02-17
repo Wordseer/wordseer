@@ -268,7 +268,7 @@ class StringProcessor(object):
                             "found; giving up on parse. This likely indicates "
                             "an error in the preprocessing; rerunning the "
                             "preprocessor is recommended.")
-                        project_logger.info(sentence)
+                        project_logger.info(sentence.text)
                         
                         return #die
 
