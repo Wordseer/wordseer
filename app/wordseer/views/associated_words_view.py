@@ -47,7 +47,6 @@ class AssociatedWordsView(MethodView):
                 filter(Sentence.id == SequenceInSentence.sentence_id)
 
             
-
         associated_words = db.session.query(
             Word.id.label("id"),
             Word.part_of_speech.label("pos"),
@@ -58,7 +57,8 @@ class AssociatedWordsView(MethodView):
         filter(WordInSentence.sentence_id.in_([sentence.id for sentence in sentences])).\
         filter(WordInSentence.word_id == Word.id).\
         filter(Sentence.id == WordInSentence.sentence_id).\
-        group_by(Word.id)
+        group_by(Word.id).\
+        limit(100)
     
         response = {"Synsets": [], "Words": []}
 
