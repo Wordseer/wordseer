@@ -1,6 +1,7 @@
 Flask==0.10.1
 Flask-SQLAlchemy==1.0
 Flask-Security==1.7.5
+flask-reverse-proxy==0.2.0.1
 SQLAlchemy==0.9.4
 Unidecode==0.4.18
 pexpect==3.2
