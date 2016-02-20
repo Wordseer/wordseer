@@ -16,6 +16,7 @@ from flask import render_template
 from flask import request
 from flask import send_from_directory
 from flask import session
+from flask import url_for
 from flask_security.core import current_user
 from flask_security.decorators import login_required
 from flask_security.utils import login_user
@@ -52,16 +53,16 @@ def check_form_token():
         if not token or token != request.form.get('_form_token'):
             redirect(request.url)
 
-@uploader.route("/")
+@uploader.route(app.config["HOME_ROUTE"])
 def home():
     """Display the home page, or go direct to project list if logged in.
     """
     if current_user.is_authenticated:
-        return redirect(app.config["PROJECT_ROUTE"])
+        return redirect(url_for('.project_list'))
     else:
         return render_template("home.html")
 
-@uploader.route("/demo")
+@uploader.route(app.config['DEMO_ROUTE'])
 def start_demo():
     """Login as a restricted demo user that can view pre-loaded demo project(s). 
     User with email "demo@wordseer.berkeley.edu" must exist in the database. 
@@ -69,7 +70,7 @@ def start_demo():
     """
     demo_user = User.query.filter(User.email=='demo@wordseer.berkeley.edu').one()
     login_user(demo_user)
-    return redirect(app.config["PROJECT_ROUTE"])
+    return redirect(url_for('.project_list'))
 
 @uploader.route(app.config["PROJECT_ROUTE"])
 @login_required

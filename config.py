@@ -35,6 +35,8 @@ class BaseConfig(object):
     DOCUMENT_EXTENSION = "xml"
 
     # Routing URLS
+    HOME_ROUTE = "/"
+    DEMO_ROUTE = "/load_demo/"
     PROJECT_ROUTE = "/projects/"
     DOCUMENT_ROUTE = "/documents/"
     UPLOAD_ROUTE = "/uploads/"

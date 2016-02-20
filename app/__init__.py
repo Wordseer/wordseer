@@ -20,12 +20,12 @@ class CustomProxyFix(object):
         self.app = app
 
     def __call__(self, environ, start_response):
-        host = environ.get('HTTP_X_FORWARDED_HOST', '')
+        host = environ.get('HTTP_X_FORWARDED_SERVER', '')
         if host:
-            # proxy alias on Persimmon
             environ['HTTP_HOST'] = host
-            pathinfo = environ.get('PATH_INFO', '')
-            environ['PATH_INFO'] = '/demo' + pathinfo
+            # proxy alias on Persimmon
+            scriptname = environ.get('SCRIPT_NAME', '')
+            environ['SCRIPT_NAME'] = '/demo' + scriptname
 
         return self.app(environ, start_response)
 
