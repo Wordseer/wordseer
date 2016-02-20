@@ -17,7 +17,7 @@ Ext.define('WordSeer.view.desktop.topbar.WidgetsMenu',{
 	items: [
 	{
 		xtype: 'button',
-		href: '/projects/',
+		href: ws_project_path,
 		hrefTarget: "_self",
 		html: '&laquo;Return to Project List'
 	}

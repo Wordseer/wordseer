@@ -48,7 +48,7 @@ Ext.define('WordSeer.view.windowing.viewport.LandingPage',  {
                     children: [
                         {
                             tag: 'a',
-                            href: '/projects',
+                            href: ws_project_path,
                             cls: 'all-projects',
                             html: "&laquo; All projects"
                         },
