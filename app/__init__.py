@@ -5,7 +5,6 @@ import json
 from flask import Flask
 from flask.ext.security import Security, SQLAlchemyUserDatastore
 from flask_wtf.csrf import CsrfProtect
-from flask_reverse_proxy import FlaskReverseProxied
 
 from config import DEFAULT_ENV
 
@@ -16,8 +15,22 @@ app = Flask(__name__)
 csrf = CsrfProtect(app)
 
 # Reverse proxy config for running on demo server
-proxied = FlaskReverseProxied(app)
-proxied.init_app(app)
+class CustomProxyFix(object):
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        host = environ.get('HTTP_X_FORWARDED_HOST', '')
+        if host:
+            # proxy alias on Persimmon
+            environ['HTTP_HOST'] = host
+            pathinfo = environ.get('PATH_INFO', '')
+            environ['PATH_INFO'] = '/demo' + pathinfo
+
+        return self.app(environ, start_response)
+
+app.wsgi_app = CustomProxyFix(app.wsgi_app)
+
 
 # Load configurations for current environment by reading in the environment
 # variable FLASK_ENV and changing it to camel case with the title() function.
