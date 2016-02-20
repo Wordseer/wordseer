@@ -52,6 +52,8 @@ class BaseConfig(object):
     SECURITY_CHANGEABLE = True
     SECURITY_RECOVERABLE = True
     SECRET_KEY = "secret"
+    SECURITY_POST_LOGIN_VIEW = 'uploader.project_list'
+    SECURITY_POST_LOGOUT_VIEW = 'uploader.home'
 
     #Email settings
     SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = False
