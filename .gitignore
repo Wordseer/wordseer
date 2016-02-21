@@ -39,3 +39,9 @@ requirements-pexpect.txt
 get-pip.py
 
 *.BAK
+
+errorlog
+
+accesslog
+
+gunicorn.pid
