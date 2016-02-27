@@ -114,7 +114,7 @@ the one you just uploaded).
 **IMPORTANT NOTE:** this beta release of WordSeer cannot handle large collections very well. The exact 
 definition of "large" depends on how powerful your machine is, but as a rule of thumb: two or three 
 Shakespeare plays should be fine, but the Complete Works will give you problems. (We could use help 
-fixing this shortcoming: if you or a collaborator think you can help, please see our [Guidelines for Contributors](https://github.com/Wordseer/wordseer/blob/master/CONTRIBUTING.markdown) and get in touch.)
+fixing this shortcoming: if you or a collaborator think you can help, please see our [Guidelines for Contributors](https://github.com/Wordseer/wordseer/blob/master/CONTRIBUTING.md) and get in touch.)
 
 Take note: **processing can be SLOW.** The good news, though, is that you only need to do it once. 
 Depending on the number, length, and complexity of the documents in your project, it may take anywhere 
@@ -150,11 +150,7 @@ WordSeer is open-source beta software, so you are likely to encounter bugs as yo
 Feel free to report them on our [GitHub Issues page](https://github.com/Wordseer/wordseer/issues) 
 (but please check to see if someone else already has, so you don't create a duplicate report). 
 
-We'd also love to hear from you with any feedback, good or bad! We want to know who's 
-out there using WordSeer so we can understand how the community is using it and hopefully
-continue developing and improving it. The WordSeer project is directed by [Prof. Marti Hearst](http://people.ischool.berkeley.edu/~hearst/) 
-at the University of California, Berkeley, School of Information; you may contact her via email 
-at hearst@berkeley.edu.
+This software is released as is and is not supported. It was part of a research project that is now complete. We hope that people find it useful and take it upon themselves to improve it.
 
 ## License information 
 
