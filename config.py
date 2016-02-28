@@ -11,7 +11,7 @@ import os
 import tempfile
 
 #TODO: Change this for your use case
-DEFAULT_ENV = "Development"
+DEFAULT_ENV = "Amazon"
 
 class BaseConfig(object):
     """This module contains application-wide configurations. It provides
@@ -182,3 +182,20 @@ class Testing(BaseConfig):
     SQLALCHEMY_ECHO = False
 
     PAGE_SIZE = 10
+
+class Amazon(BaseConfig):
+    """ This class has specific settings for deploying to AWS for an online demo.
+    """
+
+    DEBUG = True
+
+    # CSRF settings for forms
+    WTF_CSRF_ENABLED = True
+    
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://%s:%s@%s:%s/%s" % (
+        os.environ['RDS_USERNAME'], 
+        os.environ['RDS_PASSWORD'],
+        os.environ['RDS_HOSTNAME'],
+        os.environ['RDS_PORT'],
+        os.environ['RDS_DB_NAME'],
+    )
