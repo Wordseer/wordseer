@@ -1,1 +1,1 @@
-web: python wordseer.py
+web: gunicorn wordseer:app -b 0.0.0.0:$PORT 
