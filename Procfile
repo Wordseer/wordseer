@@ -1,1 +1,1 @@
-web: python wordseer.py
+web: gunicorn wsgi.py --log-file -

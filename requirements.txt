@@ -10,3 +10,4 @@ mock==1.0.1
 inflect==0.2.4
 nltk==3.1
 PyMySQL==0.7.2
+gunicorn==19.4.5
