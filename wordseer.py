@@ -3,7 +3,13 @@
 """Run the wordseer_flask website.
 """
 import os
+from sys import argv
+
 from app import app
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+	if len(argv) > 1:
+		port = int(argv[1])
+	else:
+		port = None
+    app.run(host='0.0.0.0', port=port)
