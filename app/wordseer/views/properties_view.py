@@ -61,11 +61,8 @@ class PropertiesView(MethodView):
                 Property.value.label("value"),
                 func.count(Property.unit_id.distinct()).label("unit_count")
             ).\
-            join(
-                PropertyOfSentence,
-                PropertyOfSentence.property_id == Property.id).\
-            join(SentenceInQuery,
-                PropertyOfSentence.sentence_id ==
+            filter(PropertyOfSentence.property_id == Property.id).\
+            filter(PropertyOfSentence.sentence_id ==
                 SentenceInQuery.sentence_id).\
             filter(SentenceInQuery.query_id == params["query_id"][0]).\
             filter(not_(Property.name.contains("_set"))).\
@@ -99,8 +96,7 @@ class PropertiesView(MethodView):
         group_by(Property.value)
 
         if "query_id" in params:
-            values = values.join(SentenceInQuery,
-                PropertyOfSentence.sentence_id == 
+            values = values.filter(PropertyOfSentence.sentence_id == 
                 SentenceInQuery.sentence_id).\
             filter(SentenceInQuery.query_id == params["query_id"][0])
         return values.all()
@@ -122,7 +118,7 @@ class PropertiesView(MethodView):
             PropertyMetadata.property_name.label("property_name"),
             PropertyMetadata.data_type.label("data_type"),
             PropertyMetadata.date_format.label("date_format")).\
-        join(Property, Property.property_metadata_id == PropertyMetadata.id).\
+        filter(Property.property_metadata_id == PropertyMetadata.id).\
         filter(Property.project_id == project.id).\
         filter(PropertyMetadata.is_category == True).\
         group_by(PropertyMetadata.property_name)

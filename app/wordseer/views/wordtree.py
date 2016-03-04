@@ -79,8 +79,7 @@ class WordTreeView(MethodView):
                 Word.surface.label("surface"),
                 func.count(
                     WordInSentence.sentence_id.distinct()).label("count")).\
-            join(SentenceInQuery,
-                SentenceInQuery.sentence_id == WordInSentence.sentence_id).\
+            filter(SentenceInQuery.sentence_id == WordInSentence.sentence_id).\
             filter(WordInSentence.word_id == Word.id).\
             filter(SentenceInQuery.query_id == query.id).\
             filter(Word.part_of_speech.like("N%")).\

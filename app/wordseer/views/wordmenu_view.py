@@ -45,7 +45,7 @@ class GrammaticalSearchOptionsView(MethodView):
             GrammaticalRelationship.name.label("relationship"),
             Word.surface.label("word"),
             func.count(DependencyInSentence.sentence_id).label("count")).\
-        join(Dependency, Dependency.dependent_id == Word.id).\
+        filter(Dependency.dependent_id == Word.id).\
         filter(GrammaticalRelationship.project_id == project.id).\
         filter(GrammaticalRelationship.id ==
             Dependency.grammatical_relationship_id).\
@@ -57,7 +57,7 @@ class GrammaticalSearchOptionsView(MethodView):
             GrammaticalRelationship.name.label("relationship"),
             Word.surface.label("word"),
             func.count(DependencyInSentence.sentence_id).label("count")).\
-        join(Dependency, Dependency.governor_id == Word.id).\
+        filter(Dependency.governor_id == Word.id).\
         filter(GrammaticalRelationship.project_id == project.id).\
         filter(Dependency.dependent_id.in_(word_ids)).\
         filter(GrammaticalRelationship.id ==

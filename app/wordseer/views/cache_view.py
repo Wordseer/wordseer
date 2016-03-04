@@ -104,7 +104,7 @@ class QueryCacheView(MethodView):
                     word = Word.query.get(word_id)
                     matching_sentences = db.session.query(
                         WordInSentence.sentence_id).\
-                    join(Word, WordInSentence.word_id == Word.id).\
+                    filter(WordInSentence.word_id == Word.id).\
                     filter(Word.lemma == word.lemma).subquery()
                 else:
                     matching_sentences = db.session.query(
@@ -112,8 +112,7 @@ class QueryCacheView(MethodView):
                     filter(WordInSentence.word_id == word.id).subquery()
 
 
-            filtered_sentences = filtered_sentences.join(
-                matching_sentences,
+            filtered_sentences = filtered_sentences.filter(
                 Sentence.id == matching_sentences.c.sentence_id)
         return filtered_sentences
 
@@ -139,20 +138,19 @@ class QueryCacheView(MethodView):
                     values.append(value)
                 matching_sentences = db.session.query(
                     PropertyOfSentence.sentence_id.label("sentence_id")).\
-                join(Property, PropertyOfSentence.property_id == Property.id).\
+                filter(PropertyOfSentence.property_id == Property.id).\
                 filter(Property.name == property_name).\
                 filter(Property.value.in_(values)).subquery()
             else:
                 for values in value_list:
                     matching_sentences = db.session.query(
                         PropertyOfSentence.sentence_id.label("sentence_id")).\
-                    join(Property, PropertyOfSentence.property_id == Property.id).\
+                    filter(PropertyOfSentence.property_id == Property.id).\
                         filter(Property.name == property_name).\
                         filter(Property.value >= values[0]).\
                         filter(Property.value <= values[1]).\
                         subquery()
-            filtered_sentences = filtered_sentences.join(
-                matching_sentences,
+            filtered_sentences = filtered_sentences.filter(
                 Sentence.id == matching_sentences.c.sentence_id)
         return filtered_sentences
 

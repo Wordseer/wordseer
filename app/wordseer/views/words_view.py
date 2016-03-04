@@ -42,8 +42,7 @@ class WordsView(MethodView):
                 func.count(Sentence.document_id.distinct()).label("document_count")).\
                 group_by(Word.lemma if is_lemmatized else Word.surface).\
                 filter(Sentence.project_id == project.id).\
-                join(SentenceInQuery,
-                    SentenceInQuery.sentence_id == Sentence.id).\
+                filter(SentenceInQuery.sentence_id == Sentence.id).\
                 filter(SentenceInQuery.query_id == query.id).\
                 filter(Word.part_of_speech.like(like_query)).\
                 filter(Word.id == WordInSentence.word_id).\

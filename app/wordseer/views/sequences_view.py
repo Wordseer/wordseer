@@ -36,8 +36,7 @@ class SequencesView(MethodView):
                 func.count(Sentence.document_id.distinct()).label("document_count")).\
                 group_by(Sequence.id).\
                 filter(Sentence.project_id == project.id).\
-                join(SentenceInQuery,
-                     SentenceInQuery.sentence_id == Sentence.id).\
+                filter(SentenceInQuery.sentence_id == Sentence.id).\
                 filter(SentenceInQuery.query_id == query.id).\
                 filter(Sequence.all_function_words == False).\
                 filter(Sequence.length == length).\
@@ -108,7 +107,7 @@ class ContainingSequencesView(MethodView):
             func.count(SequenceInSentence.sentence_id.distinct()).label("sentence_count")).\
         filter(SequenceInSentence.sequence_id == Sequence.id).\
         filter(Sequence.lemmatized == False).\
-        join(sequences, SequenceInSentence.sequence_id ==
+        filter(SequenceInSentence.sequence_id ==
                        sequences.c.sequence_id).\
         group_by(Sequence.id).\
         order_by(asc(Sequence.length))

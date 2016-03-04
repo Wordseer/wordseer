@@ -27,8 +27,8 @@ class DocumentsView(MethodView):
             documents = db.session.query(
                 Document.id.label('id'),
                 func.count(Sentence.id.distinct()).label("matches")).\
-                join(Sentence, Sentence.document_id == Document.id).\
-                join(SentenceInQuery, Sentence.id == SentenceInQuery.sentence_id).\
+                filter(Sentence.document_id == Document.id).\
+                filter(Sentence.id == SentenceInQuery.sentence_id).\
             filter(SentenceInQuery.query_id == query.id).\
             group_by(Document.id)
 
@@ -75,7 +75,7 @@ class SingleDocumentView(MethodView):
         properties = db.session.query(
             Property.name.label("property_name"),
             Property.value.label("value")).\
-        join(PropertyOfSentence, PropertyOfSentence.property_id == Property.id).\
+        filter(PropertyOfSentence.property_id == Property.id).\
         filter(PropertyOfSentence.sentence_id == sentence.id).\
         filter(Property.name.contains("_set"))
         for property in properties:
